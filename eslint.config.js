@@ -7,7 +7,7 @@ import importPlugin from 'eslint-plugin-import';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'husky_utils/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -24,11 +24,11 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      // Import sorting rules
       'import/order': [
         'error',
         {
           groups: [
+            'type',
             'builtin',
             'external',
             'internal',
@@ -36,7 +36,6 @@ export default tseslint.config([
             'sibling',
             'index',
             'object',
-            'type',
           ],
           pathGroups: [
             {
@@ -56,10 +55,39 @@ export default tseslint.config([
             order: 'asc',
             caseInsensitive: true,
           },
+          distinctGroup: false,
         },
       ],
       'import/newline-after-import': 'error',
       'import/no-duplicates': 'error',
+
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/rules-of-hooks': 'error',
+
+      'padding-line-between-statements': [
+        'error',
+        {
+          blankLine: 'always',
+          prev: '*',
+          next: 'return',
+        },
+      ],
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'no-console': 'error',
+      'no-unused-vars': 'off',
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
+      'no-debugger': 'error',
+      'no-alert': 'error',
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-useless-concat': 'error',
     },
   },
 ]);
