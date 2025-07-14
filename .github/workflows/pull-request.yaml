@@ -1,9 +1,0 @@
-name: Check PR Title via Reusable Workflow
-
-on:
-  pull_request:
-    types: [opened, edited, synchronize]
-
-jobs:
-  pr-title-check:
-    uses: Midmind-ai/devops-tools/.github/workflows/pull-request.yaml@main
