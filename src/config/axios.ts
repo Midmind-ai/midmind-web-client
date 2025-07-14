@@ -23,10 +23,10 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 const BASE_URL = 'http://localhost:3000/api';
-const TIMEOUT = 10000;
+const TIMEOUT = 10000; // 10 seconds
 
 export const baseAxiosInstance = axios.create({
-  baseURL: `${BASE_URL}`,
+  baseURL: BASE_URL,
   timeout: TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
