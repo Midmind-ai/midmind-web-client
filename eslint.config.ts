@@ -26,20 +26,61 @@ export default tseslint.config([
       'import/order': [
         'error',
         {
-          groups: [
-            'type',
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-            'object',
-          ],
+          groups: ['external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
           pathGroups: [
             {
               pattern: 'react',
               group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: '@/types/**',
+              group: 'type',
+              position: 'before',
+            },
+            {
+              pattern: '@/assets/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/components/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/config/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/constants/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/features/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/hooks/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/lib/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/stores/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/utils/**',
+              group: 'internal',
               position: 'before',
             },
             {
@@ -54,7 +95,7 @@ export default tseslint.config([
             order: 'asc',
             caseInsensitive: true,
           },
-          distinctGroup: false,
+          distinctGroup: true,
         },
       ],
       'import/newline-after-import': 'error',

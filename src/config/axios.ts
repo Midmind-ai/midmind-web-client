@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { TIMEOUT } from '@/constants/api';
+
 import { getFromStorage, removeFromStorage, setToStorage } from '@/utils/localStorage';
 
 type RefreshQueueItem = {
@@ -23,7 +25,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 const BASE_URL = 'http://localhost:3000/api';
-const TIMEOUT = 10000; // 10 seconds
 
 export const baseAxiosInstance = axios.create({
   baseURL: BASE_URL,
