@@ -1,10 +1,13 @@
 import type { FC } from 'react';
+
 import axios from 'axios';
 import { Link } from 'react-router';
 import useSWR from 'swr';
 
-import { Button } from '@/components/button';
+import { Button } from '@/components/Button';
+
 import useCounterStore from '@/stores/useCounter';
+
 import type { User } from '@/types/user';
 
 const fetcher = (url: string) => axios.get<User[]>(url).then(res => res.data);
@@ -19,7 +22,7 @@ const Home: FC = () => {
   } = useSWR('https://jsonplaceholder.typicode.com/users', fetcher);
 
   return (
-    <div className="min-h-svh bg-gray-50 p-8">
+    <div className="min-h-sv p-8">
       <div className="flex min-h-svh flex-col items-center justify-center">
         <div className="mb-12 text-center">
           <div className="mb-6">

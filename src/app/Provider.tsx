@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+
 import { RouterProvider } from 'react-router';
 
 import router from '@/app/Router';

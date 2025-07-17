@@ -1,16 +1,28 @@
 import { createBrowserRouter } from 'react-router';
 
-import Auth from '@/app/routes/Auth';
-import Home from '@/app/routes/Home';
+import { AppRoutes } from '@/constants/router';
+
+import ForgotPasswordPage from '@/app/routes/ForgotPassword';
+import HomePage from '@/app/routes/Home';
+import SignInPage from '@/app/routes/SignIn';
+import SignUpPage from '@/app/routes/SignUp';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    Component: Home,
+    path: AppRoutes.Home,
+    element: <HomePage />,
   },
   {
-    path: '/auth',
-    Component: Auth,
+    path: AppRoutes.SignIn,
+    element: <SignInPage />,
+  },
+  {
+    path: AppRoutes.SignUp,
+    element: <SignUpPage />,
+  },
+  {
+    path: AppRoutes.ForgotPassword,
+    element: <ForgotPasswordPage />,
   },
 ]);
 
