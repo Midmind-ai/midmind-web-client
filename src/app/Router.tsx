@@ -2,6 +2,8 @@ import { createBrowserRouter } from 'react-router';
 
 import { AppRoutes } from '@/constants/router';
 
+import RouteGuard from '@/features/RouteGuard';
+
 import ForgotPasswordPage from '@/app/routes/ForgotPassword';
 import HomePage from '@/app/routes/Home';
 import SignInPage from '@/app/routes/SignIn';
@@ -10,7 +12,13 @@ import SignUpPage from '@/app/routes/SignUp';
 const router = createBrowserRouter([
   {
     path: AppRoutes.Home,
-    element: <HomePage />,
+    element: <RouteGuard />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+    ],
   },
   {
     path: AppRoutes.SignIn,

@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { z } from 'zod';
 
 import Apple from '@/assets/svg/apple.svg';
@@ -16,16 +16,23 @@ import { Separator } from '@/components/Separator';
 import { ThemedP } from '@/components/ThemedP';
 import { ThemedSpan } from '@/components/ThemedSpan';
 
+import { LocalStorageKeys } from '@/constants/localStorage';
 import { AppRoutes } from '@/constants/router';
+
+import { useSignIn } from '@/hooks/useSignIn';
+
+import { setToStorage } from '@/utils/localStorage';
 
 const signInSchema = z.object({
   email: z.email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 type SignInFormData = z.infer<typeof signInSchema>;
 
 const SignInForm: FC = () => {
+  const navigate = useNavigate();
+  const { signIn } = useSignIn();
   const {
     register,
     handleSubmit,
@@ -34,19 +41,38 @@ const SignInForm: FC = () => {
     resolver: zodResolver(signInSchema),
   });
 
-  const handleSignIn = async (data: SignInFormData) => {
-    // eslint-disable-next-line no-console
-    console.log('Sign in data:', data);
+  const handleSignIn = (data: SignInFormData) => {
+    signIn(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: data => {
+          // eslint-disable-next-line no-console
+          console.log('response', data);
+
+          setToStorage(LocalStorageKeys.AccessToken, data.access_token);
+          navigate(AppRoutes.Home);
+        },
+        onError: error => {
+          // eslint-disable-next-line no-console
+          console.log('error', error);
+        },
+      }
+    );
   };
 
   return (
     <form onSubmit={handleSubmit(handleSignIn)}>
       <div className="flex flex-col gap-4">
         <div>
-          <Label className="mb-2">Email</Label>
+          <Label
+            htmlFor="email"
+            className="mb-2"
+          >
+            Email
+          </Label>
           <Input
+            id="email"
             placeholder="Email"
-            className="text-sm"
             {...register('email')}
             aria-invalid={!!errors.email?.message}
           />
@@ -56,7 +82,7 @@ const SignInForm: FC = () => {
         </div>
         <div>
           <div className="flex justify-between mb-2">
-            <Label>Password</Label>
+            <Label htmlFor="password">Password</Label>
             <Link
               to={AppRoutes.ForgotPassword}
               className="underline text-sm text-muted-foreground"
@@ -65,9 +91,9 @@ const SignInForm: FC = () => {
             </Link>
           </div>
           <Input
+            id="password"
             type="password"
             placeholder="Password"
-            className="text-sm"
             {...register('password')}
             aria-invalid={!!errors.password?.message}
           />

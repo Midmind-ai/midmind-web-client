@@ -1,3 +1,7 @@
 export const TIMEOUT = 10000; // 10 seconds
 
-export const ApiEndpoints = {} as const;
+export const ApiEndpoints = {
+  SignIn: '/sign-in',
+  Logout: '/logout',
+  Refresh: '/refresh',
+} as const;

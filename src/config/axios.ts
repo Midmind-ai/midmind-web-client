@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-import { TIMEOUT } from '@/constants/api';
+import { ApiEndpoints, TIMEOUT } from '@/constants/api';
+import { LocalStorageKeys } from '@/constants/localStorage';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@/utils/localStorage';
 
@@ -24,19 +25,19 @@ const processQueue = (error: unknown, token: string | null = null) => {
   refreshQueue = [];
 };
 
-const BASE_URL = 'http://localhost:3000/api';
-
 export const baseAxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: TIMEOUT,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const authAxiosInstance = axios.create({
-  baseURL: `${BASE_URL}/auth`,
+  baseURL: `${import.meta.env.VITE_API_URL}/auth`,
   timeout: TIMEOUT,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,7 +45,7 @@ export const authAxiosInstance = axios.create({
 
 baseAxiosInstance.interceptors.request.use(
   request => {
-    const accessToken = getFromStorage<string>('access_token');
+    const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
 
     if (accessToken) {
       request.headers.Authorization = `Bearer ${accessToken}`;
@@ -63,12 +64,6 @@ baseAxiosInstance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const refreshToken = getFromStorage<string>('refresh_token');
-
-      if (!refreshToken) {
-        return Promise.reject(error);
-      }
-
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           refreshQueue.push({ resolve, reject });
@@ -86,13 +81,11 @@ baseAxiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await authAxiosInstance.post('/refresh', {
-          refresh_token: refreshToken,
-        });
+        const { data } = await authAxiosInstance.post(ApiEndpoints.Refresh);
 
         const newAccessToken = data.access_token;
 
-        setToStorage('access_token', newAccessToken);
+        setToStorage(LocalStorageKeys.AccessToken, newAccessToken);
 
         processQueue(null, newAccessToken);
 
@@ -102,8 +95,7 @@ baseAxiosInstance.interceptors.response.use(
       } catch (error) {
         processQueue(error);
 
-        removeFromStorage('access_token');
-        removeFromStorage('refresh_token');
+        removeFromStorage(LocalStorageKeys.AccessToken);
 
         return Promise.reject(error);
       } finally {
