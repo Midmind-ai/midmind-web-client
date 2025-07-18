@@ -2,8 +2,11 @@ import axios from 'axios';
 
 import { ApiEndpoints, TIMEOUT } from '@/constants/api';
 import { LocalStorageKeys } from '@/constants/localStorage';
+import { AppRoutes } from '@/constants/router';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@/utils/localStorage';
+
+import router from '@/app/Router';
 
 type RefreshQueueItem = {
   resolve: (value: unknown) => void;
@@ -96,6 +99,8 @@ baseAxiosInstance.interceptors.response.use(
         processQueue(error);
 
         removeFromStorage(LocalStorageKeys.AccessToken);
+
+        router.navigate(AppRoutes.SignIn, { replace: true });
 
         return Promise.reject(error);
       } finally {
