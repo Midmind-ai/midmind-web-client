@@ -6,6 +6,8 @@ import { ApiEndpoints, TIMEOUT } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
+import type { TokenResponse } from '@shared/services/auth/types';
+
 import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/localStorage';
 
 type RefreshQueueItem = {
@@ -84,7 +86,7 @@ baseAxiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await authAxiosInstance.post(ApiEndpoints.RefreshToken);
+        const { data } = await authAxiosInstance.post<TokenResponse>(ApiEndpoints.RefreshToken);
 
         const newAccessToken = data.access_token;
 
