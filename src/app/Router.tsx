@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router';
 
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@shared/constants/router';
 
-import RouteGuard from '@/features/RouteGuard';
+import RouteGuard from '@features/SignIn/components/RouteGuard';
 
 import ForgotPasswordPage from '@/app/routes/ForgotPassword';
 import HomePage from '@/app/routes/Home';

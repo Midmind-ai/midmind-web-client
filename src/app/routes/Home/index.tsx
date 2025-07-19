@@ -2,14 +2,14 @@ import type { FC } from 'react';
 
 import { useNavigate } from 'react-router';
 
-import { Button } from '@/components/Button';
+import { Button } from '@shared/components/Button';
 
-import { LocalStorageKeys } from '@/constants/localStorage';
-import { AppRoutes } from '@/constants/router';
+import { LocalStorageKeys } from '@shared/constants/localStorage';
+import { AppRoutes } from '@shared/constants/router';
 
-import { useLogout } from '@/hooks/useLogout';
+import { useLogout } from '@shared/hooks/useLogout';
 
-import { removeFromStorage } from '@/utils/localStorage';
+import { removeFromStorage } from '@shared/utils/localStorage';
 
 const Home: FC = () => {
   const navigate = useNavigate();
