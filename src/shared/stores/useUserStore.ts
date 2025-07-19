@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
-import type { User } from '@/types/user';
+import type { User } from '@shared/types/entities';
 
-interface UserState {
+type UserState = {
   user: User | null;
   setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   setAuthenticated: (value: boolean) => void;
-}
+};
 
 export const useUserStore = create<UserState>(set => ({
   user: null,

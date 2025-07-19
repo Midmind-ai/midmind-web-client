@@ -1,4 +1,4 @@
 {
-  "src/**/*.{json,md}": ["prettier --write"],
-  "src/**/*.{js,jsx,ts,tsx}": ["prettier --write", "eslint --quiet", "eslint --fix"]
+  "src/**/*.{ts,tsx,js,jsx,json,css,md}": ["yarn format"],
+  "src/**/*.{js,jsx,ts,tsx}": ["yarn lint"]
 }
