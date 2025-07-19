@@ -1,6 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 
-import { ApiEndpoints } from '@shared/constants/api';
+import { SWRCacheKeys } from '@shared/constants/api';
 
 import { authService } from '@shared/services/auth';
 import type { SignInRequest, TokenResponse } from '@shared/services/auth/types';
@@ -18,7 +18,7 @@ export const useSignIn = () => {
     trigger: signIn,
     isMutating: isLoading,
     error,
-  } = useSWRMutation(ApiEndpoints.SignIn, fetcher);
+  } = useSWRMutation(SWRCacheKeys.SignIn, fetcher);
 
   return { signIn, isLoading, error };
 };

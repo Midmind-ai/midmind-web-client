@@ -2,11 +2,11 @@ import axios from 'axios';
 
 import router from '@app/Router';
 
-import { ApiEndpoints, TIMEOUT } from '@shared/constants/api';
+import { TIMEOUT } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
-import type { TokenResponse } from '@shared/services/auth/types';
+import { refreshToken } from '@shared/services/auth';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/localStorage';
 
@@ -86,15 +86,13 @@ baseAxiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await authAxiosInstance.post<TokenResponse>(ApiEndpoints.RefreshToken);
+        const { access_token } = await refreshToken();
 
-        const newAccessToken = data.access_token;
+        setToStorage(LocalStorageKeys.AccessToken, access_token);
 
-        setToStorage(LocalStorageKeys.AccessToken, newAccessToken);
+        processQueue(null, access_token);
 
-        processQueue(null, newAccessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
         return baseAxiosInstance(originalRequest);
       } catch (error) {

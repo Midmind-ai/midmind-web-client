@@ -1,8 +1,8 @@
 export const TIMEOUT = 10000; // 10 seconds
 
-export const ApiEndpoints = {
-  SignIn: '/sign-in',
-  Logout: '/logout',
-  RefreshToken: '/refresh',
-  CurrentUser: '/users/current',
+export const SWRCacheKeys = {
+  SignIn: 'signIn',
+  Logout: 'logout',
+  RefreshToken: 'refreshToken',
+  CurrentUser: 'currentUser',
 } as const;
