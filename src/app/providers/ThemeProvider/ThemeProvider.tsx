@@ -1,36 +1,38 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 
+import { getFromStorage, setToStorage } from '@shared/utils/localStorage';
+
 type Theme = 'dark' | 'light' | 'system';
 
-type ThemeProviderProps = {
-  children: React.ReactNode;
+type Props = {
+  children: ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
 };
 
-type ThemeProviderState = {
+type State = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
 
-const initialState: ThemeProviderState = {
+const initialState: State = {
   theme: 'system',
   setTheme: () => null,
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+const ThemeProviderContext = createContext<State>(initialState);
 
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
   storageKey = LocalStorageKeys.Theme,
   ...props
-}: ThemeProviderProps) {
+}: Props) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => getFromStorage<Theme>(storageKey) || defaultTheme
   );
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
+      setToStorage(storageKey, theme);
       setTheme(theme);
     },
   };
