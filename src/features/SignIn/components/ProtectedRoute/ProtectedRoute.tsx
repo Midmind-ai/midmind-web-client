@@ -1,12 +1,10 @@
-import type { FC } from 'react';
-
 import { Navigate, Outlet } from 'react-router';
 
 import { AppRoutes } from '@shared/constants/router';
 
 import { useCheckAuth } from '@shared/hooks/useCheckAuth';
 
-const ProtectedRoute: FC = () => {
+const ProtectedRoute = () => {
   const { isLoading, isAuthenticated } = useCheckAuth();
 
   if (isLoading) {

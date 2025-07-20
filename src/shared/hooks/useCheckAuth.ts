@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { SWRCacheKeys } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 
-import { usersService } from '@shared/services/users';
+import { UsersService } from '@shared/services/users/usersService';
 
 import { useUserStore } from '@shared/stores/useUserStore';
 
@@ -16,7 +16,7 @@ export const useCheckAuth = () => {
 
   const { isLoading, data, error } = useSWR(
     accessToken ? SWRCacheKeys.CurrentUser : null,
-    usersService.getCurrentUser,
+    UsersService.getCurrentUser,
     {
       onSuccess: user => {
         setUser(user);

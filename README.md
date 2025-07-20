@@ -67,7 +67,7 @@ src
 |  |  |  |
 |  |  |  +- SignInForm
 |  |  |     |
-|  |  |     +- index.tsx             # Main component entry point
+|  |  |     +- SignInForm.tsx             # Main component entry point
 |  |  |     +- useSignInLogic.ts     # Custom hook encapsulating component logic
 |  |  |
 |  |  +-- assets                     # Sign-in images/icons (e.g., Google logo, login illustration)
@@ -82,7 +82,7 @@ src
 |  |  |  |
 |  |  |  +- Messages
 |  |  |     |
-|  |  |     +- index.tsx             # Main component entry point
+|  |  |     +- Messages.tsx             # Main component entry point
 |  |  |     +- useMessagesLogic.ts   # Custom hook encapsulating component logic
 |  |  |
 |  |  +- assets                      # Chat-specific assets (e.g., user avatar placeholder, chat icons)
@@ -101,7 +101,7 @@ type Props = {
   someProp: string;
 };
 
-const MyComponent: FC<Props> = ({ someProp }) => {
+const MyComponent = ({ someProp }: Props) => {
   const data = useMyComponentLogic();
 
   return <div>MyComponent</div>;
@@ -114,7 +114,6 @@ export default MyComponent;
 
 - ✅ **Type-safe props** — Component props are always explicitly typed using type, and the name is always **Props** for consistency.
 - ✅ **Arrow functions** — Functional components are written as arrow functions for consistency.
-- ✅ **FC<Props>** — Components are typed using the React.FC<Props> generic.
 - ✅ **Encapsulated logic** — All component-related logic is extracted into a separate hook named in the format use[ComponentName]Logic.ts (e.g. `useSignInFormLogic.ts`) to ensure separation of concerns and cleaner JSX.
 - ✅ **Default export** — Components use export default to keep imports clean and predictable.
 

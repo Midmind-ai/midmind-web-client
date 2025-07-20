@@ -2,14 +2,14 @@ import useSWRMutation from 'swr/mutation';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
-import { authService } from '@shared/services/auth';
+import { AuthService } from '@shared/services/auth/authService';
 
 export const useLogout = () => {
   const {
     trigger: logout,
     isMutating: isLoading,
     error,
-  } = useSWRMutation(SWRCacheKeys.Logout, authService.logout);
+  } = useSWRMutation(SWRCacheKeys.Logout, AuthService.logout);
 
   return { logout, isLoading, error };
 };

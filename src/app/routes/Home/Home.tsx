@@ -1,5 +1,3 @@
-import type { FC } from 'react';
-
 import { useNavigate } from 'react-router';
 
 import { Button } from '@shared/components/Button';
@@ -28,7 +26,7 @@ const getInitials = (firstName: string, lastName: string) => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 };
 
-const Home: FC = () => {
+const Home = () => {
   const navigate = useNavigate();
   const { logout, isLoading } = useLogout();
   const { reset } = useUserStore();

@@ -2,15 +2,15 @@ import useSWRMutation from 'swr/mutation';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
-import { authService } from '@shared/services/auth';
-import type { SignInRequest, TokenResponse } from '@shared/services/auth/types';
+import { AuthService } from '@shared/services/auth/authService';
+import type { SignInRequest } from '@shared/services/auth/types';
 
 type SignInFetcherArgs = {
   arg: SignInRequest;
 };
 
-const fetcher = async (_key: string, { arg }: SignInFetcherArgs): Promise<TokenResponse> => {
-  return authService.signIn(arg);
+const fetcher = async (_key: string, { arg }: SignInFetcherArgs) => {
+  return AuthService.signIn(arg);
 };
 
 export const useSignIn = () => {

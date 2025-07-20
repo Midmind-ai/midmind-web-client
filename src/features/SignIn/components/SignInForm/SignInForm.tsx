@@ -1,5 +1,3 @@
-import type { FC } from 'react';
-
 import { Link } from 'react-router';
 
 import { Button } from '@shared/components/Button';
@@ -16,7 +14,7 @@ import GitHubIcon from '@features/SignIn/assets/icons/github.svg';
 import GoogleIcon from '@features/SignIn/assets/icons/google.svg';
 import { useSignInFormLogic } from '@features/SignIn/components/SignInForm/useSignInFormLogic';
 
-const SignInForm: FC = () => {
+const SignInForm = () => {
   const { errors, isSubmitting, register, handleSubmit } = useSignInFormLogic();
 
   return (

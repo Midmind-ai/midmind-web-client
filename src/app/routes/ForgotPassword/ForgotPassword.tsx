@@ -1,6 +1,4 @@
-import type { FC } from 'react';
-
-const ForgotPasswordPage: FC = () => {
+const ForgotPasswordPage = () => {
   return <div>ForgotPassword</div>;
 };
 

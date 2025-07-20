@@ -1,5 +1,3 @@
-import type { FC } from 'react';
-
 import LogoIcon from '@shared/assets/icons/logo.svg';
 
 import { ThemedH1 } from '@shared/components/ThemedH1';
@@ -9,9 +7,9 @@ import { ThemedSpan } from '@shared/components/ThemedSpan';
 
 import ChatTreeIcon from '@features/SignIn/assets/icons/chatTree.svg';
 import LogoBackgroundIcon from '@features/SignIn/assets/icons/logoBackground.svg';
-import SignInForm from '@features/SignIn/components/SignInForm';
+import SignInForm from '@features/SignIn/components/SignInForm/SignInForm';
 
-const SignInPage: FC = () => {
+const SignInPage = () => {
   return (
     <div className="min-h-svh flex flex-col p-4 sm:p-6">
       <div className="flex flex-1 flex-col lg:flex-row">
