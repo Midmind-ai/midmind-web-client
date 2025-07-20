@@ -90,7 +90,7 @@ const SignInForm: FC = () => {
           <GoogleIcon className="w-4 h-4" />
         </Button>
         <Button
-          type="submit"
+          type="button"
           variant="outline"
           className="flex-1"
         >

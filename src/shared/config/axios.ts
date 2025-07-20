@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import router from '@app/Router';
 
-import { TIMEOUT } from '@shared/constants/api';
+import { ApiErrorCodes, TIMEOUT } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
@@ -10,27 +10,9 @@ import { refreshToken } from '@shared/services/auth';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/localStorage';
 
-type RefreshQueueItem = {
-  resolve: (value: unknown) => void;
-  reject: (reason: unknown) => void;
-};
-
 let isRefreshing = false;
-let refreshQueue: RefreshQueueItem[] = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
-  refreshQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(token);
-    }
-  });
-
-  refreshQueue = [];
-};
-
-export const baseAxiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: TIMEOUT,
   withCredentials: true,
@@ -39,16 +21,7 @@ export const baseAxiosInstance = axios.create({
   },
 });
 
-export const authAxiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/auth`,
-  timeout: TIMEOUT,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-baseAxiosInstance.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   request => {
     const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
 
@@ -61,26 +34,16 @@ baseAxiosInstance.interceptors.request.use(
   error => Promise.reject(error)
 );
 
-baseAxiosInstance.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === ApiErrorCodes.Unauthorized && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          refreshQueue.push({ resolve, reject });
-        })
-          .then(token => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-
-            return baseAxiosInstance(originalRequest);
-          })
-          .catch(err => {
-            return Promise.reject(err);
-          });
+        return Promise.reject(error);
       }
 
       isRefreshing = true;
@@ -90,19 +53,15 @@ baseAxiosInstance.interceptors.response.use(
 
         setToStorage(LocalStorageKeys.AccessToken, access_token);
 
-        processQueue(null, access_token);
-
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
-        return baseAxiosInstance(originalRequest);
-      } catch (error) {
-        processQueue(error);
-
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
         removeFromStorage(LocalStorageKeys.AccessToken);
 
         router.navigate(AppRoutes.SignIn, { replace: true });
 
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }

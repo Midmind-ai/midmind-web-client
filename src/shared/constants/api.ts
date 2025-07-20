@@ -6,3 +6,9 @@ export const SWRCacheKeys = {
   RefreshToken: 'refreshToken',
   CurrentUser: 'currentUser',
 } as const;
+
+export const ApiErrorCodes = {
+  Unauthorized: 401,
+  Forbidden: 403,
+  NotFound: 404,
+} as const;

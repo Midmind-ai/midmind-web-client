@@ -12,6 +12,8 @@ import { setToStorage } from '@shared/utils/localStorage';
 
 import { useSignIn } from '@features/SignIn/hooks/useSignIn';
 
+import { ApiErrorCodes } from '@/shared/constants/api';
+
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
@@ -22,6 +24,7 @@ export const useSignInFormLogic = () => {
   const { signIn } = useSignIn();
   const {
     register,
+    setError,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInRequest>({
@@ -31,15 +34,21 @@ export const useSignInFormLogic = () => {
   const handleSignIn = (data: SignInRequest) => {
     signIn(data, {
       onSuccess: response => {
-        // eslint-disable-next-line no-console
-        console.log('response', response);
-
         setToStorage(LocalStorageKeys.AccessToken, response.access_token);
+
         navigate(AppRoutes.Home);
       },
       onError: error => {
-        // eslint-disable-next-line no-console
-        console.log('error', error);
+        switch (error.response?.status) {
+          case ApiErrorCodes.Forbidden:
+            setError('password', { message: error.response?.data.message });
+            break;
+          case ApiErrorCodes.NotFound:
+            setError('email', { message: error.response?.data.message });
+            break;
+          default:
+            break;
+        }
       },
     });
   };

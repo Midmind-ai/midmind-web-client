@@ -1,25 +1,25 @@
-import { authAxiosInstance } from '@shared/config/axios';
+import { axiosInstance } from '@shared/config/axios';
 
 import type { SignInRequest, TokenResponse } from '@shared/services/auth/types';
 
 import type { MessageResponse } from '@shared/types/common';
 
-const signIn = async (data: SignInRequest) => {
-  const response = await authAxiosInstance.post<TokenResponse>('/sign-in', data);
+const signIn = async (requestBody: SignInRequest) => {
+  const { data } = await axiosInstance.post<TokenResponse>('/auth/sign-in', requestBody);
 
-  return response.data;
+  return data;
 };
 
 const logout = async () => {
-  const response = await authAxiosInstance.post<MessageResponse>('/logout');
+  const { data } = await axiosInstance.post<MessageResponse>('/auth/logout');
 
-  return response.data;
+  return data;
 };
 
 export const refreshToken = async () => {
-  const response = await authAxiosInstance.post<TokenResponse>('/refresh');
+  const { data } = await axiosInstance.post<TokenResponse>('/auth/refresh');
 
-  return response.data;
+  return data;
 };
 
 export const authService = {
