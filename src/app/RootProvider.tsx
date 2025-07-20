@@ -6,7 +6,7 @@ import { LocalStorageKeys } from '@shared/constants/localStorage';
 
 import router from '@/app/Router';
 
-const Provider = () => {
+const RootProvider = () => {
   return (
     <ThemeProvider
       defaultTheme="light"
@@ -17,4 +17,4 @@ const Provider = () => {
   );
 };
 
-export default Provider;
+export default RootProvider;
