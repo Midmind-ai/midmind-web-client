@@ -9,12 +9,12 @@ import { ThemedP } from '@shared/components/ThemedP';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
+import { useCurrentUser } from '@shared/hooks/useCurrentUser';
 import { useLogout } from '@shared/hooks/useLogout';
 
-import { removeFromStorage } from '@shared/utils/localStorage';
+import { useUserStore } from '@shared/stores/useUserStore';
 
-import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
-import { useUserStore } from '@/shared/stores/useUserStore';
+import { removeFromStorage } from '@shared/utils/localStorage';
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -60,10 +60,10 @@ const Home: FC = () => {
               <img
                 src={user.avatar}
                 alt={`${user.first_name} ${user.last_name}`}
-                className="w-16 h-16 rounded-full object-cover border-3 border-white dark:border-gray-700 shadow-md"
+                className="w-16 h-16 rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-md"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-3 border-white dark:border-gray-700 shadow-md">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-2 border-white dark:border-gray-700 shadow-md">
                 <span className="text-white text-lg font-bold">
                   {getInitials(user.first_name, user.last_name)}
                 </span>

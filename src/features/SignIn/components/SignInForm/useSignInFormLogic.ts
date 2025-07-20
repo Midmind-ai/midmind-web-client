@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
+import { ApiErrorCodes } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
@@ -11,8 +12,6 @@ import type { SignInRequest } from '@shared/services/auth/types';
 import { setToStorage } from '@shared/utils/localStorage';
 
 import { useSignIn } from '@features/SignIn/hooks/useSignIn';
-
-import { ApiErrorCodes } from '@/shared/constants/api';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),
