@@ -1,24 +1,16 @@
 import { useNavigate } from 'react-router';
 
+import { useTheme } from '@app/providers/ThemeProvider/ThemeProvider';
+
 import { Button } from '@shared/components/Button';
 import { ThemedH1 } from '@shared/components/ThemedH1';
 import { ThemedP } from '@shared/components/ThemedP';
 
-import { LocalStorageKeys } from '@shared/constants/localStorage';
-import { AppRoutes } from '@shared/constants/router';
-
-import { useCurrentUser } from '@shared/hooks/useCurrentUser';
-import { useLogout } from '@shared/hooks/useLogout';
-
-import { removeFromStorage } from '@shared/utils/localStorage';
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-};
+import { LocalStorageKeys } from '@/shared/constants/localStorage';
+import { AppRoutes } from '@/shared/constants/router';
+import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+import { useLogout } from '@/shared/hooks/useLogout';
+import { removeFromStorage } from '@/shared/utils/localStorage';
 
 const getInitials = (firstName: string, lastName: string) => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -27,6 +19,7 @@ const getInitials = (firstName: string, lastName: string) => {
 const Home = () => {
   const navigate = useNavigate();
   const { logout, isLoading } = useLogout();
+  const { theme, setTheme } = useTheme();
   const user = useCurrentUser();
 
   const handleLogout = () => {
@@ -36,6 +29,10 @@ const Home = () => {
         navigate(AppRoutes.SignIn);
       },
     });
+  };
+
+  const handleThemeToggle = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -86,8 +83,32 @@ const Home = () => {
               <div className="flex items-center justify-between">
                 <ThemedP className="text-xs text-gray-600 dark:text-gray-400">Joined:</ThemedP>
                 <ThemedP className="text-xs font-medium text-gray-900 dark:text-white">
-                  {formatDate(user.created_at)}
+                  {new Date(user.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
                 </ThemedP>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <ThemedP className="text-xs text-gray-600 dark:text-gray-400">Theme:</ThemedP>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={theme === 'dark'}
+                    onChange={handleThemeToggle}
+                    className="sr-only"
+                  />
+                  <div className="relative w-10 h-6 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out dark:bg-gray-600">
+                    <div
+                      className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`}
+                    />
+                  </div>
+                  <span className="ml-2 text-xs text-gray-600 dark:text-gray-400">
+                    {theme === 'dark' ? 'Dark' : 'Light'}
+                  </span>
+                </label>
               </div>
             </div>
           </div>
