@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 
-import Provider from '@/app/Provider';
+import RootProvider from '@/app/RootProvider';
 
 const App: FC = () => {
-  return <Provider />;
+  return <RootProvider />;
 };
 
 export default App;

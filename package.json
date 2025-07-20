@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode dev",
     "build": "tsc -b && vite build",
     "lint": "eslint . --cache --fix --max-warnings 0",
     "types": "tsc --noEmit",
@@ -41,6 +41,7 @@
     "@vitejs/plugin-react-swc": "^3.10.2",
     "add": "^2.0.6",
     "eslint": "^9.30.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

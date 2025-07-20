@@ -3,7 +3,7 @@ import importPlugin from 'eslint-plugin-import';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import * as tseslint from 'typescript-eslint';
 
 export default tseslint.config([
   {
@@ -22,6 +22,14 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.app.json',
+        },
+      },
+    },
     rules: {
       'import/order': [
         'error',
@@ -34,52 +42,62 @@ export default tseslint.config([
               position: 'before',
             },
             {
-              pattern: '@/types/**',
-              group: 'type',
-              position: 'before',
-            },
-            {
-              pattern: '@/assets/**',
+              pattern: '@app/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/components/**',
+              pattern: '@shared/assets/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/config/**',
+              pattern: '@shared/components/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/constants/**',
+              pattern: '@shared/config/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/features/**',
+              pattern: '@shared/constants/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/hooks/**',
+              pattern: '@shared/hooks/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/lib/**',
+              pattern: '@shared/services/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/stores/**',
+              pattern: '@shared/stores/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@/utils/**',
+              pattern: '@shared/theme/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@shared/types/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@shared/utils/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@features/**',
               group: 'internal',
               position: 'before',
             },
@@ -100,6 +118,7 @@ export default tseslint.config([
       ],
       'import/newline-after-import': 'error',
       'import/no-duplicates': 'error',
+      'import/no-unresolved': 'error',
 
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'error',
