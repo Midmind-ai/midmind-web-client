@@ -1,4 +1,4 @@
-import axios, { type InternalAxiosRequestConfig } from 'axios';
+import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 
 import router from '@app/Router';
 
@@ -10,7 +10,25 @@ import { AuthService } from '@shared/services/auth/authService';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/localStorage';
 
+type RefreshQueueItem = {
+  resolve: (value: string) => void;
+  reject: (reason: unknown) => void;
+};
+
 let isRefreshing = false;
+let refreshQueue: RefreshQueueItem[] = [];
+
+const processQueue = (error: unknown, token: string = '') => {
+  refreshQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+
+  refreshQueue = [];
+};
 
 const addTokenToRequest = (request: InternalAxiosRequestConfig) => {
   const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
@@ -56,12 +74,23 @@ baseAxiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === ApiErrorCodes.Unauthorized && !originalRequest._retry) {
-      originalRequest._retry = true;
-
       if (isRefreshing) {
-        return Promise.reject(error);
+        return new Promise<AxiosResponse>((resolve, reject) => {
+          refreshQueue.push({
+            resolve: (token: string) => {
+              if (token) {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+                resolve(baseAxiosInstance(originalRequest));
+              } else {
+                reject(new Error('Token is null'));
+              }
+            },
+            reject,
+          });
+        });
       }
 
+      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
@@ -69,12 +98,15 @@ baseAxiosInstance.interceptors.response.use(
 
         setToStorage(LocalStorageKeys.AccessToken, access_token);
 
+        processQueue(null, access_token);
+
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
         return baseAxiosInstance(originalRequest);
       } catch (refreshError) {
-        removeFromStorage(LocalStorageKeys.AccessToken);
+        processQueue(refreshError, '');
 
+        removeFromStorage(LocalStorageKeys.AccessToken);
         router.navigate(AppRoutes.SignIn, { replace: true });
 
         return Promise.reject(refreshError);

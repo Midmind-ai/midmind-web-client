@@ -10,8 +10,6 @@ import { AppRoutes } from '@shared/constants/router';
 import { useCurrentUser } from '@shared/hooks/useCurrentUser';
 import { useLogout } from '@shared/hooks/useLogout';
 
-import { useUserStore } from '@shared/stores/useUserStore';
-
 import { removeFromStorage } from '@shared/utils/localStorage';
 
 const formatDate = (dateString: string) => {
@@ -29,7 +27,6 @@ const getInitials = (firstName: string, lastName: string) => {
 const Home = () => {
   const navigate = useNavigate();
   const { logout, isLoading } = useLogout();
-  const { reset } = useUserStore();
   const user = useCurrentUser();
 
   const handleLogout = () => {
@@ -37,7 +34,6 @@ const Home = () => {
       onSuccess: () => {
         removeFromStorage(LocalStorageKeys.AccessToken);
         navigate(AppRoutes.SignIn);
-        reset();
       },
     });
   };
