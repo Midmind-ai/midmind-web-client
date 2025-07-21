@@ -5,7 +5,7 @@ export type User = {
   updated_at: string | null;
   last_name: string;
   first_name: string;
-  avatar: string;
+  avatar: string | null;
   provider: string | null;
   provider_id: string | null;
 };
