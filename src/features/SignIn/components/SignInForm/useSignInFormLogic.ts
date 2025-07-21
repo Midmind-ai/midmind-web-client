@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
-import { ApiErrorCodes } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
@@ -26,7 +25,6 @@ export const useSignInFormLogic = () => {
   const { signIn } = useSignIn();
   const {
     register,
-    setError,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInRequest>({
@@ -36,16 +34,11 @@ export const useSignInFormLogic = () => {
   const loginWithGoogle = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: async tokenResponse => {
-      try {
-        const response = await AuthService.signInWithGoogle({ code: tokenResponse.code });
+      const response = await AuthService.signInWithGoogle({ code: tokenResponse.code });
 
-        setToStorage(LocalStorageKeys.AccessToken, response.access_token);
+      setToStorage(LocalStorageKeys.AccessToken, response.access_token);
 
-        navigate(AppRoutes.Home);
-      } catch (error) {
-        console.error('Google sign-in failed:', error);
-        // TODO: Add proper user notification for Google sign-in errors
-      }
+      navigate(AppRoutes.Home);
     },
     onError: error => {
       console.error('Google OAuth error:', error);
@@ -61,16 +54,8 @@ export const useSignInFormLogic = () => {
         navigate(AppRoutes.Home);
       },
       onError: error => {
-        switch (error.response?.status) {
-          case ApiErrorCodes.Forbidden:
-            setError('password', { message: error.response?.data.message });
-            break;
-          case ApiErrorCodes.NotFound:
-            setError('email', { message: error.response?.data.message });
-            break;
-          default:
-            break;
-        }
+        console.error('Sign in error:', error);
+        // TODO: Add proper user notification for  errors
       },
     });
   };

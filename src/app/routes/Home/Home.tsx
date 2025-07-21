@@ -67,9 +67,6 @@ const Home = () => {
               <ThemedH1 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {user.first_name} {user.last_name}
               </ThemedH1>
-              <ThemedP className="text-gray-600 dark:text-gray-400 text-sm">
-                @{user.username}
-              </ThemedP>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 space-y-2">
