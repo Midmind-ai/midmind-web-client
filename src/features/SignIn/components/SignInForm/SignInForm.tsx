@@ -15,7 +15,7 @@ import GoogleIcon from '@features/SignIn/assets/icons/google.svg';
 import { useSignInFormLogic } from '@features/SignIn/components/SignInForm/useSignInFormLogic';
 
 const SignInForm = () => {
-  const { errors, isSubmitting, register, handleSubmit } = useSignInFormLogic();
+  const { errors, isSubmitting, register, handleSubmit, loginWithGoogle } = useSignInFormLogic();
 
   return (
     <form onSubmit={handleSubmit}>
@@ -84,6 +84,7 @@ const SignInForm = () => {
           type="button"
           variant="outline"
           className="flex-1"
+          onClick={loginWithGoogle}
         >
           <GoogleIcon className="w-4 h-4" />
         </Button>

@@ -1,6 +1,10 @@
 import { authAxiosInstance, baseAxiosInstance } from '@shared/config/axios';
 
-import type { SignInRequest, TokenResponse } from '@shared/services/auth/types';
+import type {
+  SignInRequest,
+  SignInWithGoogleRequest,
+  TokenResponse,
+} from '@shared/services/auth/types';
 
 import type { MessageResponse } from '@shared/types/common';
 
@@ -11,8 +15,14 @@ export class AuthService {
     return data;
   }
 
+  static async signInWithGoogle(requestBody: SignInWithGoogleRequest) {
+    const { data } = await authAxiosInstance.post<TokenResponse>('/google', requestBody);
+
+    return data;
+  }
+
   static async logout() {
-    const { data } = await baseAxiosInstance.post<MessageResponse>('/auth/logout');
+    const { data } = await baseAxiosInstance.post<MessageResponse>('/logout');
 
     return data;
   }
