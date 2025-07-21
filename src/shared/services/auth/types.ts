@@ -1,3 +1,7 @@
+export type SignInWithGoogleRequest = {
+  code: string;
+};
+
 export type SignInRequest = {
   email: string;
   password: string;

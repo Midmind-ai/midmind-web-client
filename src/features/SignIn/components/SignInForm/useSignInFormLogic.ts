@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -12,6 +13,8 @@ import type { SignInRequest } from '@shared/services/auth/types';
 import { setToStorage } from '@shared/utils/localStorage';
 
 import { useSignIn } from '@features/SignIn/hooks/useSignIn';
+
+import { AuthService } from '@/shared/services/auth/authService';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),
@@ -28,6 +31,26 @@ export const useSignInFormLogic = () => {
     formState: { errors, isSubmitting },
   } = useForm<SignInRequest>({
     resolver: zodResolver(signInValidationSchema),
+  });
+
+  const loginWithGoogle = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: async tokenResponse => {
+      try {
+        const response = await AuthService.signInWithGoogle({ code: tokenResponse.code });
+
+        setToStorage(LocalStorageKeys.AccessToken, response.access_token);
+
+        navigate(AppRoutes.Home);
+      } catch (error) {
+        console.error('Google sign-in failed:', error);
+        // TODO: Add proper user notification for Google sign-in errors
+      }
+    },
+    onError: error => {
+      console.error('Google OAuth error:', error);
+      // TODO: Add proper user notification for Google OAuth errors
+    },
   });
 
   const handleSignIn = (data: SignInRequest) => {
@@ -56,6 +79,7 @@ export const useSignInFormLogic = () => {
     errors,
     isSubmitting,
     register,
+    loginWithGoogle,
     handleSubmit: handleSubmit(handleSignIn),
     navigate,
   };
