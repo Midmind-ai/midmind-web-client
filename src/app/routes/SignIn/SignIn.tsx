@@ -11,7 +11,7 @@ import SignInForm from '@features/SignIn/components/SignInForm/SignInForm';
 
 const SignInPage = () => {
   return (
-    <div className="min-h-svh flex flex-col p-4 sm:p-6">
+    <div className="min-h-svh flex flex-col p-6 sm:p-6">
       <div className="flex flex-1 flex-col lg:flex-row">
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-full max-w-[360px]">
