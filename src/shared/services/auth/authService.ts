@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   static async logout() {
-    const { data } = await baseAxiosInstance.post<MessageResponse>('/logout');
+    const { data } = await baseAxiosInstance.post<MessageResponse>('auth/logout');
 
     return data;
   }
