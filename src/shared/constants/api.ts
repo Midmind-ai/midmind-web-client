@@ -5,6 +5,11 @@ export const SWRCacheKeys = {
   Logout: 'logout',
   RefreshToken: 'refreshToken',
   CurrentUser: 'currentUser',
+  CreateChat: 'createChat',
+  GetChats: 'getChats',
+  GetChatDetails: (id: string) => `getChatDetails/${id}`,
+  UpdateChatDetails: 'updateChatDetails',
+  DeleteChat: 'deleteChat',
 } as const;
 
 export const ApiErrorCodes = {

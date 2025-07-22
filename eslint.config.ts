@@ -137,7 +137,7 @@ export default tseslint.config([
       ],
       'prefer-const': 'error',
       'no-var': 'error',
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-console': 'error',
       'no-unused-vars': 'off',
       eqeqeq: ['error', 'always'],
       curly: ['error', 'all'],
