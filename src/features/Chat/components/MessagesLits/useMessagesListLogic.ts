@@ -1,18 +1,10 @@
 import { useParams } from 'react-router';
-import useSWR from 'swr';
 
-import { ChatsService } from '@shared/services/chats/chatsService';
-
-import { SWRCacheKeys } from '@/shared/constants/api';
+import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
 
 export const useMessagesListLogic = () => {
   const { id } = useParams();
+  const { chatDetails, isLoading } = useGetChatDetails(id || '');
 
-  const { data: chatDetails, isLoading: isChatDetailsLoading } = useSWR(
-    SWRCacheKeys.GetChatDetails(id || ''),
-    () => ChatsService.getChatDetails(id || ''),
-    { revalidateOnFocus: false }
-  );
-
-  return { chatDetails, isChatDetailsLoading, id };
+  return { chatDetails, isLoading, id };
 };

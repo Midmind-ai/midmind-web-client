@@ -14,7 +14,7 @@ const mockMessages = [
 ];
 
 const MessagesList = () => {
-  const { chatDetails, isChatDetailsLoading, id: chatId } = useMessagesListLogic();
+  const { chatDetails, isLoading: isChatDetailsLoading, id: chatId } = useMessagesListLogic();
   const { updateChatDetails, isLoading: isUpdating } = useUpdateChatDetails();
   const [editedName, setEditedName] = useState('');
 

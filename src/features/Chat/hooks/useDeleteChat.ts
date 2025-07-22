@@ -5,6 +5,8 @@ import { SWRCacheKeys } from '@shared/constants/api';
 
 import { ChatsService } from '@shared/services/chats/chatsService';
 
+import type { Chat } from '@shared/types/entities';
+
 type DeleteChatFetcherArgs = {
   arg: {
     id: string;
@@ -29,7 +31,17 @@ export const useDeleteChat = () => {
         { id: chatId },
         {
           onSuccess: () => {
-            mutate(SWRCacheKeys.GetChats);
+            mutate(
+              SWRCacheKeys.GetChats,
+              (existingChats?: Chat[]) => {
+                if (!existingChats) {
+                  return [];
+                }
+
+                return existingChats.filter(chat => chat.id !== chatId);
+              },
+              false
+            );
           },
         }
       );
