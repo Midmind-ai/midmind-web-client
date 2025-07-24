@@ -2,7 +2,7 @@ export type MessageResponse = {
   message: string;
 };
 
-export type PaginationData = {
+type PaginationData = {
   currentPage: number;
   lastPage: number;
   next: number | null;

@@ -15,5 +15,12 @@ export type Chat = {
   created_at: string;
   name: string | null;
   updated_at: string | null;
-  description: string | null;
+};
+
+export type ChatMessage = {
+  id: string;
+  content: string;
+  user_id: string | null;
+  created_at: string;
+  type: string; // add enum
 };
