@@ -20,16 +20,24 @@ const fetcher = async (_key: string, { arg }: UpdateChatDetailsFetcherArgs) => {
 export const useUpdateChatDetails = () => {
   const { mutate } = useSWRConfig();
   const {
-    trigger: updateChatDetails,
+    trigger,
     isMutating: isLoading,
     error,
   } = useSWRMutation(SWRCacheKeys.UpdateChatDetails, fetcher);
 
+  const updateChatDetails = async (id: string, body: UpdateChatDetailsRequest) => {
+    await trigger(
+      { id, body },
+      {
+        onSuccess: () => {
+          mutate(SWRCacheKeys.GetChatDetails(id), { ...body, id }, false);
+        },
+      }
+    );
+  };
+
   return {
-    updateChatDetails: async (id: string, body: UpdateChatDetailsRequest) => {
-      await updateChatDetails({ id, body });
-      mutate(SWRCacheKeys.GetChatDetails(id), { ...body, id }, false);
-    },
+    updateChatDetails,
     isLoading,
     error,
   };

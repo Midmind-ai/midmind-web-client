@@ -10,29 +10,31 @@ import type { Chat } from '@shared/types/entities';
 export const useCreateChat = () => {
   const { mutate } = useSWRConfig();
   const {
-    trigger: createChat,
+    trigger,
     isMutating: isLoading,
     error,
   } = useSWRMutation(SWRCacheKeys.CreateChat, ChatsService.createChat);
 
-  return {
-    createChat: async () => {
-      await createChat(null, {
-        onSuccess: data => {
-          mutate(
-            SWRCacheKeys.GetChats,
-            (existingChats?: Chat[]) => {
-              if (!existingChats) {
-                return [data];
-              }
+  const createChat = async () => {
+    await trigger(null, {
+      onSuccess: data => {
+        mutate(
+          SWRCacheKeys.GetChats,
+          (existingChats?: Chat[]) => {
+            if (!existingChats) {
+              return [data];
+            }
 
-              return [...existingChats, data];
-            },
-            false
-          );
-        },
-      });
-    },
+            return [...existingChats, data];
+          },
+          false
+        );
+      },
+    });
+  };
+
+  return {
+    createChat,
     isLoading,
     error,
   };

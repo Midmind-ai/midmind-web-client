@@ -41,7 +41,6 @@ export const useSignInFormLogic = () => {
       navigate(AppRoutes.Home);
     },
     onError: error => {
-      // eslint-disable-next-line no-console
       console.error('Google OAuth error:', error);
       // TODO: Add proper user notification for Google OAuth errors
     },
@@ -55,7 +54,6 @@ export const useSignInFormLogic = () => {
         navigate(AppRoutes.Home);
       },
       onError: error => {
-        // eslint-disable-next-line no-console
         console.error('Sign in error:', error);
         // TODO: Add proper user notification for  errors
       },

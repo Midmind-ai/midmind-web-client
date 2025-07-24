@@ -20,32 +20,34 @@ const fetcher = async (_key: string, { arg }: DeleteChatFetcherArgs) => {
 export const useDeleteChat = () => {
   const { mutate } = useSWRConfig();
   const {
-    trigger: deleteChat,
+    trigger,
     isMutating: isLoading,
     error,
   } = useSWRMutation(SWRCacheKeys.DeleteChat, fetcher);
 
-  return {
-    deleteChat: async (chatId: string) => {
-      await deleteChat(
-        { id: chatId },
-        {
-          onSuccess: () => {
-            mutate(
-              SWRCacheKeys.GetChats,
-              (existingChats?: Chat[]) => {
-                if (!existingChats) {
-                  return [];
-                }
+  const deleteChat = async (chatId: string) => {
+    await trigger(
+      { id: chatId },
+      {
+        onSuccess: () => {
+          mutate(
+            SWRCacheKeys.GetChats,
+            (existingChats?: Chat[]) => {
+              if (!existingChats) {
+                return [];
+              }
 
-                return existingChats.filter(chat => chat.id !== chatId);
-              },
-              false
-            );
-          },
-        }
-      );
-    },
+              return existingChats.filter(chat => chat.id !== chatId);
+            },
+            false
+          );
+        },
+      }
+    );
+  };
+
+  return {
+    deleteChat,
     isLoading,
     error,
   };

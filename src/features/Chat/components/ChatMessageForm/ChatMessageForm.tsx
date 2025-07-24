@@ -28,11 +28,10 @@ const ChatMessageForm = () => {
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-            <SelectItem value="gpt-4o-mini">GPT-4o-mini</SelectItem>
-            <SelectItem value="claude-3-5-sonnet">Claude 3.5 Sonnet</SelectItem>
-            <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
-            <SelectItem value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</SelectItem>
+            <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
+            <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+            <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
+            <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
           </SelectContent>
         </Select>
         <Button className="size-8 bg-secondary hover:bg-secondary">

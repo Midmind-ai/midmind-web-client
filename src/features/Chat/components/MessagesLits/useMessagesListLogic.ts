@@ -3,8 +3,8 @@ import { useParams } from 'react-router';
 import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
 
 export const useMessagesListLogic = () => {
-  const { id } = useParams();
-  const { chatDetails, isLoading } = useGetChatDetails(id || '');
+  const { id: chatId } = useParams();
+  const { chatDetails, isLoading } = useGetChatDetails(chatId || '');
 
-  return { chatDetails, isLoading, id };
+  return { chatDetails, isLoading, chatId };
 };
