@@ -3,4 +3,5 @@ export const AppRoutes = {
   SignIn: '/sign-in',
   SignUp: '/sign-up',
   ForgotPassword: '/forgot-password',
+  Chat: (id: string) => `/chats/${id}`,
 } as const;

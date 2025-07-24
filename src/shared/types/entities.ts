@@ -9,3 +9,11 @@ export type User = {
   provider: string | null;
   provider_id: string | null;
 };
+
+export type Chat = {
+  id: string;
+  created_at: string;
+  name: string | null;
+  updated_at: string | null;
+  description: string | null;
+};

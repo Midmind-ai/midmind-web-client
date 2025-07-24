@@ -23,10 +23,6 @@ export const useCheckAuth = () => {
         setAuthenticated(true);
       },
       onError: () => reset(),
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-      shouldRetryOnError: false,
-      errorRetryCount: 0,
     }
   );
 
