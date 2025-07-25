@@ -76,12 +76,8 @@ baseAxiosInstance.interceptors.response.use(
         return new Promise<AxiosResponse>((resolve, reject) => {
           refreshQueue.push({
             resolve: (token: string) => {
-              if (token) {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                resolve(baseAxiosInstance(originalRequest));
-              } else {
-                reject(new Error('Token is null'));
-              }
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(baseAxiosInstance(originalRequest));
             },
             reject,
           });

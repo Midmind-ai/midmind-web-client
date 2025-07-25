@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router';
+import { useSWRConfig } from 'swr';
 
+import { SWRCacheKeys } from '@/shared/constants/api';
 import { LocalStorageKeys } from '@/shared/constants/localStorage';
 import { AppRoutes } from '@/shared/constants/router';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
@@ -8,13 +10,17 @@ import { removeFromStorage } from '@/shared/utils/localStorage';
 
 export const useSidebarFooterLogic = () => {
   const navigate = useNavigate();
+  const { mutate } = useSWRConfig();
   const { logout, isLoading } = useLogout();
   const { avatar, first_name, last_name, email } = useCurrentUser();
 
   const handleLogout = async () => {
     await logout(null, {
-      onSuccess: () => {
+      onSuccess: async () => {
         removeFromStorage(LocalStorageKeys.AccessToken);
+
+        await mutate(SWRCacheKeys.CurrentUser);
+
         navigate(AppRoutes.SignIn);
       },
     });
