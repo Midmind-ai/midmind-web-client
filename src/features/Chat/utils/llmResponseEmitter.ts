@@ -17,3 +17,7 @@ export const unsubscribeFromResponseChunk = (
 ) => {
   llmResponseEmitter.off('responseChunk', callback);
 };
+
+export const clearAllResponseChunkListeners = () => {
+  llmResponseEmitter.removeAllListeners('responseChunk');
+};

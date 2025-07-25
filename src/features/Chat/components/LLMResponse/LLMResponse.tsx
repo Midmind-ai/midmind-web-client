@@ -1,15 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import ReactMarkdown from 'react-markdown';
 
-import {
-  subscribeToResponseChunk,
-  unsubscribeFromResponseChunk,
-} from '@/features/Chat/utils/llmResponseEmitter';
+import { useLLMResponseLogic } from '@/features/Chat/components/LLMResponse/useLLMResponseLogic';
 import { ThemedP } from '@/shared/components/ThemedP';
-import { SearchParams } from '@/shared/constants/router';
-import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import type { SendMessageToChatResponse } from '@/shared/services/chats/types';
 
 type Props = {
   content: string;
@@ -17,25 +9,7 @@ type Props = {
 };
 
 const LLMResponse = ({ content, id }: Props) => {
-  const { value: currentModel } = useUrlParams(SearchParams.Model);
-  const [streamingContent, setStreamingContent] = useState(content);
-
-  const handleResponseChunk = useCallback(
-    (chunk: SendMessageToChatResponse) => {
-      if (id === chunk.id) {
-        setStreamingContent(prev => prev + chunk.body);
-      }
-    },
-    [id]
-  );
-
-  useEffect(() => {
-    subscribeToResponseChunk(handleResponseChunk);
-
-    return () => {
-      unsubscribeFromResponseChunk(handleResponseChunk);
-    };
-  }, [id, handleResponseChunk]);
+  const { currentModel, streamingContent } = useLLMResponseLogic(id, content);
 
   return (
     <div className="m-2.5">

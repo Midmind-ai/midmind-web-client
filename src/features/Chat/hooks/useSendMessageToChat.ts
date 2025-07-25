@@ -22,49 +22,57 @@ export const useSendMessageToChat = (chatId: string) => {
     SWRCacheKeys.SendMessageToChat,
     (_, { arg }: { arg: SendMessageToChatRequest }) =>
       ChatsService.sendMessageToChat(chatId, arg, (chunk: SendMessageToChatResponse) => {
-        const cachedData = cache.get(SWRCacheKeys.GetMessages(chatId));
-
-        let found = false;
-        if (cachedData && cachedData.data && Array.isArray(cachedData.data.data)) {
-          for (let i = cachedData.data.data.length - 1; i >= 0; i--) {
-            const message = cachedData.data.data[i];
-            if (message.id === chunk.id) {
-              found = true;
-              break;
-            }
-          }
-        }
-
-        if (found) {
-          emitResponseChunk(chunk);
-
-          return;
-        }
+        emitResponseChunk(chunk);
 
         if (chunk.id && chunk.type === 'content') {
-          const llmResponse: ChatMessage = {
-            id: chunk.id,
-            content: chunk.body,
-            role: 'model',
-            created_at: new Date().toISOString(),
-          };
+          const cachedData = cache.get(SWRCacheKeys.GetMessages(chatId));
+          const messages = cachedData?.data?.data;
 
-          mutate(
-            SWRCacheKeys.GetMessages(chatId),
-            (data?: { data: ChatMessage[] }) => {
-              if (data && Array.isArray(data.data)) {
+          const messageExists =
+            Array.isArray(messages) && messages.some(message => message.id === chunk.id);
+
+          if (!messageExists) {
+            const llmResponse: ChatMessage = {
+              id: chunk.id,
+              content: chunk.body,
+              role: 'model',
+              created_at: new Date().toISOString(),
+            };
+
+            mutate(
+              SWRCacheKeys.GetMessages(chatId),
+              (data?: { data: ChatMessage[] }) => {
+                if (!data?.data) {
+                  return data;
+                }
+
                 return {
                   ...data,
                   data: [...data.data, llmResponse],
                 };
-              }
+              },
+              false
+            );
+          } else {
+            mutate(
+              SWRCacheKeys.GetMessages(chatId),
+              (data?: { data: ChatMessage[] }) => {
+                if (!data?.data) {
+                  return data;
+                }
 
-              return data;
-            },
-            false
-          );
-
-          emitResponseChunk(chunk);
+                return {
+                  ...data,
+                  data: data.data.map(message =>
+                    message.id === chunk.id
+                      ? { ...message, content: message.content + chunk.body }
+                      : message
+                  ),
+                };
+              },
+              false
+            );
+          }
         }
       })
   );
@@ -80,12 +88,14 @@ export const useSendMessageToChat = (chatId: string) => {
     await mutate(
       SWRCacheKeys.GetMessages(chatId),
       (data?: { data: ChatMessage[] }) => {
-        if (data && Array.isArray(data.data)) {
-          return {
-            ...data,
-            data: [...data.data, tempMessage],
-          };
+        if (!data?.data) {
+          return data;
         }
+
+        return {
+          ...data,
+          data: [...data.data, tempMessage],
+        };
       },
       false
     );
