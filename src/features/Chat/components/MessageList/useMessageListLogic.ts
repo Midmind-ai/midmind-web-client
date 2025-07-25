@@ -4,7 +4,7 @@ import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
 import { useUpdateChatDetails } from '@/features/Chat/hooks/useUpdateChatDetails';
 
-export const useMessagesListLogic = () => {
+export const useMessageListLogic = () => {
   const { id: chatId } = useParams();
   const { chatDetails, isLoading: isChatDetailsLoading } = useGetChatDetails(chatId || '');
   const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '');

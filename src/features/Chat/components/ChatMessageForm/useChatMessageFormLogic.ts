@@ -2,13 +2,19 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 
 import { useSendMessageToChat } from '@/features/Chat/hooks/useSendMessageToChat';
+import { LLModels } from '@/shared/constants/api';
+import { SearchParams } from '@/shared/constants/router';
+import { useUrlParams } from '@/shared/hooks/useUrlParams';
 
-interface ChatMessageFormData {
+type ChatMessageFormData = {
   message: string;
-}
+};
 
 export const useChatMessageFormLogic = () => {
   const { id: chatId } = useParams();
+  const { value: currentModel, setValue: setModel } = useUrlParams(SearchParams.Model, {
+    defaultValue: LLModels.Gemini20Flash,
+  });
   const { register, handleSubmit, watch, reset } = useForm<ChatMessageFormData>({
     defaultValues: {
       message: '',
@@ -18,12 +24,14 @@ export const useChatMessageFormLogic = () => {
 
   const messageValue = watch('message');
 
+  const handleModelChange = (newModel: string) => setModel(newModel);
+
   const handleFormSubmit = (data: ChatMessageFormData) => {
     sendMessage({
       content: data.message,
-      model: 'gemini-2.0-flash',
-      parent_message_id: 'ce349c6f-ecd1-47c2-ac14-8e6b601a979c',
+      model: currentModel,
     });
+
     reset();
   };
 
@@ -31,6 +39,8 @@ export const useChatMessageFormLogic = () => {
     register,
     handleSubmit,
     handleFormSubmit,
+    handleModelChange,
+    currentModel,
     isValidMessage: !!messageValue?.trim().length,
     isLoading,
     error,

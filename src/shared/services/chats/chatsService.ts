@@ -4,6 +4,7 @@ import type { Chat, ChatMessage } from '@shared/types/entities';
 
 import type {
   SendMessageToChatRequest,
+  SendMessageToChatResponse,
   UpdateChatDetailsRequest,
 } from '@/shared/services/chats/types';
 import type { MessageResponse, PaginatedResponse } from '@/shared/types/common';
@@ -49,85 +50,37 @@ export class ChatsService {
 
   static async sendMessageToChat(
     chatId: string,
-    body: SendMessageToChatRequest
-  ): Promise<
-    ReadableStream<{ data: { content: string; type: 'content' | 'error' | 'completed' } }>
-  > {
-    return new ReadableStream({
-      async start(controller) {
-        try {
-          if (!chatId || !body.content) {
-            controller.enqueue({
-              data: {
-                content: 'Invalid chatId or message',
-                type: 'error',
-              },
-            });
-            controller.close();
+    body: SendMessageToChatRequest,
+    onChunk: (data: SendMessageToChatResponse) => void
+  ) {
+    try {
+      let lastProcessedLength = 0;
 
-            return;
-          }
+      await baseAxiosInstance.post<SendMessageToChatResponse>(`/chats/${chatId}/messages`, body, {
+        responseType: 'text',
+        onDownloadProgress: progressEvent => {
+          const responseText = progressEvent.event.target.response;
 
-          controller.enqueue({
-            data: {
-              content: 'Начинаю обработку сообщения...',
-              type: 'content',
-            },
-          });
+          const newData = responseText.slice(lastProcessedLength);
+          lastProcessedLength = responseText.length;
 
-          const response = await baseAxiosInstance.post(`/chats/${chatId}/messages`, body, {
-            responseType: 'stream',
-          });
+          const lines = newData.split('\n').filter((line: string) => line.trim());
 
-          const reader = response.data.getReader();
-          const decoder = new TextDecoder();
+          for (const line of lines) {
+            const trimmed = line.trim();
 
-          while (true) {
-            const { done, value } = await reader.read();
+            if (trimmed.startsWith('data:')) {
+              const jsonStr = trimmed.replace(/^data:\s*/, '');
 
-            if (done) {
-              break;
-            }
+              const parsed = JSON.parse(jsonStr);
 
-            const chunkText = decoder.decode(value, { stream: true });
-
-            for (const line of chunkText.split('\n')) {
-              if (!line.trim()) {
-                continue;
-              }
-
-              try {
-                const parsed = JSON.parse(line);
-                controller.enqueue({ data: parsed });
-              } catch (error) {
-                console.error('Error parsing chunk:', error);
-                controller.enqueue({
-                  data: {
-                    content: line,
-                    type: 'content',
-                  },
-                });
-              }
+              onChunk(parsed);
             }
           }
-
-          controller.enqueue({
-            data: {
-              content: 'Сообщение успешно отправлено',
-              type: 'completed',
-            },
-          });
-        } catch (error) {
-          controller.enqueue({
-            data: {
-              content: error instanceof Error ? error.message : 'Произошла неизвестная ошибка',
-              type: 'error',
-            },
-          });
-        } finally {
-          controller.close();
-        }
-      },
-    });
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

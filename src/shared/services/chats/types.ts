@@ -5,5 +5,11 @@ export type UpdateChatDetailsRequest = {
 export type SendMessageToChatRequest = {
   content: string;
   model: string;
-  parent_message_id: string;
+  parent_message_id?: string;
+};
+
+export type SendMessageToChatResponse = {
+  id: string;
+  body: string;
+  type: 'content' | 'error' | 'completed';
 };

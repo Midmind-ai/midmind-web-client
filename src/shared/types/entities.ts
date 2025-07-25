@@ -20,7 +20,6 @@ export type Chat = {
 export type ChatMessage = {
   id: string;
   content: string;
-  user_id: string | null;
+  role: 'user' | 'model';
   created_at: string;
-  type: string; // add enum
 };

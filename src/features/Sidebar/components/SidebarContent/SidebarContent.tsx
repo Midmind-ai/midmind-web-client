@@ -7,7 +7,8 @@ import { useSidebarContentLogic } from '@/features/Sidebar/components/SidebarCon
 import { Button } from '@/shared/components/Button';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ThemedH3 } from '@/shared/components/ThemedH3';
-import { AppRoutes } from '@/shared/constants/router';
+import { LLModels } from '@/shared/constants/api';
+import { AppRoutes, SearchParams } from '@/shared/constants/router';
 
 const SidebarContent = () => {
   const { chats, isLoading, isDeleting, handleDelete } = useSidebarContentLogic();
@@ -32,7 +33,7 @@ const SidebarContent = () => {
           >
             <Link
               className="block flex-1 truncate"
-              to={AppRoutes.Chat(chat.id)}
+              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=${LLModels.Gemini20Flash}`}
             >
               {chat.id}
             </Link>

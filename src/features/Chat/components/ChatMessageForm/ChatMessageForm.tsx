@@ -15,7 +15,7 @@ import { Button } from '@/shared/components/Button';
 import { LLModels } from '@/shared/constants/api';
 
 const ChatMessageForm = () => {
-  const { register, handleSubmit, handleFormSubmit, isValidMessage, isLoading } =
+  const { register, handleSubmit, handleFormSubmit, handleModelChange, currentModel, isLoading } =
     useChatMessageFormLogic();
 
   return (
@@ -25,8 +25,14 @@ const ChatMessageForm = () => {
         onSubmit={handleSubmit(handleFormSubmit)}
         className="flex items-center w-full p-2 gap-2"
       >
-        <Select defaultValue={LLModels.Gemini20Flash}>
-          <SelectTrigger className="h-8 p-0 gap-0">
+        <Select
+          value={currentModel}
+          onValueChange={handleModelChange}
+        >
+          <SelectTrigger
+            size="sm"
+            className="p-0 gap-0"
+          >
             <div className="px-2">
               <SelectValue />
             </div>
@@ -44,20 +50,21 @@ const ChatMessageForm = () => {
         </Select>
         <Button
           type="button"
-          className="size-8 bg-secondary hover:bg-secondary"
+          variant="secondary"
+          className="size-8"
         >
           <PaperclipIcon className="text-secondary-foreground" />
         </Button>
         <div className="flex-1">
           <Input
             {...register('message')}
+            autoComplete="off"
             className="border-0 shadow-none p-0 focus-visible:ring-0"
             placeholder="Write a message..."
           />
         </div>
         <Button
-          type="submit"
-          disabled={!isValidMessage || isLoading}
+          disabled={isLoading}
           className="size-9"
         >
           <MicIcon />

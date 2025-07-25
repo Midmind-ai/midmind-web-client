@@ -2,7 +2,7 @@ import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axio
 
 import router from '@app/Router';
 
-import { ApiErrorCodes, TIMEOUT } from '@shared/constants/api';
+import { ApiErrorCodes } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
@@ -42,7 +42,6 @@ const addTokenToRequest = (request: InternalAxiosRequestConfig) => {
 
 export const baseAxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: TIMEOUT,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -51,7 +50,6 @@ export const baseAxiosInstance = axios.create({
 
 export const authAxiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/auth`,
-  timeout: TIMEOUT,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
