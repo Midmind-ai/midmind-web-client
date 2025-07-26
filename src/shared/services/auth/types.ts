@@ -1,12 +1,7 @@
-export type SignInWithGoogleRequest = {
-  code: string;
-};
+import type { components } from '@shared/services/types/generated';
 
-export type SignInRequest = {
-  email: string;
-  password: string;
-};
+export type SignInWithGoogleRequest = components['schemas']['SignInWithGoogleDto'];
 
-export type TokenResponse = {
-  access_token: string;
-};
+export type SignInRequest = components['schemas']['SingInDto'];
+
+export type TokenResponse = components['schemas']['AccessTokenDto'];

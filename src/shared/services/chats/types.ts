@@ -1,15 +1,7 @@
-export type UpdateChatDetailsRequest = {
-  name: string;
-};
+import type { components } from '@shared/services/types/generated';
 
-export type SendMessageToChatRequest = {
-  content: string;
-  model: string;
-  parent_message_id?: string;
-};
+export type UpdateChatDetailsRequest = components['schemas']['UpdateChatDto'];
 
-export type SendMessageToChatResponse = {
-  id: string;
-  body: string;
-  type: 'content' | 'error' | 'completed';
-};
+export type SendMessageToChatRequest = components['schemas']['CreateMessageDto'];
+
+export type SendMessageToChatResponse = components['schemas']['CreateMessageResponseContentDto'];

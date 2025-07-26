@@ -1,17 +1,6 @@
-export type MessageResponse = {
-  message: string;
-};
+import type { components } from '@shared/services/types/generated';
 
-type PaginationData = {
-  currentPage: number;
-  lastPage: number;
-  next: number | null;
-  prev: number | null;
-  total: number;
-  perPage: number;
-};
+export type MessageResponse = components['schemas']['MessageDto'];
 
-export type PaginatedResponse<T> = {
-  data: T;
-  meta: PaginationData;
-};
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type PaginatedResponse<_T> = components['schemas']['PaginatedResult'];
