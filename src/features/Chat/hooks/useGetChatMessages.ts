@@ -10,13 +10,9 @@ export const useGetChatMessages = (chatId: string, params: GetChatMessagesParams
     data: messages,
     isLoading,
     error,
-  } = useSWR(
-    [SWRCacheKeys.GetMessages(chatId), params],
-    () => ChatsService.getChatMessages(chatId, params),
-    {
-      revalidateOnFocus: false,
-    }
-  );
+  } = useSWR(SWRCacheKeys.GetMessages(chatId), () => ChatsService.getChatMessages(chatId, params), {
+    revalidateOnFocus: false,
+  });
 
   return {
     isLoading,
