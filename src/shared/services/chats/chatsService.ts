@@ -6,6 +6,7 @@ import type {
   SendMessageToChatRequest,
   SendMessageToChatResponse,
   UpdateChatDetailsRequest,
+  GetChatMessagesParams,
 } from '@/shared/services/chats/types';
 import type { MessageResponse, PaginatedResponse } from '@/shared/types/common';
 
@@ -40,9 +41,10 @@ export class ChatsService {
     return data;
   }
 
-  static async getChatMessages(chatId: string) {
+  static async getChatMessages(chatId: string, params: GetChatMessagesParams) {
     const { data } = await baseAxiosInstance.get<PaginatedResponse<ChatMessage[]>>(
-      `/chats/${chatId}/messages`
+      `/chats/${chatId}/messages`,
+      { params }
     );
 
     return data;

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -10,10 +10,13 @@ export const useMessageListLogic = () => {
   const { id: chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { chatDetails, isLoading: isChatDetailsLoading } = useGetChatDetails(chatId || '');
-  const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '');
+  const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '', {
+    skip: 0,
+    take: 20,
+  });
   const { updateChatDetails, isLoading: isUpdating } = useUpdateChatDetails();
 
-  const handleAutoScroll = () => {
+  const handleAutoScroll = (withAnimation = true) => {
     if (scrollAreaRef.current) {
       const scrollElement = scrollAreaRef.current.querySelector(
         '[data-radix-scroll-area-viewport]'
@@ -22,11 +25,15 @@ export const useMessageListLogic = () => {
       if (scrollElement) {
         scrollElement.scrollTo({
           top: scrollElement.scrollHeight,
-          behavior: 'smooth',
+          behavior: withAnimation ? 'smooth' : 'auto',
         });
       }
     }
   };
+
+  useEffect(() => {
+    handleAutoScroll(false);
+  }, [chatId]);
 
   return {
     chatDetails,
