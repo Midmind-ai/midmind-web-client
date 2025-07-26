@@ -5,3 +5,7 @@ export const AppRoutes = {
   ForgotPassword: '/forgot-password',
   Chat: (id: string) => `/chats/${id}`,
 } as const;
+
+export const SearchParams = {
+  Model: 'model',
+} as const;

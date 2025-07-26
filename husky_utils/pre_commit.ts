@@ -33,12 +33,12 @@ const validateTypes = async () => {
   return new Promise<void>((resolve, reject) => {
     const loaderInterval = loader('Running type checking');
 
-    exec('yarn types', (error, stdout) => {
+    exec('yarn types:check', (error, stdout) => {
       clearInterval(loaderInterval);
       emptyLine();
 
       if (error) {
-        console.log(chalk.red('✖ yarn types\n'));
+        console.log(chalk.red('✖ yarn types:check\n'));
 
         const errors = parseTypescriptErrors(stdout);
 

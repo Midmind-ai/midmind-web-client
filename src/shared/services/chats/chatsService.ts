@@ -1,9 +1,14 @@
 import { baseAxiosInstance } from '@shared/config/axios';
 
-import { type Chat } from '@shared/types/entities';
+import type { Chat, ChatMessage } from '@shared/types/entities';
 
-import type { UpdateChatDetailsRequest } from '@/shared/services/chats/types';
-import type { MessageResponse } from '@/shared/types/common';
+import type {
+  SendMessageToChatRequest,
+  SendMessageToChatResponse,
+  UpdateChatDetailsRequest,
+  GetChatMessagesParams,
+} from '@/shared/services/chats/types';
+import type { MessageResponse, PaginatedResponse } from '@/shared/types/common';
 
 export class ChatsService {
   static async getChats() {
@@ -18,21 +23,66 @@ export class ChatsService {
     return data;
   }
 
-  static async getChatDetails(id: string) {
-    const { data } = await baseAxiosInstance.get<Chat>(`/chats/${id}`);
+  static async getChatDetails(chatId: string) {
+    const { data } = await baseAxiosInstance.get<Chat>(`/chats/${chatId}`);
 
     return data;
   }
 
-  static async updateChatDetails(id: string, body: UpdateChatDetailsRequest) {
-    const { data } = await baseAxiosInstance.put<MessageResponse>(`/chats/${id}`, body);
+  static async updateChatDetails(chatId: string, body: UpdateChatDetailsRequest) {
+    const { data } = await baseAxiosInstance.put<MessageResponse>(`/chats/${chatId}`, body);
 
     return data;
   }
 
-  static async deleteChat(id: string) {
-    const { data } = await baseAxiosInstance.delete<MessageResponse>(`/chats/${id}`);
+  static async deleteChat(chatId: string) {
+    const { data } = await baseAxiosInstance.delete<MessageResponse>(`/chats/${chatId}`);
 
     return data;
+  }
+
+  static async getChatMessages(chatId: string, params: GetChatMessagesParams) {
+    const { data } = await baseAxiosInstance.get<PaginatedResponse<ChatMessage[]>>(
+      `/chats/${chatId}/messages`,
+      { params }
+    );
+
+    return data;
+  }
+
+  static async sendMessageToChat(
+    chatId: string,
+    body: SendMessageToChatRequest,
+    onChunk: (data: SendMessageToChatResponse) => void
+  ) {
+    try {
+      let lastProcessedLength = 0;
+
+      await baseAxiosInstance.post<SendMessageToChatResponse>(`/chats/${chatId}/messages`, body, {
+        responseType: 'text',
+        onDownloadProgress: progressEvent => {
+          const responseText = progressEvent.event.target.response;
+
+          const newData = responseText.slice(lastProcessedLength);
+          lastProcessedLength = responseText.length;
+
+          const lines = newData.split('\n').filter((line: string) => line.trim());
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+
+            if (trimmed.startsWith('data:')) {
+              const jsonStr = trimmed.replace(/^data:\s*/, '');
+
+              const parsed = JSON.parse(jsonStr);
+
+              onChunk(parsed);
+            }
+          }
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

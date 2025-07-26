@@ -18,7 +18,8 @@ export const useSidebarContentLogic = () => {
 
     if (currentChatId === chatId) {
       if (updatedChats.length > 0) {
-        navigate(AppRoutes.Chat(updatedChats[updatedChats.length - 1].id));
+        const currentSearch = location.search;
+        navigate(`${AppRoutes.Chat(updatedChats[updatedChats.length - 1].id)}${currentSearch}`);
       } else {
         navigate(AppRoutes.Home);
       }

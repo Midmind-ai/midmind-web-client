@@ -2,8 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
+import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
+import { SWRCacheKeys } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 import { AppRoutes } from '@shared/constants/router';
 
@@ -22,6 +24,7 @@ const signInValidationSchema = z.object({
 
 export const useSignInFormLogic = () => {
   const navigate = useNavigate();
+  const { mutate } = useSWRConfig();
   const { signIn } = useSignIn();
   const {
     register,
@@ -38,6 +41,8 @@ export const useSignInFormLogic = () => {
 
       setToStorage(LocalStorageKeys.AccessToken, response.access_token);
 
+      await mutate(SWRCacheKeys.CurrentUser);
+
       navigate(AppRoutes.Home);
     },
     onError: error => {
@@ -48,8 +53,10 @@ export const useSignInFormLogic = () => {
 
   const handleSignIn = (data: SignInRequest) => {
     signIn(data, {
-      onSuccess: response => {
+      onSuccess: async response => {
         setToStorage(LocalStorageKeys.AccessToken, response.access_token);
+
+        await mutate(SWRCacheKeys.CurrentUser);
 
         navigate(AppRoutes.Home);
       },
