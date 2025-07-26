@@ -6,10 +6,11 @@ import { ThemedP } from '@/shared/components/ThemedP';
 type Props = {
   content: string;
   id: string;
+  onContentChange: VoidFunction;
 };
 
-const LLMResponse = ({ content, id }: Props) => {
-  const { currentModel, streamingContent } = useLLMResponseLogic(id, content);
+const LLMResponse = ({ content, id, onContentChange }: Props) => {
+  const { currentModel, streamingContent } = useLLMResponseLogic(id, content, onContentChange);
 
   return (
     <div className="m-2.5">

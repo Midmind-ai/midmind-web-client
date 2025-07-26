@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { useParams } from 'react-router';
 
 import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
@@ -6,9 +8,25 @@ import { useUpdateChatDetails } from '@/features/Chat/hooks/useUpdateChatDetails
 
 export const useMessageListLogic = () => {
   const { id: chatId } = useParams();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { chatDetails, isLoading: isChatDetailsLoading } = useGetChatDetails(chatId || '');
   const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '');
   const { updateChatDetails, isLoading: isUpdating } = useUpdateChatDetails();
+
+  const handleAutoScroll = () => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      );
+
+      if (scrollElement) {
+        scrollElement.scrollTo({
+          top: scrollElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }
+  };
 
   return {
     chatDetails,
@@ -17,6 +35,8 @@ export const useMessageListLogic = () => {
     messages,
     isMessagesLoading,
     isUpdating,
+    scrollAreaRef,
     updateChatDetails,
+    handleAutoScroll,
   };
 };
