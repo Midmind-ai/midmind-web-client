@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -30,10 +30,6 @@ export const useMessageListLogic = () => {
       }
     }
   };
-
-  useEffect(() => {
-    handleAutoScroll(false);
-  }, [chatId]);
 
   return {
     chatDetails,

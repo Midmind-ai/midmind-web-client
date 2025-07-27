@@ -53,25 +53,6 @@ export const useSendMessageToChat = (chatId: string) => {
               },
               false
             );
-          } else {
-            mutate(
-              SWRCacheKeys.GetMessages(chatId),
-              (data?: { data: ChatMessage[] }) => {
-                if (!data?.data) {
-                  return data;
-                }
-
-                return {
-                  ...data,
-                  data: data.data.map(message =>
-                    message.id === chunk.id
-                      ? { ...message, content: message.content + chunk.body }
-                      : message
-                  ),
-                };
-              },
-              false
-            );
           }
         }
       })

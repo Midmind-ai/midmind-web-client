@@ -1,10 +1,12 @@
+import { memo } from 'react';
+
 import LLMResponse from '@/features/Chat/components/LLMResponse/LLMResponse';
 import { useMessageListLogic } from '@/features/Chat/components/MessageList/useMessageListLogic';
 import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 
-const MessageList = () => {
-  const { messages, scrollAreaRef, handleAutoScroll } = useMessageListLogic();
+const MessageList = memo(() => {
+  const { messages, scrollAreaRef } = useMessageListLogic();
 
   return (
     <ScrollArea
@@ -27,13 +29,14 @@ const MessageList = () => {
               key={id}
               id={id}
               content={content}
-              onContentChange={handleAutoScroll}
             />
           );
         })}
       </div>
     </ScrollArea>
   );
-};
+});
+
+MessageList.displayName = 'MessageList';
 
 export default MessageList;

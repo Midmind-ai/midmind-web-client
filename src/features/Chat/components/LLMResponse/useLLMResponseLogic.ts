@@ -8,7 +8,7 @@ import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import type { SendMessageToChatResponse } from '@/shared/services/chats/types';
 
-export const useLLMResponseLogic = (id: string, content: string, onContentChange: VoidFunction) => {
+export const useLLMResponseLogic = (id: string, content: string) => {
   const { value: currentModel } = useUrlParams(SearchParams.Model);
   const [streamingContent, setStreamingContent] = useState(content);
 
@@ -22,11 +22,9 @@ export const useLLMResponseLogic = (id: string, content: string, onContentChange
 
           return prev + chunk.body;
         });
-
-        onContentChange();
       }
     },
-    [id, onContentChange]
+    [id]
   );
 
   useEffect(() => {
