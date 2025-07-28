@@ -48,7 +48,7 @@ export const useSendMessageToChat = (chatId: string) => {
 
                 return {
                   ...data,
-                  data: [...data.data, llmResponse],
+                  data: [llmResponse, ...data.data],
                 };
               },
               false
@@ -75,7 +75,7 @@ export const useSendMessageToChat = (chatId: string) => {
 
         return {
           ...data,
-          data: [...data.data, tempMessage],
+          data: [tempMessage, ...data.data],
         };
       },
       false

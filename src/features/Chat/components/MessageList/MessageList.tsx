@@ -6,15 +6,16 @@ import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 
 const MessageList = memo(() => {
-  const { messages, scrollAreaRef } = useMessageListLogic();
+  const { messages, scrollAreaRef, handleScroll } = useMessageListLogic();
 
   return (
     <ScrollArea
       ref={scrollAreaRef}
       className="flex-1 overflow-y-auto"
+      onScroll={handleScroll}
     >
       <div className="flex flex-col gap-2.5">
-        {messages?.data?.map(({ id, content, role }) => {
+        {messages?.map(({ id, content, role }) => {
           if (role === 'user') {
             return (
               <UserMessage
