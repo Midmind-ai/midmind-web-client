@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState, useEffect, type UIEvent } from 'react';
+import { useRef, type UIEvent } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -6,19 +6,19 @@ import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
 import { useUpdateChatDetails } from '@/features/Chat/hooks/useUpdateChatDetails';
 
-const TAKE = 20;
-
 export const useMessageListLogic = () => {
   const { id: chatId } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [skip, setSkip] = useState(0);
-  const [take, setTake] = useState(TAKE);
 
   const { chatDetails, isLoading: isChatDetailsLoading } = useGetChatDetails(chatId || '');
-  const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '', {
-    skip,
-    take,
-  });
+  const {
+    messages,
+    isLoading: isMessagesLoading,
+    hasMore,
+    loadMore,
+    refresh,
+    isValidating,
+  } = useGetChatMessages(chatId || '');
   const { updateChatDetails, isLoading: isUpdating } = useUpdateChatDetails();
 
   const handleAutoScroll = (withAnimation = true) => {
@@ -36,31 +36,13 @@ export const useMessageListLogic = () => {
     }
   };
 
-  const handleLoadMoreMessages = useCallback(() => {
-    setSkip(prevSkip => prevSkip + take);
-    setTake(TAKE);
-  }, [take]);
+  const handleLoadMore = () => {
+    if (hasMore && !isValidating) {
+      loadMore();
+    }
+  };
 
-  const handleScroll = useCallback(
-    (event: UIEvent<HTMLDivElement>) => {
-      const target = event.target as HTMLDivElement;
-      const scrollTop = target.scrollTop;
-
-      if (scrollTop <= 5) {
-        handleLoadMoreMessages();
-      }
-    },
-    [handleLoadMoreMessages]
-  );
-
-  const resetPagination = useCallback(() => {
-    setSkip(0);
-    setTake(TAKE);
-  }, []);
-
-  useEffect(() => {
-    resetPagination();
-  }, [chatId, resetPagination]);
+  const handleScroll = (_event: UIEvent<HTMLDivElement>) => {};
 
   return {
     chatDetails,
@@ -69,10 +51,13 @@ export const useMessageListLogic = () => {
     messages,
     isMessagesLoading,
     isUpdating,
+    hasMore,
+    isValidating,
     scrollAreaRef,
     updateChatDetails,
     handleAutoScroll,
     handleScroll,
-    handleLoadMoreMessages,
+    handleLoadMore,
+    refresh,
   };
 };
