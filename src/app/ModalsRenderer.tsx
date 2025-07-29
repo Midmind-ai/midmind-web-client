@@ -25,15 +25,15 @@ const ModalsRenderer = () => {
 
         return (
           <Fragment key={index}>
-            <Component
-              // open={!isClosing}
-              // onAnimationEnd={() => {
-              //   if (isClosing) {
-              //     finishClosing(modal.name);
-              //   }
-              // }}
+            {/* <Component
+              open={!isClosing}
+              onAnimationEnd={() => {
+                if (isClosing) {
+                  finishClosing(modal.name);
+                }
+              }}
               {...modal.props}
-            />
+            /> */}
           </Fragment>
         );
       })}
