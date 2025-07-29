@@ -47,9 +47,12 @@ export const useModalsStore = create<ModalsStore>(set => ({
     });
   },
   closeAllModals: () => {
-    set({
-      modals: [],
-      closingModals: new Set(),
+    set(state => {
+      const allModalNames = state.modals.map(modal => modal.name);
+
+      return {
+        closingModals: new Set([...state.closingModals, ...allModalNames]),
+      };
     });
   },
 }));

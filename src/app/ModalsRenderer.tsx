@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { type ModalNames, Modals } from '@/shared/constants/modals';
+import { Modals } from '@/shared/constants/modals';
 import { useModalsStore } from '@/shared/stores/useModalsStore';
 
 const ModalsRenderer = () => {
@@ -13,7 +13,7 @@ const ModalsRenderer = () => {
   return (
     <>
       {modals.map((modal, index) => {
-        const Component = Modals[modal.name as ModalNames];
+        const Component = Modals[modal.name];
         const isClosing = closingModals.has(modal.name);
 
         if (!Component) {
