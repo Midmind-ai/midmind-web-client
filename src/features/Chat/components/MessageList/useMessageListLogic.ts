@@ -1,20 +1,23 @@
-import { useRef } from 'react';
+import { useRef, type UIEvent, useEffect } from 'react';
 
 import { useParams } from 'react-router';
 
-import { useGetChatDetails } from '@/features/Chat/hooks/useGetChatDetails';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
-import { useUpdateChatDetails } from '@/features/Chat/hooks/useUpdateChatDetails';
+
+const LOAD_MORE_SCROLL_DISTANCE = 1000; // 1000px
 
 export const useMessageListLogic = () => {
-  const { id: chatId } = useParams();
+  const { id: chatId = '' } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const { chatDetails, isLoading: isChatDetailsLoading } = useGetChatDetails(chatId || '');
-  const { messages, isLoading: isMessagesLoading } = useGetChatMessages(chatId || '', {
-    skip: 0,
-    take: 20,
-  });
-  const { updateChatDetails, isLoading: isUpdating } = useUpdateChatDetails();
+  const previousScrollTopPositionRef = useRef(0);
+
+  const {
+    messages,
+    isLoading: isMessagesLoading,
+    hasMore,
+    loadMore,
+    isValidating,
+  } = useGetChatMessages(chatId);
 
   const handleAutoScroll = (withAnimation = true) => {
     if (scrollAreaRef.current) {
@@ -31,15 +34,33 @@ export const useMessageListLogic = () => {
     }
   };
 
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+    const scrollTop = target.scrollTop;
+
+    const isScrollingUp = scrollTop < previousScrollTopPositionRef.current;
+
+    if (
+      isScrollingUp &&
+      scrollTop < LOAD_MORE_SCROLL_DISTANCE &&
+      hasMore &&
+      !isValidating &&
+      !isMessagesLoading
+    ) {
+      loadMore();
+    }
+
+    previousScrollTopPositionRef.current = scrollTop;
+  };
+
+  useEffect(() => {
+    handleAutoScroll(false);
+  }, [chatId, isMessagesLoading]);
+
   return {
-    chatDetails,
-    isChatDetailsLoading,
-    chatId,
     messages,
     isMessagesLoading,
-    isUpdating,
     scrollAreaRef,
-    updateChatDetails,
-    handleAutoScroll,
+    handleScroll,
   };
 };
