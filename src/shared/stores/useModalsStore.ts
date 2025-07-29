@@ -10,18 +10,13 @@ type ModalData = {
 type ModalsState = {
   modals: ModalData[];
   closingModals: Set<string>;
-};
-
-type ModalsActions = {
   openModal: (modalName: ModalNames, props?: Record<string, unknown>) => void;
   closeModal: (modalName: ModalNames) => void;
   closeAllModals: () => void;
   finishClosing: (modalName: ModalNames) => void;
 };
 
-type ModalsStore = ModalsState & ModalsActions;
-
-export const useModalsStore = create<ModalsStore>(set => ({
+export const useModalsStore = create<ModalsState>(set => ({
   modals: [],
   closingModals: new Set(),
   openModal: (modalName: ModalNames, props = {}) => {
@@ -56,3 +51,15 @@ export const useModalsStore = create<ModalsStore>(set => ({
     });
   },
 }));
+
+export const useModalActions = () => {
+  const openModal = useModalsStore(state => state.openModal);
+  const closeModal = useModalsStore(state => state.closeModal);
+  const closeAllModals = useModalsStore(state => state.closeAllModals);
+
+  return {
+    openModal,
+    closeModal,
+    closeAllModals,
+  };
+};
