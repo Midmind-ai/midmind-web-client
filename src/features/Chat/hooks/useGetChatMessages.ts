@@ -6,7 +6,7 @@ import { ChatsService } from '@/shared/services/chats/chatsService';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
-export const ITEMS_PER_PAGE = 4;
+export const ITEMS_PER_PAGE = 20;
 
 export const useGetChatMessages = (chatId: string) => {
   const getKey = (pageIndex: number, previousPageData: PaginatedResponse<ChatMessage[]> | null) => {
@@ -26,7 +26,6 @@ export const useGetChatMessages = (chatId: string) => {
     size,
     setSize,
     isValidating,
-    mutate,
   } = useSWRInfinite(
     getKey,
     key => {
@@ -51,17 +50,12 @@ export const useGetChatMessages = (chatId: string) => {
     }
   };
 
-  const refresh = () => {
-    mutate();
-  };
-
   return {
     isLoading,
     messages,
     error,
     hasMore,
     loadMore,
-    refresh,
     isValidating,
   };
 };

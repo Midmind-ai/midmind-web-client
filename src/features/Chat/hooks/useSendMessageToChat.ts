@@ -58,7 +58,10 @@ export const useSendMessageToChat = (chatId: string) => {
 
               return updatedData;
             },
-            false
+            {
+              revalidate: false,
+              populateCache: true,
+            }
           );
         }
       })
@@ -96,7 +99,10 @@ export const useSendMessageToChat = (chatId: string) => {
 
         return updatedData;
       },
-      false
+      {
+        revalidate: false,
+        populateCache: true,
+      }
     );
 
     await trigger(body, {

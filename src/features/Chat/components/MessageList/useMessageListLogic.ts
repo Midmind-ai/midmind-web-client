@@ -4,11 +4,12 @@ import { useParams } from 'react-router';
 
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
 
-const LOAD_MORE_SCROLL_DISTANCE = 1000;
+const LOAD_MORE_SCROLL_DISTANCE = 1000; // 1000px
 
 export const useMessageListLogic = () => {
   const { id: chatId = '' } = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const previousScrollTopPositionRef = useRef(0);
 
   const {
     messages,
@@ -37,9 +38,19 @@ export const useMessageListLogic = () => {
     const target = event.target as HTMLElement;
     const scrollTop = target.scrollTop;
 
-    if (scrollTop < LOAD_MORE_SCROLL_DISTANCE && hasMore && !isValidating && !isMessagesLoading) {
+    const isScrollingUp = scrollTop < previousScrollTopPositionRef.current;
+
+    if (
+      isScrollingUp &&
+      scrollTop < LOAD_MORE_SCROLL_DISTANCE &&
+      hasMore &&
+      !isValidating &&
+      !isMessagesLoading
+    ) {
       loadMore();
     }
+
+    previousScrollTopPositionRef.current = scrollTop;
   };
 
   useEffect(() => {
