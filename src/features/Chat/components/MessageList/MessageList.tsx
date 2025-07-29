@@ -7,20 +7,14 @@ import { Button } from '@/shared/components/Button';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 
 const MessageList = memo(() => {
-  const {
-    messages,
-    scrollAreaRef,
-    hasMore,
-    isValidating,
-    handleLoadMore,
-    // handleScroll
-  } = useMessageListLogic();
+  const { messages, scrollAreaRef, hasMore, isValidating, handleLoadMore, handleScroll } =
+    useMessageListLogic();
 
   return (
     <ScrollArea
       ref={scrollAreaRef}
       className="flex-1 overflow-y-auto"
-      // onScroll={handleScroll}
+      onScroll={handleScroll}
     >
       <div className="flex flex-col gap-2.5">
         {hasMore && (

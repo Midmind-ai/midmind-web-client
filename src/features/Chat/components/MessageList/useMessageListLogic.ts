@@ -1,4 +1,4 @@
-import { useRef, type UIEvent } from 'react';
+import { useRef, type UIEvent, useEffect } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -43,6 +43,10 @@ export const useMessageListLogic = () => {
   };
 
   const handleScroll = (_event: UIEvent<HTMLDivElement>) => {};
+
+  useEffect(() => {
+    handleAutoScroll(false);
+  }, [chatId, isMessagesLoading]);
 
   return {
     chatDetails,
