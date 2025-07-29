@@ -11,6 +11,7 @@ export const getInfiniteKey = (chatId: string) => {
       if (previousPageData && !previousPageData.data?.length) {
         return null;
       }
+
       const skip = pageIndex * ITEMS_PER_PAGE;
 
       return `${SWRCacheKeys.GetMessages(chatId)}?page=${pageIndex}&skip=${skip}&take=${ITEMS_PER_PAGE}`;

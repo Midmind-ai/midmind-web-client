@@ -35,12 +35,25 @@ export const useGetChatMessages = (chatId: string) => {
       return ChatsService.getChatMessages(chatId, { skip, take: ITEMS_PER_PAGE });
     },
     {
-      revalidateOnFocus: false,
       revalidateFirstPage: false,
     }
   );
 
-  const messages = pages ? pages.flatMap(page => page.data || []).reverse() : [];
+  const messages = pages
+    ? (() => {
+        const messageMap = new Map<string, ChatMessage>();
+
+        for (const page of pages) {
+          for (const message of page.data || []) {
+            if (!messageMap.has(message.id)) {
+              messageMap.set(message.id, message);
+            }
+          }
+        }
+
+        return Array.from(messageMap.values()).reverse();
+      })()
+    : [];
 
   const hasMore = pages && pages.length > 0 && pages[pages.length - 1]?.meta?.next !== null;
 
