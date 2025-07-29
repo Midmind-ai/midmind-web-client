@@ -5,15 +5,17 @@ import { SWRCacheKeys } from '@shared/constants/api';
 
 import { ChatsService } from '@shared/services/chats/chatsService';
 
+import { getInfiniteKey } from '@/features/Chat/utils/getInfiniteKey';
 import { emitResponseChunk } from '@/features/Chat/utils/llmResponseEmitter';
 import type {
   SendMessageToChatRequest,
   SendMessageToChatResponse,
 } from '@/shared/services/chats/types';
+import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
 export const useSendMessageToChat = (chatId: string) => {
-  const { cache, mutate } = useSWRConfig();
+  const { mutate } = useSWRConfig();
   const {
     trigger,
     isMutating: isLoading,
@@ -25,35 +27,39 @@ export const useSendMessageToChat = (chatId: string) => {
         emitResponseChunk(chunk);
 
         if (chunk.id && chunk.type === 'content') {
-          const cachedData = cache.get(SWRCacheKeys.GetMessages(chatId));
-          const messages = cachedData?.data?.data;
+          const llmResponse: ChatMessage = {
+            id: chunk.id,
+            content: chunk.body,
+            role: 'model',
+            created_at: new Date().toISOString(),
+          };
 
-          const messageExists =
-            Array.isArray(messages) && messages.some(message => message.id === chunk.id);
+          mutate(
+            getInfiniteKey(chatId),
+            (data?: PaginatedResponse<ChatMessage[]>[]) => {
+              if (!data || !Array.isArray(data) || data.length === 0) {
+                return data;
+              }
 
-          if (!messageExists) {
-            const llmResponse: ChatMessage = {
-              id: chunk.id,
-              content: chunk.body,
-              role: 'model',
-              created_at: new Date().toISOString(),
-            };
+              const allMessages = data.flatMap(page => page.data || []);
+              const messageExists = allMessages.some(message => message.id === chunk.id);
 
-            mutate(
-              SWRCacheKeys.GetMessages(chatId),
-              (data?: { data: ChatMessage[] }) => {
-                if (!data?.data) {
-                  return data;
-                }
+              if (messageExists) {
+                return data;
+              }
 
-                return {
-                  ...data,
-                  data: [llmResponse, ...data.data],
+              const updatedData = [...data];
+              if (updatedData[0]) {
+                updatedData[0] = {
+                  ...updatedData[0],
+                  data: [llmResponse, ...(updatedData[0].data || [])],
                 };
-              },
-              false
-            );
-          }
+              }
+
+              return updatedData;
+            },
+            false
+          );
         }
       })
   );
@@ -67,16 +73,28 @@ export const useSendMessageToChat = (chatId: string) => {
     };
 
     await mutate(
-      SWRCacheKeys.GetMessages(chatId),
-      (data?: { data: ChatMessage[] }) => {
-        if (!data?.data) {
+      getInfiniteKey(chatId),
+      (data?: PaginatedResponse<ChatMessage[]>[]) => {
+        if (!data || !Array.isArray(data) || data.length === 0) {
           return data;
         }
 
-        return {
-          ...data,
-          data: [tempMessage, ...data.data],
-        };
+        const allMessages = data.flatMap(page => page.data || []);
+        const messageExists = allMessages.some(message => message.id === tempMessage.id);
+
+        if (messageExists) {
+          return data;
+        }
+
+        const updatedData = [...data];
+        if (updatedData[0]) {
+          updatedData[0] = {
+            ...updatedData[0],
+            data: [tempMessage, ...(updatedData[0].data || [])],
+          };
+        }
+
+        return updatedData;
       },
       false
     );

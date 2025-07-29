@@ -6,7 +6,7 @@ import { ChatsService } from '@/shared/services/chats/chatsService';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
-const ITEMS_PER_PAGE = 20;
+export const ITEMS_PER_PAGE = 4;
 
 export const useGetChatMessages = (chatId: string) => {
   const getKey = (pageIndex: number, previousPageData: PaginatedResponse<ChatMessage[]> | null) => {
