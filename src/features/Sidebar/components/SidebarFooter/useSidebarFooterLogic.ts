@@ -17,9 +17,9 @@ export const useSidebarFooterLogic = () => {
   const handleLogout = async () => {
     await logout(null, {
       onSuccess: async () => {
-        removeFromStorage(LocalStorageKeys.AccessToken);
-
         await mutate(SWRCacheKeys.CurrentUser);
+
+        removeFromStorage(LocalStorageKeys.AccessToken);
 
         navigate(AppRoutes.SignIn);
       },

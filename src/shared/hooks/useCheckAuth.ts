@@ -15,7 +15,7 @@ export const useCheckAuth = () => {
   const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
 
   const { isLoading, data, error } = useSWR(
-    accessToken ? [SWRCacheKeys.CurrentUser, accessToken] : null,
+    accessToken ? SWRCacheKeys.CurrentUser : null,
     () => UsersService.getCurrentUser(),
     {
       onSuccess: user => {
