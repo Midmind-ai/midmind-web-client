@@ -5,6 +5,7 @@ import { ThemeProvider } from '@app/providers/ThemeProvider/ThemeProvider';
 
 import { LocalStorageKeys } from '@shared/constants/localStorage';
 
+import ModalsRenderer from '@/app/ModalsRenderer';
 import { SWRProvider } from '@/app/providers/SWRProvider/SWRProvider';
 import router from '@/app/Router';
 
@@ -17,6 +18,7 @@ const RootProvider = () => {
       >
         <SWRProvider>
           <RouterProvider router={router} />
+          <ModalsRenderer />
         </SWRProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>
