@@ -1,4 +1,21 @@
+import NestedModal from '@/app/NestedModal';
+import TestModal, { type TestModalProps } from '@/app/TestModal';
+
+// base type for all modal props
+export type BaseModalProps = {
+  open: boolean;
+  onAnimationEnd: () => void;
+};
+
+export type ModalPropsMap = {
+  TestModal: Omit<TestModalProps, keyof BaseModalProps>;
+  NestedModal: null;
+};
+
 // modal name must be unique
-export const Modals = {} as const;
+export const Modals = {
+  TestModal,
+  NestedModal,
+} as const;
 
 export type ModalNames = keyof typeof Modals;

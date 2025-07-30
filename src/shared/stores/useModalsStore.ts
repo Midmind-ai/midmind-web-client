@@ -1,25 +1,28 @@
 import { create } from 'zustand';
 
-import type { ModalNames } from '@/shared/constants/modals';
+import type { ModalNames, ModalPropsMap } from '@/shared/constants/modals';
 
-type ModalData = {
-  name: ModalNames;
-  props: Record<string, unknown>;
+type ModalData<T extends ModalNames = ModalNames> = {
+  name: T;
+  props?: ModalPropsMap[T];
 };
 
 type ModalsState = {
   modals: ModalData[];
   closingModals: Set<string>;
-  openModal: (modalName: ModalNames, props?: Record<string, unknown>) => void;
+  openModal: <T extends ModalNames>(
+    modalName: T,
+    ...args: ModalPropsMap[T] extends null ? [] : [props: ModalPropsMap[T]]
+  ) => void;
   closeModal: (modalName: ModalNames) => void;
-  closeAllModals: () => void;
   finishClosing: (modalName: ModalNames) => void;
+  closeAllModals: () => void;
 };
 
 export const useModalsStore = create<ModalsState>(set => ({
   modals: [],
   closingModals: new Set(),
-  openModal: (modalName: ModalNames, props = {}) => {
+  openModal: (modalName, props?) => {
     set(state => ({
       modals: [...state.modals, { name: modalName, props }],
     }));
@@ -51,15 +54,3 @@ export const useModalsStore = create<ModalsState>(set => ({
     });
   },
 }));
-
-export const useModalActions = () => {
-  const openModal = useModalsStore(state => state.openModal);
-  const closeModal = useModalsStore(state => state.closeModal);
-  const closeAllModals = useModalsStore(state => state.closeAllModals);
-
-  return {
-    openModal,
-    closeModal,
-    closeAllModals,
-  };
-};

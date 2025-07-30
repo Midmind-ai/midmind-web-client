@@ -4,36 +4,31 @@ import { Modals } from '@/shared/constants/modals';
 import { useModalsStore } from '@/shared/stores/useModalsStore';
 
 const ModalsRenderer = () => {
-  const {
-    modals,
-    //  closingModals, finishClosing
-  } = useModalsStore();
-
-  if (!modals.length) {
-    return null;
-  }
+  const { modals, closingModals, finishClosing } = useModalsStore();
 
   return (
     <>
-      {modals.map((modal, index) => {
-        const Component = Modals[modal.name];
-        // const isClosing = closingModals.has(modal.name);
+      {modals.map(modal => {
+        const modalName = modal.name;
+        const Component = Modals[modalName];
+        const isClosing = closingModals.has(modalName);
 
         if (!Component) {
           return null;
         }
 
         return (
-          <Fragment key={index}>
-            {/* <Component
+          <Fragment key={modalName}>
+            {/* @ts-expect-error props are type-checked in openModal function */}
+            <Component
+              {...modal.props}
               open={!isClosing}
               onAnimationEnd={() => {
                 if (isClosing) {
-                  finishClosing(modal.name);
+                  finishClosing(modalName);
                 }
               }}
-              {...modal.props}
-            /> */}
+            />
           </Fragment>
         );
       })}
