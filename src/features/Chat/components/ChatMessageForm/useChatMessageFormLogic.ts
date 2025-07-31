@@ -1,34 +1,45 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
+import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
 
-import { useSendMessageToChat } from '@/features/Chat/hooks/useSendMessageToChat';
+import { useConversationWithAI } from '@/features/Chat/hooks/useConversationWithAI';
 import { LLModels } from '@/shared/constants/api';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 
 type ChatMessageFormData = {
-  message: string;
+  content: string;
 };
 
 export const useChatMessageFormLogic = () => {
-  const { id: chatId } = useParams();
+  const { id: chatId = '' } = useParams();
   const { value: currentModel, setValue: setModel } = useUrlParams(SearchParams.Model, {
     defaultValue: LLModels.Gemini20Flash,
   });
-  const { register, handleSubmit, watch, reset } = useForm<ChatMessageFormData>({
-    defaultValues: {
-      message: '',
-    },
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = useForm<ChatMessageFormData>({
+    resolver: zodResolver(
+      z.object({
+        content: z.string().min(1).trim(),
+      })
+    ),
+    mode: 'onChange',
   });
-  const { sendMessage, isLoading, error } = useSendMessageToChat(chatId || '');
-
-  const messageValue = watch('message');
+  const { conversationWithAI, isLoading, error } = useConversationWithAI(chatId);
 
   const handleModelChange = (newModel: string) => setModel(newModel);
 
   const handleFormSubmit = (data: ChatMessageFormData) => {
-    sendMessage({
-      content: data.message,
+    conversationWithAI({
+      chat_id: chatId,
+      message_id: uuidv4(),
+      content: data.content,
       model: currentModel,
     });
 
@@ -41,7 +52,7 @@ export const useChatMessageFormLogic = () => {
     handleFormSubmit,
     handleModelChange,
     currentModel,
-    isValidMessage: !!messageValue?.trim().length,
+    isValid,
     isLoading,
     error,
   };

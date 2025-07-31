@@ -15,8 +15,15 @@ import { Button } from '@/shared/components/Button';
 import { LLModels } from '@/shared/constants/api';
 
 const ChatMessageForm = () => {
-  const { register, handleSubmit, handleFormSubmit, handleModelChange, currentModel, isLoading } =
-    useChatMessageFormLogic();
+  const {
+    register,
+    handleSubmit,
+    handleFormSubmit,
+    handleModelChange,
+    currentModel,
+    isValid,
+    isLoading,
+  } = useChatMessageFormLogic();
 
   return (
     <>
@@ -57,14 +64,15 @@ const ChatMessageForm = () => {
         </Button>
         <div className="flex-1">
           <Input
-            {...register('message')}
+            {...register('content')}
             autoComplete="off"
             className="border-0 shadow-none p-0 focus-visible:ring-0"
             placeholder="Write a message..."
           />
         </div>
         <Button
-          disabled={isLoading}
+          type="submit"
+          disabled={isLoading || !isValid}
           className="size-9"
         >
           <MicIcon />

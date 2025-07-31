@@ -11,7 +11,7 @@ export const SWRCacheKeys = {
   UpdateChatDetails: 'updateChatDetails',
   DeleteChat: 'deleteChat',
   GetMessages: (chatId: string) => `getMessages/${chatId}`,
-  SendMessageToChat: 'sendMessageToChat',
+  SendMessageToChat: (chatId: string) => `sendMessageToChat/${chatId}`,
 } as const;
 
 export const ApiErrorCodes = {
