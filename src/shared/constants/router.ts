@@ -4,6 +4,7 @@ export const AppRoutes = {
   SignUp: '/sign-up',
   ForgotPassword: '/forgot-password',
   Chat: (id: string) => `/chats/${id}`,
+  NotFound: '*',
 } as const;
 
 export const SearchParams = {
