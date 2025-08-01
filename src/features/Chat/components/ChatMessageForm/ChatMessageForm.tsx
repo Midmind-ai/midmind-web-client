@@ -1,4 +1,4 @@
-import { ChevronDownIcon, MicIcon, PaperclipIcon } from 'lucide-react';
+import { ChevronDownIcon, PaperclipIcon, SendHorizonal } from 'lucide-react';
 
 import { Input } from '@shared/components/Input';
 import {
@@ -12,11 +12,17 @@ import { Separator } from '@shared/components/Separator';
 
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
 import { Button } from '@/shared/components/Button';
-import { LLModels } from '@/shared/constants/api';
 
 const ChatMessageForm = () => {
-  const { register, handleSubmit, handleFormSubmit, handleModelChange, currentModel, isLoading } =
-    useChatMessageFormLogic();
+  const {
+    currentModel,
+    isValid,
+    isLoading,
+    register,
+    handleSubmit,
+    handleFormSubmit,
+    handleModelChange,
+  } = useChatMessageFormLogic();
 
   return (
     <>
@@ -42,10 +48,10 @@ const ChatMessageForm = () => {
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={LLModels.Gemini20Flash}>2.0-FLASH</SelectItem>
-            <SelectItem value={LLModels.Gemini20FlashLite}>2.0-FLASH-LIGHT</SelectItem>
-            <SelectItem value={LLModels.Gemini25Flash}>2.5-FLASH</SelectItem>
-            <SelectItem value={LLModels.Gemini25Pro}>2.5-PRO</SelectItem>
+            <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
+            <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+            <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
+            <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
           </SelectContent>
         </Select>
         <Button
@@ -57,17 +63,18 @@ const ChatMessageForm = () => {
         </Button>
         <div className="flex-1">
           <Input
-            {...register('message')}
+            {...register('content')}
             autoComplete="off"
             className="border-0 shadow-none p-0 focus-visible:ring-0"
             placeholder="Write a message..."
           />
         </div>
         <Button
-          disabled={isLoading}
+          type="submit"
+          disabled={isLoading || !isValid}
           className="size-9"
         >
-          <MicIcon />
+          <SendHorizonal className="size-4 text-background" />
         </Button>
       </form>
     </>

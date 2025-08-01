@@ -143,6 +143,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/conversations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Initiate a new conversation */
+    post: operations['ConversationController_initiateConversation'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/chats': {
     parameters: {
       query?: never;
@@ -153,8 +170,7 @@ export interface paths {
     /** Get all user not deleted chats */
     get: operations['ChatController_getUserChats'];
     put?: never;
-    /** Create a new chat */
-    post: operations['ChatController_createChat'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -190,24 +206,24 @@ export interface paths {
     /** Get chat messages */
     get: operations['MessageController_getChatMessages'];
     put?: never;
-    /** Send a new message */
-    post: operations['MessageController_createMessage'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/gemini/chat': {
+  '/api/messages/{id}/thread-context': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** Get thread context by message id */
+    get: operations['ThreadContextController_getThreadContextByMessage'];
     put?: never;
-    post: operations['GeminiController_chat'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -277,60 +293,87 @@ export interface components {
       data: unknown[][];
       meta: components['schemas']['PaginationMetadata'];
     };
+    CreateConversationResponseContentDto: {
+      id: string;
+      body: string;
+      /** @enum {string} */
+      type: 'error' | 'content' | 'complete';
+    };
+    CreateConversationResponseCompleteDto: {
+      id: string;
+      /** @enum {string} */
+      type: 'error' | 'content' | 'complete';
+    };
+    CreateConversationResponseErrorDto: {
+      id: string;
+      error: string;
+      /** @enum {string} */
+      type: 'error' | 'content' | 'complete';
+    };
+    ConversationThreadContextDto: {
+      /** Format: uuid */
+      parent_chat_id: string;
+      /** Format: uuid */
+      parent_message_id: string;
+      selected_text?: string;
+      start_position?: number;
+      end_position?: number;
+      /** @enum {string} */
+      connection_type: 'attached' | 'detached' | 'temporary';
+      /** @enum {string} */
+      context_type: 'full_message' | 'text_selection';
+      thread_level: number;
+    };
+    CreateConversationDto: {
+      /** Format: uuid */
+      chat_id: string;
+      /** Format: uuid */
+      message_id: string;
+      content: string;
+      /** @enum {string} */
+      model: 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
+      thread_context?: components['schemas']['ConversationThreadContextDto'];
+    };
     ChatDto: {
       /** Format: uuid */
       id: string;
       /** Format: date-time */
       created_at: string;
       name: string | null;
+      thread_level: number;
       /** Format: date-time */
       updated_at: string | null;
     };
     UpdateChatDto: {
       name?: string;
     };
-    CreateMessageResponseContentDto: {
+    AppMessageThreadDto: {
       id: string;
-      body: string;
+      connection_type: string;
+      connection_color: string;
       /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
-    };
-    CreateMessageResponseCompleteDto: {
-      id: string;
-      /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
-    };
-    CreateMessageResponseErrorDto: {
-      id: string;
-      error: string;
-      /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
-    };
-    CreateMessageDto: {
-      content: string;
-      /** @enum {string} */
-      model: 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
-      /** Format: uuid */
-      parent_message_id?: string;
+      context_type: 'full_message' | 'text_selection';
+      end_position: number | null;
+      start_position: number | null;
     };
     AppMessageDto: {
       /** Format: uuid */
       id: string;
       content: string;
-      /** Format: date-time */
-      created_at: string;
       /** @enum {string} */
       role: 'model' | 'user';
+      llm_model: string | null;
+      threads: components['schemas']['AppMessageThreadDto'][];
     };
-    GeminiRequestDto: {
+    ThreadContextByMessageIdDto: {
+      /** Format: uuid */
+      id: string;
+      connection_type: string;
+      connection_color: string;
       /** @enum {string} */
-      model: 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
-      message: string;
-    };
-    GeminiStreamChunkDto: {
-      data: {
-        content: string;
-      };
+      context_type: 'full_message' | 'text_selection';
+      end_position: number | null;
+      start_position: number | null;
     };
   };
   responses: never;
@@ -600,6 +643,38 @@ export interface operations {
       };
     };
   };
+  ConversationController_initiateConversation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateConversationDto'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json':
+            | components['schemas']['CreateConversationResponseContentDto']
+            | components['schemas']['CreateConversationResponseCompleteDto']
+            | components['schemas']['CreateConversationResponseErrorDto'];
+        };
+      };
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   ChatController_getUserChats: {
     parameters: {
       query?: never;
@@ -615,25 +690,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ChatDto'][];
-        };
-      };
-    };
-  };
-  ChatController_createChat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChatDto'];
         };
       };
     };
@@ -731,7 +787,7 @@ export interface operations {
       };
     };
   };
-  MessageController_createMessage: {
+  ThreadContextController_getThreadContextByMessage: {
     parameters: {
       query?: never;
       header?: never;
@@ -740,57 +796,15 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateMessageDto'];
-      };
-    };
+    requestBody?: never;
     responses: {
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json':
-            | components['schemas']['CreateMessageResponseContentDto']
-            | components['schemas']['CreateMessageResponseCompleteDto']
-            | components['schemas']['CreateMessageResponseErrorDto'];
+          'application/json': components['schemas']['ThreadContextByMessageIdDto'];
         };
-      };
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  GeminiController_chat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GeminiRequestDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['GeminiStreamChunkDto'];
-        };
-      };
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
       };
     };
   };

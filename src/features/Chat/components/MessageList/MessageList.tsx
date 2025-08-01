@@ -4,7 +4,21 @@ import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 
 const MessageList = () => {
-  const { messages, scrollAreaRef, handleScroll } = useMessageListLogic();
+  const {
+    messages,
+    scrollAreaRef,
+    handleScroll,
+    handleCopyText,
+    handleReply,
+    handleNewAttachedBranch,
+    handleNewDetachedBranch,
+    handleNewTemporaryBranch,
+    handleNewSetOfBranches,
+    handleOpenBranch,
+    handleOpenInSidePanel,
+    handleOpenInNewTab,
+    handleNewNote,
+  } = useMessageListLogic();
 
   return (
     <ScrollArea
@@ -13,12 +27,21 @@ const MessageList = () => {
       onScroll={handleScroll}
     >
       <div className="flex flex-col gap-2.5">
-        {messages?.map(({ id, content, role }) => {
-          if (role === 'user') {
+        {messages?.map((message, index) => {
+          const { id, content } = message;
+          const isLastMessage = index === messages.length - 1;
+
+          if (message.role === 'user') {
             return (
               <UserMessage
                 key={id}
                 content={content}
+                onCopyText={handleCopyText}
+                onReply={() => handleReply(id)}
+                onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
+                onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
+                onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
+                onNewSetOfBranches={() => handleNewSetOfBranches(id)}
               />
             );
           }
@@ -26,8 +49,18 @@ const MessageList = () => {
           return (
             <LLMResponse
               key={id}
-              id={id}
-              content={content}
+              {...message}
+              isLastMessage={isLastMessage}
+              onCopyText={handleCopyText}
+              onReply={() => handleReply(id)}
+              onOpenBranch={() => handleOpenBranch(id)}
+              onOpenInSidePanel={() => handleOpenInSidePanel(id)}
+              onOpenInNewTab={() => handleOpenInNewTab(id)}
+              onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
+              onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
+              onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
+              onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+              onNewNote={() => handleNewNote(id)}
             />
           );
         })}

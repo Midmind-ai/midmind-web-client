@@ -51,7 +51,7 @@ export const useGetChatMessages = (chatId: string) => {
           }
         }
 
-        return Array.from(messageMap.values()).reverse();
+        return Array.from(messageMap.values());
       })()
     : [];
 

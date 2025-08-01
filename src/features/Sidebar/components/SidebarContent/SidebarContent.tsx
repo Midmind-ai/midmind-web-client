@@ -7,7 +7,6 @@ import { useSidebarContentLogic } from '@/features/Sidebar/components/SidebarCon
 import { Button } from '@/shared/components/Button';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { ThemedH3 } from '@/shared/components/ThemedH3';
-import { LLModels } from '@/shared/constants/api';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 
 const SidebarContent = () => {
@@ -33,16 +32,18 @@ const SidebarContent = () => {
           >
             <Link
               className="block flex-1 truncate"
-              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=${LLModels.Gemini20Flash}`}
+              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=gemini-2.0-flash`}
             >
               {chat.id}
             </Link>
             <Button
-              className="ml-2 p-1 rounded hover:bg-red-100 focus:bg-red-200 focus:outline-none"
+              className="ml-2 p-1.5 rounded-lg bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => handleDelete(chat.id)}
               disabled={isDeleting}
+              aria-label={`Delete chat ${chat.id}`}
+              title="Delete chat"
             >
-              <Trash2Icon className="size-4 text-red-500" />
+              <Trash2Icon className="size-4 text-gray-600 hover:text-red-600 transition-colors duration-200" />
             </Button>
           </div>
         ))
