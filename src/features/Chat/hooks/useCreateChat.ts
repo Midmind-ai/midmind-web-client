@@ -1,13 +1,14 @@
 import { useSWRConfig } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
-import { LLModels, SWRCacheKeys } from '@shared/constants/api';
+import { SWRCacheKeys } from '@shared/constants/api';
 
 import { ChatsService } from '@shared/services/chats/chatsService';
 
 import type { Chat, ChatMessage } from '@shared/types/entities';
 
 import { ITEMS_PER_PAGE } from '@/features/Chat/hooks/useGetChatMessages';
+import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { handleLLMResponse } from '@/features/Chat/utils/swr';
 import type {
   ConversationWithAIRequest,
@@ -17,7 +18,11 @@ import type {
 export const useCreateChat = () => {
   const { mutate } = useSWRConfig();
 
-  const createChat = async (content: string, model = LLModels.Gemini20Flash) => {
+  const createChat = async (
+    content: string,
+    model: LLModel,
+    threadContext?: ConversationWithAIRequest['thread_context']
+  ) => {
     const chatId = uuidv4();
     const messageId = uuidv4();
 
@@ -26,7 +31,7 @@ export const useCreateChat = () => {
       name: 'New chat',
       created_at: new Date().toISOString(),
       updated_at: null,
-      thread_level: 0,
+      thread_level: threadContext?.thread_level || 0,
     };
 
     await mutate(
@@ -46,7 +51,7 @@ export const useCreateChat = () => {
       content: content,
       role: 'user',
       threads: [],
-      llm_model: null,
+      llm_model: model,
     };
 
     const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
@@ -75,6 +80,7 @@ export const useCreateChat = () => {
       message_id: messageId,
       content,
       model,
+      ...(threadContext && { thread_context: threadContext }),
     };
 
     ChatsService.conversationWithAI(conversationBody, (chunk: ConversationWithAIResponse) => {

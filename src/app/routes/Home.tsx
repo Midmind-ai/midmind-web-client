@@ -9,7 +9,6 @@ import { Input } from '@shared/components/Input';
 import { ThemedH1 } from '@shared/components/ThemedH1';
 import { ThemedP } from '@shared/components/ThemedP';
 
-import { LLModels } from '@shared/constants/api';
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
@@ -39,9 +38,9 @@ const Home = () => {
   const sendMessage = async (data: FormData) => {
     if (data.content.trim()) {
       try {
-        const chatId = await createChat(data.content);
+        const chatId = await createChat(data.content, 'gemini-2.0-flash');
 
-        navigate(`${AppRoutes.Chat(chatId)}?${SearchParams.Model}=${LLModels.Gemini20Flash}`);
+        navigate(`${AppRoutes.Chat(chatId)}?${SearchParams.Model}=gemini-2.0-flash`);
 
         reset();
       } catch (error) {
@@ -89,7 +88,7 @@ const Home = () => {
                   <Input
                     {...register('content')}
                     autoComplete="off"
-                    placeholder="What's on your mind?"
+                    placeholder="Write your thoughts..."
                     className="h-12 text-base pr-12"
                     autoFocus
                   />

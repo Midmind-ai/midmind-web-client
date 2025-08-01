@@ -1,9 +1,7 @@
-/* eslint-disable no-console */
-
 const cache = new Map<string, unknown>();
 
 const logStorageError = (method: string, error: unknown): void => {
-  console.log(`[ERROR Storage ${method}] >>>`, error);
+  console.error(`[ERROR Storage ${method}] >>>`, error);
 };
 
 export const setToStorage = <T>(key: string, value: T): void => {

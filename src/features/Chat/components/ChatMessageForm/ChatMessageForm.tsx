@@ -12,7 +12,6 @@ import { Separator } from '@shared/components/Separator';
 
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
 import { Button } from '@/shared/components/Button';
-import { LLModels } from '@/shared/constants/api';
 
 const ChatMessageForm = () => {
   const {
@@ -49,10 +48,10 @@ const ChatMessageForm = () => {
             </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={LLModels.Gemini20Flash}>2.0-FLASH</SelectItem>
-            <SelectItem value={LLModels.Gemini20FlashLite}>2.0-FLASH-LIGHT</SelectItem>
-            <SelectItem value={LLModels.Gemini25Flash}>2.5-FLASH</SelectItem>
-            <SelectItem value={LLModels.Gemini25Pro}>2.5-PRO</SelectItem>
+            <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
+            <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+            <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
+            <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
           </SelectContent>
         </Select>
         <Button

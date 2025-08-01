@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import type { LLModel } from '@/features/Chat/types/chatTypes';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
@@ -9,7 +10,7 @@ import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
 
 export const useLLMResponseLogic = (id: string, content: string) => {
-  const { value: currentModel } = useUrlParams(SearchParams.Model);
+  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
   const [streamingContent, setStreamingContent] = useState(content);
 
   const handleResponseChunk = useCallback(

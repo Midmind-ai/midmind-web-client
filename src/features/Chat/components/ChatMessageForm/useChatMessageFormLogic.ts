@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
 import { useConversationWithAI } from '@/features/Chat/hooks/useConversationWithAI';
-import { LLModels } from '@/shared/constants/api';
+import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 
@@ -15,8 +15,8 @@ type ChatMessageFormData = {
 
 export const useChatMessageFormLogic = () => {
   const { id: chatId = '' } = useParams();
-  const { value: currentModel, setValue: setModel } = useUrlParams(SearchParams.Model, {
-    defaultValue: LLModels.Gemini20Flash,
+  const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
+    defaultValue: 'gemini-2.0-flash',
   });
   const {
     register,
