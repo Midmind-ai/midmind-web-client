@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { LLModel } from '@/features/Chat/types/chatTypes';
 import {
@@ -16,8 +16,8 @@ export const useLLMResponseLogic = (id: string, content: string, isLastMessage: 
   const isNewMessage = isLastMessage && content.length < 10;
   const [isStreaming, setIsStreaming] = useState(isNewMessage);
 
-  const handleResponseChunk = useCallback(
-    (chunk: ConversationWithAIResponse) => {
+  useEffect(() => {
+    const handleResponseChunk = (chunk: ConversationWithAIResponse) => {
       if (id === chunk.id && chunk.body && chunk.type === 'content') {
         setIsStreaming(true);
         setStreamingContent(prev => prev + chunk.body);
@@ -26,17 +26,14 @@ export const useLLMResponseLogic = (id: string, content: string, isLastMessage: 
       if (id === chunk.id && chunk.type === 'complete') {
         setIsStreaming(false);
       }
-    },
-    [id]
-  );
+    };
 
-  useEffect(() => {
     subscribeToResponseChunk(handleResponseChunk);
 
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [handleResponseChunk]);
+  }, [id]);
 
   return {
     currentModel,

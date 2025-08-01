@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SendIcon, Sparkles, Brain, Zap } from 'lucide-react';
+import { Sparkles, Brain, Zap, SendHorizonal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -38,7 +38,11 @@ const Home = () => {
   const sendMessage = async (data: FormData) => {
     if (data.content.trim()) {
       try {
-        const chatId = await createChat(data.content, 'gemini-2.0-flash');
+        const chatId = await createChat({
+          content: data.content,
+          model: 'gemini-2.0-flash',
+          sendMessage: true,
+        });
 
         navigate(`${AppRoutes.Chat(chatId)}?${SearchParams.Model}=gemini-2.0-flash`);
 
@@ -51,11 +55,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <div className="max-w-5xl w-full space-y-12">
           <div className="text-center space-y-6">
@@ -98,7 +97,7 @@ const Home = () => {
                     size="icon"
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md transition-all duration-300 hover:scale-105 border border-primary/30"
                   >
-                    <SendIcon className="h-4 w-4 text-white" />
+                    <SendHorizonal className=" text-background" />
                   </Button>
                 </div>
               </form>

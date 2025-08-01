@@ -1,4 +1,4 @@
-import { ChevronDownIcon, MicIcon, PaperclipIcon } from 'lucide-react';
+import { ChevronDownIcon, PaperclipIcon, SendHorizonal } from 'lucide-react';
 
 import { Input } from '@shared/components/Input';
 import {
@@ -15,13 +15,13 @@ import { Button } from '@/shared/components/Button';
 
 const ChatMessageForm = () => {
   const {
+    currentModel,
+    isValid,
+    isLoading,
     register,
     handleSubmit,
     handleFormSubmit,
     handleModelChange,
-    currentModel,
-    isValid,
-    isLoading,
   } = useChatMessageFormLogic();
 
   return (
@@ -74,7 +74,7 @@ const ChatMessageForm = () => {
           disabled={isLoading || !isValid}
           className="size-9"
         >
-          <MicIcon />
+          <SendHorizonal className="size-4 text-background" />
         </Button>
       </form>
     </>

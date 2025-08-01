@@ -1,6 +1,5 @@
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { v4 as uuidv4 } from 'uuid';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
@@ -14,8 +13,12 @@ import type {
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
+import { useThreadContext } from './useThreadContext';
+
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();
+  const { threadContext, clearThreadContext } = useThreadContext(chatId);
+
   const {
     trigger,
     isMutating: isLoading,
@@ -31,11 +34,11 @@ export const useConversationWithAI = (chatId: string) => {
 
   const conversationWithAI = async (body: ConversationWithAIRequest) => {
     const userMessage: ChatMessage = {
-      id: uuidv4(),
+      id: body.message_id,
       content: body.content,
       role: 'user',
       threads: [],
-      llm_model: null,
+      llm_model: body.model,
     };
 
     await mutate(
@@ -68,9 +71,17 @@ export const useConversationWithAI = (chatId: string) => {
       }
     );
 
-    await trigger(body, {
+    const requestBody: ConversationWithAIRequest = {
+      ...body,
+      ...(threadContext && { thread_context: threadContext }),
+    };
+
+    await trigger(requestBody, {
       rollbackOnError: true,
     });
+
+    // Only the first message of the thread will be sent with thread_context
+    clearThreadContext();
   };
 
   return {

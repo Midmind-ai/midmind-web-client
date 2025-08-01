@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
 import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types/chatTypes';
+import { emitThreadCreated } from '@/features/Chat/utils/threadEventEmitter';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import {
@@ -80,8 +81,7 @@ export const useMessageListLogic = () => {
 
     const contextType: ContextType = isFullSelected ? 'full_message' : 'text_selection';
     const textToUse = selectedText || content;
-
-    const newChatId = await createChat(textToUse, currentModel, {
+    const threadContext = {
       parent_chat_id: chatId,
       parent_message_id: messageId,
       connection_type: connectionType,
@@ -90,9 +90,19 @@ export const useMessageListLogic = () => {
       selected_text: textToUse,
       start_position: startPosition,
       end_position: endPosition,
+    };
+
+    const newChatId = await createChat({
+      content: textToUse,
+      model: currentModel,
+      threadContext,
     });
 
     navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);
+
+    emitThreadCreated({
+      threadContext,
+    });
   };
 
   const handleNewAttachedBranch = (messageId: string, content: string) => {

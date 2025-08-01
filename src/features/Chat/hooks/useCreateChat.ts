@@ -15,14 +15,22 @@ import type {
   ConversationWithAIResponse,
 } from '@/shared/services/chats/types';
 
+type CreateChatArgs = {
+  content: string;
+  model: LLModel;
+  threadContext?: ConversationWithAIRequest['thread_context'];
+  sendMessage?: boolean;
+};
+
 export const useCreateChat = () => {
   const { mutate } = useSWRConfig();
 
-  const createChat = async (
-    content: string,
-    model: LLModel,
-    threadContext?: ConversationWithAIRequest['thread_context']
-  ) => {
+  const createChat = async ({
+    content,
+    model,
+    threadContext,
+    sendMessage = false,
+  }: CreateChatArgs) => {
     const chatId = uuidv4();
     const messageId = uuidv4();
 
@@ -41,51 +49,53 @@ export const useCreateChat = () => {
           return [newChat];
         }
 
-        return [newChat, ...existingChats];
+        return [...existingChats, newChat];
       },
       { revalidate: false }
     );
 
-    const userMessage: ChatMessage = {
-      id: messageId,
-      content: content,
-      role: 'user',
-      threads: [],
-      llm_model: model,
-    };
+    if (sendMessage) {
+      const userMessage: ChatMessage = {
+        id: messageId,
+        content: content,
+        role: 'user',
+        threads: [],
+        llm_model: model,
+      };
 
-    const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+      const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
 
-    await mutate(
-      messagesKey,
-      {
-        data: [userMessage],
-        meta: {
-          total: 1,
-          lastPage: 1,
-          currentPage: 1,
-          perPage: 20,
-          prev: null,
-          next: null,
+      await mutate(
+        messagesKey,
+        {
+          data: [userMessage],
+          meta: {
+            total: 1,
+            lastPage: 1,
+            currentPage: 1,
+            perPage: 20,
+            prev: null,
+            next: null,
+          },
         },
-      },
-      {
-        revalidate: false,
-        populateCache: true,
-      }
-    );
+        {
+          revalidate: false,
+          populateCache: true,
+        }
+      );
 
-    const conversationBody: ConversationWithAIRequest = {
-      chat_id: chatId,
-      message_id: messageId,
-      content,
-      model,
-      ...(threadContext && { thread_context: threadContext }),
-    };
+      const conversationBody: ConversationWithAIRequest = {
+        chat_id: chatId,
+        message_id: messageId,
+        content,
+        model,
+        ...(threadContext && { thread_context: threadContext }),
+      };
 
-    ChatsService.conversationWithAI(conversationBody, (chunk: ConversationWithAIResponse) => {
-      handleLLMResponse(mutate, chatId, chunk);
-    });
+      ChatsService.conversationWithAI(conversationBody, (chunk: ConversationWithAIResponse) => {
+        handleLLMResponse(mutate, chatId, chunk);
+      });
+    }
 
     return chatId;
   };

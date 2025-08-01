@@ -28,7 +28,7 @@ export const handleLLMResponse = (
 ) => {
   emitResponseChunk(chunk);
 
-  if (chunk.id && chunk.type === 'content') {
+  if (chunk.id && chunk.type === 'content' && chunk.body) {
     mutate(
       getInfiniteKey(chatId),
       (data?: PaginatedResponse<ChatMessage[]>[]) => {
@@ -37,38 +37,25 @@ export const handleLLMResponse = (
         }
 
         const updatedData = [...data];
+        if (updatedData[0]) {
+          const alreadyExists = (updatedData[0].data || []).some(
+            message => message.id === chunk.id
+          );
 
-        const pageIndex = updatedData.findIndex(
-          page => page.data?.findIndex(message => message.id === chunk.id) !== -1
-        );
+          if (!alreadyExists) {
+            const llmResponse: ChatMessage = {
+              id: chunk.id,
+              content: chunk.body,
+              role: 'model',
+              threads: [],
+              llm_model: null,
+            };
 
-        if (pageIndex !== -1) {
-          const page = updatedData[pageIndex];
-          const messageIndex = page.data?.findIndex(message => message.id === chunk.id);
-
-          if (messageIndex !== undefined && messageIndex !== -1 && page.data) {
-            updatedData[pageIndex] = {
-              ...page,
-              data: page.data.map((message, index) =>
-                index === messageIndex
-                  ? { ...message, content: message.content + chunk.body }
-                  : message
-              ),
+            updatedData[0] = {
+              ...updatedData[0],
+              data: [...(updatedData[0].data || []), llmResponse],
             };
           }
-        } else if (updatedData[0]) {
-          const llmResponse: ChatMessage = {
-            id: chunk.id,
-            content: chunk.body,
-            role: 'model',
-            threads: [],
-            llm_model: null,
-          };
-
-          updatedData[0] = {
-            ...updatedData[0],
-            data: [...(updatedData[0].data || []), llmResponse],
-          };
         }
 
         return updatedData;
