@@ -27,8 +27,9 @@ const MessageList = () => {
       onScroll={handleScroll}
     >
       <div className="flex flex-col gap-2.5">
-        {messages?.map(message => {
+        {messages?.map((message, index) => {
           const { id, content } = message;
+          const isLastMessage = index === messages.length - 1;
 
           if (message.role === 'user') {
             return (
@@ -49,6 +50,7 @@ const MessageList = () => {
             <LLMResponse
               key={id}
               {...message}
+              isLastMessage={isLastMessage}
               onCopyText={handleCopyText}
               onReply={() => handleReply(id)}
               onOpenBranch={() => handleOpenBranch(id)}

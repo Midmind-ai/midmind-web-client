@@ -14,16 +14,17 @@ type Props = {
   id: string;
   llm_model: string | null;
   threads: ChatMessage['threads'];
-  onCopyText?: VoidFunction;
-  onReply?: VoidFunction;
-  onOpenBranch?: VoidFunction;
-  onOpenInSidePanel?: VoidFunction;
-  onOpenInNewTab?: VoidFunction;
-  onNewAttachedBranch?: VoidFunction;
-  onNewDetachedBranch?: VoidFunction;
-  onNewTemporaryBranch?: VoidFunction;
-  onNewSetOfBranches?: VoidFunction;
-  onNewNote?: VoidFunction;
+  isLastMessage: boolean;
+  onCopyText: VoidFunction;
+  onReply: VoidFunction;
+  onOpenBranch: VoidFunction;
+  onOpenInSidePanel: VoidFunction;
+  onOpenInNewTab: VoidFunction;
+  onNewAttachedBranch: VoidFunction;
+  onNewDetachedBranch: VoidFunction;
+  onNewTemporaryBranch: VoidFunction;
+  onNewSetOfBranches: VoidFunction;
+  onNewNote: VoidFunction;
 };
 
 const LLMResponse = ({
@@ -31,6 +32,7 @@ const LLMResponse = ({
   id,
   llm_model,
   threads,
+  isLastMessage = false,
   onCopyText,
   onReply,
   onOpenBranch,
@@ -42,7 +44,11 @@ const LLMResponse = ({
   onNewSetOfBranches,
   onNewNote,
 }: Props) => {
-  const { currentModel, streamingContent } = useLLMResponseLogic(id, content);
+  const { currentModel, streamingContent, isStreaming } = useLLMResponseLogic(
+    id,
+    content,
+    isLastMessage
+  );
 
   return (
     <ContextMenu>
@@ -173,28 +179,30 @@ const LLMResponse = ({
               />
             ))}
           </div>
-          <div className="flex gap-2.5">
-            <QuickActionButton
-              icon={<GitBranchPlus className="size-6 text-foreground" />}
-              label="New attached branch"
-              onClick={onNewAttachedBranch}
-            />
-            <QuickActionButton
-              icon={<GitCommitVertical className="size-6 text-foreground" />}
-              label="New detached branch"
-              onClick={onNewDetachedBranch}
-            />
-            <QuickActionButton
-              icon={<Glasses className="size-6 text-foreground" />}
-              label="New temporary branch"
-              onClick={onNewTemporaryBranch}
-            />
-            <QuickActionButton
-              icon={<FilePlus className="size-6 text-foreground" />}
-              label="Create new note"
-              onClick={onNewNote}
-            />
-          </div>
+          {!isStreaming && isLastMessage && (
+            <div className="flex gap-2.5">
+              <QuickActionButton
+                icon={<GitBranchPlus className="size-6 text-foreground" />}
+                label="New attached branch"
+                onClick={onNewAttachedBranch}
+              />
+              <QuickActionButton
+                icon={<GitCommitVertical className="size-6 text-foreground" />}
+                label="New detached branch"
+                onClick={onNewDetachedBranch}
+              />
+              <QuickActionButton
+                icon={<Glasses className="size-6 text-foreground" />}
+                label="New temporary branch"
+                onClick={onNewTemporaryBranch}
+              />
+              <QuickActionButton
+                icon={<FilePlus className="size-6 text-foreground" />}
+                label="Create new note"
+                onClick={onNewNote}
+              />
+            </div>
+          )}
         </div>
       </ContextMenuTrigger>
       <MessageContextMenu

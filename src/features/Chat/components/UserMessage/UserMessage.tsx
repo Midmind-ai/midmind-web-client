@@ -4,12 +4,12 @@ import { ThemedP } from '@/shared/components/ThemedP';
 
 type Props = {
   content: string;
-  onCopyText?: VoidFunction;
-  onReply?: VoidFunction;
-  onNewAttachedBranch?: VoidFunction;
-  onNewDetachedBranch?: VoidFunction;
-  onNewTemporaryBranch?: VoidFunction;
-  onNewSetOfBranches?: VoidFunction;
+  onCopyText: VoidFunction;
+  onReply: VoidFunction;
+  onNewAttachedBranch: VoidFunction;
+  onNewDetachedBranch: VoidFunction;
+  onNewTemporaryBranch: VoidFunction;
+  onNewSetOfBranches: VoidFunction;
 };
 
 const UserMessage = ({

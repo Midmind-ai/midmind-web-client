@@ -9,14 +9,22 @@ import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
 
-export const useLLMResponseLogic = (id: string, content: string) => {
+export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
   const [streamingContent, setStreamingContent] = useState(content);
 
+  const isNewMessage = isLastMessage && content.length < 10;
+  const [isStreaming, setIsStreaming] = useState(isNewMessage);
+
   const handleResponseChunk = useCallback(
     (chunk: ConversationWithAIResponse) => {
-      if (id === chunk.id && chunk.body) {
+      if (id === chunk.id && chunk.body && chunk.type === 'content') {
+        setIsStreaming(true);
         setStreamingContent(prev => prev + chunk.body);
+      }
+
+      if (id === chunk.id && chunk.type === 'complete') {
+        setIsStreaming(false);
       }
     },
     [id]
@@ -33,5 +41,6 @@ export const useLLMResponseLogic = (id: string, content: string) => {
   return {
     currentModel,
     streamingContent,
+    isStreaming,
   };
 };
