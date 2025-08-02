@@ -22,6 +22,8 @@ export const getInfiniteKey = (chatId: string) => {
   );
 };
 
+const messageChunks = new Map<string, string[]>();
+
 export const handleLLMResponse = (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
   clearAbortController: VoidFunction,
@@ -33,44 +35,74 @@ export const handleLLMResponse = (
 
   if (chunk.type === 'complete') {
     clearAbortController();
+
+    if (chunk.id && messageChunks.has(chunk.id)) {
+      const chunks = messageChunks.get(chunk.id);
+      const completeContent = chunks?.join('') || '';
+
+      if (completeContent) {
+        mutate(
+          getInfiniteKey(chatId),
+          (data?: PaginatedResponse<ChatMessage[]>[]) => {
+            const messages = data?.[0]?.data || [];
+            const messageMap = new Map(messages.map((msg: ChatMessage) => [msg.id, msg]));
+
+            if (messageMap.get(chunk.id)) {
+              const updatedMessages = messages.map((msg: ChatMessage) =>
+                msg.id === chunk.id ? { ...msg, content: completeContent } : msg
+              );
+
+              return data?.map((page, index) =>
+                index === 0 ? { ...page, data: updatedMessages } : page
+              );
+            }
+
+            return data;
+          },
+          { revalidate: false, populateCache: true }
+        );
+      }
+
+      messageChunks.clear();
+    }
+
+    return;
   }
 
   if (chunk.id && chunk.type === 'content' && chunk.body) {
-    mutate(
-      getInfiniteKey(chatId),
-      (data?: PaginatedResponse<ChatMessage[]>[]) => {
-        if (!data || !Array.isArray(data) || data.length === 0) {
-          return data;
-        }
+    if (!messageChunks.has(chunk.id)) {
+      messageChunks.set(chunk.id, []);
 
-        const updatedData = [...data];
-        if (updatedData[0]) {
-          const alreadyExists = (updatedData[0].data || []).some(
-            message => message.id === chunk.id
-          );
-
-          if (!alreadyExists) {
-            const llmResponse: ChatMessage = {
-              id: chunk.id,
-              content: chunk.body,
-              role: 'model',
-              threads: [],
-              llm_model: model,
-            };
-
-            updatedData[0] = {
-              ...updatedData[0],
-              data: [...(updatedData[0].data || []), llmResponse],
-            };
+      mutate(
+        getInfiniteKey(chatId),
+        (data?: PaginatedResponse<ChatMessage[]>[]) => {
+          if (!data?.[0]) {
+            return data;
           }
-        }
 
-        return updatedData;
-      },
-      {
-        revalidate: false,
-        populateCache: true,
-      }
-    );
+          const messages = data[0].data || [];
+
+          const updatedData = [...data];
+          updatedData[0] = {
+            ...updatedData[0],
+            data: [
+              ...messages,
+              {
+                id: chunk.id,
+                content: chunk.body,
+                role: 'model',
+                threads: [],
+                llm_model: model,
+              },
+            ],
+          };
+
+          return updatedData;
+        },
+        { revalidate: false, populateCache: true }
+      );
+    }
+
+    messageChunks.get(chunk.id)?.push(chunk.body);
   }
 };

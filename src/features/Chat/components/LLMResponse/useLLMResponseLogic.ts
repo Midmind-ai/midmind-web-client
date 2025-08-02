@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { useParams } from 'react-router';
+
 import type { LLModel } from '@/features/Chat/types/chatTypes';
 import {
   subscribeToResponseChunk,
@@ -10,11 +12,13 @@ import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
 
 export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
-  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
-  const [streamingContent, setStreamingContent] = useState(content);
-
   const isNewMessage = isLastMessage && content.length < 10;
+
+  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
+  const { id: chatId } = useParams();
+
   const [isStreaming, setIsStreaming] = useState(isNewMessage);
+  const [streamingContent, setStreamingContent] = useState(content);
 
   useEffect(() => {
     const handleResponseChunk = (chunk: ConversationWithAIResponse) => {
@@ -33,7 +37,7 @@ export const useLLMResponseLogic = (id: string, content: string, isLastMessage: 
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [id]);
+  }, [id, chatId]);
 
   return {
     currentModel,
