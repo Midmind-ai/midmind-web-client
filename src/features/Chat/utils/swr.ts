@@ -23,6 +23,7 @@ export const getInfiniteKey = (chatId: string) => {
 };
 
 const messageChunks = new Map<string, string[]>();
+const createdMessages = new Set<string>();
 
 export const handleLLMResponse = (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
@@ -63,7 +64,8 @@ export const handleLLMResponse = (
         );
       }
 
-      messageChunks.clear();
+      messageChunks.delete(chunk.id);
+      createdMessages.delete(chunk.id);
     }
 
     return;
@@ -72,6 +74,12 @@ export const handleLLMResponse = (
   if (chunk.id && chunk.type === 'content' && chunk.body) {
     if (!messageChunks.has(chunk.id)) {
       messageChunks.set(chunk.id, []);
+    }
+
+    messageChunks.get(chunk.id)?.push(chunk.body);
+
+    if (!createdMessages.has(chunk.id)) {
+      createdMessages.add(chunk.id);
 
       mutate(
         getInfiniteKey(chatId),
@@ -81,8 +89,8 @@ export const handleLLMResponse = (
           }
 
           const messages = data[0].data || [];
-
           const updatedData = [...data];
+
           updatedData[0] = {
             ...updatedData[0],
             data: [
@@ -102,7 +110,5 @@ export const handleLLMResponse = (
         { revalidate: false, populateCache: true }
       );
     }
-
-    messageChunks.get(chunk.id)?.push(chunk.body);
   }
 };

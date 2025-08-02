@@ -1,4 +1,4 @@
-import { ChevronDownIcon, PaperclipIcon, SendHorizonal, Square } from 'lucide-react';
+import { ChevronDownIcon, CircleStop, PaperclipIcon, SendHorizonal } from 'lucide-react';
 
 import {
   Select,
@@ -83,7 +83,7 @@ const ChatMessageForm = ({ onSubmit }: Props) => {
           className="size-9 self-end"
           onClick={abortCurrentRequest}
         >
-          <Square className="size-4 text-background" />
+          <CircleStop className="size-4 text-background" />
         </Button>
       ) : (
         <Button
