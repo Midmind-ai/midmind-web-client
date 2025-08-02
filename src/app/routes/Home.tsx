@@ -12,6 +12,7 @@ import { ThemedP } from '@shared/components/ThemedP';
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
+import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore';
 
 type FormData = {
   content: string;
@@ -20,6 +21,7 @@ type FormData = {
 const Home = () => {
   const navigate = useNavigate();
   const { createChat } = useCreateChat();
+  const { createAbortController } = useAbortControllerStore();
 
   const {
     register,
@@ -38,10 +40,13 @@ const Home = () => {
   const sendMessage = async (data: FormData) => {
     if (data.content.trim()) {
       try {
+        const abortController = createAbortController();
+
         const chatId = await createChat({
           content: data.content,
           model: 'gemini-2.0-flash',
           sendMessage: true,
+          abortController,
         });
 
         navigate(`${AppRoutes.Chat(chatId)}?${SearchParams.Model}=gemini-2.0-flash`);
@@ -97,7 +102,7 @@ const Home = () => {
                     size="icon"
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md transition-all duration-300 hover:scale-105 border border-primary/30"
                   >
-                    <SendHorizonal className=" text-background" />
+                    <SendHorizonal className="text-background" />
                   </Button>
                 </div>
               </form>

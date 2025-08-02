@@ -10,6 +10,7 @@ import type {
   ConversationWithAIRequest,
   ConversationWithAIResponse,
 } from '@/shared/services/chats/types';
+import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
@@ -17,20 +18,31 @@ import { useThreadContext } from './useThreadContext';
 
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();
-  const { threadContext, clearThreadContext } = useThreadContext(chatId);
-
   const {
     trigger,
     isMutating: isLoading,
     error,
   } = useSWRMutation(
     SWRCacheKeys.SendMessageToChat(chatId),
-    (_, { arg }: { arg: ConversationWithAIRequest }) => {
-      ChatsService.conversationWithAI(arg, (chunk: ConversationWithAIResponse) => {
-        handleLLMResponse(mutate, chatId, chunk);
-      });
+    async (_, { arg }: { arg: ConversationWithAIRequest }) => {
+      const abortController = createAbortController();
+
+      ChatsService.conversationWithAI(
+        arg,
+        (chunk: ConversationWithAIResponse) => {
+          handleLLMResponse(mutate, clearAbortController, chatId, arg.model, chunk);
+        },
+        abortController.signal
+      );
     }
   );
+
+  const { threadContext, clearThreadContext } = useThreadContext(chatId);
+
+  const abortController = useAbortControllerStore(state => state.abortController);
+  const abortCurrentRequest = useAbortControllerStore(state => state.abortCurrentRequest);
+  const createAbortController = useAbortControllerStore(state => state.createAbortController);
+  const clearAbortController = useAbortControllerStore(state => state.clearAbortController);
 
   const conversationWithAI = async (body: ConversationWithAIRequest) => {
     const userMessage: ChatMessage = {
@@ -86,6 +98,8 @@ export const useConversationWithAI = (chatId: string) => {
 
   return {
     conversationWithAI,
+    abortCurrentRequest,
+    hasActiveRequest: !!abortController,
     isLoading,
     error,
   };

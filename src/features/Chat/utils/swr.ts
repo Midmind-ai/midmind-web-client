@@ -1,6 +1,7 @@
 import { unstable_serialize } from 'swr/infinite';
 
 import { ITEMS_PER_PAGE } from '@/features/Chat/hooks/useGetChatMessages';
+import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { emitResponseChunk } from '@/features/Chat/utils/llmResponseEmitter';
 import { SWRCacheKeys } from '@/shared/constants/api';
 import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
@@ -23,10 +24,16 @@ export const getInfiniteKey = (chatId: string) => {
 
 export const handleLLMResponse = (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
+  clearAbortController: VoidFunction,
   chatId: string,
+  model: LLModel,
   chunk: ConversationWithAIResponse
 ) => {
   emitResponseChunk(chunk);
+
+  if (chunk.type === 'complete') {
+    clearAbortController();
+  }
 
   if (chunk.id && chunk.type === 'content' && chunk.body) {
     mutate(
@@ -48,7 +55,7 @@ export const handleLLMResponse = (
               content: chunk.body,
               role: 'model',
               threads: [],
-              llm_model: null,
+              llm_model: model,
             };
 
             updatedData[0] = {

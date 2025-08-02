@@ -8,9 +8,7 @@ export const useGetChatDetails = (id: string) => {
     data: chatDetails,
     isLoading: isLoading,
     error,
-  } = useSWR(SWRCacheKeys.GetChatDetails(id), () => ChatsService.getChatDetails(id), {
-    revalidateOnFocus: false,
-  });
+  } = useSWR(SWRCacheKeys.GetChatDetails(id), () => ChatsService.getChatDetails(id));
 
   return {
     chatDetails,

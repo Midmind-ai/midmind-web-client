@@ -8,6 +8,7 @@ import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types
 import { emitThreadCreated } from '@/features/Chat/utils/threadEventEmitter';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
+import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore';
 import {
   getSelectedText,
   isFullTextSelected,
@@ -20,9 +21,9 @@ export const useMessageListLogic = () => {
   const navigate = useNavigate();
   const { id: chatId = '' } = useParams();
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
+
   const { createChat } = useCreateChat();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const previousScrollTopPositionRef = useRef(0);
+  const createAbortController = useAbortControllerStore(state => state.createAbortController);
   const {
     messages,
     isLoading: isMessagesLoading,
@@ -30,6 +31,9 @@ export const useMessageListLogic = () => {
     loadMore,
     isValidating,
   } = useGetChatMessages(chatId);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const previousScrollTopPositionRef = useRef(0);
 
   const handleAutoScroll = (withAnimation = false) => {
     if (scrollAreaRef.current) {
@@ -92,10 +96,13 @@ export const useMessageListLogic = () => {
       end_position: endPosition,
     };
 
+    const abortController = createAbortController();
+
     const newChatId = await createChat({
       content: textToUse,
       model: currentModel,
       threadContext,
+      abortController,
     });
 
     navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);

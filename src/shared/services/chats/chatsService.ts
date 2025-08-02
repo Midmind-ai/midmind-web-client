@@ -37,12 +37,14 @@ export class ChatsService {
 
   static async conversationWithAI(
     body: ConversationWithAIRequest,
-    onChunk: (data: ConversationWithAIResponse) => void
+    onChunk: (data: ConversationWithAIResponse) => void,
+    signal?: AbortSignal
   ) {
     let lastProcessedLength = 0;
 
     await baseAxiosInstance.post<ConversationWithAIResponse>(`/conversations`, body, {
       responseType: 'text',
+      signal,
       onDownloadProgress: progressEvent => {
         const responseText = progressEvent.event.target.response;
 

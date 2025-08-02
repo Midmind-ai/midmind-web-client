@@ -9,16 +9,14 @@ type SignInFetcherArgs = {
   arg: SignInRequest;
 };
 
-const fetcher = async (_key: string, { arg }: SignInFetcherArgs) => {
-  return AuthService.signIn(arg);
-};
-
 export const useSignIn = () => {
   const {
     trigger: signIn,
     isMutating: isLoading,
     error,
-  } = useSWRMutation(SWRCacheKeys.SignIn, fetcher);
+  } = useSWRMutation(SWRCacheKeys.SignIn, async (_key: string, { arg }: SignInFetcherArgs) => {
+    return AuthService.signIn(arg);
+  });
 
   return { signIn, isLoading, error };
 };

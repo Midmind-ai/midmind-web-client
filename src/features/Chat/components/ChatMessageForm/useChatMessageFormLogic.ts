@@ -18,6 +18,7 @@ export const useChatMessageFormLogic = () => {
   const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
     defaultValue: 'gemini-2.0-flash',
   });
+
   const {
     register,
     handleSubmit,
@@ -31,7 +32,11 @@ export const useChatMessageFormLogic = () => {
     ),
     mode: 'onChange',
   });
-  const { conversationWithAI, isLoading, error } = useConversationWithAI(chatId);
+
+  const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
+    useConversationWithAI(chatId);
+
+  const isRequestActive = hasActiveRequest;
 
   const handleModelChange = (newModel: string) => setModel(newModel);
 
@@ -50,7 +55,9 @@ export const useChatMessageFormLogic = () => {
     register,
     handleSubmit,
     handleFormSubmit,
+    abortCurrentRequest,
     handleModelChange,
+    isRequestActive,
     currentModel,
     isValid,
     isLoading,

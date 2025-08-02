@@ -52,7 +52,10 @@ const LLMResponse = ({
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger asChild>
+      <ContextMenuTrigger
+        disabled={isStreaming}
+        asChild
+      >
         <div className="w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-200">
           <h6 className="text-blue-500 text-xs font-medium tracking-wide uppercase">
             {llm_model || currentModel}

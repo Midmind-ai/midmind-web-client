@@ -1,4 +1,4 @@
-import { ChevronDownIcon, PaperclipIcon, SendHorizonal } from 'lucide-react';
+import { ChevronDownIcon, PaperclipIcon, SendHorizonal, Square } from 'lucide-react';
 
 import { Input } from '@shared/components/Input';
 import {
@@ -17,11 +17,12 @@ const ChatMessageForm = () => {
   const {
     currentModel,
     isValid,
-    isLoading,
+    isRequestActive,
     register,
     handleSubmit,
     handleFormSubmit,
     handleModelChange,
+    abortCurrentRequest,
   } = useChatMessageFormLogic();
 
   return (
@@ -34,6 +35,7 @@ const ChatMessageForm = () => {
         <Select
           value={currentModel}
           onValueChange={handleModelChange}
+          disabled={isRequestActive}
         >
           <SelectTrigger
             size="sm"
@@ -58,6 +60,7 @@ const ChatMessageForm = () => {
           type="button"
           variant="secondary"
           className="size-8"
+          disabled={isRequestActive}
         >
           <PaperclipIcon className="text-secondary-foreground" />
         </Button>
@@ -67,15 +70,27 @@ const ChatMessageForm = () => {
             autoComplete="off"
             className="border-0 shadow-none p-0 focus-visible:ring-0"
             placeholder="Write a message..."
+            disabled={isRequestActive}
           />
         </div>
-        <Button
-          type="submit"
-          disabled={isLoading || !isValid}
-          className="size-9"
-        >
-          <SendHorizonal className="size-4 text-background" />
-        </Button>
+        {isRequestActive ? (
+          <Button
+            type="button"
+            className="size-9"
+            onClick={abortCurrentRequest}
+            disabled={!isRequestActive}
+          >
+            <Square className="size-4 text-background" />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            className="size-9"
+            disabled={!isValid || isRequestActive}
+          >
+            <SendHorizonal className="size-4 text-background" />
+          </Button>
+        )}
       </form>
     </>
   );
