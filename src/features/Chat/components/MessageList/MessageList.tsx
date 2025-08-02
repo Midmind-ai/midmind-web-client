@@ -23,48 +23,46 @@ const MessageList = () => {
   return (
     <ScrollArea
       ref={scrollAreaRef}
-      className="flex-1 overflow-y-auto"
       onScroll={handleScroll}
+      className="flex flex-1 flex-col gap-2.5"
     >
-      <div className="flex flex-col gap-2.5">
-        {messages?.map((message, index) => {
-          const { id, content } = message;
-          const isLastMessage = index === messages.length - 1;
+      {messages?.map((message, index) => {
+        const { id, content } = message;
+        const isLastMessage = index === messages.length - 1;
 
-          if (message.role === 'user') {
-            return (
-              <UserMessage
-                key={id}
-                content={content}
-                onCopyText={handleCopyText}
-                onReply={() => handleReply(id)}
-                onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
-                onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
-                onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-                onNewSetOfBranches={() => handleNewSetOfBranches(id)}
-              />
-            );
-          }
-
+        if (message.role === 'user') {
           return (
-            <LLMResponse
+            <UserMessage
               key={id}
-              {...message}
-              isLastMessage={isLastMessage}
+              content={content}
               onCopyText={handleCopyText}
               onReply={() => handleReply(id)}
-              onOpenBranch={() => handleOpenBranch(id)}
-              onOpenInSidePanel={() => handleOpenInSidePanel(id)}
-              onOpenInNewTab={() => handleOpenInNewTab(id)}
               onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
               onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
               onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
               onNewSetOfBranches={() => handleNewSetOfBranches(id)}
-              onNewNote={() => handleNewNote(id)}
             />
           );
-        })}
-      </div>
+        }
+
+        return (
+          <LLMResponse
+            key={id}
+            {...message}
+            isLastMessage={isLastMessage}
+            onCopyText={handleCopyText}
+            onReply={() => handleReply(id)}
+            onOpenBranch={() => handleOpenBranch(id)}
+            onOpenInSidePanel={() => handleOpenInSidePanel(id)}
+            onOpenInNewTab={() => handleOpenInNewTab(id)}
+            onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
+            onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
+            onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
+            onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+            onNewNote={() => handleNewNote(id)}
+          />
+        );
+      })}
     </ScrollArea>
   );
 };

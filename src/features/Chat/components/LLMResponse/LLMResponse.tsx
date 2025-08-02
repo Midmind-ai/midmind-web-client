@@ -32,7 +32,7 @@ const LLMResponse = ({
   id,
   llm_model,
   threads,
-  isLastMessage = false,
+  isLastMessage,
   onCopyText,
   onReply,
   onOpenBranch,
@@ -57,7 +57,7 @@ const LLMResponse = ({
         asChild
       >
         <div className="w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-200">
-          <h6 className="text-blue-500 text-xs font-medium tracking-wide uppercase">
+          <h6 className="text-blue-500 text-xs font-medium uppercase mb-4">
             {llm_model || currentModel}
           </h6>
           <div className="text-sm font-light leading-relaxed">
@@ -99,17 +99,17 @@ const LLMResponse = ({
                   </h6>
                 ),
                 ul: ({ children }) => (
-                  <ul className="list-disc list-inside mb-4 space-y-2 ml-4 text-gray-700 dark:text-gray-300">
+                  <ul className="list-disc mb-4 space-y-2 ml-4 text-gray-700 dark:text-gray-300">
                     {children}
                   </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="list-decimal list-inside mb-4 space-y-2 ml-4 text-gray-700 dark:text-gray-300">
+                  <ol className="list-decimal mb-4 space-y-2 ml-4 text-gray-700 dark:text-gray-300">
                     {children}
                   </ol>
                 ),
                 li: ({ children }) => (
-                  <li className="text-sm font-light leading-6 marker:text-blue-500 dark:marker:text-blue-400">
+                  <li className="text-sm font-light leading-6 marker:text-blue-500 dark:marker:text-blue-400 pl-2">
                     {children}
                   </li>
                 ),

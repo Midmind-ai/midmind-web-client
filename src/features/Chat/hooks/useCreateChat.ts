@@ -19,7 +19,6 @@ import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore
 type CreateChatArgs = {
   content: string;
   model: LLModel;
-  abortController: AbortController;
   threadContext?: ConversationWithAIRequest['thread_context'];
   sendMessage?: boolean;
 };
@@ -28,16 +27,18 @@ export const useCreateChat = () => {
   const { mutate } = useSWRConfig();
 
   const clearAbortController = useAbortControllerStore(state => state.clearAbortController);
+  const createAbortController = useAbortControllerStore(state => state.createAbortController);
 
   const createChat = async ({
     content,
     model,
     threadContext,
     sendMessage = false,
-    abortController,
   }: CreateChatArgs) => {
     const chatId = uuidv4();
     const messageId = uuidv4();
+
+    const newAbortController = createAbortController();
 
     const newChat: Chat = {
       id: chatId,
@@ -102,8 +103,10 @@ export const useCreateChat = () => {
         (chunk: ConversationWithAIResponse) => {
           handleLLMResponse(mutate, clearAbortController, chatId, model, chunk);
         },
-        abortController.signal
+        newAbortController.signal
       );
+    } else {
+      clearAbortController();
     }
 
     return chatId;

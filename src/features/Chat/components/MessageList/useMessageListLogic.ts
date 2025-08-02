@@ -8,7 +8,6 @@ import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types
 import { emitThreadCreated } from '@/features/Chat/utils/threadEventEmitter';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore';
 import {
   getSelectedText,
   isFullTextSelected,
@@ -23,7 +22,6 @@ export const useMessageListLogic = () => {
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
 
   const { createChat } = useCreateChat();
-  const createAbortController = useAbortControllerStore(state => state.createAbortController);
   const {
     messages,
     isLoading: isMessagesLoading,
@@ -96,13 +94,10 @@ export const useMessageListLogic = () => {
       end_position: endPosition,
     };
 
-    const abortController = createAbortController();
-
     const newChatId = await createChat({
       content: textToUse,
       model: currentModel,
       threadContext,
-      abortController,
     });
 
     navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);

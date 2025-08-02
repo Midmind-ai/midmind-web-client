@@ -1,6 +1,5 @@
 import { ChevronDownIcon, PaperclipIcon, SendHorizonal, Square } from 'lucide-react';
 
-import { Input } from '@shared/components/Input';
 import {
   Select,
   SelectContent,
@@ -9,90 +8,93 @@ import {
   SelectValue,
 } from '@shared/components/Select';
 import { Separator } from '@shared/components/Separator';
+import { Textarea } from '@shared/components/Textarea';
 
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
+import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { Button } from '@/shared/components/Button';
 
-const ChatMessageForm = () => {
+type Props = {
+  onSubmit?: (data: OnSubmitArgs) => void;
+};
+
+const ChatMessageForm = ({ onSubmit }: Props) => {
   const {
     currentModel,
     isValid,
-    isRequestActive,
+    hasActiveRequest,
     register,
     handleSubmit,
     handleFormSubmit,
     handleModelChange,
     abortCurrentRequest,
-  } = useChatMessageFormLogic();
+    handleKeyDown,
+  } = useChatMessageFormLogic(onSubmit);
 
   return (
-    <>
-      <Separator />
-      <form
-        onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex items-center w-full p-2 gap-2"
+    <form
+      onSubmit={handleSubmit(handleFormSubmit)}
+      className="flex items-center gap-2 outline-1 outline-input px-2.5 py-2 rounded-lg"
+    >
+      <Select
+        value={currentModel}
+        onValueChange={handleModelChange}
+        disabled={hasActiveRequest}
       >
-        <Select
-          value={currentModel}
-          onValueChange={handleModelChange}
-          disabled={isRequestActive}
+        <SelectTrigger
+          size="sm"
+          className="p-0 gap-0 self-end"
         >
-          <SelectTrigger
-            size="sm"
-            className="p-0 gap-0"
-          >
-            <div className="px-2">
-              <SelectValue />
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex items-center justify-center px-2">
-              <ChevronDownIcon className="size-4" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
-            <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
-            <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
-            <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
-          </SelectContent>
-        </Select>
+          <div className="px-3">
+            <SelectValue />
+          </div>
+          <Separator orientation="vertical" />
+          <div className="flex items-center justify-center px-1">
+            <ChevronDownIcon className="size-4" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
+          <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+          <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
+          <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
+        variant="secondary"
+        className="size-8 self-end"
+        disabled={hasActiveRequest}
+      >
+        <PaperclipIcon className="text-secondary-foreground" />
+      </Button>
+      <Textarea
+        {...register('content')}
+        autoComplete="off"
+        placeholder="Write a message..."
+        className="border-none shadow-none px-0 flex items-center focus-visible:ring-0 max-h-28 resize-none overflow-y-auto"
+        disabled={hasActiveRequest}
+        autoFocus
+        onKeyDown={handleKeyDown}
+      />
+      {hasActiveRequest ? (
         <Button
           type="button"
-          variant="secondary"
-          className="size-8"
-          disabled={isRequestActive}
+          className="size-9 self-end"
+          onClick={abortCurrentRequest}
         >
-          <PaperclipIcon className="text-secondary-foreground" />
+          <Square className="size-4 text-background" />
         </Button>
-        <div className="flex-1">
-          <Input
-            {...register('content')}
-            autoComplete="off"
-            className="border-0 shadow-none p-0 focus-visible:ring-0"
-            placeholder="Write a message..."
-            disabled={isRequestActive}
-          />
-        </div>
-        {isRequestActive ? (
-          <Button
-            type="button"
-            className="size-9"
-            onClick={abortCurrentRequest}
-            disabled={!isRequestActive}
-          >
-            <Square className="size-4 text-background" />
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            className="size-9"
-            disabled={!isValid || isRequestActive}
-          >
-            <SendHorizonal className="size-4 text-background" />
-          </Button>
-        )}
-      </form>
-    </>
+      ) : (
+        <Button
+          type="submit"
+          className="size-9 self-end"
+          disabled={!isValid || hasActiveRequest}
+        >
+          <SendHorizonal className="size-4 text-background" />
+        </Button>
+      )}
+    </form>
   );
 };
 
