@@ -25,11 +25,11 @@ const signInValidationSchema = z.object({
 export const useSignInFormLogic = () => {
   const navigate = useNavigate();
   const { mutate } = useSWRConfig();
-  const { signIn } = useSignIn();
+  const { signIn, isLoading } = useSignIn();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<SignInRequest>({
     resolver: zodResolver(signInValidationSchema),
   });
@@ -69,7 +69,7 @@ export const useSignInFormLogic = () => {
 
   return {
     errors,
-    isSubmitting,
+    isSubmitting: isLoading,
     register,
     loginWithGoogle,
     handleSubmit: handleSubmit(handleSignIn),
