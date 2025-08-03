@@ -29,6 +29,7 @@ const SignInForm = () => {
           </Label>
           <Input
             id="email"
+            type="email"
             placeholder="Email"
             {...register('email')}
             aria-invalid={!!errors.email?.message}

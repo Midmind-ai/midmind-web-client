@@ -13,17 +13,18 @@ type UpdateChatDetailsFetcherArgs = {
   };
 };
 
-const fetcher = async (_key: string, { arg }: UpdateChatDetailsFetcherArgs) => {
-  return ChatsService.updateChatDetails(arg.id, arg.body);
-};
-
 export const useUpdateChatDetails = () => {
   const { mutate } = useSWRConfig();
   const {
     trigger,
     isMutating: isLoading,
     error,
-  } = useSWRMutation(SWRCacheKeys.UpdateChatDetails, fetcher);
+  } = useSWRMutation(
+    SWRCacheKeys.UpdateChatDetails,
+    async (_key: string, { arg }: UpdateChatDetailsFetcherArgs) => {
+      return ChatsService.updateChatDetails(arg.id, arg.body);
+    }
+  );
 
   const updateChatDetails = async (id: string, body: UpdateChatDetailsRequest) => {
     await trigger(

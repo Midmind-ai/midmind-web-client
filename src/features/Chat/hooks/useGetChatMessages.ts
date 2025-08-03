@@ -39,21 +39,19 @@ export const useGetChatMessages = (chatId: string) => {
     }
   );
 
-  const messages = pages
-    ? (() => {
-        const messageMap = new Map<string, ChatMessage>();
+  const messages = (() => {
+    const messageMap = new Map<string, ChatMessage>();
 
-        for (const page of pages) {
-          for (const message of page.data || []) {
-            if (!messageMap.has(message.id)) {
-              messageMap.set(message.id, message);
-            }
-          }
+    for (const page of pages || []) {
+      for (const message of page.data || []) {
+        if (!messageMap.has(message.id)) {
+          messageMap.set(message.id, message);
         }
+      }
+    }
 
-        return Array.from(messageMap.values()).reverse();
-      })()
-    : [];
+    return Array.from(messageMap.values()).reverse();
+  })();
 
   const hasMore = pages && pages.length > 0 && pages[pages.length - 1]?.meta?.next !== null;
 

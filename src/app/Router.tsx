@@ -1,16 +1,17 @@
 import { createBrowserRouter } from 'react-router';
 
-import ChatPage from '@app/routes/Chat/Chat';
-import HomePage from '@app/routes/Home/Home';
-import SignInPage from '@app/routes/SignIn/SignIn';
-import SignUpPage from '@app/routes/SignUp/SignUp';
+import ChatPage from '@app/routes/Chat';
+import HomePage from '@app/routes/Home';
+import NotFoundPage from '@app/routes/NotFound';
+import SignInPage from '@app/routes/SignIn';
+import SignUpPage from '@app/routes/SignUp';
 
 import { AppRoutes } from '@shared/constants/router';
 
 import ProtectedRoute from '@features/SignIn/components/ProtectedRoute/ProtectedRoute';
 
 import RootLayout from '@/app/RootLayout';
-import ForgotPasswordPage from '@/app/routes/ForgotPassword/ForgotPassword';
+import ForgotPasswordPage from '@/app/routes/ForgotPassword';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: AppRoutes.ForgotPassword,
     element: <ForgotPasswordPage />,
+  },
+  {
+    path: AppRoutes.NotFound,
+    element: <NotFoundPage />,
   },
 ]);
 

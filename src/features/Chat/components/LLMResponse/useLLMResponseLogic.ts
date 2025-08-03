@@ -1,42 +1,47 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useParams } from 'react-router';
+
+import type { LLModel } from '@/features/Chat/types/chatTypes';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
 } from '@/features/Chat/utils/llmResponseEmitter';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import type { SendMessageToChatResponse } from '@/shared/services/chats/types';
+import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
 
-export const useLLMResponseLogic = (id: string, content: string) => {
-  const { value: currentModel } = useUrlParams(SearchParams.Model);
+export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
+  const isNewMessage = isLastMessage && content.length < 10;
+
+  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
+  const { id: chatId } = useParams();
+
+  const [isStreaming, setIsStreaming] = useState(isNewMessage);
   const [streamingContent, setStreamingContent] = useState(content);
 
-  const handleResponseChunk = useCallback(
-    (chunk: SendMessageToChatResponse) => {
-      if (id === chunk.id && chunk.body) {
-        setStreamingContent(prev => {
-          if (prev.endsWith(chunk.body)) {
-            return prev;
-          }
-
-          return prev + chunk.body;
-        });
-      }
-    },
-    [id]
-  );
-
   useEffect(() => {
+    const handleResponseChunk = (chunk: ConversationWithAIResponse) => {
+      if (id === chunk.id && chunk.body && chunk.type === 'content') {
+        setIsStreaming(true);
+        setStreamingContent(prev => prev + chunk.body);
+      }
+
+      if (id === chunk.id && chunk.type === 'complete') {
+        setIsStreaming(false);
+      }
+    };
+
     subscribeToResponseChunk(handleResponseChunk);
 
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [handleResponseChunk]);
+  }, [id, chatId]);
 
   return {
     currentModel,
     streamingContent,
+    isStreaming,
   };
 };
