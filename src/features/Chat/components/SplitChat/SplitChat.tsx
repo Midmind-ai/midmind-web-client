@@ -2,10 +2,9 @@ import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMess
 import LLMResponse from '@/features/Chat/components/LLMResponse/LLMResponse';
 import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
+import { useMessageHandlers } from '@/features/Chat/hooks/useMessageHandlers';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 import type { ChatMessage } from '@/shared/types/entities';
-
-import { useSplitChatHandlers } from './useSplitChatHandlers';
 
 type SplitChatProps = {
   parentChatId: string;
@@ -15,7 +14,7 @@ type SplitChatProps = {
 const SplitChat = ({ parentChatId, childChatId }: SplitChatProps) => {
   const { messages: parentMessages } = useGetChatMessages(parentChatId);
   const { messages: childMessages } = useGetChatMessages(childChatId);
-  const handlers = useSplitChatHandlers();
+  const handlers = useMessageHandlers();
 
   const renderMessage = (message: ChatMessage, index: number, messages: ChatMessage[]) => {
     const isLastMessage = index === messages.length - 1;

@@ -11,7 +11,7 @@ import {
   getTextPositions,
 } from '@/shared/utils/textSelection';
 
-export const useSplitChatHandlers = () => {
+export const useMessageHandlers = () => {
   const navigate = useNavigate();
   const { id: chatId = '' } = useParams();
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
