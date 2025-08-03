@@ -6,13 +6,13 @@ import { AppRoutes, SearchParams } from '@shared/constants/router';
 
 import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMessageForm';
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
-import type { LLModel } from '@/features/Chat/types/chatTypes';
+import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 
 const Home = () => {
   const navigate = useNavigate();
   const { createChat } = useCreateChat();
 
-  const handleSubmit = async (data: { content: string; model: LLModel }) => {
+  const handleSubmit = async (data: OnSubmitArgs) => {
     const chatId = await createChat({
       content: data.content,
       model: data.model,

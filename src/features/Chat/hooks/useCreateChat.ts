@@ -43,9 +43,6 @@ export const useCreateChat = () => {
     const newChat: Chat = {
       id: chatId,
       name: 'New chat',
-      created_at: new Date().toISOString(),
-      updated_at: null,
-      thread_level: threadContext?.thread_level || 0, // will be removed in the future
     };
 
     await mutate(
@@ -67,6 +64,7 @@ export const useCreateChat = () => {
         role: 'user',
         threads: [],
         llm_model: model,
+        created_at: new Date().toISOString(),
       };
 
       const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;

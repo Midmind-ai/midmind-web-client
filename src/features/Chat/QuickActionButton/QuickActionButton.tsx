@@ -4,7 +4,7 @@ import { ThemedSpan } from '@/shared/components/ThemedSpan';
 type Props = {
   icon: React.ReactNode;
   label: string;
-  onClick: () => void;
+  onClick: VoidFunction;
 };
 
 const QuickActionButton = ({ icon, label, onClick }: Props) => {

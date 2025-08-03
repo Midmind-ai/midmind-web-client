@@ -88,7 +88,6 @@ export const useMessageListLogic = () => {
       parent_message_id: messageId,
       connection_type: connectionType,
       context_type: contextType,
-      thread_level: 0, // will be removed in the future
       selected_text: textToUse,
       start_position: startPosition,
       end_position: endPosition,
