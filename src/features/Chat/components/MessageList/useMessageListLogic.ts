@@ -81,7 +81,8 @@ export const useMessageListLogic = () => {
     const isFullSelected = isFullTextSelected(content);
     const { startPosition, endPosition } = getTextPositions(content);
 
-    const contextType: ContextType = isFullSelected ? 'full_message' : 'text_selection';
+    const contextType: ContextType =
+      !selectedText || isFullSelected ? 'full_message' : 'text_selection';
     const textToUse = selectedText || content;
     const threadContext = {
       parent_chat_id: chatId,
