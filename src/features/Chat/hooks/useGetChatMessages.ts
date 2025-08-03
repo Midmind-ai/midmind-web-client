@@ -50,7 +50,7 @@ export const useGetChatMessages = (chatId: string) => {
       }
     }
 
-    return Array.from(messageMap.values());
+    return Array.from(messageMap.values()).reverse();
   })();
 
   const hasMore = pages && pages.length > 0 && pages[pages.length - 1]?.meta?.next !== null;

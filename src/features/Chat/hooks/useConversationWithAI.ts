@@ -47,6 +47,7 @@ export const useConversationWithAI = (chatId: string) => {
   const conversationWithAI = async (body: ConversationWithAIRequest) => {
     const userMessage: ChatMessage = {
       id: body.message_id,
+      created_at: new Date().toISOString(),
       content: body.content,
       role: 'user',
       threads: [],
@@ -71,7 +72,7 @@ export const useConversationWithAI = (chatId: string) => {
         if (updatedData[0]) {
           updatedData[0] = {
             ...updatedData[0],
-            data: [...(updatedData[0].data || []), userMessage],
+            data: [userMessage, ...(updatedData[0].data || [])],
           };
         }
 

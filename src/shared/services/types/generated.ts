@@ -184,8 +184,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get chat details */
-    get: operations['ChatController_getChatDetails'];
+    get?: never;
     /** Update a chat data */
     put: operations['ChatController_updateChatData'];
     post?: never;
@@ -322,7 +321,6 @@ export interface components {
       connection_type: 'attached' | 'detached' | 'temporary';
       /** @enum {string} */
       context_type: 'full_message' | 'text_selection';
-      thread_level: number;
     };
     CreateConversationDto: {
       /** Format: uuid */
@@ -337,18 +335,16 @@ export interface components {
     ChatDto: {
       /** Format: uuid */
       id: string;
-      /** Format: date-time */
-      created_at: string;
       name: string | null;
-      thread_level: number;
-      /** Format: date-time */
-      updated_at: string | null;
     };
     UpdateChatDto: {
       name?: string;
     };
     AppMessageThreadDto: {
+      /** Format: uuid */
       id: string;
+      /** Format: uuid */
+      child_chat_id: string;
       connection_type: string;
       connection_color: string;
       /** @enum {string} */
@@ -360,6 +356,8 @@ export interface components {
       /** Format: uuid */
       id: string;
       content: string;
+      /** Format: date-time */
+      created_at: string;
       /** @enum {string} */
       role: 'model' | 'user';
       llm_model: string | null;
@@ -368,6 +366,8 @@ export interface components {
     ThreadContextByMessageIdDto: {
       /** Format: uuid */
       id: string;
+      /** Format: uuid */
+      child_chat_id: string;
       connection_type: string;
       connection_color: string;
       /** @enum {string} */
@@ -690,27 +690,6 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ChatDto'][];
-        };
-      };
-    };
-  };
-  ChatController_getChatDetails: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ChatDto'];
         };
       };
     };

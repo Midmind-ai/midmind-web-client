@@ -174,13 +174,20 @@ const LLMResponse = ({
             </ReactMarkdown>
           </div>
           <div className="flex items-center gap-2.5 mb-4">
-            {threads.map(thread => (
-              <ConnectionTypeBadge
-                key={thread.id}
-                bgColor={thread.connection_color}
-                connectionType={thread.connection_type}
-              />
-            ))}
+            {threads.map(({ id, connection_color, connection_type, child_chat_id }) => {
+              if (connection_type === 'temporary') {
+                return null;
+              }
+
+              return (
+                <ConnectionTypeBadge
+                  key={id}
+                  bgColor={connection_color}
+                  threadChatId={child_chat_id}
+                  connectionType={connection_type}
+                />
+              );
+            })}
           </div>
           {!isStreaming && isLastMessage && (
             <div className="flex gap-2.5">

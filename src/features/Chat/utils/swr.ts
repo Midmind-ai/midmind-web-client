@@ -94,14 +94,15 @@ export const handleLLMResponse = (
           updatedData[0] = {
             ...updatedData[0],
             data: [
-              ...messages,
               {
                 id: chunk.id,
                 content: chunk.body,
                 role: 'model',
+                created_at: new Date().toISOString(),
                 threads: [],
                 llm_model: model,
               },
+              ...messages,
             ],
           };
 
