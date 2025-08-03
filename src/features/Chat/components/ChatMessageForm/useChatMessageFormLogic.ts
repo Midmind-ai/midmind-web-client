@@ -15,8 +15,13 @@ type ChatMessageFormData = {
   content: string;
 };
 
-export const useChatMessageFormLogic = (onSubmit?: (data: OnSubmitArgs) => void) => {
-  const { id: chatId = '' } = useParams();
+type UseChatMessageFormLogicProps = {
+  chatId?: string;
+  onSubmit?: (data: OnSubmitArgs) => void;
+};
+
+export const useChatMessageFormLogic = ({ chatId, onSubmit }: UseChatMessageFormLogicProps) => {
+  const { id: urlChatId = '' } = useParams();
   const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
     defaultValue: 'gemini-2.0-flash',
   });
@@ -35,8 +40,10 @@ export const useChatMessageFormLogic = (onSubmit?: (data: OnSubmitArgs) => void)
     mode: 'onChange',
   });
 
+  const actualChatId = chatId || urlChatId;
+
   const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
-    useConversationWithAI(chatId);
+    useConversationWithAI(actualChatId);
 
   const handleModelChange = (newModel: string) => setModel(newModel as LLModel);
 
@@ -50,7 +57,7 @@ export const useChatMessageFormLogic = (onSubmit?: (data: OnSubmitArgs) => void)
     } else {
       // For existing chat
       conversationWithAI({
-        chat_id: chatId,
+        chat_id: actualChatId,
         message_id: uuidv4(),
         content: data.content,
         model: currentModel,

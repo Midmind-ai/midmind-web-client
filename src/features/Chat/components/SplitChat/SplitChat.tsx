@@ -72,7 +72,7 @@ const SplitChat = ({ parentChatId, childChatId }: SplitChatProps) => {
           </ScrollArea>
         </div>
 
-        <ChatMessageForm />
+        <ChatMessageForm chatId={parentChatId} />
       </div>
       <div className="flex flex-col w-1/2">
         <div className="flex items-center justify-between p-4 border-b border-border">
@@ -89,7 +89,7 @@ const SplitChat = ({ parentChatId, childChatId }: SplitChatProps) => {
           </ScrollArea>
         </div>
 
-        <ChatMessageForm />
+        <ChatMessageForm chatId={childChatId} />
       </div>
     </div>
   );

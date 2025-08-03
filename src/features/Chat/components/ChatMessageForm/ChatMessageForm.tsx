@@ -15,10 +15,11 @@ import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { Button } from '@/shared/components/Button';
 
 type Props = {
+  chatId?: string;
   onSubmit?: (data: OnSubmitArgs) => void;
 };
 
-const ChatMessageForm = ({ onSubmit }: Props) => {
+const ChatMessageForm = ({ chatId, onSubmit }: Props) => {
   const {
     currentModel,
     isValid,
@@ -29,7 +30,7 @@ const ChatMessageForm = ({ onSubmit }: Props) => {
     handleModelChange,
     abortCurrentRequest,
     handleKeyDown,
-  } = useChatMessageFormLogic(onSubmit);
+  } = useChatMessageFormLogic({ chatId, onSubmit });
 
   return (
     <form
