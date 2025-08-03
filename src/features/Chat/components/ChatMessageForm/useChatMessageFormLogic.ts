@@ -1,4 +1,4 @@
-import { type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useRef, useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { useConversationWithAI } from '@/features/Chat/hooks/useConversationWith
 import type { LLModel, OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
+import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 
 type ChatMessageFormData = {
   content: string;
@@ -17,14 +18,21 @@ type ChatMessageFormData = {
 
 type UseChatMessageFormLogicProps = {
   chatId?: string;
+  threadContext?: ConversationWithAIRequest['thread_context'];
   onSubmit?: (data: OnSubmitArgs) => void;
 };
 
-export const useChatMessageFormLogic = ({ chatId, onSubmit }: UseChatMessageFormLogicProps) => {
+export const useChatMessageFormLogic = ({
+  chatId,
+  onSubmit,
+  threadContext,
+}: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
   const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
     defaultValue: 'gemini-2.0-flash',
   });
+
+  const hasFirstMessageInNewBranchSent = useRef(false);
 
   const {
     register,
@@ -56,12 +64,19 @@ export const useChatMessageFormLogic = ({ chatId, onSubmit }: UseChatMessageForm
       });
     } else {
       // For existing chat
+      const shouldIncludeThreadContext = threadContext && !hasFirstMessageInNewBranchSent.current;
+
       conversationWithAI({
         chat_id: actualChatId,
         message_id: uuidv4(),
         content: data.content,
         model: currentModel,
+        ...(shouldIncludeThreadContext && { thread_context: threadContext }),
       });
+
+      if (shouldIncludeThreadContext) {
+        hasFirstMessageInNewBranchSent.current = true;
+      }
     }
 
     reset();
@@ -74,6 +89,10 @@ export const useChatMessageFormLogic = ({ chatId, onSubmit }: UseChatMessageForm
       handleSubmit(handleFormSubmit)();
     }
   };
+
+  useEffect(() => {
+    hasFirstMessageInNewBranchSent.current = false;
+  }, [threadContext, actualChatId]);
 
   return {
     hasActiveRequest,

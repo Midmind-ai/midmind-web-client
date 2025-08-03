@@ -3,8 +3,8 @@ import { useParams } from 'react-router';
 import { useThreadContext } from '@/features/Chat/hooks/useThreadContext';
 
 export const useSplitChatLogic = () => {
-  const { id: currentChatId } = useParams();
-  const { threadContext } = useThreadContext(currentChatId || '');
+  const { id: currentChatId = '' } = useParams();
+  const { threadContext, clearThreadContext } = useThreadContext(currentChatId);
 
   const parentChatId = threadContext?.parent_chat_id;
   const childChatId = currentChatId;
@@ -12,8 +12,10 @@ export const useSplitChatLogic = () => {
   const isSplitMode = Boolean(parentChatId && childChatId && parentChatId !== childChatId);
 
   return {
+    threadContext,
     isSplitMode,
     parentChatId,
     childChatId,
+    clearThreadContext,
   };
 };

@@ -29,32 +29,34 @@ export const useMessageHandlers = () => {
 
     const contextType: ContextType =
       !selectedText || isFullSelected ? 'full_message' : 'text_selection';
+
     const textToUse = selectedText || content;
+
     const threadContext = {
       parent_chat_id: chatId,
       parent_message_id: messageId,
       connection_type: connectionType,
       context_type: contextType,
-      selected_text: textToUse,
-      start_position: startPosition,
-      end_position: endPosition,
+      ...(contextType === 'text_selection' && {
+        selected_text: textToUse,
+        start_position: startPosition,
+        end_position: endPosition,
+      }),
     };
+
+    emitThreadCreated({ threadContext });
 
     const newChatId = await createChat({
       content: textToUse,
       model: currentModel,
-      threadContext,
     });
 
     navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);
-
-    emitThreadCreated({
-      threadContext,
-    });
   };
 
   const handleCopyText = () => {
     const selectedText = getSelectedText();
+
     navigator.clipboard.writeText(selectedText || '');
   };
 

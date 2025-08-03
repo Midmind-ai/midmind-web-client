@@ -4,14 +4,16 @@ import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
 import { useMessageHandlers } from '@/features/Chat/hooks/useMessageHandlers';
 import { ScrollArea } from '@/shared/components/ScrollArea';
+import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 import type { ChatMessage } from '@/shared/types/entities';
 
 type SplitChatProps = {
   parentChatId: string;
   childChatId: string;
+  threadContext: ConversationWithAIRequest['thread_context'];
 };
 
-const SplitChat = ({ parentChatId, childChatId }: SplitChatProps) => {
+const SplitChat = ({ parentChatId, childChatId, threadContext }: SplitChatProps) => {
   const { messages: parentMessages } = useGetChatMessages(parentChatId);
   const { messages: childMessages } = useGetChatMessages(childChatId);
   const handlers = useMessageHandlers();
@@ -88,7 +90,10 @@ const SplitChat = ({ parentChatId, childChatId }: SplitChatProps) => {
           </ScrollArea>
         </div>
 
-        <ChatMessageForm chatId={childChatId} />
+        <ChatMessageForm
+          chatId={childChatId}
+          threadContext={threadContext}
+        />
       </div>
     </div>
   );

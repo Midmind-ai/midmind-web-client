@@ -7,10 +7,10 @@ import {
 import type { ThreadEvent } from '@/features/Chat/utils/threadEventEmitter';
 
 export const useThreadContext = (chatId: string) => {
-  const threadContextRef = useRef<ThreadEvent['threadContext'] | null>(null);
+  const threadContextRef = useRef<ThreadEvent['threadContext'] | undefined>(undefined);
 
   const clearThreadContext = () => {
-    threadContextRef.current = null;
+    threadContextRef.current = undefined;
   };
 
   useEffect(() => {

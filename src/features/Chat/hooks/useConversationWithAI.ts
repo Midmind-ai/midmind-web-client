@@ -14,8 +14,6 @@ import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
 
-import { useThreadContext } from './useThreadContext';
-
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();
   const {
@@ -36,8 +34,6 @@ export const useConversationWithAI = (chatId: string) => {
       );
     }
   );
-
-  const { threadContext, clearThreadContext } = useThreadContext(chatId);
 
   const abortController = useAbortControllerStore(state => state.abortController);
   const abortCurrentRequest = useAbortControllerStore(state => state.abortCurrentRequest);
@@ -84,17 +80,9 @@ export const useConversationWithAI = (chatId: string) => {
       }
     );
 
-    const requestBody: ConversationWithAIRequest = {
-      ...body,
-      ...(threadContext && { thread_context: threadContext }),
-    };
-
-    await trigger(requestBody, {
+    await trigger(body, {
       rollbackOnError: true,
     });
-
-    // Only the first message of the thread will be sent with thread_context
-    clearThreadContext();
   };
 
   return {

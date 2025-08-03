@@ -13,13 +13,15 @@ import { Textarea } from '@shared/components/Textarea';
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
 import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { Button } from '@/shared/components/Button';
+import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 
 type Props = {
   chatId?: string;
   onSubmit?: (data: OnSubmitArgs) => void;
+  threadContext?: ConversationWithAIRequest['thread_context'];
 };
 
-const ChatMessageForm = ({ chatId, onSubmit }: Props) => {
+const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
   const {
     currentModel,
     isValid,
@@ -30,7 +32,7 @@ const ChatMessageForm = ({ chatId, onSubmit }: Props) => {
     handleModelChange,
     abortCurrentRequest,
     handleKeyDown,
-  } = useChatMessageFormLogic({ chatId, onSubmit });
+  } = useChatMessageFormLogic({ chatId, onSubmit, threadContext });
 
   return (
     <form

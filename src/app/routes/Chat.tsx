@@ -4,7 +4,7 @@ import SplitChat from '@/features/Chat/components/SplitChat/SplitChat';
 import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
 
 const Chat = () => {
-  const { isSplitMode, parentChatId, childChatId } = useSplitChatLogic();
+  const { isSplitMode, parentChatId, childChatId, threadContext } = useSplitChatLogic();
 
   if (isSplitMode && parentChatId && childChatId) {
     return (
@@ -12,6 +12,7 @@ const Chat = () => {
         <SplitChat
           parentChatId={parentChatId}
           childChatId={childChatId}
+          threadContext={threadContext}
         />
       </div>
     );
