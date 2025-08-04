@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 
+import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
 import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types/chatTypes';
 import { emitThreadCreated } from '@/features/Chat/utils/threadEventEmitter';
@@ -15,6 +16,7 @@ export const useMessageHandlers = () => {
   const navigate = useNavigate();
   const { id: chatId = '' } = useParams();
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
+  const { isSplitMode, childChatId } = useSplitChatLogic();
 
   const { createChat } = useCreateChat();
 
@@ -32,8 +34,10 @@ export const useMessageHandlers = () => {
 
     const textToUse = selectedText || content;
 
+    const parentChatId = isSplitMode && chatId === childChatId ? childChatId : chatId;
+
     const threadContext = {
-      parent_chat_id: chatId,
+      parent_chat_id: parentChatId,
       parent_message_id: messageId,
       connection_type: connectionType,
       context_type: contextType,
