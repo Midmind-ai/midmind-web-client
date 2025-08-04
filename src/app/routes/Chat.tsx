@@ -4,7 +4,16 @@ import SplitChat from '@/features/Chat/components/SplitChat/SplitChat';
 import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
 
 const Chat = () => {
-  const { isSplitMode, parentChatId, childChatId, threadContext } = useSplitChatLogic();
+  const {
+    isSplitMode,
+    parentChatId,
+    childChatId,
+    threadContext,
+    isParentFullscreen,
+    isChildFullscreen,
+    handleToggleParentFullscreen,
+    handleToggleChildFullscreen,
+  } = useSplitChatLogic();
 
   if (isSplitMode && parentChatId && childChatId) {
     return (
@@ -13,6 +22,10 @@ const Chat = () => {
           parentChatId={parentChatId}
           childChatId={childChatId}
           threadContext={threadContext}
+          isParentFullscreen={isParentFullscreen}
+          isChildFullscreen={isChildFullscreen}
+          onToggleParentFullscreen={handleToggleParentFullscreen}
+          onToggleChildFullscreen={handleToggleChildFullscreen}
         />
       </div>
     );
