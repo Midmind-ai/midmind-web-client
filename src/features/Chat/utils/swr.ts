@@ -27,7 +27,7 @@ const createdMessages = new Set<string>();
 
 export const handleLLMResponse = (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
-  clearAbortController: VoidFunction,
+  clearAbortController: (chatId: string) => void,
   chatId: string,
   model: LLModel,
   chunk: ConversationWithAIResponse
@@ -35,7 +35,7 @@ export const handleLLMResponse = (
   emitResponseChunk(chunk);
 
   if (chunk.type === 'complete') {
-    clearAbortController();
+    clearAbortController(chatId);
 
     if (chunk.id && messageChunks.has(chunk.id)) {
       const chunks = messageChunks.get(chunk.id);

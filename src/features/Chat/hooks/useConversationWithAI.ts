@@ -23,7 +23,7 @@ export const useConversationWithAI = (chatId: string) => {
   } = useSWRMutation(
     SWRCacheKeys.SendMessageToChat(chatId),
     async (_, { arg }: { arg: ConversationWithAIRequest }) => {
-      const abortController = createAbortController();
+      const abortController = createAbortController(chatId);
 
       ChatsService.conversationWithAI(
         arg,
@@ -35,10 +35,10 @@ export const useConversationWithAI = (chatId: string) => {
     }
   );
 
-  const abortController = useAbortControllerStore(state => state.abortController);
   const abortCurrentRequest = useAbortControllerStore(state => state.abortCurrentRequest);
   const createAbortController = useAbortControllerStore(state => state.createAbortController);
   const clearAbortController = useAbortControllerStore(state => state.clearAbortController);
+  const hasActiveRequest = useAbortControllerStore(state => state.hasActiveRequest);
 
   const conversationWithAI = async (body: ConversationWithAIRequest) => {
     const userMessage: ChatMessage = {
@@ -87,8 +87,8 @@ export const useConversationWithAI = (chatId: string) => {
 
   return {
     conversationWithAI,
-    abortCurrentRequest,
-    hasActiveRequest: !!abortController,
+    abortCurrentRequest: () => abortCurrentRequest(chatId),
+    hasActiveRequest: hasActiveRequest(chatId),
     isLoading,
     error,
   };

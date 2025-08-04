@@ -32,7 +32,7 @@ export const useCreateChat = () => {
     const chatId = uuidv4();
     const messageId = uuidv4();
 
-    const newAbortController = createAbortController();
+    const newAbortController = createAbortController(chatId);
 
     const newChat: Chat = {
       id: chatId,
@@ -97,7 +97,7 @@ export const useCreateChat = () => {
         newAbortController.signal
       );
     } else {
-      clearAbortController();
+      clearAbortController(chatId);
     }
 
     return chatId;

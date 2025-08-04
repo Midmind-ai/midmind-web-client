@@ -1,37 +1,67 @@
 import { create } from 'zustand';
 
-interface AbortControllerStore {
-  abortController: AbortController | null;
-  createAbortController: () => AbortController;
-  abortCurrentRequest: VoidFunction;
-  clearAbortController: VoidFunction;
-}
+type AbortControllerState = {
+  abortControllers: Map<string, AbortController>;
+  createAbortController: (chatId: string) => AbortController;
+  abortCurrentRequest: (chatId: string) => void;
+  clearAbortController: (chatId: string) => void;
+  getAbortController: (chatId: string) => AbortController | null;
+  hasActiveRequest: (chatId: string) => boolean;
+};
 
-export const useAbortControllerStore = create<AbortControllerStore>((set, get) => ({
-  abortController: null,
-  createAbortController: () => {
-    const { abortController } = get();
+export const useAbortControllerStore = create<AbortControllerState>((set, get) => ({
+  abortControllers: new Map(),
+  createAbortController: (chatId: string) => {
+    const { abortControllers } = get();
 
-    if (abortController) {
-      abortController.abort();
+    const existingController = abortControllers.get(chatId);
+
+    if (existingController) {
+      existingController.abort();
     }
 
     const newAbortController = new AbortController();
 
-    set({ abortController: newAbortController });
+    const newControllers = new Map(abortControllers);
+
+    newControllers.set(chatId, newAbortController);
+
+    set({ abortControllers: newControllers });
 
     return newAbortController;
   },
-  abortCurrentRequest: () => {
-    const { abortController } = get();
+  abortCurrentRequest: (chatId: string) => {
+    const { abortControllers } = get();
 
-    if (abortController) {
-      abortController.abort();
+    const controller = abortControllers.get(chatId);
 
-      set({ abortController: null });
+    if (controller) {
+      controller.abort();
+
+      const newControllers = new Map(abortControllers);
+
+      newControllers.delete(chatId);
+
+      set({ abortControllers: newControllers });
     }
   },
-  clearAbortController: () => {
-    set({ abortController: null });
+  clearAbortController: (chatId: string) => {
+    const { abortControllers } = get();
+
+    const newControllers = new Map(abortControllers);
+
+    newControllers.delete(chatId);
+
+    set({ abortControllers: newControllers });
+  },
+  getAbortController: (chatId: string) => {
+    const { abortControllers } = get();
+
+    return abortControllers.get(chatId) || null;
+  },
+  hasActiveRequest: (chatId: string) => {
+    const { abortControllers } = get();
+
+    return abortControllers.has(chatId);
   },
 }));
