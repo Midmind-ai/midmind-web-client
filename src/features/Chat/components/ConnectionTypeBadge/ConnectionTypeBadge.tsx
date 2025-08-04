@@ -35,7 +35,7 @@ const ConnectionTypeBadge = ({ bgColor, connectionType, threadChatId }: Props) =
 
   return (
     <Link
-      to={`${AppRoutes.Chat(threadChatId)}?${SearchParams.Model}=gemini-2.0-flash`}
+      to={`${AppRoutes.Chat(threadChatId)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
       target="_blank"
       className={cn(
         'h-7 inline-flex cursor-pointer items-center gap-x-1.5 p-1 rounded-[6px] group',

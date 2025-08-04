@@ -10,7 +10,7 @@ import { ThemedH3 } from '@/shared/components/ThemedH3';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 
 const SidebarContent = () => {
-  const { chats, isLoading, isDeleting, handleDelete } = useSidebarContentLogic();
+  const { chats, isLoading, isDeleting, handleDelete, handleChatClick } = useSidebarContentLogic();
 
   return (
     <SHDCNSidebarContent className="p-4">
@@ -31,10 +31,11 @@ const SidebarContent = () => {
             className="flex items-center w-full max-w-full truncate cursor-pointer py-1 rounded hover:bg-muted focus:bg-muted outline-none group"
           >
             <Link
+              onClick={() => handleChatClick(chat.name || '')}
               className="block flex-1 truncate"
-              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=gemini-2.0-flash`}
+              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
             >
-              {chat.id}
+              {chat.name}
             </Link>
             <Button
               className="ml-2 p-1.5 rounded-lg bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"

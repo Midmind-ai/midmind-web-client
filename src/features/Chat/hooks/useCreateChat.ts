@@ -46,7 +46,7 @@ export const useCreateChat = () => {
           return [newChat];
         }
 
-        return [...existingChats, newChat];
+        return [newChat, ...existingChats];
       },
       { revalidate: false }
     );

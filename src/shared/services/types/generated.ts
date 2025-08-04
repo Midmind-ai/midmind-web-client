@@ -292,22 +292,28 @@ export interface components {
       data: unknown[][];
       meta: components['schemas']['PaginationMetadata'];
     };
+    CreateConversationResponseTitleDto: {
+      title: string;
+      chat_id: string;
+      /** @enum {string} */
+      type: 'error' | 'title' | 'content' | 'complete';
+    };
     CreateConversationResponseContentDto: {
       id: string;
       body: string;
       /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
+      type: 'error' | 'title' | 'content' | 'complete';
     };
     CreateConversationResponseCompleteDto: {
       id: string;
       /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
+      type: 'error' | 'title' | 'content' | 'complete';
     };
     CreateConversationResponseErrorDto: {
       id: string;
       error: string;
       /** @enum {string} */
-      type: 'error' | 'content' | 'complete';
+      type: 'error' | 'title' | 'content' | 'complete';
     };
     ConversationThreadContextDto: {
       /** Format: uuid */
@@ -329,7 +335,7 @@ export interface components {
       message_id: string;
       content: string;
       /** @enum {string} */
-      model: 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
+      model: 'gemini-2.0-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
       thread_context?: components['schemas']['ConversationThreadContextDto'];
     };
     ChatDto: {
@@ -662,9 +668,10 @@ export interface operations {
         };
         content: {
           'application/json':
+            | components['schemas']['CreateConversationResponseTitleDto']
+            | components['schemas']['CreateConversationResponseErrorDto']
             | components['schemas']['CreateConversationResponseContentDto']
-            | components['schemas']['CreateConversationResponseCompleteDto']
-            | components['schemas']['CreateConversationResponseErrorDto'];
+            | components['schemas']['CreateConversationResponseCompleteDto'];
         };
       };
       201: {

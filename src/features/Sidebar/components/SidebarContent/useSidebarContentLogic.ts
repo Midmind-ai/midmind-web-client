@@ -26,10 +26,15 @@ export const useSidebarContentLogic = () => {
     }
   };
 
+  const handleChatClick = (name: string) => {
+    document.title = name;
+  };
+
   return {
     chats,
     isLoading,
     isDeleting,
     handleDelete,
+    handleChatClick,
   };
 };

@@ -57,8 +57,8 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
           </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
           <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
           <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
           <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
         </SelectContent>

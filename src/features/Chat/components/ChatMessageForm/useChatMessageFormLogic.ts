@@ -29,7 +29,7 @@ export const useChatMessageFormLogic = ({
 }: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
   const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
-    defaultValue: 'gemini-2.0-flash',
+    defaultValue: 'gemini-2.0-flash-lite',
   });
 
   const hasFirstMessageInNewBranchSent = useRef(false);
