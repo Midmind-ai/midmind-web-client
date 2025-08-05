@@ -3,7 +3,7 @@ import ParentChat from '@features/Chat/components/ParentChat/ParentChat';
 
 import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 
-type SplitChatProps = {
+type Props = {
   parentChatId: string;
   childChatId: string;
   threadContext: ConversationWithAIRequest['thread_context'];
@@ -21,7 +21,7 @@ const SplitChat = ({
   isChildFullscreen,
   onToggleParentFullscreen,
   onToggleChildFullscreen,
-}: SplitChatProps) => {
+}: Props) => {
   return (
     <div className="flex h-screen">
       <ParentChat

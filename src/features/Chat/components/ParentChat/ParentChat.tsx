@@ -10,14 +10,14 @@ import { ScrollArea } from '@/shared/components/ScrollArea';
 import type { ChatMessage } from '@/shared/types/entities';
 import { cn } from '@/shared/utils/cn';
 
-type ParentChatProps = {
+type Props = {
   chatId: string;
   isFullscreen: boolean;
   isHidden: boolean;
-  onToggleFullscreen: () => void;
+  onToggleFullscreen: VoidFunction;
 };
 
-const ParentChat = ({ chatId, isFullscreen, isHidden, onToggleFullscreen }: ParentChatProps) => {
+const ParentChat = ({ chatId, isFullscreen, isHidden, onToggleFullscreen }: Props) => {
   const { messages } = useGetChatMessages(chatId);
   const handlers = useMessageHandlers();
 

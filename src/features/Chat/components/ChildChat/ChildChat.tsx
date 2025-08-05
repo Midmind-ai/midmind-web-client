@@ -11,12 +11,12 @@ import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 import type { ChatMessage } from '@/shared/types/entities';
 import { cn } from '@/shared/utils/cn';
 
-type ChildChatProps = {
+type Props = {
   chatId: string;
   threadContext: ConversationWithAIRequest['thread_context'];
   isFullscreen: boolean;
   isHidden: boolean;
-  onToggleFullscreen: () => void;
+  onToggleFullscreen: VoidFunction;
 };
 
 const ChildChat = ({
@@ -25,7 +25,7 @@ const ChildChat = ({
   isFullscreen,
   isHidden,
   onToggleFullscreen,
-}: ChildChatProps) => {
+}: Props) => {
   const { messages } = useGetChatMessages(chatId);
   const handlers = useMessageHandlers();
 
