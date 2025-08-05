@@ -83,6 +83,8 @@ export const handleLLMResponse = (
   if (chunk.type === 'title' && 'title' in chunk && 'chat_id' in chunk) {
     const titleChunk = chunk as TitleChunk;
 
+    document.title = titleChunk.title;
+
     mutate(
       SWRCacheKeys.GetChatDetails(titleChunk.chat_id),
       (data: ChatDetails | undefined) => {

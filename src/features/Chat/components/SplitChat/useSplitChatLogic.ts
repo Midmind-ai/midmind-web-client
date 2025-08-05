@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router';
 
 import { useThreadContext } from '@/features/Chat/hooks/useThreadContext';
+import { usePageTitle } from '@/shared/hooks/usePageTitle';
 
 export const useSplitChatLogic = () => {
   const { id: currentChatId = '' } = useParams();
@@ -31,6 +32,8 @@ export const useSplitChatLogic = () => {
       setIsParentFullscreen(false);
     }
   };
+
+  usePageTitle('New chat');
 
   return {
     threadContext,

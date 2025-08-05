@@ -32,8 +32,6 @@ export const useCreateChat = () => {
     const chatId = uuidv4();
     const messageId = uuidv4();
 
-    const newAbortController = createAbortController(chatId);
-
     const newChat: Chat = {
       id: chatId,
       name: 'New chat',
@@ -89,6 +87,8 @@ export const useCreateChat = () => {
         model,
       };
 
+      const newAbortController = createAbortController(chatId);
+
       ChatsService.conversationWithAI(
         conversationBody,
         (chunk: ConversationWithAIResponse) => {
@@ -96,8 +96,6 @@ export const useCreateChat = () => {
         },
         newAbortController.signal
       );
-    } else {
-      clearAbortController(chatId);
     }
 
     return chatId;

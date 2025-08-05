@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
 import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types/chatTypes';
-import { emitThreadCreated } from '@/features/Chat/utils/threadEventEmitter';
+import { emitThreadCreated } from '@/features/Chat/utils/threadCreationEmitter';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
 import {

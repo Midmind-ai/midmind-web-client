@@ -9,8 +9,8 @@ type SplitChatProps = {
   threadContext: ConversationWithAIRequest['thread_context'];
   isParentFullscreen: boolean;
   isChildFullscreen: boolean;
-  onToggleParentFullscreen: () => void;
-  onToggleChildFullscreen: () => void;
+  onToggleParentFullscreen: VoidFunction;
+  onToggleChildFullscreen: VoidFunction;
 };
 
 const SplitChat = ({

@@ -35,10 +35,8 @@ export const useConversationWithAI = (chatId: string) => {
     }
   );
 
-  const abortCurrentRequest = useAbortControllerStore(state => state.abortCurrentRequest);
-  const createAbortController = useAbortControllerStore(state => state.createAbortController);
-  const clearAbortController = useAbortControllerStore(state => state.clearAbortController);
-  const hasActiveRequest = useAbortControllerStore(state => state.hasActiveRequest);
+  const { abortControllers, createAbortController, clearAbortController, abortCurrentRequest } =
+    useAbortControllerStore();
 
   const conversationWithAI = async (body: ConversationWithAIRequest) => {
     const userMessage: ChatMessage = {
@@ -88,7 +86,7 @@ export const useConversationWithAI = (chatId: string) => {
   return {
     conversationWithAI,
     abortCurrentRequest: () => abortCurrentRequest(chatId),
-    hasActiveRequest: hasActiveRequest(chatId),
+    hasActiveRequest: abortControllers.has(chatId),
     isLoading,
     error,
   };

@@ -6,7 +6,6 @@ type AbortControllerState = {
   abortCurrentRequest: (chatId: string) => void;
   clearAbortController: (chatId: string) => void;
   getAbortController: (chatId: string) => AbortController | null;
-  hasActiveRequest: (chatId: string) => boolean;
 };
 
 export const useAbortControllerStore = create<AbortControllerState>((set, get) => ({
@@ -58,10 +57,5 @@ export const useAbortControllerStore = create<AbortControllerState>((set, get) =
     const { abortControllers } = get();
 
     return abortControllers.get(chatId) || null;
-  },
-  hasActiveRequest: (chatId: string) => {
-    const { abortControllers } = get();
-
-    return abortControllers.has(chatId);
   },
 }));

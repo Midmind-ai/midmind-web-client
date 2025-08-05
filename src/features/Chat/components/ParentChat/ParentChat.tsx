@@ -102,7 +102,7 @@ const ParentChat = ({ chatId, isFullscreen, isHidden, onToggleFullscreen }: Pare
       </div>
       <div className={getContentClasses()}>
         <ScrollArea className="h-full">
-          <div className={cn('p-4', getContentWrapperClasses())}>
+          <div className={getContentWrapperClasses()}>
             {messages?.map((message, index) => renderMessage(message, index, messages))}
           </div>
         </ScrollArea>
