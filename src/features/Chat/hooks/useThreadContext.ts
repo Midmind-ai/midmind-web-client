@@ -3,14 +3,14 @@ import { useEffect, useRef } from 'react';
 import {
   subscribeToThreadCreated,
   unsubscribeFromThreadCreated,
-} from '@/features/Chat/utils/threadEventEmitter';
-import type { ThreadEvent } from '@/features/Chat/utils/threadEventEmitter';
+} from '@/features/Chat/utils/threadCreationEmitter';
+import type { ThreadEvent } from '@/features/Chat/utils/threadCreationEmitter';
 
 export const useThreadContext = (chatId: string) => {
-  const threadContextRef = useRef<ThreadEvent['threadContext'] | null>(null);
+  const threadContextRef = useRef<ThreadEvent['threadContext'] | undefined>(undefined);
 
   const clearThreadContext = () => {
-    threadContextRef.current = null;
+    threadContextRef.current = undefined;
   };
 
   useEffect(() => {

@@ -13,12 +13,15 @@ import { Textarea } from '@shared/components/Textarea';
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
 import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { Button } from '@/shared/components/Button';
+import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
 
 type Props = {
+  chatId?: string;
   onSubmit?: (data: OnSubmitArgs) => void;
+  threadContext?: ConversationWithAIRequest['thread_context'];
 };
 
-const ChatMessageForm = ({ onSubmit }: Props) => {
+const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
   const {
     currentModel,
     isValid,
@@ -29,7 +32,7 @@ const ChatMessageForm = ({ onSubmit }: Props) => {
     handleModelChange,
     abortCurrentRequest,
     handleKeyDown,
-  } = useChatMessageFormLogic(onSubmit);
+  } = useChatMessageFormLogic({ chatId, onSubmit, threadContext });
 
   return (
     <form
@@ -54,8 +57,8 @@ const ChatMessageForm = ({ onSubmit }: Props) => {
           </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
           <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
+          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
           <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
           <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
         </SelectContent>

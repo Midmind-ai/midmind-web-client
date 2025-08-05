@@ -2,9 +2,9 @@ import EventEmitter from 'eventemitter3';
 
 import type { components } from '@/shared/services/types/generated';
 
-export interface ThreadEvent {
+export type ThreadEvent = {
   threadContext: components['schemas']['ConversationThreadContextDto'];
-}
+};
 
 export const threadEventEmitter = new EventEmitter();
 

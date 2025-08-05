@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import ConnectionTypeBadge from '@/features/Chat/components/ConnectionTypeBadge/ConnectionTypeBadge';
 import { useLLMResponseLogic } from '@/features/Chat/components/LLMResponse/useLLMResponseLogic';
 import MessageContextMenu from '@/features/Chat/components/MessageContextMenu/MessageContextMenu';
-import QuickActionButton from '@/features/Chat/QuickActionButton/QuickActionButton';
+import QuickActionButton from '@/features/Chat/components/QuickActionButton/QuickActionButton';
 import { ContextMenu, ContextMenuTrigger } from '@/shared/components/ContextMenu';
 import { ThemedP } from '@/shared/components/ThemedP';
 import type { ChatMessage } from '@/shared/types/entities';
@@ -190,7 +190,7 @@ const LLMResponse = ({
             })}
           </div>
           {!isStreaming && isLastMessage && (
-            <div className="flex gap-2.5">
+            <div className="flex flex-wrap gap-2.5">
               <QuickActionButton
                 icon={<GitBranchPlus className="size-6 text-foreground" />}
                 label="New attached branch"

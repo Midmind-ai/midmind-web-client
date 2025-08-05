@@ -5,8 +5,12 @@ import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { emitResponseChunk } from '@/features/Chat/utils/llmResponseEmitter';
 import { SWRCacheKeys } from '@/shared/constants/api';
 import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
+import type { components } from '@/shared/services/types/generated';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
+
+type ChatDetails = components['schemas']['ChatDto'];
+type TitleChunk = components['schemas']['CreateConversationResponseTitleDto'];
 
 export const getInfiniteKey = (chatId: string) => {
   return unstable_serialize(
@@ -27,49 +31,12 @@ const createdMessages = new Set<string>();
 
 export const handleLLMResponse = (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
-  clearAbortController: VoidFunction,
+  clearAbortController: (chatId: string) => void,
   chatId: string,
   model: LLModel,
   chunk: ConversationWithAIResponse
 ) => {
   emitResponseChunk(chunk);
-
-  if (chunk.type === 'complete') {
-    clearAbortController();
-
-    if (chunk.id && messageChunks.has(chunk.id)) {
-      const chunks = messageChunks.get(chunk.id);
-      const completeContent = chunks?.join('') || '';
-
-      if (completeContent) {
-        mutate(
-          getInfiniteKey(chatId),
-          (data?: PaginatedResponse<ChatMessage[]>[]) => {
-            const messages = data?.[0]?.data || [];
-            const messageMap = new Map(messages.map((msg: ChatMessage) => [msg.id, msg]));
-
-            if (messageMap.get(chunk.id)) {
-              const updatedMessages = messages.map((msg: ChatMessage) =>
-                msg.id === chunk.id ? { ...msg, content: completeContent } : msg
-              );
-
-              return data?.map((page, index) =>
-                index === 0 ? { ...page, data: updatedMessages } : page
-              );
-            }
-
-            return data;
-          },
-          { revalidate: false, populateCache: true }
-        );
-      }
-
-      messageChunks.delete(chunk.id);
-      createdMessages.delete(chunk.id);
-    }
-
-    return;
-  }
 
   if (chunk.id && chunk.type === 'content' && chunk.body) {
     if (!messageChunks.has(chunk.id)) {
@@ -111,5 +78,74 @@ export const handleLLMResponse = (
         { revalidate: false, populateCache: true }
       );
     }
+  }
+
+  if (chunk.type === 'title' && 'title' in chunk && 'chat_id' in chunk) {
+    const titleChunk = chunk as TitleChunk;
+
+    document.title = titleChunk.title;
+
+    mutate(
+      SWRCacheKeys.GetChatDetails(titleChunk.chat_id),
+      (data: ChatDetails | undefined) => {
+        if (data) {
+          return { ...data, name: titleChunk.title };
+        }
+
+        return data;
+      },
+      { revalidate: false, populateCache: true }
+    );
+
+    mutate(
+      SWRCacheKeys.GetChats,
+      (data: ChatDetails[] | undefined) => {
+        if (data) {
+          return data.map((chat: ChatDetails) =>
+            chat.id === titleChunk.chat_id ? { ...chat, name: titleChunk.title } : chat
+          );
+        }
+
+        return data;
+      },
+      { revalidate: false, populateCache: true }
+    );
+  }
+
+  if (chunk.type === 'complete') {
+    clearAbortController(chatId);
+
+    if (chunk.id && messageChunks.has(chunk.id)) {
+      const chunks = messageChunks.get(chunk.id);
+      const completeContent = chunks?.join('') || '';
+
+      if (completeContent) {
+        mutate(
+          getInfiniteKey(chatId),
+          (data?: PaginatedResponse<ChatMessage[]>[]) => {
+            const messages = data?.[0]?.data || [];
+            const messageMap = new Map(messages.map((msg: ChatMessage) => [msg.id, msg]));
+
+            if (messageMap.get(chunk.id)) {
+              const updatedMessages = messages.map((msg: ChatMessage) =>
+                msg.id === chunk.id ? { ...msg, content: completeContent } : msg
+              );
+
+              return data?.map((page, index) =>
+                index === 0 ? { ...page, data: updatedMessages } : page
+              );
+            }
+
+            return data;
+          },
+          { revalidate: false, populateCache: true }
+        );
+      }
+
+      messageChunks.delete(chunk.id);
+      createdMessages.delete(chunk.id);
+    }
+
+    return;
   }
 };

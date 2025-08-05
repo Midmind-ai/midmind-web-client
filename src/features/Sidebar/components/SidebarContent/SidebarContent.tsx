@@ -32,9 +32,9 @@ const SidebarContent = () => {
           >
             <Link
               className="block flex-1 truncate"
-              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=gemini-2.0-flash`}
+              to={`${AppRoutes.Chat(chat.id)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
             >
-              {chat.id}
+              {chat.name}
             </Link>
             <Button
               className="ml-2 p-1.5 rounded-lg bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
