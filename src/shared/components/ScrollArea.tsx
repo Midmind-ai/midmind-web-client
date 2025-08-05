@@ -17,7 +17,8 @@ function ScrollArea({ className, children, onScroll, ...props }: ScrollAreaProps
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+        // [&>div]:!block - Fix for Radix ScrollArea internal div with display:table causing width issues
+        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&>div]:!block"
         onScroll={onScroll}
       >
         {children}

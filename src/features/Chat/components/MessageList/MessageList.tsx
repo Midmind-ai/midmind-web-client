@@ -24,7 +24,7 @@ const MessageList = () => {
     <ScrollArea
       ref={scrollAreaRef}
       onScroll={handleScroll}
-      className="flex flex-1 flex-col gap-2.5"
+      className="flex flex-1 flex-col gap-2.5 pt-8"
     >
       {messages?.map((message, index) => {
         const { id, content } = message;

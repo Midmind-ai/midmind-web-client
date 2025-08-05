@@ -56,8 +56,8 @@ const LLMResponse = ({
         disabled={isStreaming}
         asChild
       >
-        <div className="w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-200">
-          <h6 className="text-blue-500 text-xs font-medium uppercase mb-4">
+        <div className="group w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-200">
+          <h6 className="text-blue-500 text-xs font-medium uppercase mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
             {llm_model || currentModel}
           </h6>
           <div className="text-base font-light leading-relaxed">
@@ -164,7 +164,7 @@ const LLMResponse = ({
             })}
           </div>
           {!isStreaming && isLastMessage && (
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2.5 mb-8">
               <QuickActionButton
                 icon={<GitBranchPlus className="size-6 text-foreground" />}
                 label="New attached branch"
