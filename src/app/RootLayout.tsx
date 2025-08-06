@@ -9,7 +9,14 @@ import { SidebarProvider } from '@/shared/components/ui/sidebar';
 const Layout = () => {
   return (
     <div className="flex h-screen">
-      <SidebarProvider>
+      <SidebarProvider
+        style={
+          {
+            '--sidebar-width': '22rem',
+            '--sidebar-width-mobile': '20rem',
+          } as React.CSSProperties
+        }
+      >
         {/* <AppSidebar /> */}
         <AppSidebar2 />
         <main className="flex-1">

@@ -1,7 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from 'react';
 
-import { ChevronRight, Folder, Loader2Icon, MessagesSquare, MoreHorizontal } from 'lucide-react';
+import {
+  ChevronRight,
+  Folder,
+  Folders,
+  Home,
+  Loader2Icon,
+  MessagesSquare,
+  MoreHorizontal,
+  Search,
+} from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 
 import {
@@ -14,6 +23,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -22,6 +32,7 @@ import {
   SidebarRail,
 } from '@shared/components/ui/sidebar';
 
+import { Button } from '@/shared/components/Button';
 import { Skeleton } from '@/shared/components/Skeleton';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 
@@ -33,6 +44,7 @@ import {
 } from '../../shared/components/DropdownMenu';
 import { useSidebarContentLogic } from '../Sidebar/components/SidebarContent/useSidebarContentLogic';
 
+import { OrgSwitcher } from './org-switcher';
 import TreeActions from './tree-actions';
 
 type TreeItem = {
@@ -66,33 +78,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar {...props}>
-      <SidebarContent>
-        <TreeActions />
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {isLoading && (
-                <div className="mt-2 space-y-2">
-                  {[...Array(4)].map((_, idx) => (
-                    <Skeleton
-                      key={idx}
-                      className="h-6 w-full rounded"
+      <SidebarHeader className="border-b-1">
+        <OrgSwitcher teams={[]} />
+      </SidebarHeader>
+      <div className="flex h-full ">
+        <SidebarContent className="flex-none border-r-1 flex-col p-1.5 gap-1">
+          <Button
+            variant={'ghost'}
+            size={'icon'}
+            className="w-10! h-10!"
+          >
+            <Home className="size-5.5!" />
+          </Button>
+          <Button
+            variant={'ghost'}
+            size={'icon'}
+            className="w-10! h-10!"
+          >
+            <Search className="size-5.5!" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="w-10! h-10! bg-gray-200"
+          >
+            <Folders className="size-5.5!" />
+          </Button>
+        </SidebarContent>
+        <SidebarContent className="gap-0">
+          <TreeActions />
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {isLoading && (
+                  <div className="mt-2 space-y-2">
+                    {[...Array(4)].map((_, idx) => (
+                      <Skeleton
+                        key={idx}
+                        className="h-6 w-full rounded"
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {!isLoading &&
+                  chats?.map((item, index) => (
+                    <Tree
+                      key={index}
+                      item={item as TreeItem}
                     />
                   ))}
-                </div>
-              )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </div>
 
-              {!isLoading &&
-                chats?.map((item, index) => (
-                  <Tree
-                    key={index}
-                    item={item as TreeItem}
-                  />
-                ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
       <SidebarRail />
     </Sidebar>
   );
