@@ -33,6 +33,8 @@ import {
 } from '../../shared/components/DropdownMenu';
 import { useSidebarContentLogic } from '../Sidebar/components/SidebarContent/useSidebarContentLogic';
 
+import TreeActions from './tree-actions';
+
 type TreeItem = {
   id: string;
   name: string;
@@ -65,8 +67,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarContent>
+        <TreeActions />
         <SidebarGroup>
-          {/* <SidebarGroupLabel>Files</SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
               {isLoading && (
@@ -153,9 +155,19 @@ function Tree({ item }: { item: TreeItem }) {
   );
 }
 
+const openInNewTab = (path: string) => {
+  const fullUrl = `${window.location.origin}${path}`;
+  window.open(fullUrl, '_blank', 'noopener,noreferrer');
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function Dropdown({ id, ...props }: { id: string; [key: string]: any }) {
   const { isDeleting, handleDelete } = useSidebarContentLogic();
+
+  const handleOpenInNewTab = () => {
+    const path = `${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`;
+    openInNewTab(path);
+  };
 
   return (
     <DropdownMenu {...props}>
@@ -168,7 +180,7 @@ function Dropdown({ id, ...props }: { id: string; [key: string]: any }) {
         side="right"
         align="start"
       >
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleOpenInNewTab}>
           <span>Open in new tab</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleDelete(id)}>
