@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router';
 
-import { AppSidebar } from '@/features/sidebar-new/app-sidebar';
+import { AppSidebar } from '@/features/sidebar/sidebar';
 import { SidebarProvider } from '@/shared/components/ui/sidebar';
 
 const Layout = () => {

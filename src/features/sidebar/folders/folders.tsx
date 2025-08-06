@@ -6,7 +6,7 @@ import {
   SidebarMenu,
 } from '@/shared/components/ui/sidebar';
 
-import { useSidebarContentLogic } from '../../Sidebar/components/SidebarContent/useSidebarContentLogic';
+import { useSidebarContentLogic } from '../use-sidebar-content-logic';
 
 import FoldersActions from './folder-actions';
 import { Tree, type TreeItem } from './tree';

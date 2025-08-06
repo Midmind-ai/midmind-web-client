@@ -5,6 +5,7 @@ import { Sidebar, SidebarHeader, SidebarRail } from '@shared/components/ui/sideb
 import Folders from './folders/folders';
 import { OrgSwitcher } from './org-switcher';
 import SidebarTabs from './sidebar-tabs';
+import { User } from './user';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -13,7 +14,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <OrgSwitcher teams={[]} />
       </SidebarHeader>
       <div className="flex h-full ">
-        <SidebarTabs />
+        <div className="flex flex-col h-full border-r-1 justify-between">
+          <SidebarTabs />
+          <User />
+        </div>
         <Folders />
       </div>
       <SidebarRail />
