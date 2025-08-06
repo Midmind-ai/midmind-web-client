@@ -1,9 +1,6 @@
 import { Outlet } from 'react-router';
 
-// import { SidebarProvider } from '@shared/components/Sidebar';
-// import AppSidebar from '@features/Sidebar/components/AppSidebar/AppSidebar';
-
-import { AppSidebar as AppSidebar2 } from '@/features/sidebar-new/app-sidebar';
+import { AppSidebar } from '@/features/sidebar-new/app-sidebar';
 import { SidebarProvider } from '@/shared/components/ui/sidebar';
 
 const Layout = () => {
@@ -17,8 +14,7 @@ const Layout = () => {
           } as React.CSSProperties
         }
       >
-        {/* <AppSidebar /> */}
-        <AppSidebar2 />
+        <AppSidebar />
         <main className="flex-1">
           <Outlet />
         </main>

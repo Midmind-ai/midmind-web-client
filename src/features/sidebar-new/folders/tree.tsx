@@ -1,0 +1,92 @@
+/* eslint-disable react-refresh/only-export-components */
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { ChevronRight, Folder, MessagesSquare } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router';
+
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@/shared/components/ui/sidebar';
+import { AppRoutes, SearchParams } from '@/shared/constants/router';
+
+import { Dropdown } from './dropdown-menu';
+
+export type TreeItem = {
+  id: string;
+  name: string;
+};
+export type DataType = {
+  tree: TreeType;
+};
+export type TreeType = Array<TreeItem | TreeType>;
+
+// This is sample data.
+export const sampleData: DataType = {
+  tree: [
+    [
+      { id: '1', name: 'shared' },
+      [
+        { id: '2', name: 'prompts' },
+        [{ id: '3', name: 'basic' }, [{ id: '4', name: 'default' }]],
+        { id: '5', name: 'how to' },
+        { id: '6', name: 'layout' },
+        [{ id: '7', name: 'blog' }, [{ id: '8', name: 'page' }]],
+      ],
+    ],
+    { id: '9', name: 'chat' },
+  ],
+};
+
+export function Tree({ item }: { item: TreeItem }) {
+  const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];
+  const navigate = useNavigate();
+  const params = useParams();
+
+  if (!items.length) {
+    return (
+      <SidebarMenuButton
+        isActive={id === params.id}
+        className="data-[active=true]:bg-transparent relative group/item hover:pr-8"
+        onClick={() =>
+          navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
+        }
+      >
+        <MessagesSquare />
+        <span className="truncate block">{name}</span>
+
+        <Dropdown
+          id={id}
+          triggerClassNames={`opacity-0 group-hover/item:opacity-100`}
+        />
+      </SidebarMenuButton>
+    );
+  }
+
+  return (
+    <SidebarMenuItem>
+      <Collapsible
+        className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
+        defaultOpen={name === 'components' || name === 'ui'}
+      >
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton className="group/item hover:pr-8">
+            <ChevronRight className="transition-transform" />
+            <Folder />
+            <span className="truncate block">{name}</span>
+            <Dropdown
+              id={id}
+              triggerClassNames={`opacity-0 group-hover/item:opacity-100`}
+            />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {items.map((subItem, index) => (
+              <Tree
+                key={index}
+                item={subItem}
+              />
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </Collapsible>
+    </SidebarMenuItem>
+  );
+}

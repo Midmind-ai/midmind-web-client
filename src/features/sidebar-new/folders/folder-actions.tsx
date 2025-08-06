@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { Button } from '@/shared/components/Button';
 import { AppRoutes } from '@/shared/constants/router';
 
-export default function TreeActions() {
+export default function FolderActions() {
   const navigate = useNavigate();
 
   return (
