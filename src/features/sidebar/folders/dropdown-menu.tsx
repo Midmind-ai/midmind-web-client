@@ -1,12 +1,12 @@
+import { Loader2Icon, MoreHorizontal } from 'lucide-react';
+
+import { useSidebarContentLogic } from '@/features/sidebar/use-sidebar-content-logic';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@radix-ui/react-dropdown-menu';
-import { Loader2Icon, MoreHorizontal } from 'lucide-react';
-
-import { useSidebarContentLogic } from '@/features/sidebar/use-sidebar-content-logic';
+} from '@/shared/components/DropdownMenu';
 import { SidebarMenuAction } from '@/shared/components/ui/sidebar';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 
