@@ -68,7 +68,7 @@ const LLMResponse = ({
         disabled={isStreaming}
         asChild
       >
-        <div className="group w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-200">
+        <div className="group w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-100 rounded-md">
           <h6 className="text-blue-500 text-xs font-medium uppercase mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
             {llm_model || currentModel}
           </h6>
