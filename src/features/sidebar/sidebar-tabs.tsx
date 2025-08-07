@@ -6,16 +6,16 @@ export default function SidebarTabs() {
   return (
     <SidebarContent className="flex-none flex-col p-1.5 gap-1">
       <SidebarMenuButton className="cursor-pointer w-10! h-10!">
-        <Home className="size-5.5!" />
+        <Home className="size-5.5! stroke-[1.5px]" />
       </SidebarMenuButton>
       <SidebarMenuButton className="cursor-pointer w-10! h-10!">
-        <Search className="size-5.5!" />
+        <Search className="size-5.5! stroke-[1.5px]" />
       </SidebarMenuButton>
       <SidebarMenuButton
         className={'w-10! h-10!'}
         isActive
       >
-        <Folders className="size-5.5!" />
+        <Folders className="size-5.5! stroke-[1.5px]" />
       </SidebarMenuButton>
     </SidebarContent>
   );

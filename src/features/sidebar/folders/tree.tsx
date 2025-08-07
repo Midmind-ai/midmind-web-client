@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
-import { ChevronRight, Folder, MessagesSquare } from 'lucide-react';
+import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@/shared/components/ui/sidebar';
@@ -43,12 +43,12 @@ export function Tree({ item }: { item: TreeItem }) {
     return (
       <SidebarMenuButton
         isActive={id === params.id}
-        className="data-[active=true]:font-normal rounded-sm relative cursor-pointer group/item hover:pr-8"
+        className="data-[active=true]:font-normal rounded-sm relative cursor-pointer group/item p-1.5 hover:pr-8"
         onClick={() =>
           navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
         }
       >
-        <MessagesSquare />
+        <MessageSquare className="stroke-[1.5px]" />
         <span className="truncate block">{name}</span>
 
         <Dropdown

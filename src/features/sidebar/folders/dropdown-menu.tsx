@@ -9,6 +9,7 @@ import {
 } from '@/shared/components/DropdownMenu';
 import { SidebarMenuAction } from '@/shared/components/ui/sidebar';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
+import { cn } from '@/shared/utils/cn';
 
 const openInNewTab = (path: string) => {
   const fullUrl = `${window.location.origin}${path}`;
@@ -27,7 +28,13 @@ export function Dropdown({ id, ...props }: { id: string; [key: string]: any }) {
   return (
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuAction className={props.triggerClassNames}>
+        <SidebarMenuAction
+          className={cn(
+            props.triggerClassNames,
+            'right-1 rounded-[4px] top-1/2 -translate-y-1/2 size-6',
+            'hover:bg-sidebar'
+          )}
+        >
           <MoreHorizontal />
         </SidebarMenuAction>
       </DropdownMenuTrigger>

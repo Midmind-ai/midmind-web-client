@@ -13,7 +13,7 @@ export default function FolderActions() {
     <div className="flex justify-between border-b-1 p-1">
       <div>
         <SidebarMenuButton className={buttonClassNames}>
-          <FileSearch2 className="size-5.5! stroke-1" />
+          <FileSearch2 className="size-5.5! stroke-[1px]" />
         </SidebarMenuButton>
       </div>
       <div className="flex gap-1">
