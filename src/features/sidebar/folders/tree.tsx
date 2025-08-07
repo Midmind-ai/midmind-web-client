@@ -43,7 +43,7 @@ export function Tree({ item }: { item: TreeItem }) {
     return (
       <SidebarMenuButton
         isActive={id === params.id}
-        className="data-[active=true]:bg-transparent relative group/item hover:pr-8"
+        className="data-[active=true]:font-normal rounded-sm relative cursor-pointer group/item hover:pr-8"
         onClick={() =>
           navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
         }
