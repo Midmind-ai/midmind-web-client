@@ -1,19 +1,21 @@
 import EventEmitter from 'eventemitter3';
 
-import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
+import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations.dto';
 
 export const llmResponseEmitter = new EventEmitter();
 
-export const emitResponseChunk = (chunk: ConversationWithAIResponse) => {
+export const emitResponseChunk = (chunk: ConversationWithAIResponseDto) => {
   llmResponseEmitter.emit('responseChunk', chunk);
 };
 
-export const subscribeToResponseChunk = (callback: (chunk: ConversationWithAIResponse) => void) => {
+export const subscribeToResponseChunk = (
+  callback: (chunk: ConversationWithAIResponseDto) => void
+) => {
   llmResponseEmitter.on('responseChunk', callback);
 };
 
 export const unsubscribeFromResponseChunk = (
-  callback: (chunk: ConversationWithAIResponse) => void
+  callback: (chunk: ConversationWithAIResponseDto) => void
 ) => {
   llmResponseEmitter.off('responseChunk', callback);
 };

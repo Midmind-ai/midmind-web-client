@@ -2,15 +2,12 @@ import { useNavigate, useParams } from 'react-router';
 
 import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
 import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
-import type { ConnectionType, ContextType, LLModel } from '@/features/Chat/types/chatTypes';
+import type { ContextType, LLModel } from '@/features/Chat/types/chatTypes';
 import { emitThreadCreated } from '@/features/Chat/utils/threadCreationEmitter';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import {
-  getSelectedText,
-  isFullTextSelected,
-  getTextPositions,
-} from '@/shared/utils/textSelection';
+
+import type { CreateBranchArgs, UseMessageSelectionContextT } from './use-message-handler.types';
 
 export const useMessageHandlers = () => {
   const navigate = useNavigate();
@@ -20,19 +17,15 @@ export const useMessageHandlers = () => {
 
   const { createChat } = useCreateChat();
 
-  const createBranch = async (
-    messageId: string,
-    content: string,
-    connectionType: ConnectionType
-  ) => {
-    const selectedText = getSelectedText();
-    const isFullSelected = isFullTextSelected(content);
-    const { startPosition, endPosition } = getTextPositions(content);
+  const createBranch = async ({
+    content,
+    messageId,
+    connectionType,
+    selectionContext,
+  }: CreateBranchArgs) => {
+    const contextType: ContextType = selectionContext ? 'text_selection' : 'full_message';
 
-    const contextType: ContextType =
-      !selectedText || isFullSelected ? 'full_message' : 'text_selection';
-
-    const textToUse = selectedText || content;
+    const textToUse = selectionContext?.selectedText || content;
 
     const parentChatId = isSplitMode && chatId === childChatId ? childChatId : chatId;
 
@@ -43,8 +36,8 @@ export const useMessageHandlers = () => {
       context_type: contextType,
       ...(contextType === 'text_selection' && {
         selected_text: textToUse,
-        start_position: startPosition,
-        end_position: endPosition,
+        start_position: selectionContext?.startPosition,
+        end_position: selectionContext?.endPosition,
       }),
     };
 
@@ -58,22 +51,24 @@ export const useMessageHandlers = () => {
     navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);
   };
 
-  const handleCopyText = () => {
-    const selectedText = getSelectedText();
-
-    navigator.clipboard.writeText(selectedText || '');
+  const handleNewAttachedBranch = (
+    messageId: string,
+    content: string,
+    selectionContext?: UseMessageSelectionContextT
+  ) => {
+    createBranch({ content, messageId, connectionType: 'attached', selectionContext });
   };
 
-  const handleNewAttachedBranch = (messageId: string, content: string) => {
-    createBranch(messageId, content, 'attached');
-  };
-
-  const handleNewDetachedBranch = (messageId: string, content: string) => {
-    createBranch(messageId, content, 'detached');
+  const handleNewDetachedBranch = (
+    messageId: string,
+    content: string,
+    selectionContext?: UseMessageSelectionContextT
+  ) => {
+    createBranch({ content, messageId, connectionType: 'detached', selectionContext });
   };
 
   const handleNewTemporaryBranch = (messageId: string, content: string) => {
-    createBranch(messageId, content, 'temporary');
+    createBranch({ messageId, content, connectionType: 'temporary' });
   };
 
   const handleReply = (_messageId: string) => {
@@ -107,7 +102,6 @@ export const useMessageHandlers = () => {
   };
 
   return {
-    handleCopyText,
     handleReply,
     handleNewAttachedBranch,
     handleNewDetachedBranch,

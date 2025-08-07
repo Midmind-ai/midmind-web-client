@@ -9,7 +9,7 @@ import {
 } from '@/features/Chat/utils/llmResponseEmitter';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
+import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations.dto';
 
 export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
   const isNewMessage = isLastMessage && content.length < 10;
@@ -21,7 +21,7 @@ export const useLLMResponseLogic = (id: string, content: string, isLastMessage: 
   const [streamingContent, setStreamingContent] = useState(content);
 
   useEffect(() => {
-    const handleResponseChunk = (chunk: ConversationWithAIResponse) => {
+    const handleResponseChunk = (chunk: ConversationWithAIResponseDto) => {
       if (id === chunk.id && chunk.body && chunk.type === 'content') {
         setIsStreaming(true);
         setStreamingContent(prev => prev + chunk.body);

@@ -3,17 +3,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
-import { ChatsService } from '@shared/services/chats/chatsService';
-
 import type { Chat, ChatMessage } from '@shared/types/entities';
 
 import { ITEMS_PER_PAGE } from '@/features/Chat/hooks/useGetChatMessages';
 import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { handleLLMResponse } from '@/features/Chat/utils/swr';
 import type {
-  ConversationWithAIRequest,
-  ConversationWithAIResponse,
-} from '@/shared/services/chats/types';
+  ConversationWithAIRequestDto,
+  ConversationWithAIResponseDto,
+} from '@/shared/services/conversations/conversations.dto';
+import { ConversationsService } from '@/shared/services/conversations/conversations.service';
 import { useAbortControllerStore } from '@/shared/stores/useAbortControllerStore';
 
 type CreateChatArgs = {
@@ -80,7 +79,7 @@ export const useCreateChat = () => {
         }
       );
 
-      const conversationBody: ConversationWithAIRequest = {
+      const conversationBody: ConversationWithAIRequestDto = {
         chat_id: chatId,
         message_id: messageId,
         content,
@@ -89,9 +88,9 @@ export const useCreateChat = () => {
 
       const newAbortController = createAbortController(chatId);
 
-      ChatsService.conversationWithAI(
+      ConversationsService.conversationWithAI(
         conversationBody,
-        (chunk: ConversationWithAIResponse) => {
+        (chunk: ConversationWithAIResponseDto) => {
           handleLLMResponse(mutate, clearAbortController, chatId, model, chunk);
         },
         newAbortController.signal

@@ -3,12 +3,13 @@ import { Expand, Minimize2 } from 'lucide-react';
 import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMessageForm';
 import LLMResponse from '@/features/Chat/components/LLMResponse/LLMResponse';
 import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
+import { useMessageHandlers } from '@/features/Chat/hooks/use-message-handler/use-message-handler';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
-import { useMessageHandlers } from '@/features/Chat/hooks/useMessageHandlers';
 import { Button } from '@/shared/components/Button';
 import { ScrollArea } from '@/shared/components/ScrollArea';
 import type { ChatMessage } from '@/shared/types/entities';
 import { cn } from '@/shared/utils/cn';
+import { copyText } from '@/shared/utils/copy-text';
 
 type Props = {
   chatId: string;
@@ -29,7 +30,7 @@ const ParentChat = ({ chatId, isFullscreen, isHidden, onToggleFullscreen }: Prop
         <UserMessage
           key={message.id}
           content={message.content}
-          onCopyText={handlers.handleCopyText}
+          onCopyText={copyText}
           onReply={() => handlers.handleReply(message.id)}
           onNewAttachedBranch={() => handlers.handleNewAttachedBranch(message.id, message.content)}
           onNewDetachedBranch={() => handlers.handleNewDetachedBranch(message.id, message.content)}
@@ -46,13 +47,17 @@ const ParentChat = ({ chatId, isFullscreen, isHidden, onToggleFullscreen }: Prop
         key={message.id}
         {...message}
         isLastMessage={isLastMessage}
-        onCopyText={handlers.handleCopyText}
+        onCopyText={copyText}
         onReply={() => handlers.handleReply(message.id)}
         onOpenBranch={() => handlers.handleOpenBranch(message.id)}
         onOpenInSidePanel={() => handlers.handleOpenInSidePanel(message.id)}
         onOpenInNewTab={() => handlers.handleOpenInNewTab(message.id)}
-        onNewAttachedBranch={() => handlers.handleNewAttachedBranch(message.id, message.content)}
-        onNewDetachedBranch={() => handlers.handleNewDetachedBranch(message.id, message.content)}
+        onNewAttachedBranch={selectionContext =>
+          handlers.handleNewAttachedBranch(message.id, message.content, selectionContext)
+        }
+        onNewDetachedBranch={selectionContext =>
+          handlers.handleNewDetachedBranch(message.id, message.content, selectionContext)
+        }
         onNewTemporaryBranch={() => handlers.handleNewTemporaryBranch(message.id, message.content)}
         onNewSetOfBranches={() => handlers.handleNewSetOfBranches(message.id)}
         onNewNote={() => handlers.handleNewNote(message.id)}

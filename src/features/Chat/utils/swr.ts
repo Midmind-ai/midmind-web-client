@@ -4,7 +4,8 @@ import { ITEMS_PER_PAGE } from '@/features/Chat/hooks/useGetChatMessages';
 import type { LLModel } from '@/features/Chat/types/chatTypes';
 import { emitResponseChunk } from '@/features/Chat/utils/llmResponseEmitter';
 import { SWRCacheKeys } from '@/shared/constants/api';
-import type { ConversationWithAIResponse } from '@/shared/services/chats/types';
+import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations.dto';
+import { ThreadContextsService } from '@/shared/services/thread-contexts/thread-contexts.service';
 import type { components } from '@/shared/services/types/generated';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
@@ -29,12 +30,14 @@ export const getInfiniteKey = (chatId: string) => {
 const messageChunks = new Map<string, string[]>();
 const createdMessages = new Set<string>();
 
-export const handleLLMResponse = (
+export const handleLLMResponse = async (
   mutate: ReturnType<typeof import('swr').useSWRConfig>['mutate'],
   clearAbortController: (chatId: string) => void,
   chatId: string,
   model: LLModel,
-  chunk: ConversationWithAIResponse
+  chunk: ConversationWithAIResponseDto,
+  parentMessageId?: string,
+  parentChatId?: string
 ) => {
   emitResponseChunk(chunk);
 
@@ -144,6 +147,33 @@ export const handleLLMResponse = (
 
       messageChunks.delete(chunk.id);
       createdMessages.delete(chunk.id);
+
+      if (parentChatId && parentMessageId) {
+        const threadContext = await ThreadContextsService.getThreadContext(parentMessageId);
+
+        await mutate(
+          getInfiniteKey(parentChatId),
+          (data?: PaginatedResponse<ChatMessage[]>[]) => {
+            if (!data || !Array.isArray(data) || data.length === 0) {
+              return data;
+            }
+
+            const updatedData = data.map(page => ({
+              ...page,
+              data:
+                page.data?.map(message =>
+                  message.id === parentMessageId ? { ...message, threads: threadContext } : message
+                ) || [],
+            }));
+
+            return updatedData;
+          },
+          {
+            revalidate: false,
+            populateCache: true,
+          }
+        );
+      }
     }
 
     return;
