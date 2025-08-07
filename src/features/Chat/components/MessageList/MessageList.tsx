@@ -2,13 +2,13 @@ import LLMResponse from '@/features/Chat/components/LLMResponse/LLMResponse';
 import { useMessageListLogic } from '@/features/Chat/components/MessageList/useMessageListLogic';
 import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
 import { ScrollArea } from '@/shared/components/ScrollArea';
+import { copyText } from '@/shared/utils/copy-text';
 
 const MessageList = () => {
   const {
     messages,
     scrollAreaRef,
     handleScroll,
-    handleCopyText,
     handleReply,
     handleNewAttachedBranch,
     handleNewDetachedBranch,
@@ -35,7 +35,7 @@ const MessageList = () => {
             <UserMessage
               key={id}
               content={content}
-              onCopyText={handleCopyText}
+              onCopyText={copyText}
               onReply={() => handleReply(id)}
               onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
               onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
@@ -50,13 +50,17 @@ const MessageList = () => {
             key={id}
             {...message}
             isLastMessage={isLastMessage}
-            onCopyText={handleCopyText}
+            onCopyText={copyText}
             onReply={() => handleReply(id)}
             onOpenBranch={() => handleOpenBranch(id)}
             onOpenInSidePanel={() => handleOpenInSidePanel(id)}
             onOpenInNewTab={() => handleOpenInNewTab(id)}
-            onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
-            onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
+            onNewAttachedBranch={selectionContext =>
+              handleNewAttachedBranch(id, content, selectionContext)
+            }
+            onNewDetachedBranch={selectionContext =>
+              handleNewDetachedBranch(id, content, selectionContext)
+            }
             onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
             onNewSetOfBranches={() => handleNewSetOfBranches(id)}
             onNewNote={() => handleNewNote(id)}

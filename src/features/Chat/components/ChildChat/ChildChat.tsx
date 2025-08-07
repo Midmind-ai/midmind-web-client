@@ -3,17 +3,18 @@ import { Expand, Minimize2 } from 'lucide-react';
 import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMessageForm';
 import LLMResponse from '@/features/Chat/components/LLMResponse/LLMResponse';
 import UserMessage from '@/features/Chat/components/UserMessage/UserMessage';
+import { useMessageHandlers } from '@/features/Chat/hooks/use-message-handler/use-message-handler';
 import { useGetChatMessages } from '@/features/Chat/hooks/useGetChatMessages';
-import { useMessageHandlers } from '@/features/Chat/hooks/useMessageHandlers';
 import { Button } from '@/shared/components/Button';
 import { ScrollArea } from '@/shared/components/ScrollArea';
-import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
+import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations.dto';
 import type { ChatMessage } from '@/shared/types/entities';
 import { cn } from '@/shared/utils/cn';
+import { copyText } from '@/shared/utils/copy-text';
 
 type Props = {
   chatId: string;
-  threadContext: ConversationWithAIRequest['thread_context'];
+  threadContext: ConversationWithAIRequestDto['thread_context'];
   isFullscreen: boolean;
   isHidden: boolean;
   onToggleFullscreen: VoidFunction;
@@ -37,7 +38,7 @@ const ChildChat = ({
         <UserMessage
           key={message.id}
           content={message.content}
-          onCopyText={handlers.handleCopyText}
+          onCopyText={copyText}
           onReply={() => handlers.handleReply(message.id)}
           onNewAttachedBranch={() => handlers.handleNewAttachedBranch(message.id, message.content)}
           onNewDetachedBranch={() => handlers.handleNewDetachedBranch(message.id, message.content)}
@@ -54,7 +55,7 @@ const ChildChat = ({
         key={message.id}
         {...message}
         isLastMessage={isLastMessage}
-        onCopyText={handlers.handleCopyText}
+        onCopyText={copyText}
         onReply={() => handlers.handleReply(message.id)}
         onOpenBranch={() => handlers.handleOpenBranch(message.id)}
         onOpenInSidePanel={() => handlers.handleOpenInSidePanel(message.id)}

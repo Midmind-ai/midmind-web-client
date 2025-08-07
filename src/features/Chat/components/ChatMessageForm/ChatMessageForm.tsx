@@ -13,12 +13,12 @@ import { Textarea } from '@shared/components/Textarea';
 import { useChatMessageFormLogic } from '@/features/Chat/components/ChatMessageForm/useChatMessageFormLogic';
 import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { Button } from '@/shared/components/Button';
-import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
+import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations.dto';
 
 type Props = {
   chatId?: string;
   onSubmit?: (data: OnSubmitArgs) => void;
-  threadContext?: ConversationWithAIRequest['thread_context'];
+  threadContext?: ConversationWithAIRequestDto['thread_context'];
 };
 
 const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {

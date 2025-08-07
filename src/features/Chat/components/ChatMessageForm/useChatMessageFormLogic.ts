@@ -10,7 +10,7 @@ import { useConversationWithAI } from '@/features/Chat/hooks/useConversationWith
 import type { LLModel, OnSubmitArgs } from '@/features/Chat/types/chatTypes';
 import { SearchParams } from '@/shared/constants/router';
 import { useUrlParams } from '@/shared/hooks/useUrlParams';
-import type { ConversationWithAIRequest } from '@/shared/services/chats/types';
+import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations.dto';
 
 type ChatMessageFormData = {
   content: string;
@@ -18,7 +18,7 @@ type ChatMessageFormData = {
 
 type UseChatMessageFormLogicProps = {
   chatId?: string;
-  threadContext?: ConversationWithAIRequest['thread_context'];
+  threadContext?: ConversationWithAIRequestDto['thread_context'];
   onSubmit?: (data: OnSubmitArgs) => void;
 };
 

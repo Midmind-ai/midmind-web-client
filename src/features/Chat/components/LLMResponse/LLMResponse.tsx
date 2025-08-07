@@ -1,54 +1,66 @@
 import { FilePlus, GitBranchPlus, GitCommitVertical, Glasses } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 
 import ConnectionTypeBadge from '@/features/Chat/components/ConnectionTypeBadge/ConnectionTypeBadge';
+import type { ChatThreadContext } from '@/features/Chat/components/LLMResponse/llm-response.types';
 import { useLLMResponseLogic } from '@/features/Chat/components/LLMResponse/useLLMResponseLogic';
 import MessageContextMenu from '@/features/Chat/components/MessageContextMenu/MessageContextMenu';
 import QuickActionButton from '@/features/Chat/components/QuickActionButton/QuickActionButton';
+import ReactMarkdown from '@/features/Chat/components/react-markdown/react-markdown';
+import { useTextHighlight } from '@/features/Chat/hooks/use-text-highlight/use-text-highlight';
+import { captureSelection } from '@/features/Chat/hooks/use-text-highlight/use-text-highlight.helpers';
 import { ContextMenu, ContextMenuTrigger } from '@/shared/components/ContextMenu';
-import { ThemedP } from '@/shared/components/ThemedP';
 import type { ChatMessage } from '@/shared/types/entities';
 
 type Props = {
-  content: string;
   id: string;
+  content: string;
+  isLastMessage: boolean;
   llm_model: string | null;
   threads: ChatMessage['threads'];
-  isLastMessage: boolean;
-  onCopyText: VoidFunction;
   onReply: VoidFunction;
-  onOpenBranch: VoidFunction;
-  onOpenInSidePanel: VoidFunction;
-  onOpenInNewTab: VoidFunction;
-  onNewAttachedBranch: VoidFunction;
-  onNewDetachedBranch: VoidFunction;
-  onNewTemporaryBranch: VoidFunction;
-  onNewSetOfBranches: VoidFunction;
   onNewNote: VoidFunction;
+  onCopyText: VoidFunction;
+  onOpenBranch: VoidFunction;
+  onOpenInNewTab: VoidFunction;
+  onOpenInSidePanel: VoidFunction;
+  onNewSetOfBranches: VoidFunction;
+  onNewTemporaryBranch: VoidFunction;
+  onNewAttachedBranch: (selectionContext?: ChatThreadContext) => void;
+  onNewDetachedBranch: (selectionContext?: ChatThreadContext) => void;
 };
 
 const LLMResponse = ({
-  content,
   id,
-  llm_model,
+  content,
   threads,
+  llm_model,
   isLastMessage,
-  onCopyText,
   onReply,
+  onNewNote,
+  onCopyText,
   onOpenBranch,
-  onOpenInSidePanel,
   onOpenInNewTab,
+  onOpenInSidePanel,
+  onNewSetOfBranches,
   onNewAttachedBranch,
   onNewDetachedBranch,
   onNewTemporaryBranch,
-  onNewSetOfBranches,
-  onNewNote,
 }: Props) => {
+  let selectionContext: ChatThreadContext | undefined;
+
+  const onSelectionClick = (threadId: string) => {
+    // eslint-disable-next-line no-alert
+    alert(`You clicked on thread: ${threadId}`);
+  };
   const { currentModel, streamingContent, isStreaming } = useLLMResponseLogic(
     id,
     content,
     isLastMessage
   );
+  const { messageRef } = useTextHighlight({
+    threads,
+    onSelectionClick,
+  });
 
   return (
     <ContextMenu>
@@ -60,92 +72,16 @@ const LLMResponse = ({
           <h6 className="text-blue-500 text-xs font-medium uppercase mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
             {llm_model || currentModel}
           </h6>
-          <div className="text-base font-light leading-relaxed">
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => (
-                  <ThemedP className="text-base font-light leading-7 mb-4">{children}</ThemedP>
-                ),
-                h1: ({ children }) => (
-                  <h1 className="text-2xl font-bold mb-4 mt-6 border-b border-gray-200 dark:border-gray-700 pb-2">
-                    {children}
-                  </h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-xl font-semibold mb-3 mt-5">{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-lg font-semibold mb-3 mt-4">{children}</h3>
-                ),
-                h4: ({ children }) => (
-                  <h4 className="text-base font-semibold mb-2 mt-3">{children}</h4>
-                ),
-                h5: ({ children }) => (
-                  <h5 className="text-base font-semibold mb-2 mt-3">{children}</h5>
-                ),
-                h6: ({ children }) => (
-                  <h6 className="text-xs font-semibold mb-2 mt-3 uppercase tracking-wide">
-                    {children}
-                  </h6>
-                ),
-                ul: ({ children }) => <ul className="list-disc mb-4 space-y-2 ml-4">{children}</ul>,
-                ol: ({ children }) => (
-                  <ol className="list-decimal mb-4 space-y-2 ml-4">{children}</ol>
-                ),
-                li: ({ children }) => (
-                  <li className="text-base font-light leading-6 marker:text-blue-500 dark:marker:text-blue-400 pl-2">
-                    {children}
-                  </li>
-                ),
-                code: ({ children }) => (
-                  <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md text-xs font-mono border border-gray-200 dark:border-gray-700">
-                    {children}
-                  </code>
-                ),
-                pre: ({ children }) => (
-                  <pre className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-4 overflow-x-auto border border-gray-200 dark:border-gray-700 shadow-sm">
-                    <code className="text-xs font-mono leading-6">{children}</code>
-                  </pre>
-                ),
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 italic mb-4 bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r-lg">
-                    <div className="text-base font-light leading-6">{children}</div>
-                  </blockquote>
-                ),
-                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                em: ({ children }) => <em className="italic">{children}</em>,
-                a: ({ children, href }) => (
-                  <a
-                    href={href}
-                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline decoration-2 underline-offset-2 transition-colors duration-200"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {children}
-                  </a>
-                ),
-                hr: () => <hr className="my-6 border-gray-200 dark:border-gray-700" />,
-                table: ({ children }) => (
-                  <div className="overflow-x-auto mb-4">
-                    <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg">
-                      {children}
-                    </table>
-                  </div>
-                ),
-                th: ({ children }) => (
-                  <th className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-left text-base font-semibold border-b border-gray-200 dark:border-gray-700">
-                    {children}
-                  </th>
-                ),
-                td: ({ children }) => (
-                  <td className="px-4 py-2 text-base border-b border-gray-200 dark:border-gray-700">
-                    {children}
-                  </td>
-                ),
-              }}
-            >
-              {streamingContent}
-            </ReactMarkdown>
+          <div
+            ref={messageRef}
+            className="text-base font-light leading-relaxed"
+            onMouseUp={() => {
+              if (messageRef.current) {
+                selectionContext = captureSelection(messageRef.current);
+              }
+            }}
+          >
+            <ReactMarkdown content={streamingContent} />
           </div>
           <div className="flex items-center gap-2.5 mb-4">
             {threads.map(({ id, connection_color, connection_type, child_chat_id }) => {
@@ -190,16 +126,16 @@ const LLMResponse = ({
         </div>
       </ContextMenuTrigger>
       <MessageContextMenu
-        onCopyText={onCopyText}
         onReply={onReply}
-        onOpenBranch={onOpenBranch}
-        onOpenInSidePanel={onOpenInSidePanel}
-        onOpenInNewTab={onOpenInNewTab}
-        onNewAttachedBranch={onNewAttachedBranch}
-        onNewDetachedBranch={onNewDetachedBranch}
-        onNewTemporaryBranch={onNewTemporaryBranch}
-        onNewSetOfBranches={onNewSetOfBranches}
         showBranchActions
+        onCopyText={onCopyText}
+        onOpenBranch={onOpenBranch}
+        onOpenInNewTab={onOpenInNewTab}
+        onOpenInSidePanel={onOpenInSidePanel}
+        onNewSetOfBranches={onNewSetOfBranches}
+        onNewTemporaryBranch={onNewTemporaryBranch}
+        onNewAttachedBranch={() => onNewAttachedBranch(selectionContext)}
+        onNewDetachedBranch={() => onNewDetachedBranch(selectionContext)}
       />
     </ContextMenu>
   );

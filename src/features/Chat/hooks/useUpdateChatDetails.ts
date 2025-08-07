@@ -1,15 +1,14 @@
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { ChatsService } from '@shared/services/chats/chatsService';
-
 import { SWRCacheKeys } from '@/shared/constants/api';
-import type { UpdateChatDetailsRequest } from '@/shared/services/chats/types';
+import type { UpdateChatDetailsRequestDto } from '@/shared/services/chats/chats.dto';
+import { ChatsService } from '@/shared/services/chats/chats.service';
 
 type UpdateChatDetailsFetcherArgs = {
   arg: {
     id: string;
-    body: UpdateChatDetailsRequest;
+    body: UpdateChatDetailsRequestDto;
   };
 };
 
@@ -26,7 +25,7 @@ export const useUpdateChatDetails = () => {
     }
   );
 
-  const updateChatDetails = async (id: string, body: UpdateChatDetailsRequest) => {
+  const updateChatDetails = async (id: string, body: UpdateChatDetailsRequestDto) => {
     await trigger(
       { id, body },
       {
