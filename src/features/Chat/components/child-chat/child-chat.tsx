@@ -1,16 +1,20 @@
 import { Expand, Minimize2 } from 'lucide-react';
 
-import ChatMessageForm from '@/features/chat/components/chat-message-form/chat-message-form';
-import LLMResponse from '@/features/chat/components/llm-response/llm-response';
-import UserMessage from '@/features/chat/components/user-message/user-message';
-import { useGetChatMessages } from '@/features/chat/hooks/use-get-chat-messages';
-import { useMessageHandlers } from '@/features/chat/hooks/use-message-handlers/use-message-handlers';
-import { Button } from '@/shared/components/ui/button';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations-dtos';
-import type { ChatMessage } from '@/shared/types/entities';
-import { cn } from '@/shared/utils/cn';
-import { copyText } from '@/shared/utils/copy-text';
+import { Button } from '@shared/components/ui/button';
+import { ScrollArea } from '@shared/components/ui/scroll-area';
+
+import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
+
+import type { ChatMessage } from '@shared/types/entities';
+
+import { cn } from '@shared/utils/cn';
+import { copyText } from '@shared/utils/copy-text';
+
+import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
+import LLMResponse from '@features/chat/components/llm-response/llm-response';
+import UserMessage from '@features/chat/components/user-message/user-message';
+import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
+import { useMessageHandlers } from '@features/chat/hooks/use-message-handlers';
 
 type Props = {
   chatId: string;

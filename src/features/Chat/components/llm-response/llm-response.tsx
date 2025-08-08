@@ -1,15 +1,17 @@
 import { FilePlus, GitBranchPlus, GitCommitVertical, Glasses } from 'lucide-react';
 
-import ConnectionTypeBadge from '@/features/chat/components/connection-type-badge/connection-type-badge';
-import type { ChatThreadContext } from '@/features/chat/components/llm-response/llm-response.types';
-import { useLLMResponseLogic } from '@/features/chat/components/llm-response/use-llm-response-logic';
-import MessageContextMenu from '@/features/chat/components/message-context-menu/message-context-menu';
-import QuickActionButton from '@/features/chat/components/quick-action-button/quick-action-button';
-import ReactMarkdown from '@/features/chat/components/react-markdown/react-markdown';
-import { useTextHighlight } from '@/features/chat/hooks/use-text-highlight/use-text-highlight';
-import { captureSelection } from '@/features/chat/hooks/use-text-highlight/use-text-highlight-helpers';
-import { ContextMenu, ContextMenuTrigger } from '@/shared/components/ui/context-menu';
-import type { ChatMessage } from '@/shared/types/entities';
+import { ContextMenu, ContextMenuTrigger } from '@shared/components/ui/context-menu';
+
+import type { ChatMessage } from '@shared/types/entities';
+
+import ConnectionTypeBadge from '@features/chat/components/connection-type-badge/connection-type-badge';
+import { useLLMResponseLogic } from '@features/chat/components/llm-response/use-llm-response-logic';
+import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
+import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
+import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
+import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
+import type { ChatThreadContext } from '@features/chat/types/chat-types';
+import { captureSelection } from '@features/chat/utils/text-selection';
 
 type Props = {
   id: string;

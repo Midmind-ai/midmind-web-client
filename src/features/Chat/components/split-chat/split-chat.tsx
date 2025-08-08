@@ -1,7 +1,7 @@
+import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
+
 import ChildChat from '@features/chat/components/child-chat/child-chat';
 import ParentChat from '@features/chat/components/parent-chat/parent-chat';
-
-import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations.dto';
 
 type Props = {
   parentChatId: string;

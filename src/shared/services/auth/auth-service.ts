@@ -4,7 +4,7 @@ import type {
   SignInRequest,
   SignInWithGoogleRequest,
   TokenResponse,
-} from '@shared/services/auth/types';
+} from '@shared/services/auth/auth-dtos';
 
 import type { MessageResponse } from '@shared/types/common';
 

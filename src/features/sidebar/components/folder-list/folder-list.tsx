@@ -3,16 +3,15 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
-} from '@/shared/components/ui/sidebar';
-import { Skeleton } from '@/shared/components/ui/skeleton';
+} from '@shared/components/ui/sidebar';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
-import { useSidebarContentLogic } from '../use-sidebar-content-logic';
+import FoldersActions from '@features/sidebar/components/folder-actions/folder-actions';
+import { useFolderListLogic } from '@features/sidebar/components/folder-list/use-folder-list-logic';
+import Tree, { type TreeItem } from '@features/sidebar/components/tree/tree';
 
-import FoldersActions from './folder-actions';
-import { Tree, type TreeItem } from './tree';
-
-export default function Folders() {
-  const { chats, isLoading } = useSidebarContentLogic();
+const FolderList = () => {
+  const { chats, isLoading, isDeleting, handleDelete } = useFolderListLogic();
 
   return (
     <SidebarContent className="gap-0">
@@ -30,12 +29,13 @@ export default function Folders() {
                 ))}
               </div>
             )}
-
             {!isLoading &&
               chats?.map((item, index) => (
                 <Tree
                   key={index}
                   item={item as TreeItem}
+                  onDelete={() => handleDelete(item.id)}
+                  isDeleting={isDeleting}
                 />
               ))}
           </SidebarMenu>
@@ -43,4 +43,6 @@ export default function Folders() {
       </SidebarGroup>
     </SidebarContent>
   );
-}
+};
+
+export default FolderList;

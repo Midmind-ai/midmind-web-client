@@ -6,11 +6,14 @@ import { useParams } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
-import { useConversationWithAI } from '@/features/chat/hooks/use-conversation-with-ai';
-import type { LLModel, OnSubmitArgs } from '@/features/chat/types/chat-types';
-import { SearchParams } from '@/shared/constants/router';
-import { useUrlParams } from '@/shared/hooks/use-url-params';
-import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations-dtos';
+import { SearchParams } from '@shared/constants/router';
+
+import { useUrlParams } from '@shared/hooks/use-url-params';
+
+import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
+
+import { useConversationWithAI } from '@features/chat/hooks/use-conversation-with-ai';
+import type { LLModel, OnSubmitArgs } from '@features/chat/types/chat-types';
 
 type ChatMessageFormData = {
   content: string;

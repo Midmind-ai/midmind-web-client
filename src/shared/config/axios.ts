@@ -1,5 +1,7 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 
+import router from '@app/router';
+
 import { ApiErrorCodes } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/local-storage';
 import { AppRoutes } from '@shared/constants/router';
@@ -7,8 +9,6 @@ import { AppRoutes } from '@shared/constants/router';
 import { AuthService } from '@shared/services/auth/auth-service';
 
 import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/local-storage';
-
-import router from '@/app/router';
 
 type RefreshQueueItem = {
   resolve: (value: string) => void;

@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react';
 
 import { useParams } from 'react-router';
 
-import type { LLModel } from '@/features/chat/types/chat-types';
+import { SearchParams } from '@shared/constants/router';
+
+import { useUrlParams } from '@shared/hooks/use-url-params';
+
+import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
+
+import type { LLModel } from '@features/chat/types/chat-types';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
-} from '@/features/chat/utils/llm-response-emitter';
-import { SearchParams } from '@/shared/constants/router';
-import { useUrlParams } from '@/shared/hooks/use-url-params';
-import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations-dtos';
+} from '@features/chat/utils/llm-response-emitter';
 
 export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
   const isNewMessage = isLastMessage && content.length < 10;

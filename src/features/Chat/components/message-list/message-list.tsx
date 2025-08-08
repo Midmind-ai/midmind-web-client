@@ -1,8 +1,10 @@
-import LLMResponse from '@/features/chat/components/llm-response/llm-response';
-import { useMessageListLogic } from '@/features/chat/components/message-list/use-message-list-logic';
-import UserMessage from '@/features/chat/components/user-message/user-message';
-import { ScrollArea } from '@/shared/components/ui/scroll-area';
-import { copyText } from '@/shared/utils/copy-text';
+import { ScrollArea } from '@shared/components/ui/scroll-area';
+
+import { copyText } from '@shared/utils/copy-text';
+
+import LLMResponse from '@features/chat/components/llm-response/llm-response';
+import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
+import UserMessage from '@features/chat/components/user-message/user-message';
 
 const MessageList = () => {
   const {

@@ -1,9 +1,10 @@
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { SWRCacheKeys } from '@/shared/constants/api';
-import type { UpdateChatDetailsRequestDto } from '@/shared/services/chats/chats-dtos';
-import { ChatsService } from '@/shared/services/chats/chats-service';
+import { SWRCacheKeys } from '@shared/constants/api';
+
+import type { UpdateChatDetailsRequestDto } from '@shared/services/chats/chats-dtos';
+import { ChatsService } from '@shared/services/chats/chats-service';
 
 type UpdateChatDetailsFetcherArgs = {
   arg: {

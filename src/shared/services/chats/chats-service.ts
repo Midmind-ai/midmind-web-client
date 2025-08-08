@@ -1,9 +1,9 @@
 import { baseAxiosInstance } from '@shared/config/axios';
 
-import type { Chat } from '@shared/types/entities';
+import type { UpdateChatDetailsRequestDto } from '@shared/services/chats/chats-dtos';
 
-import type { UpdateChatDetailsRequestDto } from '@/shared/services/chats/chats-dtos';
-import type { MessageResponse } from '@/shared/types/common';
+import type { MessageResponse } from '@shared/types/common';
+import type { Chat } from '@shared/types/entities';
 
 export class ChatsService {
   static async getChats() {

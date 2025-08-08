@@ -1,8 +1,9 @@
-import type { ChatMessage } from '@shared/types/entities';
+import { baseAxiosInstance } from '@shared/config/axios';
 
-import { baseAxiosInstance } from '@/shared/config/axios';
-import type { GetChatMessagesParamsDto } from '@/shared/services/messages/messages-dtos';
-import type { PaginatedResponse } from '@/shared/types/common';
+import type { GetChatMessagesParamsDto } from '@shared/services/messages/messages-dtos';
+
+import type { PaginatedResponse } from '@shared/types/common';
+import type { ChatMessage } from '@shared/types/entities';
 
 export class MessagesService {
   static async getChatMessages(chatId: string, params: GetChatMessagesParamsDto) {

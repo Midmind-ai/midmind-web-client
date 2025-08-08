@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 import { AudioWaveform, ChevronsUpDown, Command, GalleryVerticalEnd, Plus } from 'lucide-react';
@@ -12,13 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
+} from '@shared/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/shared/components/ui/sidebar';
+} from '@shared/components/ui/sidebar';
+
+import type { Team } from '@shared/types/entities';
 
 const data = {
   user: {
@@ -45,25 +45,13 @@ const data = {
   ],
 };
 
-export function OrgSwitcher({
-  teams,
-}: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
-}) {
-  const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = useState<{
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }>(data.teams[0]);
+type Props = {
+  teams: Team[];
+};
 
-  if (!activeTeam) {
-    return null;
-  }
+const OrganizationSwitcher = ({ teams }: Props) => {
+  const { isMobile } = useSidebar();
+  const [activeTeam, setActiveTeam] = useState<Team>(data.teams[0]);
 
   return (
     <SidebarMenu>
@@ -116,4 +104,6 @@ export function OrgSwitcher({
       </SidebarMenuItem>
     </SidebarMenu>
   );
-}
+};
+
+export default OrganizationSwitcher;

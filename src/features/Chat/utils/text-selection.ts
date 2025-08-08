@@ -1,7 +1,4 @@
-import type {
-  HighlightTextNodeArgs,
-  ThreadContext,
-} from '@features/chat/hooks/use-text-highlight/use-text-highlight-types';
+import type { HighlightTextNodeArgs, ThreadContext } from '@features/chat/types/chat-types';
 
 export const captureSelection = (messageElement: Element) => {
   const selection = window.getSelection();

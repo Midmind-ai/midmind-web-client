@@ -1,8 +1,8 @@
 import { Folders, Home, Search } from 'lucide-react';
 
-import { SidebarContent, SidebarMenuButton } from '@/shared/components/ui/sidebar';
+import { SidebarContent, SidebarMenuButton } from '@shared/components/ui/sidebar';
 
-export default function SidebarTabs() {
+const SidebarTabs = () => {
   return (
     <SidebarContent className="flex-none flex-col p-1.5 gap-1">
       <SidebarMenuButton className="cursor-pointer w-10! h-10!">
@@ -19,4 +19,6 @@ export default function SidebarTabs() {
       </SidebarMenuButton>
     </SidebarContent>
   );
-}
+};
+
+export default SidebarTabs;

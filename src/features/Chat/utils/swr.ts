@@ -1,14 +1,17 @@
 import { unstable_serialize } from 'swr/infinite';
 
-import { ITEMS_PER_PAGE } from '@/features/chat/hooks/use-get-chat-messages';
-import type { LLModel } from '@/features/chat/types/chat-types';
-import { emitResponseChunk } from '@/features/chat/utils/llm-response-emitter';
-import { SWRCacheKeys } from '@/shared/constants/api';
-import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations-dtos';
-import { ThreadContextService } from '@/shared/services/thread-context/thread-context-service';
-import type { components } from '@/shared/services/types/generated';
-import type { PaginatedResponse } from '@/shared/types/common';
-import type { ChatMessage } from '@/shared/types/entities';
+import { SWRCacheKeys } from '@shared/constants/api';
+
+import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
+import { ThreadContextService } from '@shared/services/thread-context/thread-context-service';
+import type { components } from '@shared/services/types/generated';
+
+import type { PaginatedResponse } from '@shared/types/common';
+import type { ChatMessage } from '@shared/types/entities';
+
+import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
+import type { LLModel } from '@features/chat/types/chat-types';
+import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
 
 type ChatDetails = components['schemas']['ChatDto'];
 type TitleChunk = components['schemas']['CreateConversationResponseTitleDto'];

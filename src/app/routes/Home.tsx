@@ -4,9 +4,9 @@ import { ThemedH1 } from '@shared/components/ui/themed-h1';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
-import ChatMessageForm from '@/features/chat/components/chat-message-form/chat-message-form';
-import { useCreateChat } from '@/features/chat/hooks/use-create-chat';
-import type { OnSubmitArgs } from '@/features/chat/types/chat-types';
+import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
+import { useCreateChat } from '@features/chat/hooks/use-create-chat';
+import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 
 const Home = () => {
   const navigate = useNavigate();

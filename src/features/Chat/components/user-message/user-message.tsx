@@ -1,6 +1,7 @@
-import MessageContextMenu from '@/features/chat/components/message-context-menu/message-context-menu';
-import { ContextMenu, ContextMenuTrigger } from '@/shared/components/ui/context-menu';
-import { ThemedP } from '@/shared/components/ui/themed-p';
+import { ContextMenu, ContextMenuTrigger } from '@shared/components/ui/context-menu';
+import { ThemedP } from '@shared/components/ui/themed-p';
+
+import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
 
 type Props = {
   content: string;

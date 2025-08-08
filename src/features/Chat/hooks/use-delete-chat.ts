@@ -3,9 +3,9 @@ import useSWRMutation from 'swr/mutation';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
-import type { Chat } from '@shared/types/entities';
+import { ChatsService } from '@shared/services/chats/chats-service';
 
-import { ChatsService } from '@/shared/services/chats/chats-service';
+import type { Chat } from '@shared/types/entities';
 
 type DeleteChatFetcherArgs = {
   arg: {

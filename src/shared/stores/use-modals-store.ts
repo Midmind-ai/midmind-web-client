@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { ModalNames, ModalPropsMap } from '@/shared/constants/modals';
+import type { ModalNames, ModalPropsMap } from '@shared/constants/modals';
 
 type ModalData<T extends ModalNames = ModalNames> = {
   name: T;

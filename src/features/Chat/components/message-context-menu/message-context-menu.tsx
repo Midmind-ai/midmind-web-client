@@ -14,9 +14,9 @@ import {
   ContextMenuItem,
   ContextMenuContent,
   ContextMenuSeparator,
-} from '@/shared/components/ui/context-menu';
-import { ThemedP } from '@/shared/components/ui/themed-p';
-import { ThemedSpan } from '@/shared/components/ui/themed-span';
+} from '@shared/components/ui/context-menu';
+import { ThemedP } from '@shared/components/ui/themed-p';
+import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 type Props = {
   onCopyText?: VoidFunction;

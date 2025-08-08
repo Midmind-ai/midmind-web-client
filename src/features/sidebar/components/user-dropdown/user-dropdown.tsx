@@ -1,7 +1,6 @@
-'use client';
-
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from 'lucide-react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,21 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@shared/components/ui/sidebar';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/components/ui/sidebar';
+import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
+import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
 
-import { useSidebarFooterLogic } from './use-sidebar-footer-logic';
-
-export function User() {
-  const { isMobile } = useSidebar();
-
-  const { avatar, email, first_name, handleLogout, last_name } = useSidebarFooterLogic();
+const UserDropdown = () => {
+  const { avatar, email, first_name, last_name, isMobile, handleLogout } = useUserDropdownLogic();
 
   const nameAbbreviation = `${first_name[0]}${last_name[0]}`.toUpperCase();
 
@@ -63,11 +54,10 @@ export function User() {
                   <AvatarFallback className="rounded-lg">{nameAbbreviation}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {first_name}
-                    {last_name}
-                  </span>
-                  <span className="truncate text-xs">{email}</span>
+                  <ThemedSpan className="truncate font-medium">
+                    {first_name} {last_name}
+                  </ThemedSpan>
+                  <ThemedSpan className="truncate text-xs">{email}</ThemedSpan>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -103,4 +93,6 @@ export function User() {
       </SidebarMenuItem>
     </SidebarMenu>
   );
-}
+};
+
+export default UserDropdown;

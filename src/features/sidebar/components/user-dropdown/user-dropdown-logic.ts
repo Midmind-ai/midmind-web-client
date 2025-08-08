@@ -1,16 +1,21 @@
 import { useNavigate } from 'react-router';
 import { useSWRConfig } from 'swr';
 
-import { SWRCacheKeys } from '@/shared/constants/api';
-import { LocalStorageKeys } from '@/shared/constants/local-storage';
-import { AppRoutes } from '@/shared/constants/router';
-import { useCurrentUser } from '@/shared/hooks/use-current-user';
-import { useLogout } from '@/shared/hooks/use-logout';
-import { removeFromStorage } from '@/shared/utils/local-storage';
+import { useSidebar } from '@shared/components/ui/sidebar';
 
-export const useSidebarFooterLogic = () => {
+import { SWRCacheKeys } from '@shared/constants/api';
+import { LocalStorageKeys } from '@shared/constants/local-storage';
+import { AppRoutes } from '@shared/constants/router';
+
+import { useCurrentUser } from '@shared/hooks/use-current-user';
+import { useLogout } from '@shared/hooks/use-logout';
+
+import { removeFromStorage } from '@shared/utils/local-storage';
+
+export const useUserDropdownLogic = () => {
   const navigate = useNavigate();
   const { mutate } = useSWRConfig();
+  const { isMobile } = useSidebar();
   const { logout, isLoading } = useLogout();
   const { avatar, first_name, last_name, email } = useCurrentUser();
 
@@ -31,7 +36,8 @@ export const useSidebarFooterLogic = () => {
     first_name,
     last_name,
     email,
-    handleLogout,
     isLoading,
+    isMobile,
+    handleLogout,
   };
 };

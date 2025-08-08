@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-import type { DefiniteThreads } from '@/features/chat/components/llm-response/llm-response.types';
-import {
-  clearHighlights,
-  highlightSelection,
-} from '@/features/chat/hooks/use-text-highlight/use-text-highlight-helpers';
-import type { ChatMessage } from '@/shared/types/entities';
+import type { ChatMessage } from '@shared/types/entities';
+
+import type { DefiniteThreads } from '@features/chat/types/chat-types';
+import { clearHighlights, highlightSelection } from '@features/chat/utils/text-selection';
 
 type Args = {
   threads: ChatMessage['threads'];

@@ -3,17 +3,19 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
-import type { Chat, ChatMessage } from '@shared/types/entities';
-
-import { ITEMS_PER_PAGE } from '@/features/chat/hooks/use-get-chat-messages';
-import type { LLModel } from '@/features/chat/types/chat-types';
-import { handleLLMResponse } from '@/features/chat/utils/swr';
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
-} from '@/shared/services/conversations/conversations-dtos';
-import { ConversationsService } from '@/shared/services/conversations/conversations-service';
-import { useAbortControllerStore } from '@/shared/stores/use-abort-controller-store';
+} from '@shared/services/conversations/conversations-dtos';
+import { ConversationsService } from '@shared/services/conversations/conversations-service';
+
+import { useAbortControllerStore } from '@shared/stores/use-abort-controller-store';
+
+import type { Chat, ChatMessage } from '@shared/types/entities';
+
+import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
+import type { LLModel } from '@features/chat/types/chat-types';
+import { handleLLMResponse } from '@features/chat/utils/swr';
 
 type CreateChatArgs = {
   content: string;

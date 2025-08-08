@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 import { useParams } from 'react-router';
 
-import { useThreadContext } from '@/features/chat/hooks/use-thread-context';
-import { usePageTitle } from '@/shared/hooks/use-page-title';
+import { usePageTitle } from '@shared/hooks/use-page-title';
+
+import { useThreadContext } from '@features/chat/hooks/use-thread-context';
 
 export const useSplitChatLogic = () => {
   const { id: currentChatId = '' } = useParams();

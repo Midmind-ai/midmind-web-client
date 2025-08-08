@@ -1,5 +1,6 @@
 import { ChevronDownIcon, CircleStop, PaperclipIcon, SendHorizonal } from 'lucide-react';
 
+import { Button } from '@shared/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -10,10 +11,10 @@ import {
 import { Separator } from '@shared/components/ui/separator';
 import { Textarea } from '@shared/components/ui/textarea';
 
-import { useChatMessageFormLogic } from '@/features/chat/components/chat-message-form/use-chat-message-form-logic';
-import type { OnSubmitArgs } from '@/features/chat/types/chat-types';
-import { Button } from '@/shared/components/ui/button';
-import type { ConversationWithAIRequestDto } from '@/shared/services/conversations/conversations-dtos';
+import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
+
+import { useChatMessageFormLogic } from '@features/chat/components/chat-message-form/use-chat-message-form-logic';
+import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 
 type Props = {
   chatId?: string;

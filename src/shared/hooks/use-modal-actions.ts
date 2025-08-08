@@ -1,4 +1,4 @@
-import { useModalsStore } from '@/shared/stores/use-modals-store';
+import { useModalsStore } from '@shared/stores/use-modals-store';
 
 export const useModalActions = () => {
   const openModal = useModalsStore(state => state.openModal);

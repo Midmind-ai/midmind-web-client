@@ -3,18 +3,21 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/r
 import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@/shared/components/ui/sidebar';
-import { AppRoutes, SearchParams } from '@/shared/constants/router';
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@shared/components/ui/sidebar';
 
-import { Dropdown } from './dropdown-menu';
+import { AppRoutes, SearchParams } from '@shared/constants/router';
+
+import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
 
 export type TreeItem = {
   id: string;
   name: string;
 };
+
 export type DataType = {
   tree: TreeType;
 };
+
 export type TreeType = Array<TreeItem | TreeType>;
 
 // This is sample data.
@@ -34,7 +37,13 @@ export const sampleData: DataType = {
   ],
 };
 
-export function Tree({ item }: { item: TreeItem }) {
+type Props = {
+  item: TreeItem;
+  onDelete: VoidFunction;
+  isDeleting: boolean;
+};
+
+const Tree = ({ item, onDelete, isDeleting }: Props) => {
   const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];
   const navigate = useNavigate();
   const params = useParams();
@@ -51,9 +60,10 @@ export function Tree({ item }: { item: TreeItem }) {
         <MessageSquare className="stroke-[1.5px]" />
         <span className="truncate block">{name}</span>
 
-        <Dropdown
-          id={id}
-          triggerClassNames={`opacity-0 group-hover/item:opacity-100`}
+        <MoreActionsMenu
+          triggerClassNames="opacity-0 group-hover/item:opacity-100"
+          onDelete={onDelete}
+          isDeleting={isDeleting}
         />
       </SidebarMenuButton>
     );
@@ -70,9 +80,10 @@ export function Tree({ item }: { item: TreeItem }) {
             <ChevronRight className="transition-transform" />
             <Folder />
             <span className="truncate block">{name}</span>
-            <Dropdown
-              id={id}
-              triggerClassNames={`opacity-0 group-hover/item:opacity-100`}
+            <MoreActionsMenu
+              triggerClassNames="opacity-0 group-hover/item:opacity-100"
+              onDelete={onDelete}
+              isDeleting={isDeleting}
             />
           </SidebarMenuButton>
         </CollapsibleTrigger>
@@ -82,6 +93,8 @@ export function Tree({ item }: { item: TreeItem }) {
               <Tree
                 key={index}
                 item={subItem}
+                onDelete={onDelete}
+                isDeleting={isDeleting}
               />
             ))}
           </SidebarMenuSub>
@@ -89,4 +102,6 @@ export function Tree({ item }: { item: TreeItem }) {
       </Collapsible>
     </SidebarMenuItem>
   );
-}
+};
+
+export default Tree;

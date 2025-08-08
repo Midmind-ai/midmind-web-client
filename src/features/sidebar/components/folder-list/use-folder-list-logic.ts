@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from 'react-router';
 
-import { useDeleteChat } from '@/features/chat/hooks/use-delete-chat';
-import { useGetChats } from '@/features/chat/hooks/use-get-chats';
-import { AppRoutes } from '@/shared/constants/router';
+import { AppRoutes } from '@shared/constants/router';
 
-export const useSidebarContentLogic = () => {
+import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
+import { useGetChats } from '@features/chat/hooks/use-get-chats';
+
+export const useFolderListLogic = () => {
   const { chats, isLoading } = useGetChats();
   const navigate = useNavigate();
   const location = useLocation();

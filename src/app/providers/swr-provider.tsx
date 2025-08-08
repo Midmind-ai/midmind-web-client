@@ -2,7 +2,7 @@ import { type PropsWithChildren } from 'react';
 
 import { SWRConfig } from 'swr';
 
-import { TIMEOUT } from '@/shared/constants/api';
+import { TIMEOUT } from '@shared/constants/api';
 
 export const SWRProvider = ({ children }: PropsWithChildren) => {
   return (

@@ -2,8 +2,8 @@ import { useRef, type UIEvent, useEffect } from 'react';
 
 import { useParams } from 'react-router';
 
-import { useGetChatMessages } from '@/features/chat/hooks/use-get-chat-messages';
-import { useMessageHandlers } from '@/features/chat/hooks/use-message-handlers/use-message-handlers';
+import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
+import { useMessageHandlers } from '@features/chat/hooks/use-message-handlers';
 
 const LOAD_MORE_SCROLL_DISTANCE = 1000; // 1000px
 

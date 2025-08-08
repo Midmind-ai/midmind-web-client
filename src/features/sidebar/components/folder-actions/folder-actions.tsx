@@ -1,8 +1,9 @@
 import { FilePlus2, FileSearch2, FolderPlus, MessageSquarePlus, PackagePlus } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
-import { SidebarMenuButton } from '@/shared/components/ui/sidebar';
-import { AppRoutes } from '@/shared/constants/router';
+import { SidebarMenuButton } from '@shared/components/ui/sidebar';
+
+import { AppRoutes } from '@shared/constants/router';
 
 export default function FolderActions() {
   const navigate = useNavigate();
@@ -11,11 +12,9 @@ export default function FolderActions() {
 
   return (
     <div className="flex justify-between border-b-1 p-1">
-      <div>
-        <SidebarMenuButton className={buttonClassNames}>
-          <FileSearch2 className="size-5.5! stroke-[1px]" />
-        </SidebarMenuButton>
-      </div>
+      <SidebarMenuButton className={buttonClassNames}>
+        <FileSearch2 className="size-5.5! stroke-[1px]" />
+      </SidebarMenuButton>
       <div className="flex gap-1">
         <SidebarMenuButton className={buttonClassNames}>
           <FilePlus2 className="size-5.5! stroke-1" />

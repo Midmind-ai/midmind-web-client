@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3';
 
-import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations.dto';
+import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
 
 export const llmResponseEmitter = new EventEmitter();
 

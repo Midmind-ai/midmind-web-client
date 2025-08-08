@@ -1,8 +1,9 @@
-import { baseAxiosInstance } from '@/shared/config/axios';
+import { baseAxiosInstance } from '@shared/config/axios';
+
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
-} from '@/shared/services/conversations/conversations-dtos';
+} from '@shared/services/conversations/conversations-dtos';
 
 export class ConversationsService {
   static async conversationWithAI(

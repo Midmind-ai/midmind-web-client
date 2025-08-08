@@ -1,15 +1,18 @@
 import { useNavigate, useParams } from 'react-router';
 
-import { useSplitChatLogic } from '@/features/chat/components/split-chat/use-split-chat-logic';
-import { useCreateChat } from '@/features/chat/hooks/use-create-chat';
+import { AppRoutes, SearchParams } from '@shared/constants/router';
+
+import { useUrlParams } from '@shared/hooks/use-url-params';
+
+import { useSplitChatLogic } from '@features/chat/components/split-chat/use-split-chat-logic';
+import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
-} from '@/features/chat/hooks/use-message-handlers/use-message-handlers-types';
-import type { ContextType, LLModel } from '@/features/chat/types/chat-types';
-import { emitThreadCreated } from '@/features/chat/utils/thread-creation-emitter';
-import { AppRoutes, SearchParams } from '@/shared/constants/router';
-import { useUrlParams } from '@/shared/hooks/use-url-params';
+  ContextType,
+  LLModel,
+} from '@features/chat/types/chat-types';
+import { emitThreadCreated } from '@features/chat/utils/thread-creation-emitter';
 
 export const useMessageHandlers = () => {
   const navigate = useNavigate();

@@ -1,7 +1,8 @@
 import useSWR from 'swr';
 
-import { SWRCacheKeys } from '@/shared/constants/api';
-import { ChatsService } from '@/shared/services/chats/chats-service';
+import { SWRCacheKeys } from '@shared/constants/api';
+
+import { ChatsService } from '@shared/services/chats/chats-service';
 
 export const useGetChatDetails = (id: string) => {
   const {

@@ -10,12 +10,11 @@ import { LocalStorageKeys } from '@shared/constants/local-storage';
 import { AppRoutes } from '@shared/constants/router';
 
 import type { SignInRequest } from '@shared/services/auth/auth-dtos';
+import { AuthService } from '@shared/services/auth/auth-service';
 
 import { setToStorage } from '@shared/utils/local-storage';
 
 import { useSignIn } from '@features/sign-in/hooks/use-sign-in';
-
-import { AuthService } from '@/shared/services/auth/auth-service';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),

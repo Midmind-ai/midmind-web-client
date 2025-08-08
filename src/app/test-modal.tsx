@@ -1,4 +1,4 @@
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +6,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog';
-import type { BaseModalProps } from '@/shared/constants/modals';
-import { useModalActions } from '@/shared/hooks/use-modal-actions';
+} from '@shared/components/ui/dialog';
+
+import type { BaseModalProps } from '@shared/constants/modals';
+
+import { useModalActions } from '@shared/hooks/use-modal-actions';
 
 export type TestModalProps = {
   title: string;

@@ -1,9 +1,9 @@
 import EventEmitter from 'eventemitter3';
 
-import type { components } from '@/shared/services/types/generated';
+import type { ThreadContext } from '@shared/types/entities';
 
 export type ThreadEvent = {
-  threadContext: components['schemas']['ConversationThreadContextDto'];
+  threadContext: ThreadContext;
 };
 
 export const threadEventEmitter = new EventEmitter();
