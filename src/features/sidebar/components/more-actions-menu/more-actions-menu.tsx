@@ -1,6 +1,5 @@
 import { Loader2Icon, MoreHorizontal } from 'lucide-react';
 
-import { Button } from '@shared/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,16 +25,13 @@ const MoreActionsMenu = ({ triggerClassNames, isDeleting, onDelete }: Props) => 
           asChild
           className={cn(
             triggerClassNames,
-            'right-1 rounded-[4px] top-1/2 -translate-y-1/2 size-6',
+            'right-1 p-1 rounded-[4px] top-1/2 -translate-y-1/2 size-6',
             'hover:bg-sidebar'
           )}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-          >
+          <span>
             <MoreHorizontal />
-          </Button>
+          </span>
         </SidebarMenuAction>
       </DropdownMenuTrigger>
       <DropdownMenuContent

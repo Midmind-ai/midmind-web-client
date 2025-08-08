@@ -5,7 +5,7 @@ import { SidebarMenuButton } from '@shared/components/ui/sidebar';
 
 import { AppRoutes } from '@shared/constants/router';
 
-export default function FolderActions() {
+const FolderActions = () => {
   const navigate = useNavigate();
 
   const buttonClassNames = 'size-8 p-1 rounded-xs flex items-center justify-center cursor-pointer';
@@ -37,4 +37,6 @@ export default function FolderActions() {
       </div>
     </div>
   );
-}
+};
+
+export default FolderActions;

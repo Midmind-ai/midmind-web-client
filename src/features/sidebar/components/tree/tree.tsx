@@ -4,6 +4,7 @@ import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@shared/components/ui/sidebar';
+import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
@@ -58,8 +59,7 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
         }
       >
         <MessageSquare className="stroke-[1.5px]" />
-        <span className="truncate block">{name}</span>
-
+        <ThemedSpan className="truncate block">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
           onDelete={onDelete}
