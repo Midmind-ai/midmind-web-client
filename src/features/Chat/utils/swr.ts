@@ -1,11 +1,11 @@
 import { unstable_serialize } from 'swr/infinite';
 
-import { ITEMS_PER_PAGE } from '@/features/Chat/hooks/useGetChatMessages';
-import type { LLModel } from '@/features/Chat/types/chatTypes';
-import { emitResponseChunk } from '@/features/Chat/utils/llmResponseEmitter';
+import { ITEMS_PER_PAGE } from '@/features/chat/hooks/use-get-chat-messages';
+import type { LLModel } from '@/features/chat/types/chat-types';
+import { emitResponseChunk } from '@/features/chat/utils/llm-response-emitter';
 import { SWRCacheKeys } from '@/shared/constants/api';
-import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations.dto';
-import { ThreadContextsService } from '@/shared/services/thread-contexts/thread-contexts.service';
+import type { ConversationWithAIResponseDto } from '@/shared/services/conversations/conversations-dtos';
+import { ThreadContextService } from '@/shared/services/thread-context/thread-context-service';
 import type { components } from '@/shared/services/types/generated';
 import type { PaginatedResponse } from '@/shared/types/common';
 import type { ChatMessage } from '@/shared/types/entities';
@@ -149,7 +149,7 @@ export const handleLLMResponse = async (
       createdMessages.delete(chunk.id);
 
       if (parentChatId && parentMessageId) {
-        const threadContext = await ThreadContextsService.getThreadContext(parentMessageId);
+        const threadContext = await ThreadContextService.getThreadContext(parentMessageId);
 
         await mutate(
           getInfiniteKey(parentChatId),

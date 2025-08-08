@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@/shared/components/DropdownMenu';
+} from '@/shared/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,

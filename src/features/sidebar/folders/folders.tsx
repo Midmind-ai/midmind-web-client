@@ -1,10 +1,10 @@
-import { Skeleton } from '@/shared/components/Skeleton';
 import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
 } from '@/shared/components/ui/sidebar';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 
 import { useSidebarContentLogic } from '../use-sidebar-content-logic';
 

@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router';
 
-import { ThemedH1 } from '@shared/components/ThemedH1';
+import { ThemedH1 } from '@shared/components/ui/themed-h1';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
-import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMessageForm';
-import { useCreateChat } from '@/features/Chat/hooks/useCreateChat';
-import type { OnSubmitArgs } from '@/features/Chat/types/chatTypes';
+import ChatMessageForm from '@/features/chat/components/chat-message-form/chat-message-form';
+import { useCreateChat } from '@/features/chat/hooks/use-create-chat';
+import type { OnSubmitArgs } from '@/features/chat/types/chat-types';
 
 const Home = () => {
   const navigate = useNavigate();

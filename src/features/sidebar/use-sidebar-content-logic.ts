@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router';
 
-import { useDeleteChat } from '@/features/Chat/hooks/useDeleteChat';
-import { useGetChats } from '@/features/Chat/hooks/useGetChats';
+import { useDeleteChat } from '@/features/chat/hooks/use-delete-chat';
+import { useGetChats } from '@/features/chat/hooks/use-get-chats';
 import { AppRoutes } from '@/shared/constants/router';
 
 export const useSidebarContentLogic = () => {

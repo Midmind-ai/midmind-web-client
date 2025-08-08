@@ -1,4 +1,4 @@
-import RootProvider from '@/app/RootProvider';
+import RootProvider from '@/app/root-provider';
 
 const App = () => {
   return <RootProvider />;

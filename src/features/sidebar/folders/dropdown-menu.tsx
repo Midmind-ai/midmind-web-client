@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/components/DropdownMenu';
+} from '@/shared/components/ui/dropdown-menu';
 import { SidebarMenuAction } from '@/shared/components/ui/sidebar';
 import { AppRoutes, SearchParams } from '@/shared/constants/router';
 import { cn } from '@/shared/utils/cn';
@@ -29,13 +29,16 @@ export function Dropdown({ id, ...props }: { id: string; [key: string]: any }) {
     <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
         <SidebarMenuAction
+          asChild
           className={cn(
             props.triggerClassNames,
             'right-1 rounded-[4px] top-1/2 -translate-y-1/2 size-6',
             'hover:bg-sidebar'
           )}
         >
-          <MoreHorizontal />
+          <button>
+            <MoreHorizontal />
+          </button>
         </SidebarMenuAction>
       </DropdownMenuTrigger>
       <DropdownMenuContent

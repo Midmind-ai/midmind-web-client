@@ -1,7 +1,7 @@
-import ChatMessageForm from '@/features/Chat/components/ChatMessageForm/ChatMessageForm';
-import MessageList from '@/features/Chat/components/MessageList/MessageList';
-import SplitChat from '@/features/Chat/components/SplitChat/SplitChat';
-import { useSplitChatLogic } from '@/features/Chat/components/SplitChat/useSplitChatLogic';
+import ChatMessageForm from '@/features/chat/components/chat-message-form/chat-message-form';
+import MessageList from '@/features/chat/components/message-list/message-list';
+import SplitChat from '@/features/chat/components/split-chat/split-chat';
+import { useSplitChatLogic } from '@/features/chat/components/split-chat/use-split-chat-logic';
 
 const Chat = () => {
   const {

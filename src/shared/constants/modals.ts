@@ -1,5 +1,5 @@
-import NestedModal from '@/app/NestedModal';
-import TestModal, { type TestModalProps } from '@/app/TestModal';
+import NestedModal from '@/app/nested-modal';
+import TestModal, { type TestModalProps } from '@/app/test-modal';
 
 // base type for all modal props
 export type BaseModalProps = {

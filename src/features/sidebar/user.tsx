@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@shared/components/DropdownMenu';
+} from '@shared/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -18,7 +18,7 @@ import {
   useSidebar,
 } from '@shared/components/ui/sidebar';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 
 import { useSidebarFooterLogic } from './use-sidebar-footer-logic';
 

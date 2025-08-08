@@ -2,14 +2,9 @@ import { memo } from 'react';
 
 import LibReactMarkDown from 'react-markdown';
 
-import { ThemedP } from '@/shared/components/ThemedP';
+import { ThemedP } from '@shared/components/ui/themed-p';
 
-type Props = {
-  content: string;
-};
-
-{
-  /*
+/**
   ReactMarkdown is moved to a separate file and memoised for a few reasons:
   1. The text can be highlighted, but it gets highlighted by changing DOM (adding <span /> tags). 
      But the ReactMarkdown doesn't know about DOM changes. When a re-render happens React tries to tries to update ReactMarkdown nodes
@@ -17,8 +12,12 @@ type Props = {
      You can reproduce this bug from this component, if you make any small change and save the file while web is opened you'll get the error. 
      * The solution to the problem is to tell ReactMarkdown how to render highlights from the beginning. This means backend or frontend should send/parse predefined 
      * markdown and ReactMarkdown should now how to deal with it
-  2. It's a visual reason. Easer to read a consumer component */
-}
+  2. It's a visual reason. Easer to read a consumer component 
+**/
+
+type Props = {
+  content: string;
+};
 
 const ReactMarkdown = ({ content }: Props) => {
   return (

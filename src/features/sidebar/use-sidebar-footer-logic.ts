@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router';
 import { useSWRConfig } from 'swr';
 
 import { SWRCacheKeys } from '@/shared/constants/api';
-import { LocalStorageKeys } from '@/shared/constants/localStorage';
+import { LocalStorageKeys } from '@/shared/constants/local-storage';
 import { AppRoutes } from '@/shared/constants/router';
-import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
-import { useLogout } from '@/shared/hooks/useLogout';
-import { removeFromStorage } from '@/shared/utils/localStorage';
+import { useCurrentUser } from '@/shared/hooks/use-current-user';
+import { useLogout } from '@/shared/hooks/use-logout';
+import { removeFromStorage } from '@/shared/utils/local-storage';
 
 export const useSidebarFooterLogic = () => {
   const navigate = useNavigate();

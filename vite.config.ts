@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
 
+import type { NodePath, PluginObj, PluginPass } from '@babel/core';
+import type { JSXOpeningElement } from '@babel/types';
+
 // import react from '@vitejs/plugin-react-swc'; << replaced with old plugin-react to support babel custom visitor function
 
 import path from 'path';
@@ -15,13 +18,13 @@ export default defineConfig({
       babel: {
         plugins: [
           // Add data-component attribute to html to help developers navigate through Tailwind classNames
-          function emojiComponentAttribute() {
+          function emojiComponentAttribute(): PluginObj {
             return {
               visitor: {
-                JSXOpeningElement(path, state) {
+                JSXOpeningElement(path: NodePath<JSXOpeningElement>, state: PluginPass) {
                   // Extract component name from file path
-                  const file = state.file.opts.filename;
-                  const match = file.match(/([^/\\]+)\.(jsx?|tsx?)$/);
+                  const file = state.file?.opts?.filename;
+                  const match = file?.match(/([^/\\]+)\.(jsx?|tsx?)$/);
                   const componentName = match?.[1] ?? 'Unknown';
 
                   path.node.attributes.unshift({
