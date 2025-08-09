@@ -26,7 +26,7 @@ export default function BreadcrumbItem({ title, type, isActive, href }: Props) {
         <Link
           className={cn(
             isActive && 'text-foreground',
-            'group-hover:text-foreground transition-none'
+            'group-hover:text-primary transition-none'
           )}
           to={href}
         >
