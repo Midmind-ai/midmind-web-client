@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -44,13 +45,13 @@ export const useCreateChat = () => {
 
     await mutate(
       SWRCacheKeys.GetChats,
-      (existingChats?: Chat[]) => {
-        if (!existingChats) {
+      produce((draft?: Chat[]) => {
+        if (!draft) {
           return [newChat];
         }
 
-        return [newChat, ...existingChats];
-      },
+        draft.unshift(newChat);
+      }),
       { revalidate: false }
     );
 
@@ -97,7 +98,7 @@ export const useCreateChat = () => {
       ConversationsService.conversationWithAI(
         conversationBody,
         (chunk: ConversationWithAIResponseDto) => {
-          handleLLMResponse(mutate, clearAbortController, chatId, model, chunk);
+          handleLLMResponse(clearAbortController, chatId, model, chunk);
         },
         newAbortController.signal
       );

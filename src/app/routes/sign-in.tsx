@@ -7,7 +7,7 @@ import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import ChatTreeIcon from '@features/sign-in/assets/icons/chat-tree.svg';
 import LogoBackgroundIcon from '@features/sign-in/assets/icons/logo-background.svg';
-import SignInForm from '@features/sign-in/components/sign-in-form/sign-in-form';
+import SignIn from '@features/sign-in/sign-in';
 
 const SignInPage = () => {
   return (
@@ -22,7 +22,7 @@ const SignInPage = () => {
                 Log in to unlock tailored content and stay connected with your community.
               </ThemedP>
             </div>
-            <SignInForm />
+            <SignIn />
           </div>
         </div>
         <div

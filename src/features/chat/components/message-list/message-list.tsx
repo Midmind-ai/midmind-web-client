@@ -1,74 +1,68 @@
 import { ScrollArea } from '@shared/components/ui/scroll-area';
 
-import { copyText } from '@shared/utils/copy-text';
-
 import LLMResponse from '@features/chat/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat/components/user-message/user-message';
 
-const MessageList = () => {
-  const {
-    messages,
-    scrollAreaRef,
-    handleScroll,
-    handleReply,
-    handleNewAttachedBranch,
-    handleNewDetachedBranch,
-    handleNewTemporaryBranch,
-    handleNewSetOfBranches,
-    handleOpenBranch,
-    handleOpenInSidePanel,
-    handleOpenInNewTab,
-    handleNewNote,
-  } = useMessageListLogic();
+type Props = {
+  chatId: string;
+};
+
+const MessageList = ({ chatId }: Props) => {
+  const { messages, chatActions, messageActions, scrollAreaRef, handleScroll } =
+    useMessageListLogic(chatId);
 
   return (
     <ScrollArea
       ref={scrollAreaRef}
+      className="h-full"
       onScroll={handleScroll}
-      className="flex flex-1 flex-col gap-2.5 pt-8"
     >
-      {messages?.map((message, index) => {
-        const { id, content } = message;
-        const isLastMessage = index === messages.length - 1;
+      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-2.5">
+        {messages?.map((message, index) => {
+          const { id, content } = message;
+          const isLastMessage = index === messages.length - 1;
 
-        if (message.role === 'user') {
+          if (message.role === 'user') {
+            return (
+              <UserMessage
+                key={id}
+                content={content}
+                onCopyText={() => messageActions.copyText(content)}
+                onReply={() => messageActions.replyToMessage(id)}
+                onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
+                onNewDetachedBranch={() => chatActions.createDetachedBranch(id, content)}
+                onNewTemporaryBranch={() =>
+                  chatActions.createTemporaryBranch(id, content)
+                }
+                onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
+              />
+            );
+          }
+
           return (
-            <UserMessage
+            <LLMResponse
               key={id}
-              content={content}
-              onCopyText={copyText}
-              onReply={() => handleReply(id)}
-              onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
-              onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
-              onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-              onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+              {...message}
+              isLastMessage={isLastMessage}
+              onCopyText={() => messageActions.copyText(content)}
+              onReply={() => messageActions.replyToMessage(id)}
+              onOpenBranch={() => {}}
+              onOpenInSidePanel={() => chatActions.openChatInSidePanel(id)}
+              onOpenInNewTab={() => chatActions.openChatInNewTab(id)}
+              onNewAttachedBranch={branchContext =>
+                chatActions.createAttachedBranch(id, content, branchContext)
+              }
+              onNewDetachedBranch={branchContext =>
+                chatActions.createDetachedBranch(id, content, branchContext)
+              }
+              onNewTemporaryBranch={() => chatActions.createTemporaryBranch(id, content)}
+              onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
+              onNewNote={() => {}}
             />
           );
-        }
-
-        return (
-          <LLMResponse
-            key={id}
-            {...message}
-            isLastMessage={isLastMessage}
-            onCopyText={copyText}
-            onReply={() => handleReply(id)}
-            onOpenBranch={() => handleOpenBranch(id)}
-            onOpenInSidePanel={() => handleOpenInSidePanel(id)}
-            onOpenInNewTab={() => handleOpenInNewTab(id)}
-            onNewAttachedBranch={branchContext =>
-              handleNewAttachedBranch(id, content, branchContext)
-            }
-            onNewDetachedBranch={branchContext =>
-              handleNewDetachedBranch(id, content, branchContext)
-            }
-            onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-            onNewSetOfBranches={() => handleNewSetOfBranches(id)}
-            onNewNote={() => handleNewNote(id)}
-          />
-        );
-      })}
+        })}
+      </div>
     </ScrollArea>
   );
 };

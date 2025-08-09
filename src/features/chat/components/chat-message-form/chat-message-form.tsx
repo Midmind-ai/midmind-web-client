@@ -1,4 +1,5 @@
 import { ChevronDownIcon, CircleStop, PaperclipIcon, SendHorizonal } from 'lucide-react';
+import { Controller } from 'react-hook-form';
 
 import { Button } from '@shared/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import { Textarea } from '@shared/components/ui/textarea';
 import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
 
 import { useChatMessageFormLogic } from '@features/chat/components/chat-message-form/use-chat-message-form-logic';
+import { AI_MODELS } from '@features/chat/constants/ai-models';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 
 type Props = {
@@ -24,13 +26,12 @@ type Props = {
 
 const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
   const {
-    currentModel,
     isValid,
     hasActiveRequest,
     register,
+    control,
     handleSubmit,
     handleFormSubmit,
-    handleModelChange,
     abortCurrentRequest,
     handleKeyDown,
   } = useChatMessageFormLogic({ chatId, onSubmit, branchContext });
@@ -41,30 +42,44 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
       className="outline-input bg-background-accent flex items-center gap-2 rounded-lg p-2
         pl-2.5 outline-1"
     >
-      <Select
-        value={currentModel}
-        onValueChange={handleModelChange}
-        disabled={hasActiveRequest}
-      >
-        <SelectTrigger
-          size="sm"
-          className="my-0.5 gap-0 self-end p-0"
-        >
-          <div className="px-3">
-            <SelectValue />
-          </div>
-          <Separator orientation="vertical" />
-          <div className="flex items-center justify-center px-1">
-            <ChevronDownIcon className="size-4" />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="gemini-2.0-flash-lite">2.0-FLASH-LIGHT</SelectItem>
-          <SelectItem value="gemini-2.0-flash">2.0-FLASH</SelectItem>
-          <SelectItem value="gemini-2.5-flash">2.5-FLASH</SelectItem>
-          <SelectItem value="gemini-2.5-pro">2.5-PRO</SelectItem>
-        </SelectContent>
-      </Select>
+      <Controller
+        name="model"
+        control={control}
+        render={({ field }) => (
+          <Select
+            value={field.value}
+            onValueChange={field.onChange}
+            disabled={hasActiveRequest}
+          >
+            <SelectTrigger
+              size="sm"
+              className="my-0.5 gap-0 self-end p-0"
+            >
+              <div className="px-3">
+                <SelectValue />
+              </div>
+              <Separator orientation="vertical" />
+              <div className="flex items-center justify-center px-1">
+                <ChevronDownIcon className="size-4" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH_LITE}>
+                {AI_MODELS.GEMINI_2_0_FLASH_LITE.toUpperCase()}
+              </SelectItem>
+              <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH}>
+                {AI_MODELS.GEMINI_2_0_FLASH.toUpperCase()}
+              </SelectItem>
+              <SelectItem value={AI_MODELS.GEMINI_2_5_FLASH}>
+                {AI_MODELS.GEMINI_2_5_FLASH.toUpperCase()}
+              </SelectItem>
+              <SelectItem value={AI_MODELS.GEMINI_2_5_PRO}>
+                {AI_MODELS.GEMINI_2_5_PRO.toUpperCase()}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        )}
+      />
       <Button
         type="button"
         variant="secondary"

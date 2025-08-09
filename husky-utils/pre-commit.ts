@@ -1,10 +1,10 @@
-import { exec } from 'child_process';
-
 import chalk from 'chalk';
 
-import { logError, logSuccess } from './colorful_logs.ts';
-import { emptyLine } from './empty_line.ts';
+import { logError, logSuccess } from './colorful-logs.ts';
+import { emptyLine } from './empty-line.ts';
 import { loader } from './loader.ts';
+
+import { exec } from 'child_process';
 
 const parseTypescriptErrors = (output: string) => {
   const errorLines = output.split('\n');
@@ -26,6 +26,7 @@ const parseTypescriptErrors = (output: string) => {
       errors.push(error);
     }
   }
+
   return errors;
 };
 

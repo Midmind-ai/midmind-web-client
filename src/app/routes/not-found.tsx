@@ -6,11 +6,11 @@ import { ThemedP } from '@shared/components/ui/themed-p';
 
 import { AppRoutes } from '@shared/constants/router';
 
-const NotFound = () => {
+const NotFoundPage = () => {
   const navigate = useNavigate();
 
   const handleGoHome = () => {
-    navigate(AppRoutes.Home);
+    navigate(AppRoutes.Home, { replace: true });
   };
 
   return (
@@ -35,4 +35,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default NotFoundPage;

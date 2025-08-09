@@ -2,12 +2,13 @@ import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '@/shared/components/ui/breadcrumb';
-import { EntityEnum } from '@/shared/types/entity';
+} from '@shared/components/ui/breadcrumb';
 
-import BreadcrumbItem from './breadcramb-item';
+import { EntityEnum } from '@shared/types/entity';
 
-export default function Breadcrumbs() {
+import BreadcrumbItem from '@features/navigation-header/components/breadcrumb-item/breadcrumb-item';
+
+const Breadcrumbs = () => {
   return (
     <Breadcrumb>
       <BreadcrumbList className="gap-1 sm:gap-1">
@@ -62,4 +63,6 @@ export default function Breadcrumbs() {
       </BreadcrumbList>
     </Breadcrumb>
   );
-}
+};
+
+export default Breadcrumbs;

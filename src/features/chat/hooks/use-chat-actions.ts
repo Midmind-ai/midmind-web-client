@@ -1,28 +1,41 @@
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useLocation } from 'react-router';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
-import { useUrlParams } from '@shared/hooks/use-url-params';
-
 import type { BranchContext } from '@shared/types/entities';
 
-import { useSplitChatLogic } from '@features/chat/components/split-chat/use-split-chat-logic';
+import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
   ContextType,
-  LLModel,
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 
-export const useMessageHandlers = () => {
+export const useChatActions = (actualChatId?: string) => {
   const navigate = useNavigate();
-  const { id: chatId = '' } = useParams();
-  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
-  const { isSplitMode, childChatId } = useSplitChatLogic();
+  const location = useLocation();
+  const { id: urlChatId = '' } = useParams();
 
   const { createChat } = useCreateChat();
+
+  const chatId = actualChatId || urlChatId;
+
+  const openChatInSplitView = (newChatId: string) => {
+    const currentUrl = new URL(window.location.href);
+    const currentSplitChatId = currentUrl.searchParams.get(SearchParams.Split);
+
+    if (actualChatId && currentSplitChatId && currentSplitChatId === actualChatId) {
+      currentUrl.searchParams.set(SearchParams.Split, newChatId);
+
+      navigate(`${AppRoutes.Chat(actualChatId)}${currentUrl.search}`);
+    } else {
+      currentUrl.searchParams.set(SearchParams.Split, newChatId);
+
+      navigate(`${location.pathname}${currentUrl.search}`);
+    }
+  };
 
   const createBranch = async ({
     content,
@@ -34,7 +47,7 @@ export const useMessageHandlers = () => {
 
     const textToUse = selectionContext?.selectedText || content;
 
-    const parentChatId = isSplitMode && chatId === childChatId ? childChatId : chatId;
+    const parentChatId = chatId;
 
     const branchContext: BranchContext = {
       parent_chat_id: parentChatId,
@@ -52,13 +65,13 @@ export const useMessageHandlers = () => {
 
     const newChatId = await createChat({
       content: textToUse,
-      model: currentModel,
+      model: DEFAULT_AI_MODEL,
     });
 
-    navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);
+    openChatInSplitView(newChatId);
   };
 
-  const handleNewAttachedBranch = (
+  const createAttachedBranch = (
     messageId: string,
     content: string,
     selectionContext?: UseMessageSelectionContextT
@@ -71,7 +84,7 @@ export const useMessageHandlers = () => {
     });
   };
 
-  const handleNewDetachedBranch = (
+  const createDetachedBranch = (
     messageId: string,
     content: string,
     selectionContext?: UseMessageSelectionContextT
@@ -84,49 +97,29 @@ export const useMessageHandlers = () => {
     });
   };
 
-  const handleNewTemporaryBranch = (messageId: string, content: string) => {
+  const createTemporaryBranch = (messageId: string, content: string) => {
     createBranch({ messageId, content, connectionType: 'temporary' });
   };
 
-  const handleReply = (_messageId: string) => {
+  const createNewBranchSet = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
   };
 
-  const handleNewSetOfBranches = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
+  const openChatInSidePanel = (chatId: string) => {
+    openChatInSplitView(chatId);
   };
 
-  const handleOpenBranch = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
-
-  const handleOpenInSidePanel = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
-
-  const handleOpenInNewTab = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
-
-  const handleNewNote = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
+  const openChatInNewTab = (chatId: string) => {
+    window.open(AppRoutes.Chat(chatId), '_blank', 'noopener,noreferrer');
   };
 
   return {
-    handleReply,
-    handleNewAttachedBranch,
-    handleNewDetachedBranch,
-    handleNewTemporaryBranch,
-    handleNewSetOfBranches,
-    handleOpenBranch,
-    handleOpenInSidePanel,
-    handleOpenInNewTab,
-    handleNewNote,
+    createAttachedBranch,
+    createDetachedBranch,
+    createTemporaryBranch,
+    createNewBranchSet,
+    openChatInSidePanel,
+    openChatInNewTab,
   };
 };

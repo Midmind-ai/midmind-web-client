@@ -16,13 +16,17 @@ import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
 
-import { useTheme } from '@/app/providers/theme-provider';
-
 const UserDropdown = () => {
-  const { avatar, email, first_name, last_name, isMobile, handleLogout } =
-    useUserDropdownLogic();
-
-  const { theme, setTheme } = useTheme();
+  const {
+    avatar,
+    email,
+    first_name,
+    last_name,
+    isMobile,
+    theme,
+    handleLogout,
+    setTheme,
+  } = useUserDropdownLogic();
 
   const nameAbbreviation = `${first_name[0]}${last_name[0]}`.toUpperCase();
 

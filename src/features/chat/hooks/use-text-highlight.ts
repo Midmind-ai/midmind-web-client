@@ -7,10 +7,10 @@ import { clearHighlights, highlightSelection } from '@features/chat/utils/text-s
 
 type Args = {
   branches: ChatMessage['branches'];
-  onSelectionClick: (chatId: string) => void;
+  onOpenInSidePanel: (chatId: string) => void;
 };
 
-export const useTextHighlight = ({ branches, onSelectionClick }: Args) => {
+export const useTextHighlight = ({ branches, onOpenInSidePanel }: Args) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
   const textSelections = branches
@@ -33,10 +33,10 @@ export const useTextHighlight = ({ branches, onSelectionClick }: Args) => {
 
       // Highlights are applied in reverse order to maintain correct indices
       for (let i = textSelections.length - 1; i >= 0; i--) {
-        highlightSelection(messageRef.current, textSelections[i], onSelectionClick);
+        highlightSelection(messageRef.current, textSelections[i], onOpenInSidePanel);
       }
     }
-  }, [onSelectionClick, textSelections]);
+  }, [onOpenInSidePanel, textSelections]);
 
   return {
     messageRef,

@@ -5,7 +5,6 @@ import {
   CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router';
 
 import {
   SidebarMenuButton,
@@ -14,14 +13,10 @@ import {
 } from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import { AppRoutes, SearchParams } from '@shared/constants/router';
+import type { TreeItem } from '@shared/types/entities';
 
 import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
-
-export type TreeItem = {
-  id: string;
-  name: string;
-};
+import { useTreeLogic } from '@features/sidebar/components/tree/use-tree-logic';
 
 export type DataType = {
   tree: TreeType;
@@ -50,32 +45,44 @@ type Props = {
   item: TreeItem;
   onDelete: VoidFunction;
   isDeleting: boolean;
+  onOpenInSidePanel: (chatId: string) => void;
+  onOpenInNewTab: (chatId: string) => void;
 };
 
-const Tree = ({ item, onDelete, isDeleting }: Props) => {
-  const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];
-  const navigate = useNavigate();
-  const params = useParams();
+const Tree = ({
+  item,
+  onDelete,
+  isDeleting,
+  onOpenInSidePanel,
+  onOpenInNewTab,
+}: Props) => {
+  const { name, id, items, handleOpenChat, isActive } = useTreeLogic(item);
 
   if (!items.length) {
     return (
       <SidebarMenuButton
-        isActive={id === params.id}
+        isActive={isActive}
         className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
           data-[active=true]:font-normal"
-        onClick={() =>
-          navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
-        }
+        onClick={handleOpenChat}
       >
         <MessageSquare className="stroke-[1.5px]" />
         <ThemedSpan className="text-primary block truncate">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
-          onDelete={(e: React.MouseEvent<HTMLElement>) => {
+          onDelete={e => {
             e.stopPropagation();
             onDelete();
           }}
           isDeleting={isDeleting}
+          onOpenInSidePanel={e => {
+            e.stopPropagation();
+            onOpenInSidePanel(id);
+          }}
+          onOpenInNewTab={e => {
+            e.stopPropagation();
+            onOpenInNewTab(id);
+          }}
         />
       </SidebarMenuButton>
     );
@@ -95,8 +102,16 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
             <span className="block truncate">{name}</span>
             <MoreActionsMenu
               triggerClassNames="opacity-0 group-hover/item:opacity-100"
-              onDelete={onDelete}
               isDeleting={isDeleting}
+              onDelete={onDelete}
+              onOpenInSidePanel={e => {
+                e.stopPropagation();
+                onOpenInSidePanel(id);
+              }}
+              onOpenInNewTab={e => {
+                e.stopPropagation();
+                onOpenInNewTab(id);
+              }}
             />
           </SidebarMenuButton>
         </CollapsibleTrigger>
@@ -106,8 +121,10 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
               <Tree
                 key={index}
                 item={subItem}
-                onDelete={onDelete}
                 isDeleting={isDeleting}
+                onDelete={onDelete}
+                onOpenInSidePanel={onOpenInSidePanel}
+                onOpenInNewTab={onOpenInNewTab}
               />
             ))}
           </SidebarMenuSub>

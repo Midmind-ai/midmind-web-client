@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import { Button } from '@shared/components/ui/button';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import { AppRoutes, SearchParams } from '@shared/constants/router';
+import { AppRoutes } from '@shared/constants/router';
 
 import { cn } from '@shared/utils/cn';
 import { darkenColor } from '@shared/utils/colors';
@@ -38,7 +38,7 @@ const ConnectionTypeBadge = ({ bgColor, connectionType, branchChatId }: Props) =
 
   return (
     <Link
-      to={`${AppRoutes.Chat(branchChatId)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
+      to={AppRoutes.Chat(branchChatId)}
       target="_blank"
       className={cn(
         'group inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1',

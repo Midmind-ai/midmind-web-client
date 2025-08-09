@@ -9,7 +9,6 @@ import { useLLMResponseLogic } from '@features/chat/components/llm-response/use-
 import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
 import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
 import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
-import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
 import type { ChatBranchContext } from '@features/chat/types/chat-types';
 import { captureSelection } from '@features/chat/utils/text-selection';
 
@@ -50,20 +49,13 @@ const LLMResponse = ({
 }: Props) => {
   let selectionContext: ChatBranchContext | undefined;
 
-  const onSelectionClick = (branchId: string) => {
-    // eslint-disable-next-line no-alert
-    alert(`You clicked on branch: ${branchId}`);
-  };
-
-  const { currentModel, streamingContent, isStreaming } = useLLMResponseLogic(
+  const { streamingContent, isStreaming, messageRef } = useLLMResponseLogic(
     id,
     content,
-    isLastMessage
-  );
-  const { messageRef } = useTextHighlight({
+    isLastMessage,
     branches,
-    onSelectionClick,
-  });
+    onOpenInSidePanel
+  );
 
   return (
     <ContextMenu>
@@ -79,14 +71,15 @@ const LLMResponse = ({
             className="mb-4 text-xs font-medium text-blue-500 uppercase opacity-0
               transition-opacity group-hover:opacity-100"
           >
-            {llm_model || currentModel}
+            {llm_model}
           </h6>
           <div
             ref={messageRef}
             className="text-base leading-relaxed font-light"
             onMouseUp={() => {
               if (messageRef.current) {
-                selectionContext = captureSelection(messageRef.current);
+                const capturedSelection = captureSelection(messageRef.current);
+                selectionContext = capturedSelection;
               }
             }}
           >
@@ -109,7 +102,7 @@ const LLMResponse = ({
             })}
           </div>
           {!isStreaming && isLastMessage && (
-            <div className="mb-8 flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2.5">
               <QuickActionButton
                 icon={<GitBranchPlus className="text-foreground size-6" />}
                 label="New attached branch"
@@ -136,7 +129,6 @@ const LLMResponse = ({
       </ContextMenuTrigger>
       <MessageContextMenu
         onReply={onReply}
-        showBranchActions
         onCopyText={onCopyText}
         onOpenBranch={onOpenBranch}
         onOpenInNewTab={onOpenInNewTab}

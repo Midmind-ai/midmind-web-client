@@ -1,20 +1,18 @@
-import { Outlet } from 'react-router';
+import SplitLayout from '@app/split-layout';
 
 import { SidebarProvider } from '@shared/components/ui/sidebar';
 
-import Sidebar from '@/features/sidebar/sidebar';
+import Sidebar from '@features/sidebar/sidebar';
 
-const Layout = () => {
+const RootLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <SidebarProvider>
         <Sidebar />
-        <main className="flex-1">
-          <Outlet />
-        </main>
+        <SplitLayout />
       </SidebarProvider>
     </div>
   );
 };
 
-export default Layout;
+export default RootLayout;

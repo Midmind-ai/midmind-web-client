@@ -5,7 +5,7 @@ import {
   MessageSquarePlus,
   PackagePlus,
 } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { SidebarMenuButton } from '@shared/components/ui/sidebar';
 
@@ -13,9 +13,17 @@ import { AppRoutes } from '@shared/constants/router';
 
 const FolderActions = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
+
+  const handleNavigateToHome = () => {
+    const params = searchParams.toString();
+    const url = params ? `${AppRoutes.Home}?${params}` : AppRoutes.Home;
+
+    navigate(url);
+  };
 
   return (
     <div className="flex justify-between border-b-1 p-1">
@@ -31,7 +39,7 @@ const FolderActions = () => {
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}
-          onClick={() => navigate(`${AppRoutes.Home}`)}
+          onClick={handleNavigateToHome}
         >
           <MessageSquarePlus className="size-5.5! stroke-1" />
         </SidebarMenuButton>

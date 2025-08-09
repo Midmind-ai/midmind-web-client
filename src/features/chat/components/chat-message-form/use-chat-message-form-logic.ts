@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef, useEffect } from 'react';
+import { type KeyboardEvent, useRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -6,17 +6,15 @@ import { useParams } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
-import { SearchParams } from '@shared/constants/router';
-
-import { useUrlParams } from '@shared/hooks/use-url-params';
-
 import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
 
+import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useConversationWithAI } from '@features/chat/hooks/use-conversation-with-ai';
-import type { LLModel, OnSubmitArgs } from '@features/chat/types/chat-types';
+import type { OnSubmitArgs, LLModel } from '@features/chat/types/chat-types';
 
 type ChatMessageFormData = {
   content: string;
+  model: LLModel;
 };
 
 type UseChatMessageFormLogicProps = {
@@ -31,26 +29,31 @@ export const useChatMessageFormLogic = ({
   branchContext,
 }: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
-  const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(
-    SearchParams.Model,
-    {
-      defaultValue: 'gemini-2.0-flash-lite',
-    }
-  );
 
-  const hasFirstMessageInNewBranchSent = useRef(false);
+  const lastProcessedContextRef = useRef<string>('');
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { isValid },
   } = useForm<ChatMessageFormData>({
     resolver: zodResolver(
       z.object({
         content: z.string().min(1).trim(),
+        model: z.enum([
+          'gemini-2.0-flash-lite',
+          'gemini-2.0-flash',
+          'gemini-2.5-flash',
+          'gemini-2.5-pro',
+        ]),
       })
     ),
+    defaultValues: {
+      content: '',
+      model: DEFAULT_AI_MODEL,
+    },
     mode: 'onChange',
   });
 
@@ -59,34 +62,36 @@ export const useChatMessageFormLogic = ({
   const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
     useConversationWithAI(actualChatId);
 
-  const handleModelChange = (newModel: string) => setModel(newModel as LLModel);
-
   const handleFormSubmit = (data: ChatMessageFormData) => {
     if (onSubmit) {
       // For new chat
       onSubmit({
         content: data.content,
-        model: currentModel,
+        model: data.model,
       });
     } else {
       // For existing chat
+      const currentContext = `${actualChatId}:${branchContext?.parent_message_id || ''}`;
       const shouldIncludeThreadContext =
-        branchContext && !hasFirstMessageInNewBranchSent.current;
+        branchContext && currentContext !== lastProcessedContextRef.current;
 
       conversationWithAI({
         chat_id: actualChatId,
         message_id: uuidv4(),
         content: data.content,
-        model: currentModel,
+        model: data.model,
         ...(shouldIncludeThreadContext && { branch_context: branchContext }),
       });
 
       if (shouldIncludeThreadContext) {
-        hasFirstMessageInNewBranchSent.current = true;
+        lastProcessedContextRef.current = currentContext;
       }
     }
 
-    reset();
+    reset({
+      content: '',
+      model: data.model,
+    });
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -97,21 +102,16 @@ export const useChatMessageFormLogic = ({
     }
   };
 
-  useEffect(() => {
-    hasFirstMessageInNewBranchSent.current = false;
-  }, [branchContext, actualChatId]);
-
   return {
     hasActiveRequest,
-    currentModel,
     isValid,
     isLoading,
     error,
     register,
+    control,
     handleSubmit,
     handleFormSubmit,
     abortCurrentRequest,
-    handleModelChange,
     handleKeyDown,
   };
 };
