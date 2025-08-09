@@ -6,7 +6,7 @@ import {
 
 import { EntityEnum } from '@shared/types/entity';
 
-import BreadcrumbItem from '@features/section-with-header/components/breadcramb-item';
+import BreadcrumbItem from '@features/navigation-header/components/breadcrumb-item/breadcrumb-item';
 
 const Breadcrumbs = () => {
   return (

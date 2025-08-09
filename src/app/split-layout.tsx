@@ -16,7 +16,7 @@ import Chat from '@features/chat/chat';
 import { useBranchContext } from '@features/chat/hooks/use-branch-context';
 
 const SplitLayout = () => {
-  const { value: chatId = '' } = useUrlParams(SearchParams.Split);
+  const { value: chatId = '', removeValue } = useUrlParams(SearchParams.Split);
   const { branchContext } = useBranchContext(chatId);
 
   return (
@@ -39,6 +39,8 @@ const SplitLayout = () => {
         >
           <Chat
             chatId={chatId}
+            showCloseButton
+            onClose={removeValue}
             branchContext={branchContext}
           />
         </ResizablePanel>

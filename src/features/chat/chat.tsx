@@ -1,23 +1,26 @@
-import { ScrollArea } from '@shared/components/ui/scroll-area';
-
 import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
 
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import MessageList from '@features/chat/components/message-list/message-list';
+import NavigationHeader from '@features/navigation-header/navigation-header';
 
 type Props = {
   chatId: string;
+  showCloseButton?: boolean;
+  onClose?: VoidFunction;
   branchContext?: ConversationWithAIRequestDto['branch_context'];
 };
 
-const Chat = ({ chatId, branchContext }: Props) => {
+const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
   return (
     <div className="flex h-screen flex-col">
-      <ScrollArea className="flex-1 overflow-hidden">
-        <div className="mx-auto w-full max-w-[768px]">
-          <MessageList chatId={chatId} />
-        </div>
-      </ScrollArea>
+      <NavigationHeader
+        showCloseButton={showCloseButton}
+        onClose={onClose}
+      />
+      <div className="flex-1 overflow-hidden">
+        <MessageList chatId={chatId} />
+      </div>
       <div className="mx-auto w-full max-w-[768px] pb-3">
         <ChatMessageForm
           chatId={chatId}
