@@ -36,7 +36,9 @@ export const useSignInFormLogic = () => {
   const loginWithGoogle = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: async tokenResponse => {
-      const response = await AuthService.signInWithGoogle({ code: tokenResponse.code });
+      const response = await AuthService.signInWithGoogle({
+        code: tokenResponse.code,
+      });
 
       setToStorage(LocalStorageKeys.AccessToken, response.access_token);
 

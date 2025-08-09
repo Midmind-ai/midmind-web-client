@@ -70,13 +70,19 @@ const LLMResponse = ({
         disabled={isStreaming}
         asChild
       >
-        <div className="group w-full bg-transparent p-2.5 data-[state=open]:bg-muted/50 transition-colors duration-100 rounded-md">
-          <h6 className="text-blue-500 text-xs font-medium uppercase mb-4 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div
+          className="group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent
+            p-2.5 transition-colors duration-100"
+        >
+          <h6
+            className="mb-4 text-xs font-medium text-blue-500 uppercase opacity-0
+              transition-opacity group-hover:opacity-100"
+          >
             {llm_model || currentModel}
           </h6>
           <div
             ref={messageRef}
-            className="text-base font-light leading-relaxed"
+            className="text-base leading-relaxed font-light"
             onMouseUp={() => {
               if (messageRef.current) {
                 selectionContext = captureSelection(messageRef.current);
@@ -85,7 +91,7 @@ const LLMResponse = ({
           >
             <ReactMarkdown content={streamingContent} />
           </div>
-          <div className="flex items-center gap-2.5 mb-4">
+          <div className="mb-4 flex items-center gap-2.5">
             {threads.map(({ id, connection_color, connection_type, child_chat_id }) => {
               if (connection_type === 'temporary') {
                 return null;
@@ -102,24 +108,24 @@ const LLMResponse = ({
             })}
           </div>
           {!isStreaming && isLastMessage && (
-            <div className="flex flex-wrap gap-2.5 mb-8">
+            <div className="mb-8 flex flex-wrap gap-2.5">
               <QuickActionButton
-                icon={<GitBranchPlus className="size-6 text-foreground" />}
+                icon={<GitBranchPlus className="text-foreground size-6" />}
                 label="New attached branch"
                 onClick={onNewAttachedBranch}
               />
               <QuickActionButton
-                icon={<GitCommitVertical className="size-6 text-foreground" />}
+                icon={<GitCommitVertical className="text-foreground size-6" />}
                 label="New detached branch"
                 onClick={onNewDetachedBranch}
               />
               <QuickActionButton
-                icon={<Glasses className="size-6 text-foreground" />}
+                icon={<Glasses className="text-foreground size-6" />}
                 label="New temporary branch"
                 onClick={onNewTemporaryBranch}
               />
               <QuickActionButton
-                icon={<FilePlus className="size-6 text-foreground" />}
+                icon={<FilePlus className="text-foreground size-6" />}
                 label="Create new note"
                 onClick={onNewNote}
               />

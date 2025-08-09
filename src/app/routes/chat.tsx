@@ -33,9 +33,9 @@ const Chat = () => {
 
   return (
     <div className="h-screen overflow-y-auto">
-      <div className="flex h-full flex-col max-w-[768px] mx-auto w-full">
+      <div className="mx-auto flex h-full w-full max-w-[768px] flex-col">
         <MessageList />
-        <div className="sticky bottom-0 bg-background pb-3">
+        <div className="bg-background sticky bottom-0 pb-3">
           <ChatMessageForm />
         </div>
       </div>

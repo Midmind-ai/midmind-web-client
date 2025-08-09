@@ -16,7 +16,9 @@ export const useSplitChatLogic = () => {
   const parentChatId = threadContext?.parent_chat_id;
   const childChatId = currentChatId;
 
-  const isSplitMode = Boolean(parentChatId && childChatId && parentChatId !== childChatId);
+  const isSplitMode = Boolean(
+    parentChatId && childChatId && parentChatId !== childChatId
+  );
 
   const handleToggleParentFullscreen = () => {
     setIsParentFullscreen(prev => !prev);

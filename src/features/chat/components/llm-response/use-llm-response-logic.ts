@@ -14,7 +14,11 @@ import {
   unsubscribeFromResponseChunk,
 } from '@features/chat/utils/llm-response-emitter';
 
-export const useLLMResponseLogic = (id: string, content: string, isLastMessage: boolean) => {
+export const useLLMResponseLogic = (
+  id: string,
+  content: string,
+  isLastMessage: boolean
+) => {
   const isNewMessage = isLastMessage && content.length < 10;
 
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);

@@ -152,7 +152,8 @@ export const handleLLMResponse = async (
       createdMessages.delete(chunk.id);
 
       if (parentChatId && parentMessageId) {
-        const threadContext = await ThreadContextService.getThreadContext(parentMessageId);
+        const threadContext =
+          await ThreadContextService.getThreadContext(parentMessageId);
 
         await mutate(
           getInfiniteKey(parentChatId),
@@ -165,7 +166,9 @@ export const handleLLMResponse = async (
               ...page,
               data:
                 page.data?.map(message =>
-                  message.id === parentMessageId ? { ...message, threads: threadContext } : message
+                  message.id === parentMessageId
+                    ? { ...message, threads: threadContext }
+                    : message
                 ) || [],
             }));
 

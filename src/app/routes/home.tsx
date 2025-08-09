@@ -23,9 +23,11 @@ const Home = () => {
   };
 
   return (
-    <div className="h-full flex items-center justify-center">
-      <div className="flex flex-col gap-8 max-w-[768px] mx-auto w-full">
-        <ThemedH1 className="text-center text-3xl font-semibold">What should we do next?</ThemedH1>
+    <div className="flex h-full items-center justify-center">
+      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-8">
+        <ThemedH1 className="text-center text-3xl font-semibold">
+          What should we do next?
+        </ThemedH1>
         <ChatMessageForm onSubmit={handleSubmit} />
       </div>
     </div>

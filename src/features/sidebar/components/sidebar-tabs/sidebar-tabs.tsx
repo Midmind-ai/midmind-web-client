@@ -4,15 +4,15 @@ import { SidebarContent, SidebarMenuButton } from '@shared/components/ui/sidebar
 
 const SidebarTabs = () => {
   return (
-    <SidebarContent className="flex-none flex-col p-1.5 gap-1">
-      <SidebarMenuButton className="cursor-pointer w-10! h-10!">
+    <SidebarContent className="flex-none flex-col gap-1 p-1.5">
+      <SidebarMenuButton className="h-10! w-10! cursor-pointer">
         <Home className="size-5.5! stroke-[1.5px]" />
       </SidebarMenuButton>
-      <SidebarMenuButton className="cursor-pointer w-10! h-10!">
+      <SidebarMenuButton className="h-10! w-10! cursor-pointer">
         <Search className="size-5.5! stroke-[1.5px]" />
       </SidebarMenuButton>
       <SidebarMenuButton
-        className={'w-10! h-10!'}
+        className={'h-10! w-10!'}
         isActive
       >
         <Folders className="size-5.5! stroke-[1.5px]" />

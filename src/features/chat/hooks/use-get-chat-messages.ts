@@ -10,7 +10,10 @@ import type { ChatMessage } from '@shared/types/entities';
 export const ITEMS_PER_PAGE = 20;
 
 export const useGetChatMessages = (chatId: string) => {
-  const getKey = (pageIndex: number, previousPageData: PaginatedResponse<ChatMessage[]> | null) => {
+  const getKey = (
+    pageIndex: number,
+    previousPageData: PaginatedResponse<ChatMessage[]> | null
+  ) => {
     if (previousPageData && !previousPageData.data?.length) {
       return null;
     }
@@ -33,7 +36,10 @@ export const useGetChatMessages = (chatId: string) => {
       const pageIndex = parseInt(key.split('page=')[1]?.split('&')[0] || '0');
       const skip = pageIndex * ITEMS_PER_PAGE;
 
-      return MessagesService.getChatMessages(chatId, { skip, take: ITEMS_PER_PAGE });
+      return MessagesService.getChatMessages(chatId, {
+        skip,
+        take: ITEMS_PER_PAGE,
+      });
     },
     {
       revalidateFirstPage: false,
@@ -54,7 +60,8 @@ export const useGetChatMessages = (chatId: string) => {
     return Array.from(messageMap.values()).reverse();
   })();
 
-  const hasMore = pages && pages.length > 0 && pages[pages.length - 1]?.meta?.next !== null;
+  const hasMore =
+    pages && pages.length > 0 && pages[pages.length - 1]?.meta?.next !== null;
 
   const loadMore = () => {
     if (!isValidating && hasMore) {

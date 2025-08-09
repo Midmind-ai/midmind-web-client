@@ -14,7 +14,9 @@ export const useTextHighlight = ({ threads, onSelectionClick }: Args) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
   const textSelections = threads
-    .filter((thread): thread is DefiniteThreads => thread.context_type === 'text_selection')
+    .filter(
+      (thread): thread is DefiniteThreads => thread.context_type === 'text_selection'
+    )
     .map(thread => ({
       endPosition: thread.end_position,
       threadId: thread.child_chat_id,

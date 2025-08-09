@@ -14,9 +14,12 @@ export const useSignIn = () => {
     trigger: signIn,
     isMutating: isLoading,
     error,
-  } = useSWRMutation(SWRCacheKeys.SignIn, async (_key: string, { arg }: SignInFetcherArgs) => {
-    return AuthService.signIn(arg);
-  });
+  } = useSWRMutation(
+    SWRCacheKeys.SignIn,
+    async (_key: string, { arg }: SignInFetcherArgs) => {
+      return AuthService.signIn(arg);
+    }
+  );
 
   return { signIn, isLoading, error };
 };

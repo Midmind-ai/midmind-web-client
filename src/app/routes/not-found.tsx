@@ -14,11 +14,13 @@ const NotFound = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+    <div
+      className="bg-background flex min-h-screen flex-col items-center justify-center p-4"
+    >
       <div className="flex max-w-md flex-col items-center text-center">
-        <div className="mb-6 text-8xl font-bold text-muted-foreground/20">404</div>
+        <div className="text-muted-foreground/20 mb-6 text-8xl font-bold">404</div>
         <ThemedH1 className="mb-4 text-2xl font-semibold">Page Not Found</ThemedH1>
-        <ThemedP className="mb-8 text-muted-foreground">
+        <ThemedP className="text-muted-foreground mb-8">
           Sorry, the page you are looking for does not exist or has been moved.
         </ThemedP>
         <Button

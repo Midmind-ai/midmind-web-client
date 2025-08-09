@@ -24,7 +24,9 @@ const ConnectionTypeBadge = ({ bgColor, connectionType, threadChatId }: Props) =
   const isDetached = connectionType === 'detached';
   const label = CONNECTION_LABELS[connectionType as keyof typeof CONNECTION_LABELS];
 
-  const containerStyles = isDetached ? { borderColor: bgColor } : { backgroundColor: bgColor };
+  const containerStyles = isDetached
+    ? { borderColor: bgColor }
+    : { backgroundColor: bgColor };
   const iconColor = isDetached ? bgColor : 'white';
   const buttonStyles = { color: bgColor };
   const labelStyles = { color: darkenColor(bgColor) };
@@ -39,29 +41,30 @@ const ConnectionTypeBadge = ({ bgColor, connectionType, threadChatId }: Props) =
       to={`${AppRoutes.Chat(threadChatId)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
       target="_blank"
       className={cn(
-        'h-7 inline-flex cursor-pointer items-center gap-x-1.5 p-1 rounded-[6px] group',
+        'group inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1',
         isDetached && 'border bg-transparent'
       )}
       style={containerStyles}
     >
       <GitMerge
-        className="w-[18px] h-[18px] flex-1"
+        className="h-[18px] w-[18px] flex-1"
         style={{ color: iconColor }}
       />
       <Button
         variant="ghost"
         size="sm"
         className={cn(
-          'p-1.5 h-[22px] hidden group-hover:flex rounded-sm transition-colors duration-200',
+          `hidden h-[22px] rounded-sm p-1.5 transition-colors duration-200
+          group-hover:flex`,
           isDetached
-            ? `bg-muted/70 text-background hover:bg-muted`
+            ? 'bg-muted/70 text-background hover:bg-muted'
             : 'bg-background/50 hover:bg-background/70'
         )}
         style={buttonStyles}
         onClick={handleClick}
       >
         <ThemedSpan
-          className="text-sm font-medium leading-none"
+          className="text-sm leading-none font-medium"
           style={labelStyles}
         >
           {label}

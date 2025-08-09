@@ -61,7 +61,12 @@ export const useMessageHandlers = () => {
     content: string,
     selectionContext?: UseMessageSelectionContextT
   ) => {
-    createBranch({ content, messageId, connectionType: 'attached', selectionContext });
+    createBranch({
+      content,
+      messageId,
+      connectionType: 'attached',
+      selectionContext,
+    });
   };
 
   const handleNewDetachedBranch = (
@@ -69,7 +74,12 @@ export const useMessageHandlers = () => {
     content: string,
     selectionContext?: UseMessageSelectionContextT
   ) => {
-    createBranch({ content, messageId, connectionType: 'detached', selectionContext });
+    createBranch({
+      content,
+      messageId,
+      connectionType: 'detached',
+      selectionContext,
+    });
   };
 
   const handleNewTemporaryBranch = (messageId: string, content: string) => {

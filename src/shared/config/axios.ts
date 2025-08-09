@@ -8,7 +8,11 @@ import { AppRoutes } from '@shared/constants/router';
 
 import { AuthService } from '@shared/services/auth/auth-service';
 
-import { getFromStorage, removeFromStorage, setToStorage } from '@shared/utils/local-storage';
+import {
+  getFromStorage,
+  removeFromStorage,
+  setToStorage,
+} from '@shared/utils/local-storage';
 
 type RefreshQueueItem = {
   resolve: (value: string) => void;
@@ -71,7 +75,10 @@ baseAxiosInstance.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
-    if (error.response?.status === ApiErrorCodes.Unauthorized && !originalRequest._retry) {
+    if (
+      error.response?.status === ApiErrorCodes.Unauthorized &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         return new Promise<AxiosResponse>((resolve, reject) => {
           refreshQueue.push({

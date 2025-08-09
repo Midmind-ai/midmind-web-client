@@ -11,24 +11,28 @@ import SignInForm from '@features/sign-in/components/sign-in-form/sign-in-form';
 
 const SignInPage = () => {
   return (
-    <div className="min-h-svh flex flex-col p-6 sm:p-6">
+    <div className="flex min-h-svh flex-col p-6 sm:p-6">
       <div className="flex flex-1 flex-col lg:flex-row">
-        <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="flex flex-1 flex-col items-center justify-center">
           <div className="w-full max-w-[360px]">
             <LogoIcon className="mb-6" />
-            <div className="flex flex-col gap-3 mb-6">
-              <ThemedH2 className="font-bold text-2xl sm:text-3xl">Sign in</ThemedH2>
-              <ThemedP className="text-sm text-muted-foreground">
+            <div className="mb-6 flex flex-col gap-3">
+              <ThemedH2 className="text-2xl font-bold sm:text-3xl">Sign in</ThemedH2>
+              <ThemedP className="text-muted-foreground text-sm">
                 Log in to unlock tailored content and stay connected with your community.
               </ThemedP>
             </div>
             <SignInForm />
           </div>
         </div>
-        <div className="relative overflow-hidden hidden lg:flex flex-1 flex-col gap-12 items-center justify-center bg-[#fafafa] p-8 border-[1px] border-border rounded-xl shadow-[0_1px_20px_0_rgba(0,0,0,0.05)]">
-          <ThemedH1 className="text-5xl leading-[140%] max-w-[508px] font-thin">
-            <ThemedSpan className="font-normal">Reasoning space</ThemedSpan> for individuals, teams,
-            and organizations
+        <div
+          className="border-border relative hidden flex-1 flex-col items-center
+            justify-center gap-12 overflow-hidden rounded-xl border-[1px] bg-[#fafafa] p-8
+            shadow-[0_1px_20px_0_rgba(0,0,0,0.05)] lg:flex"
+        >
+          <ThemedH1 className="max-w-[508px] text-5xl leading-[140%] font-thin">
+            <ThemedSpan className="font-normal">Reasoning space</ThemedSpan> for
+            individuals, teams, and organizations
           </ThemedH1>
           <ChatTreeIcon className="z-10 max-w-full" />
           <LogoBackgroundIcon className="absolute bottom-0 left-0" />

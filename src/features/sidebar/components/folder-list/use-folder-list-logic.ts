@@ -20,7 +20,9 @@ export const useFolderListLogic = () => {
     if (currentChatId === chatId) {
       if (updatedChats.length > 0) {
         const currentSearch = location.search;
-        navigate(`${AppRoutes.Chat(updatedChats[updatedChats.length - 1].id)}${currentSearch}`);
+        navigate(
+          `${AppRoutes.Chat(updatedChats[updatedChats.length - 1].id)}${currentSearch}`
+        );
       } else {
         navigate(AppRoutes.Home);
       }

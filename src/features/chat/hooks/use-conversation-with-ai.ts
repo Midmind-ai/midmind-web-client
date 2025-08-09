@@ -45,8 +45,12 @@ export const useConversationWithAI = (chatId: string) => {
     }
   );
 
-  const { abortControllers, createAbortController, clearAbortController, abortCurrentRequest } =
-    useAbortControllerStore();
+  const {
+    abortControllers,
+    createAbortController,
+    clearAbortController,
+    abortCurrentRequest,
+  } = useAbortControllerStore();
 
   const conversationWithAI = async (body: ConversationWithAIRequestDto) => {
     const userMessage: ChatMessage = {

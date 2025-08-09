@@ -15,7 +15,8 @@ import GoogleIcon from '@features/sign-in/assets/icons/google.svg';
 import { useSignInFormLogic } from '@features/sign-in/components/sign-in-form/use-sign-in-form-logic';
 
 const SignInForm = () => {
-  const { errors, isSubmitting, register, handleSubmit, loginWithGoogle } = useSignInFormLogic();
+  const { errors, isSubmitting, register, handleSubmit, loginWithGoogle } =
+    useSignInFormLogic();
 
   return (
     <form onSubmit={handleSubmit}>
@@ -35,15 +36,17 @@ const SignInForm = () => {
             aria-invalid={!!errors.email?.message}
           />
           {errors.email && (
-            <ThemedP className="text-sm text-destructive mt-1">{errors.email.message}</ThemedP>
+            <ThemedP className="text-destructive mt-1 text-sm">
+              {errors.email.message}
+            </ThemedP>
           )}
         </div>
         <div>
-          <div className="flex justify-between mb-2">
+          <div className="mb-2 flex justify-between">
             <Label htmlFor="password">Password</Label>
             <Link
               to={AppRoutes.ForgotPassword}
-              className="underline text-sm text-muted-foreground"
+              className="text-muted-foreground text-sm underline"
             >
               Forgot password?
             </Link>
@@ -56,20 +59,24 @@ const SignInForm = () => {
             aria-invalid={!!errors.password?.message}
           />
           {errors.password && (
-            <ThemedP className="text-sm text-destructive mt-1">{errors.password.message}</ThemedP>
+            <ThemedP className="text-destructive mt-1 text-sm">
+              {errors.password.message}
+            </ThemedP>
           )}
         </div>
       </div>
       <Button
         type="submit"
-        className="w-full mt-6"
+        className="mt-6 w-full"
         disabled={isSubmitting}
       >
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
-      <div className="relative text-center my-4">
-        <Separator className="absolute top-1/2 left-0 w-full h-px" />
-        <ThemedSpan className="relative z-10 bg-background px-2 text-muted-foreground text-xs">
+      <div className="relative my-4 text-center">
+        <Separator className="absolute top-1/2 left-0 h-px w-full" />
+        <ThemedSpan
+          className="bg-background text-muted-foreground relative z-10 px-2 text-xs"
+        >
           OR
         </ThemedSpan>
       </div>
@@ -79,7 +86,7 @@ const SignInForm = () => {
           variant="outline"
           className="flex-1"
         >
-          <GitHubIcon className="w-4 h-4" />
+          <GitHubIcon className="h-4 w-4" />
         </Button>
         <Button
           type="button"
@@ -87,21 +94,21 @@ const SignInForm = () => {
           className="flex-1"
           onClick={loginWithGoogle}
         >
-          <GoogleIcon className="w-4 h-4" />
+          <GoogleIcon className="h-4 w-4" />
         </Button>
         <Button
           type="button"
           variant="outline"
           className="flex-1"
         >
-          <AppleIcon className="w-4 h-4" />
+          <AppleIcon className="h-4 w-4" />
         </Button>
       </div>
       <div className="mt-6 text-center text-sm">
         <ThemedSpan className="text-muted-foreground">Don't have an account?</ThemedSpan>{' '}
         <Link
           to={AppRoutes.SignUp}
-          className="underline text-sm text-primary"
+          className="text-primary text-sm underline"
         >
           Sign up
         </Link>

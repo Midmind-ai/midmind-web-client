@@ -48,26 +48,26 @@ const MessageContextMenu = ({
   return (
     <ContextMenuContent>
       <ContextMenuItem onClick={onCopyText}>
-        <CopyIcon className="size-4 text-foreground" />
+        <CopyIcon className="text-foreground size-4" />
         Copy text
       </ContextMenuItem>
       <ContextMenuItem onClick={onReply}>
-        <ReplyIcon className="size-4 text-foreground" />
+        <ReplyIcon className="text-foreground size-4" />
         Reply
       </ContextMenuItem>
       {showBranchActions && (
         <>
           <ContextMenuSeparator />
           <ContextMenuItem onClick={onOpenBranch}>
-            <MessageSquareMore className="size-4 text-foreground" />
+            <MessageSquareMore className="text-foreground size-4" />
             Open branch
           </ContextMenuItem>
           <ContextMenuItem onClick={onOpenInSidePanel}>
-            <PanelRight className="size-4 text-foreground" />
+            <PanelRight className="text-foreground size-4" />
             Open in side panel
           </ContextMenuItem>
           <ContextMenuItem onClick={onOpenInNewTab}>
-            <ExternalLink className="size-4 text-foreground" />
+            <ExternalLink className="text-foreground size-4" />
             Open in new tab
           </ContextMenuItem>
         </>
@@ -76,25 +76,25 @@ const MessageContextMenu = ({
         <>
           <ContextMenuSeparator />
           <ContextMenuItem onClick={onNewAttachedBranch}>
-            <GitBranchPlus className="size-4 text-foreground" />
+            <GitBranchPlus className="text-foreground size-4" />
             <ThemedP>
               New <ThemedSpan className="font-medium">attached</ThemedSpan> branch
             </ThemedP>
           </ContextMenuItem>
           <ContextMenuItem onClick={onNewDetachedBranch}>
-            <GitCommitVertical className="size-4 text-foreground" />
+            <GitCommitVertical className="text-foreground size-4" />
             <ThemedP>
               New <ThemedSpan className="font-medium">detached</ThemedSpan> branch
             </ThemedP>
           </ContextMenuItem>
           <ContextMenuItem onClick={onNewTemporaryBranch}>
-            <Glasses className="size-4 text-foreground" />
+            <Glasses className="text-foreground size-4" />
             <ThemedP>
               New <ThemedSpan className="font-medium">temporary</ThemedSpan> branch
             </ThemedP>
           </ContextMenuItem>
           <ContextMenuItem onClick={onNewSetOfBranches}>
-            <GitFork className="size-4 text-foreground" />
+            <GitFork className="text-foreground size-4" />
             <ThemedP>
               New <ThemedSpan className="font-medium">set</ThemedSpan> of branches
             </ThemedP>

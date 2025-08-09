@@ -2,7 +2,11 @@ import type { FC, HTMLAttributes } from 'react';
 
 import { cn } from '@shared/utils/cn';
 
-const ThemedSpan: FC<HTMLAttributes<HTMLSpanElement>> = ({ className, children, ...props }) => {
+const ThemedSpan: FC<HTMLAttributes<HTMLSpanElement>> = ({
+  className,
+  children,
+  ...props
+}) => {
   return (
     <span
       className={cn('text-foreground', className)}

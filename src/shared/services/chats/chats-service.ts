@@ -19,7 +19,10 @@ export class ChatsService {
   }
 
   static async updateChatDetails(chatId: string, body: UpdateChatDetailsRequestDto) {
-    const { data } = await baseAxiosInstance.put<MessageResponse>(`/chats/${chatId}`, body);
+    const { data } = await baseAxiosInstance.put<MessageResponse>(
+      `/chats/${chatId}`,
+      body
+    );
 
     return data;
   }

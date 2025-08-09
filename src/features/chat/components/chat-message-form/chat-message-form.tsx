@@ -38,7 +38,7 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="flex items-center gap-2 outline-1 outline-input px-2.5 py-2 rounded-lg"
+      className="outline-input flex items-center gap-2 rounded-lg px-2.5 py-2 outline-1"
     >
       <Select
         value={currentModel}
@@ -47,7 +47,7 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
       >
         <SelectTrigger
           size="sm"
-          className="p-0 gap-0 self-end"
+          className="gap-0 self-end p-0"
         >
           <div className="px-3">
             <SelectValue />
@@ -76,7 +76,8 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
         {...register('content')}
         autoComplete="off"
         placeholder="Write a message..."
-        className="border-none shadow-none px-0 flex items-center focus-visible:ring-0 max-h-28 resize-none overflow-y-auto"
+        className="flex max-h-28 resize-none items-center overflow-y-auto border-none px-0
+          shadow-none focus-visible:ring-0"
         disabled={hasActiveRequest}
         autoFocus
         onKeyDown={handleKeyDown}
@@ -87,7 +88,7 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
           className="size-9 self-end"
           onClick={abortCurrentRequest}
         >
-          <CircleStop className="size-4 text-background" />
+          <CircleStop className="text-background size-4" />
         </Button>
       ) : (
         <Button
@@ -95,7 +96,7 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
           className="size-9 self-end"
           disabled={!isValid || hasActiveRequest}
         >
-          <SendHorizonal className="size-4 text-background" />
+          <SendHorizonal className="text-background size-4" />
         </Button>
       )}
     </form>

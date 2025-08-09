@@ -11,5 +11,8 @@
   "endOfLine": "auto",
   "arrowParens": "avoid",
   "quoteProps": "as-needed",
-  "printWidth": 100
+  "printWidth": 90,
+  "plugins": ["prettier-plugin-tailwindcss", "prettier-plugin-classnames", "prettier-plugin-merge"],
+  "customFunctions": ["cn", "clsx"],
+  "endingPosition": "absolute"
 }

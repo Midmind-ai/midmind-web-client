@@ -34,7 +34,11 @@ const ChildChat = ({
   const { messages } = useGetChatMessages(chatId);
   const handlers = useMessageHandlers();
 
-  const renderMessage = (message: ChatMessage, index: number, messages: ChatMessage[]) => {
+  const renderMessage = (
+    message: ChatMessage,
+    index: number,
+    messages: ChatMessage[]
+  ) => {
     const isLastMessage = index === messages.length - 1;
 
     if (message.role === 'user') {
@@ -44,8 +48,12 @@ const ChildChat = ({
           content={message.content}
           onCopyText={copyText}
           onReply={() => handlers.handleReply(message.id)}
-          onNewAttachedBranch={() => handlers.handleNewAttachedBranch(message.id, message.content)}
-          onNewDetachedBranch={() => handlers.handleNewDetachedBranch(message.id, message.content)}
+          onNewAttachedBranch={() =>
+            handlers.handleNewAttachedBranch(message.id, message.content)
+          }
+          onNewDetachedBranch={() =>
+            handlers.handleNewDetachedBranch(message.id, message.content)
+          }
           onNewTemporaryBranch={() =>
             handlers.handleNewTemporaryBranch(message.id, message.content)
           }
@@ -64,9 +72,15 @@ const ChildChat = ({
         onOpenBranch={() => handlers.handleOpenBranch(message.id)}
         onOpenInSidePanel={() => handlers.handleOpenInSidePanel(message.id)}
         onOpenInNewTab={() => handlers.handleOpenInNewTab(message.id)}
-        onNewAttachedBranch={() => handlers.handleNewAttachedBranch(message.id, message.content)}
-        onNewDetachedBranch={() => handlers.handleNewDetachedBranch(message.id, message.content)}
-        onNewTemporaryBranch={() => handlers.handleNewTemporaryBranch(message.id, message.content)}
+        onNewAttachedBranch={() =>
+          handlers.handleNewAttachedBranch(message.id, message.content)
+        }
+        onNewDetachedBranch={() =>
+          handlers.handleNewDetachedBranch(message.id, message.content)
+        }
+        onNewTemporaryBranch={() =>
+          handlers.handleNewTemporaryBranch(message.id, message.content)
+        }
         onNewSetOfBranches={() => handlers.handleNewSetOfBranches(message.id)}
         onNewNote={() => handlers.handleNewNote(message.id)}
       />
@@ -102,7 +116,7 @@ const ChildChat = ({
 
   return (
     <div className={getContainerClasses()}>
-      <div className="flex items-center justify-between p-3 border-b border-border">
+      <div className="border-border flex items-center justify-between border-b p-3">
         <h2 className="text-lg font-semibold">Child Chat</h2>
         <Button
           variant="ghost"
@@ -121,7 +135,7 @@ const ChildChat = ({
         </ScrollArea>
       </div>
 
-      <div className={cn(isFullscreen && 'max-w-[768px] mx-auto w-full', 'pb-3')}>
+      <div className={cn(isFullscreen && 'mx-auto w-full max-w-[768px]', 'pb-3')}>
         <ChatMessageForm
           chatId={chatId}
           threadContext={threadContext}

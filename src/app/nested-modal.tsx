@@ -27,8 +27,8 @@ const NestedModal = ({ open, onAnimationEnd }: BaseModalProps) => {
         <DialogHeader>
           <DialogTitle>Nested Modal</DialogTitle>
           <DialogDescription>
-            This is a nested modal demonstrating the modal system&apos;s ability to handle multiple
-            modals.
+            This is a nested modal demonstrating the modal system&apos;s ability to handle
+            multiple modals.
           </DialogDescription>
         </DialogHeader>
 

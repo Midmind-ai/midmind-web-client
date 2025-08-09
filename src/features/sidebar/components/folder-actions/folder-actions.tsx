@@ -1,4 +1,10 @@
-import { FilePlus2, FileSearch2, FolderPlus, MessageSquarePlus, PackagePlus } from 'lucide-react';
+import {
+  FilePlus2,
+  FileSearch2,
+  FolderPlus,
+  MessageSquarePlus,
+  PackagePlus,
+} from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { SidebarMenuButton } from '@shared/components/ui/sidebar';
@@ -8,7 +14,8 @@ import { AppRoutes } from '@shared/constants/router';
 const FolderActions = () => {
   const navigate = useNavigate();
 
-  const buttonClassNames = 'size-8 p-1 rounded-xs flex items-center justify-center cursor-pointer';
+  const buttonClassNames =
+    'size-8 p-1 rounded-xs flex items-center justify-center cursor-pointer';
 
   return (
     <div className="flex justify-between border-b-1 p-1">

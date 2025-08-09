@@ -10,13 +10,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@shared/components/ui/sidebar';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
 
 const UserDropdown = () => {
-  const { avatar, email, first_name, last_name, isMobile, handleLogout } = useUserDropdownLogic();
+  const { avatar, email, first_name, last_name, isMobile, handleLogout } =
+    useUserDropdownLogic();
 
   const nameAbbreviation = `${first_name[0]}${last_name[0]}`.toUpperCase();
 
@@ -27,7 +32,8 @@ const UserDropdown = () => {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent
+                data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
@@ -51,7 +57,9 @@ const UserDropdown = () => {
                     src={avatar || ''}
                     alt={nameAbbreviation}
                   />
-                  <AvatarFallback className="rounded-lg">{nameAbbreviation}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {nameAbbreviation}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <ThemedSpan className="truncate font-medium">

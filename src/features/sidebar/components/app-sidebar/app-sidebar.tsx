@@ -11,7 +11,7 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader />
       <div className="flex h-full">
-        <div className="flex flex-col h-full border-r-1 justify-between">
+        <div className="flex h-full flex-col justify-between border-r-1">
           <SidebarTabs />
           <UserDropdown />
         </div>

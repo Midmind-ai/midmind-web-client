@@ -335,7 +335,11 @@ export interface components {
       message_id: string;
       content: string;
       /** @enum {string} */
-      model: 'gemini-2.0-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
+      model:
+        | 'gemini-2.0-flash-lite'
+        | 'gemini-2.0-flash'
+        | 'gemini-2.5-flash'
+        | 'gemini-2.5-pro';
       thread_context?: components['schemas']['ConversationThreadContextDto'];
     };
     ChatDto: {

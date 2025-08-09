@@ -1,4 +1,7 @@
-import type { HighlightTextNodeArgs, ThreadContext } from '@features/chat/types/chat-types';
+import type {
+  HighlightTextNodeArgs,
+  ThreadContext,
+} from '@features/chat/types/chat-types';
 
 export const captureSelection = (messageElement: Element) => {
   const selection = window.getSelection();
@@ -88,7 +91,11 @@ const getIntersectingTextNodes = (
 ): Array<{ textNode: Text; highlightStart: number; highlightEnd: number }> => {
   const walker = document.createTreeWalker(messageElement, NodeFilter.SHOW_TEXT, null);
 
-  const result: Array<{ textNode: Text; highlightStart: number; highlightEnd: number }> = [];
+  const result: Array<{
+    textNode: Text;
+    highlightStart: number;
+    highlightEnd: number;
+  }> = [];
   let currentIndex = 0;
   let node;
 
@@ -129,9 +136,13 @@ const highlightTextNode = ({
     return;
   }
 
-  const beforeText = textNode.textContent?.substring(0, threadContext.startPosition) || '';
+  const beforeText =
+    textNode.textContent?.substring(0, threadContext.startPosition) || '';
   const selectedText =
-    textNode.textContent?.substring(threadContext.startPosition, threadContext.endPosition) || '';
+    textNode.textContent?.substring(
+      threadContext.startPosition,
+      threadContext.endPosition
+    ) || '';
   const afterText = textNode.textContent?.substring(threadContext.endPosition) || '';
 
   const fragments: Node[] = [];

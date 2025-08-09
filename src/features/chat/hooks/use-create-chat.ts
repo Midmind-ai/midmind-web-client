@@ -26,8 +26,12 @@ type CreateChatArgs = {
 export const useCreateChat = () => {
   const { mutate } = useSWRConfig();
 
-  const clearAbortController = useAbortControllerStore(state => state.clearAbortController);
-  const createAbortController = useAbortControllerStore(state => state.createAbortController);
+  const clearAbortController = useAbortControllerStore(
+    state => state.clearAbortController
+  );
+  const createAbortController = useAbortControllerStore(
+    state => state.createAbortController
+  );
 
   const createChat = async ({ content, model, sendMessage = false }: CreateChatArgs) => {
     const chatId = uuidv4();

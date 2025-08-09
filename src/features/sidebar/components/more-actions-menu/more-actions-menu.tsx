@@ -25,7 +25,7 @@ const MoreActionsMenu = ({ triggerClassNames, isDeleting, onDelete }: Props) => 
           asChild
           className={cn(
             triggerClassNames,
-            'right-1 p-1 rounded-[4px] top-1/2 -translate-y-1/2 size-6',
+            'top-1/2 right-1 size-6 -translate-y-1/2 rounded-[4px] p-1',
             'hover:bg-sidebar'
           )}
         >

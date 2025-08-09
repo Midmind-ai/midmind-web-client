@@ -1,4 +1,8 @@
-import { SidebarGroup, SidebarGroupContent, SidebarMenu } from '@shared/components/ui/sidebar';
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+} from '@shared/components/ui/sidebar';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
 import { useFolderListLogic } from '@features/sidebar/components/folder-list/use-folder-list-logic';

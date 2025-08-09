@@ -31,9 +31,12 @@ export const useChatMessageFormLogic = ({
   threadContext,
 }: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
-  const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(SearchParams.Model, {
-    defaultValue: 'gemini-2.0-flash-lite',
-  });
+  const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(
+    SearchParams.Model,
+    {
+      defaultValue: 'gemini-2.0-flash-lite',
+    }
+  );
 
   const hasFirstMessageInNewBranchSent = useRef(false);
 
@@ -67,7 +70,8 @@ export const useChatMessageFormLogic = ({
       });
     } else {
       // For existing chat
-      const shouldIncludeThreadContext = threadContext && !hasFirstMessageInNewBranchSent.current;
+      const shouldIncludeThreadContext =
+        threadContext && !hasFirstMessageInNewBranchSent.current;
 
       conversationWithAI({
         chat_id: actualChatId,

@@ -1,9 +1,17 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@radix-ui/react-collapsible';
 import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub } from '@shared/components/ui/sidebar';
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+} from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
@@ -53,13 +61,14 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
     return (
       <SidebarMenuButton
         isActive={id === params.id}
-        className="data-[active=true]:font-normal rounded-sm relative cursor-pointer group/item p-1.5 hover:pr-8"
+        className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
+          data-[active=true]:font-normal"
         onClick={() =>
           navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
         }
       >
         <MessageSquare className="stroke-[1.5px]" />
-        <ThemedSpan className="truncate block">{name}</ThemedSpan>
+        <ThemedSpan className="block truncate">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
           onDelete={onDelete}
@@ -72,14 +81,15 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
   return (
     <SidebarMenuItem>
       <Collapsible
-        className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
+        className="group/collapsible
+          [&[data-state=open]>button>svg:first-child]:rotate-90"
         defaultOpen={name === 'components' || name === 'ui'}
       >
         <CollapsibleTrigger asChild>
           <SidebarMenuButton className="group/item hover:pr-8">
             <ChevronRight className="transition-transform" />
             <Folder />
-            <span className="truncate block">{name}</span>
+            <span className="block truncate">{name}</span>
             <MoreActionsMenu
               triggerClassNames="opacity-0 group-hover/item:opacity-100"
               onDelete={onDelete}

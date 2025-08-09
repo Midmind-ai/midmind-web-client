@@ -6,9 +6,16 @@ interface UseUrlParamsOptions<T> {
   deserialize?: (value: string) => T;
 }
 
-export const useUrlParams = <T = string>(key: string, options: UseUrlParamsOptions<T> = {}) => {
+export const useUrlParams = <T = string>(
+  key: string,
+  options: UseUrlParamsOptions<T> = {}
+) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { defaultValue, serialize = String, deserialize = (value: string) => value as T } = options;
+  const {
+    defaultValue,
+    serialize = String,
+    deserialize = (value: string) => value as T,
+  } = options;
 
   const getValue = (): T => {
     const paramValue = searchParams.get(key);
