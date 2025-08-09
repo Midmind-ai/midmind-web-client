@@ -77,7 +77,7 @@ const Tree = ({
         }}
       >
         <MessageSquare className="stroke-[1.5px]" />
-        <ThemedSpan className="block truncate">{name}</ThemedSpan>
+        <ThemedSpan className="text-primary block truncate">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
           onDelete={e => {
