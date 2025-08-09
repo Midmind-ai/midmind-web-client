@@ -15,7 +15,7 @@ const Sidebar = () => {
     <ShadcnSidebar>
       <SidebarHeader />
       <div className="flex h-full">
-        <div className="flex h-full flex-col justify-between border-r-1">
+        <div className="flex h-full flex-col justify-between border-r-1 border-l-1 p-1">
           <SidebarTabs />
           <UserDropdown />
         </div>
