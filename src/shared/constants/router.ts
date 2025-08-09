@@ -8,6 +8,5 @@ export const AppRoutes = {
 } as const;
 
 export const SearchParams = {
-  Model: 'model',
   Split: 'split',
 } as const;

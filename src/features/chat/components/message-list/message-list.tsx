@@ -15,15 +15,15 @@ const MessageList = ({ chatId }: Props) => {
     messages,
     scrollAreaRef,
     handleScroll,
-    handleReply,
-    handleNewAttachedBranch,
-    handleNewDetachedBranch,
-    handleNewTemporaryBranch,
-    createNewSetOfBranches,
-    openChat,
+    replyToMessage,
+    createAttachedBranch,
+    createDetachedBranch,
+    createTemporaryBranch,
+    createNewBranchSet,
+    openChatInMainView,
     openChatInSidePanel,
     openChatInNewTab,
-    handleNewNote,
+    createNoteFromMessage,
   } = useMessageListLogic(chatId);
 
   return (
@@ -42,11 +42,11 @@ const MessageList = ({ chatId }: Props) => {
               key={id}
               content={content}
               onCopyText={copyText}
-              onReply={() => handleReply(id)}
-              onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
-              onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
-              onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-              onNewSetOfBranches={() => createNewSetOfBranches(id)}
+              onReply={() => replyToMessage(id)}
+              onNewAttachedBranch={() => createAttachedBranch(id, content)}
+              onNewDetachedBranch={() => createDetachedBranch(id, content)}
+              onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
+              onNewSetOfBranches={() => createNewBranchSet(id)}
             />
           );
         }
@@ -57,19 +57,19 @@ const MessageList = ({ chatId }: Props) => {
             {...message}
             isLastMessage={isLastMessage}
             onCopyText={copyText}
-            onReply={() => handleReply(id)}
-            onOpenBranch={() => openChat(id)}
+            onReply={() => replyToMessage(id)}
+            onOpenBranch={() => openChatInMainView(id)}
             onOpenInSidePanel={() => openChatInSidePanel(id)}
             onOpenInNewTab={() => openChatInNewTab(id)}
             onNewAttachedBranch={branchContext =>
-              handleNewAttachedBranch(id, content, branchContext)
+              createAttachedBranch(id, content, branchContext)
             }
             onNewDetachedBranch={branchContext =>
-              handleNewDetachedBranch(id, content, branchContext)
+              createDetachedBranch(id, content, branchContext)
             }
-            onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-            onNewSetOfBranches={() => createNewSetOfBranches(id)}
-            onNewNote={() => handleNewNote(id)}
+            onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
+            onNewSetOfBranches={() => createNewBranchSet(id)}
+            onNewNote={() => createNoteFromMessage(id)}
           />
         );
       })}

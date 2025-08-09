@@ -2,32 +2,39 @@ import { useNavigate, useParams, useLocation } from 'react-router';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
-import { useUrlParams } from '@shared/hooks/use-url-params';
-
 import type { BranchContext } from '@shared/types/entities';
 
+import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
   ContextType,
-  LLModel,
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 
-export const useMessageHandlers = () => {
+export const useChatActions = (actualChatId?: string) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id: chatId = '' } = useParams();
-  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
+  const { id: urlChatId = '' } = useParams();
+
+  const chatId = actualChatId || urlChatId;
 
   const { createChat } = useCreateChat();
 
-  const openChatInSplitView = (chatId: string) => {
+  const openChatInSplitView = (newChatId: string) => {
     const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set(SearchParams.Split, chatId);
+    const currentSplitChatId = currentUrl.searchParams.get(SearchParams.Split);
 
-    navigate(`${location.pathname}${currentUrl.search}`);
+    if (actualChatId && currentSplitChatId && currentSplitChatId === actualChatId) {
+      currentUrl.searchParams.set(SearchParams.Split, newChatId);
+
+      navigate(`${AppRoutes.Chat(actualChatId)}${currentUrl.search}`);
+    } else {
+      currentUrl.searchParams.set(SearchParams.Split, newChatId);
+
+      navigate(`${location.pathname}${currentUrl.search}`);
+    }
   };
 
   const createBranch = async ({
@@ -58,13 +65,13 @@ export const useMessageHandlers = () => {
 
     const newChatId = await createChat({
       content: textToUse,
-      model: currentModel,
+      model: DEFAULT_AI_MODEL,
     });
 
     openChatInSplitView(newChatId);
   };
 
-  const handleNewAttachedBranch = (
+  const createAttachedBranch = (
     messageId: string,
     content: string,
     selectionContext?: UseMessageSelectionContextT
@@ -77,7 +84,7 @@ export const useMessageHandlers = () => {
     });
   };
 
-  const handleNewDetachedBranch = (
+  const createDetachedBranch = (
     messageId: string,
     content: string,
     selectionContext?: UseMessageSelectionContextT
@@ -90,21 +97,21 @@ export const useMessageHandlers = () => {
     });
   };
 
-  const handleNewTemporaryBranch = (messageId: string, content: string) => {
+  const createTemporaryBranch = (messageId: string, content: string) => {
     createBranch({ messageId, content, connectionType: 'temporary' });
   };
 
-  const handleReply = (_messageId: string) => {
+  const replyToMessage = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
   };
 
-  const createNewSetOfBranches = (_messageId: string) => {
+  const createNewBranchSet = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
   };
 
-  const openChat = (chatId: string) => {
+  const openChatInMainView = (chatId: string) => {
     // eslint-disable-next-line no-alert
     alert(chatId);
   };
@@ -114,27 +121,23 @@ export const useMessageHandlers = () => {
   };
 
   const openChatInNewTab = (chatId: string) => {
-    window.open(
-      `${AppRoutes.Chat(chatId)}?${SearchParams.Model}=${currentModel}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    window.open(AppRoutes.Chat(chatId), '_blank', 'noopener,noreferrer');
   };
 
-  const handleNewNote = (_messageId: string) => {
+  const createNoteFromMessage = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
   };
 
   return {
-    handleReply,
-    handleNewAttachedBranch,
-    handleNewDetachedBranch,
-    handleNewTemporaryBranch,
-    createNewSetOfBranches,
-    openChat,
+    replyToMessage,
+    createAttachedBranch,
+    createDetachedBranch,
+    createTemporaryBranch,
+    createNewBranchSet,
+    openChatInMainView,
     openChatInSidePanel,
     openChatInNewTab,
-    handleNewNote,
+    createNoteFromMessage,
   };
 };

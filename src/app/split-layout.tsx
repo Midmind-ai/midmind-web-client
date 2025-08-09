@@ -1,6 +1,10 @@
 import { Outlet } from 'react-router';
 
-import { Separator } from '@shared/components/ui/separator';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@shared/components/ui/resizable';
 
 import { SearchParams } from '@shared/constants/router';
 
@@ -16,21 +20,34 @@ const SplitLayout = () => {
   const { branchContext } = useBranchContext(chatId);
 
   return (
-    <div className="flex flex-1">
-      <div className={cn(chatId ? 'w-1/2' : 'w-full')}>
+    <ResizablePanelGroup
+      className="flex flex-1"
+      direction="horizontal"
+    >
+      <ResizablePanel
+        id="main-panel"
+        order={1}
+        minSize={40}
+        className={cn(chatId ? 'w-1/2' : 'w-full')}
+      >
         <Outlet />
-      </div>
-      <Separator orientation="vertical" />
+      </ResizablePanel>
+      <ResizableHandle />
       {chatId && (
-        <div className="w-1/2">
+        <ResizablePanel
+          id="split-chat-panel"
+          order={2}
+          minSize={40}
+          className="w-1/2"
+        >
           <ChatView
             chatId={chatId}
             branchContext={branchContext}
             showCloseButton={true}
           />
-        </div>
+        </ResizablePanel>
       )}
-    </div>
+    </ResizablePanelGroup>
   );
 };
 

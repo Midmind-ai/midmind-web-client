@@ -1,7 +1,7 @@
 import { useRef, type UIEvent, useEffect } from 'react';
 
+import { useChatActions } from '@features/chat/hooks/use-chat-actions';
 import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
-import { useMessageHandlers } from '@features/chat/hooks/use-message-handlers';
 
 const LOAD_MORE_SCROLL_DISTANCE = 1000; // 1000px
 
@@ -17,7 +17,7 @@ export const useMessageListLogic = (chatId: string) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousScrollTopPositionRef = useRef(0);
 
-  const messageHandlers = useMessageHandlers();
+  const chatActions = useChatActions(chatId);
 
   const handleAutoScroll = (withAnimation = false) => {
     if (scrollAreaRef.current) {
@@ -62,6 +62,6 @@ export const useMessageListLogic = (chatId: string) => {
     isMessagesLoading,
     scrollAreaRef,
     handleScroll,
-    ...messageHandlers,
+    ...chatActions,
   };
 };
