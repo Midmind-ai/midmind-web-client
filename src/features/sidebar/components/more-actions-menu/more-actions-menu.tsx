@@ -15,9 +15,17 @@ type Props = {
   triggerClassNames: string;
   isDeleting: boolean;
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
+  onOpenInSidePanel: (e: React.MouseEvent<HTMLElement>) => void;
+  onOpenInNewTab: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
-const MoreActionsMenu = ({ triggerClassNames, isDeleting, onDelete }: Props) => {
+const MoreActionsMenu = ({
+  triggerClassNames,
+  isDeleting,
+  onDelete,
+  onOpenInSidePanel,
+  onOpenInNewTab,
+}: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,8 +46,11 @@ const MoreActionsMenu = ({ triggerClassNames, isDeleting, onDelete }: Props) => 
         side="right"
         align="start"
       >
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onOpenInNewTab}>
           <ThemedSpan>Open in new tab</ThemedSpan>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onOpenInSidePanel}>
+          <ThemedSpan>Open in side panel</ThemedSpan>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={onDelete}>
           {isDeleting && <Loader2Icon className="animate-spin" />}

@@ -12,8 +12,11 @@ import { useLogout } from '@shared/hooks/use-logout';
 
 import { removeFromStorage } from '@shared/utils/local-storage';
 
+import { useTheme } from '@/app/providers/theme-provider';
+
 export const useUserDropdownLogic = () => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const { mutate } = useSWRConfig();
   const { isMobile } = useSidebar();
   const { logout, isLoading } = useLogout();
@@ -38,6 +41,8 @@ export const useUserDropdownLogic = () => {
     email,
     isLoading,
     isMobile,
+    theme,
+    setTheme,
     handleLogout,
   };
 };

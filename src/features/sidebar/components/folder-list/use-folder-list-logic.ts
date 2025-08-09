@@ -5,11 +5,14 @@ import { AppRoutes } from '@shared/constants/router';
 import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
 import { useGetChats } from '@features/chat/hooks/use-get-chats';
 
+import { useChatActions } from '@/features/chat/hooks/use-chat-actions';
+
 export const useFolderListLogic = () => {
   const { chats, isLoading } = useGetChats();
   const navigate = useNavigate();
   const location = useLocation();
   const { deleteChat, isLoading: isDeleting } = useDeleteChat();
+  const { openChatInSidePanel, openChatInNewTab } = useChatActions();
 
   const handleDelete = async (chatId: string) => {
     await deleteChat(chatId);
@@ -34,5 +37,7 @@ export const useFolderListLogic = () => {
     isLoading,
     isDeleting,
     handleDelete,
+    openChatInSidePanel,
+    openChatInNewTab,
   };
 };

@@ -14,7 +14,7 @@ import {
 } from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import { AppRoutes, SearchParams } from '@shared/constants/router';
+import { AppRoutes } from '@shared/constants/router';
 
 import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
 
@@ -50,9 +50,17 @@ type Props = {
   item: TreeItem;
   onDelete: VoidFunction;
   isDeleting: boolean;
+  onOpenInSidePanel: (chatId: string) => void;
+  onOpenInNewTab: (chatId: string) => void;
 };
 
-const Tree = ({ item, onDelete, isDeleting }: Props) => {
+const Tree = ({
+  item,
+  onDelete,
+  isDeleting,
+  onOpenInSidePanel,
+  onOpenInNewTab,
+}: Props) => {
   const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];
   const navigate = useNavigate();
   const params = useParams();
@@ -63,19 +71,28 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
         isActive={id === params.id}
         className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
           data-[active=true]:font-normal"
-        onClick={() =>
-          navigate(`${AppRoutes.Chat(id)}?${SearchParams.Model}=gemini-2.0-flash-lite`)
-        }
+        onClick={() => {
+          const currentSearch = window.location.search;
+          navigate(`${AppRoutes.Chat(id)}${currentSearch}`);
+        }}
       >
         <MessageSquare className="stroke-[1.5px]" />
         <ThemedSpan className="block truncate">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
-          onDelete={(e: React.MouseEvent<HTMLElement>) => {
+          onDelete={e => {
             e.stopPropagation();
             onDelete();
           }}
           isDeleting={isDeleting}
+          onOpenInSidePanel={e => {
+            e.stopPropagation();
+            onOpenInSidePanel(id);
+          }}
+          onOpenInNewTab={e => {
+            e.stopPropagation();
+            onOpenInNewTab(id);
+          }}
         />
       </SidebarMenuButton>
     );
@@ -95,8 +112,16 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
             <span className="block truncate">{name}</span>
             <MoreActionsMenu
               triggerClassNames="opacity-0 group-hover/item:opacity-100"
-              onDelete={onDelete}
               isDeleting={isDeleting}
+              onDelete={onDelete}
+              onOpenInSidePanel={e => {
+                e.stopPropagation();
+                onOpenInSidePanel(id);
+              }}
+              onOpenInNewTab={e => {
+                e.stopPropagation();
+                onOpenInNewTab(id);
+              }}
             />
           </SidebarMenuButton>
         </CollapsibleTrigger>
@@ -106,8 +131,10 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
               <Tree
                 key={index}
                 item={subItem}
-                onDelete={onDelete}
                 isDeleting={isDeleting}
+                onDelete={onDelete}
+                onOpenInSidePanel={onOpenInSidePanel}
+                onOpenInNewTab={onOpenInNewTab}
               />
             ))}
           </SidebarMenuSub>

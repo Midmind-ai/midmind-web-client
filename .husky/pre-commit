@@ -1,1 +1,1 @@
-npx tsx husky_utils/pre_commit.ts
+npx tsx husky-utils/pre-commit.ts

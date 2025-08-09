@@ -7,7 +7,7 @@ import * as tseslint from 'typescript-eslint';
 
 export default tseslint.config([
   {
-    ignores: ['dist', 'husky_utils/**'],
+    ignores: ['dist', 'husky-utils/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

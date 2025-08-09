@@ -6,21 +6,25 @@ import LLMResponse from '@features/chat/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat/components/user-message/user-message';
 
-const MessageList = () => {
+type Props = {
+  chatId: string;
+};
+
+const MessageList = ({ chatId }: Props) => {
   const {
     messages,
     scrollAreaRef,
     handleScroll,
-    handleReply,
-    handleNewAttachedBranch,
-    handleNewDetachedBranch,
-    handleNewTemporaryBranch,
-    handleNewSetOfBranches,
-    handleOpenBranch,
-    handleOpenInSidePanel,
-    handleOpenInNewTab,
-    handleNewNote,
-  } = useMessageListLogic();
+    replyToMessage,
+    createAttachedBranch,
+    createDetachedBranch,
+    createTemporaryBranch,
+    createNewBranchSet,
+    openChatInMainView,
+    openChatInSidePanel,
+    openChatInNewTab,
+    createNoteFromMessage,
+  } = useMessageListLogic(chatId);
 
   return (
     <ScrollArea
@@ -38,11 +42,11 @@ const MessageList = () => {
               key={id}
               content={content}
               onCopyText={copyText}
-              onReply={() => handleReply(id)}
-              onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
-              onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
-              onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-              onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+              onReply={() => replyToMessage(id)}
+              onNewAttachedBranch={() => createAttachedBranch(id, content)}
+              onNewDetachedBranch={() => createDetachedBranch(id, content)}
+              onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
+              onNewSetOfBranches={() => createNewBranchSet(id)}
             />
           );
         }
@@ -53,19 +57,19 @@ const MessageList = () => {
             {...message}
             isLastMessage={isLastMessage}
             onCopyText={copyText}
-            onReply={() => handleReply(id)}
-            onOpenBranch={() => handleOpenBranch(id)}
-            onOpenInSidePanel={() => handleOpenInSidePanel(id)}
-            onOpenInNewTab={() => handleOpenInNewTab(id)}
+            onReply={() => replyToMessage(id)}
+            onOpenBranch={() => openChatInMainView(id)}
+            onOpenInSidePanel={() => openChatInSidePanel(id)}
+            onOpenInNewTab={() => openChatInNewTab(id)}
             onNewAttachedBranch={branchContext =>
-              handleNewAttachedBranch(id, content, branchContext)
+              createAttachedBranch(id, content, branchContext)
             }
             onNewDetachedBranch={branchContext =>
-              handleNewDetachedBranch(id, content, branchContext)
+              createDetachedBranch(id, content, branchContext)
             }
-            onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-            onNewSetOfBranches={() => handleNewSetOfBranches(id)}
-            onNewNote={() => handleNewNote(id)}
+            onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
+            onNewSetOfBranches={() => createNewBranchSet(id)}
+            onNewNote={() => createNoteFromMessage(id)}
           />
         );
       })}

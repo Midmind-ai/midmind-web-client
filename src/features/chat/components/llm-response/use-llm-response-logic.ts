@@ -2,30 +2,46 @@ import { useEffect, useState } from 'react';
 
 import { useParams } from 'react-router';
 
-import { SearchParams } from '@shared/constants/router';
-
-import { useUrlParams } from '@shared/hooks/use-url-params';
-
 import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
 
-import type { LLModel } from '@features/chat/types/chat-types';
+import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
+import type { ChatBranchContext } from '@features/chat/types/chat-types';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
 } from '@features/chat/utils/llm-response-emitter';
+import { captureSelection } from '@features/chat/utils/text-selection';
+
+import type { ChatMessage } from '@/shared/types/entities';
 
 export const useLLMResponseLogic = (
   id: string,
   content: string,
-  isLastMessage: boolean
+  isLastMessage: boolean,
+  branches: ChatMessage['branches'],
+  onOpenInSidePanel: (chatId: string) => void
 ) => {
+  let selectionContext: ChatBranchContext | undefined;
+  let selectionText: string = '';
   const isNewMessage = isLastMessage && content.length < 10;
 
-  const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
   const { id: chatId } = useParams();
+
+  const { messageRef } = useTextHighlight({
+    branches,
+    onOpenInSidePanel,
+  });
 
   const [isStreaming, setIsStreaming] = useState(isNewMessage);
   const [streamingContent, setStreamingContent] = useState(content);
+
+  const handleTextSelection = () => {
+    if (messageRef.current) {
+      const capturedSelection = captureSelection(messageRef.current);
+      selectionContext = capturedSelection;
+      selectionText = capturedSelection?.selectedText || '';
+    }
+  };
 
   useEffect(() => {
     const handleResponseChunk = (chunk: ConversationWithAIResponseDto) => {
@@ -47,8 +63,11 @@ export const useLLMResponseLogic = (
   }, [id, chatId]);
 
   return {
-    currentModel,
+    messageRef,
     streamingContent,
     isStreaming,
+    selectionContext,
+    selectionText,
+    handleTextSelection,
   };
 };
