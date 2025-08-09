@@ -101,19 +101,9 @@ export const useChatActions = (actualChatId?: string) => {
     createBranch({ messageId, content, connectionType: 'temporary' });
   };
 
-  const replyToMessage = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
-
   const createNewBranchSet = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
-  };
-
-  const openChatInMainView = (chatId: string) => {
-    // eslint-disable-next-line no-alert
-    alert(chatId);
   };
 
   const openChatInSidePanel = (chatId: string) => {
@@ -124,20 +114,12 @@ export const useChatActions = (actualChatId?: string) => {
     window.open(AppRoutes.Chat(chatId), '_blank', 'noopener,noreferrer');
   };
 
-  const createNoteFromMessage = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
-
   return {
-    replyToMessage,
     createAttachedBranch,
     createDetachedBranch,
     createTemporaryBranch,
     createNewBranchSet,
-    openChatInMainView,
     openChatInSidePanel,
     openChatInNewTab,
-    createNoteFromMessage,
   };
 };

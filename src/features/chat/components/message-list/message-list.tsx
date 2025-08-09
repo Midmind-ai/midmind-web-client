@@ -1,7 +1,5 @@
 import { ScrollArea } from '@shared/components/ui/scroll-area';
 
-import { copyText } from '@shared/utils/copy-text';
-
 import LLMResponse from '@features/chat/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat/components/user-message/user-message';
@@ -11,20 +9,8 @@ type Props = {
 };
 
 const MessageList = ({ chatId }: Props) => {
-  const {
-    messages,
-    scrollAreaRef,
-    handleScroll,
-    replyToMessage,
-    createAttachedBranch,
-    createDetachedBranch,
-    createTemporaryBranch,
-    createNewBranchSet,
-    openChatInMainView,
-    openChatInSidePanel,
-    openChatInNewTab,
-    createNoteFromMessage,
-  } = useMessageListLogic(chatId);
+  const { messages, scrollAreaRef, chatActions, messageActions, handleScroll } =
+    useMessageListLogic(chatId);
 
   return (
     <ScrollArea
@@ -41,12 +27,12 @@ const MessageList = ({ chatId }: Props) => {
             <UserMessage
               key={id}
               content={content}
-              onCopyText={copyText}
-              onReply={() => replyToMessage(id)}
-              onNewAttachedBranch={() => createAttachedBranch(id, content)}
-              onNewDetachedBranch={() => createDetachedBranch(id, content)}
-              onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
-              onNewSetOfBranches={() => createNewBranchSet(id)}
+              onCopyText={() => messageActions.copyText(content)}
+              onReply={() => messageActions.replyToMessage(id)}
+              onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
+              onNewDetachedBranch={() => chatActions.createDetachedBranch(id, content)}
+              onNewTemporaryBranch={() => chatActions.createTemporaryBranch(id, content)}
+              onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
             />
           );
         }
@@ -56,20 +42,20 @@ const MessageList = ({ chatId }: Props) => {
             key={id}
             {...message}
             isLastMessage={isLastMessage}
-            onCopyText={copyText}
-            onReply={() => replyToMessage(id)}
-            onOpenBranch={() => openChatInMainView(id)}
-            onOpenInSidePanel={() => openChatInSidePanel(id)}
-            onOpenInNewTab={() => openChatInNewTab(id)}
+            onCopyText={() => messageActions.copyText(content)}
+            onReply={() => messageActions.replyToMessage(id)}
+            onOpenBranch={() => {}}
+            onOpenInSidePanel={() => chatActions.openChatInSidePanel(id)}
+            onOpenInNewTab={() => chatActions.openChatInNewTab(id)}
             onNewAttachedBranch={branchContext =>
-              createAttachedBranch(id, content, branchContext)
+              chatActions.createAttachedBranch(id, content, branchContext)
             }
             onNewDetachedBranch={branchContext =>
-              createDetachedBranch(id, content, branchContext)
+              chatActions.createDetachedBranch(id, content, branchContext)
             }
-            onNewTemporaryBranch={() => createTemporaryBranch(id, content)}
-            onNewSetOfBranches={() => createNewBranchSet(id)}
-            onNewNote={() => createNoteFromMessage(id)}
+            onNewTemporaryBranch={() => chatActions.createTemporaryBranch(id, content)}
+            onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
+            onNewNote={() => {}}
           />
         );
       })}

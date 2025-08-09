@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -33,13 +34,17 @@ export const useDeleteChat = () => {
         onSuccess: () => {
           mutate(
             SWRCacheKeys.GetChats,
-            (existingChats?: Chat[]) => {
-              if (!existingChats) {
-                return [];
+            produce((draft?: Chat[]) => {
+              if (!draft) {
+                return;
               }
 
-              return existingChats.filter(chat => chat.id !== chatId);
-            },
+              const chatIndex = draft.findIndex(chat => chat.id === chatId);
+
+              if (chatIndex !== -1) {
+                draft.splice(chatIndex, 1);
+              }
+            }),
             false
           );
         },

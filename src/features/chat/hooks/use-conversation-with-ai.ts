@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -31,7 +32,6 @@ export const useConversationWithAI = (chatId: string) => {
         arg,
         (chunk: ConversationWithAIResponseDto) => {
           handleLLMResponse(
-            mutate,
             clearAbortController,
             chatId,
             arg.model,
@@ -64,28 +64,16 @@ export const useConversationWithAI = (chatId: string) => {
 
     await mutate(
       getInfiniteKey(chatId),
-      (data?: PaginatedResponse<ChatMessage[]>[]) => {
-        if (!data || !Array.isArray(data) || data.length === 0) {
-          return data;
-        }
-
-        const allMessages = data.flatMap(page => page.data || []);
-        const messageExists = allMessages.some(message => message.id === userMessage.id);
+      produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {
+        const allMessages = draft?.flatMap(page => page.data || []);
+        const messageExists = allMessages?.some(message => message.id === userMessage.id);
 
         if (messageExists) {
-          return data;
+          return;
         }
 
-        const updatedData = [...data];
-        if (updatedData[0]) {
-          updatedData[0] = {
-            ...updatedData[0],
-            data: [userMessage, ...(updatedData[0].data || [])],
-          };
-        }
-
-        return updatedData;
-      },
+        draft?.[0].data.unshift(userMessage);
+      }),
       {
         revalidate: false,
         populateCache: true,

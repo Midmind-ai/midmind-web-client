@@ -10,6 +10,7 @@ import MessageContextMenu from '@features/chat/components/message-context-menu/m
 import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
 import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
 import type { ChatBranchContext } from '@features/chat/types/chat-types';
+import { captureSelection } from '@features/chat/utils/text-selection';
 
 type Props = {
   id: string;
@@ -46,13 +47,15 @@ const LLMResponse = ({
   onNewDetachedBranch,
   onNewTemporaryBranch,
 }: Props) => {
-  const {
-    streamingContent,
-    isStreaming,
-    messageRef,
-    selectionContext,
-    handleTextSelection,
-  } = useLLMResponseLogic(id, content, isLastMessage, branches, onOpenInSidePanel);
+  let selectionContext: ChatBranchContext | undefined;
+
+  const { streamingContent, isStreaming, messageRef } = useLLMResponseLogic(
+    id,
+    content,
+    isLastMessage,
+    branches,
+    onOpenInSidePanel
+  );
 
   return (
     <ContextMenu>
@@ -73,7 +76,12 @@ const LLMResponse = ({
           <div
             ref={messageRef}
             className="text-base leading-relaxed font-light"
-            onMouseUp={handleTextSelection}
+            onMouseUp={() => {
+              if (messageRef.current) {
+                const capturedSelection = captureSelection(messageRef.current);
+                selectionContext = capturedSelection;
+              }
+            }}
           >
             <ReactMarkdown content={streamingContent} />
           </div>
@@ -121,7 +129,6 @@ const LLMResponse = ({
       </ContextMenuTrigger>
       <MessageContextMenu
         onReply={onReply}
-        showBranchActions
         onCopyText={onCopyText}
         onOpenBranch={onOpenBranch}
         onOpenInNewTab={onOpenInNewTab}
