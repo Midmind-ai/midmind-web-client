@@ -38,7 +38,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="outline-input flex items-center gap-2 rounded-lg px-2.5 py-2 outline-1"
+      className="outline-input flex items-center gap-2 rounded-lg p-2 pl-2.5 outline-1"
     >
       <Select
         value={currentModel}
@@ -47,7 +47,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
       >
         <SelectTrigger
           size="sm"
-          className="gap-0 self-end p-0"
+          className="my-0.5 gap-0 self-end p-0"
         >
           <div className="px-3">
             <SelectValue />
@@ -67,7 +67,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
       <Button
         type="button"
         variant="secondary"
-        className="size-8 self-end"
+        className="my-0.5 size-8 self-end"
         disabled={hasActiveRequest}
       >
         <PaperclipIcon className="text-secondary-foreground" />
@@ -76,7 +76,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
         {...register('content')}
         autoComplete="off"
         placeholder="Write a message..."
-        className="flex max-h-28 resize-none items-center overflow-y-auto border-none px-0
+        className="flex resize-none items-center overflow-y-auto border-none px-0
           shadow-none focus-visible:ring-0"
         disabled={hasActiveRequest}
         autoFocus

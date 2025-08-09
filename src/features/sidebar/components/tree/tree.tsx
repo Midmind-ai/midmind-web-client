@@ -71,7 +71,10 @@ const Tree = ({ item, onDelete, isDeleting }: Props) => {
         <ThemedSpan className="block truncate">{name}</ThemedSpan>
         <MoreActionsMenu
           triggerClassNames="opacity-0 group-hover/item:opacity-100"
-          onDelete={onDelete}
+          onDelete={(e: React.MouseEvent<HTMLElement>) => {
+            e.stopPropagation();
+            onDelete();
+          }}
           isDeleting={isDeleting}
         />
       </SidebarMenuButton>
