@@ -5,8 +5,10 @@ import {
 } from '@shared/components/ui/sidebar';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
+import type { TreeItem } from '@shared/types/entities';
+
 import { useFolderListLogic } from '@features/sidebar/components/folder-list/use-folder-list-logic';
-import Tree, { type TreeItem } from '@features/sidebar/components/tree/tree';
+import Tree from '@features/sidebar/components/tree/tree';
 
 const FolderList = () => {
   const {

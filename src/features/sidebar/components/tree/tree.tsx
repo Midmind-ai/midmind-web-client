@@ -5,7 +5,6 @@ import {
   CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router';
 
 import {
   SidebarMenuButton,
@@ -14,14 +13,10 @@ import {
 } from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import { AppRoutes } from '@shared/constants/router';
+import type { TreeItem } from '@shared/types/entities';
 
 import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
-
-export type TreeItem = {
-  id: string;
-  name: string;
-};
+import { useTreeLogic } from '@features/sidebar/components/tree/use-tree-logic';
 
 export type DataType = {
   tree: TreeType;
@@ -61,20 +56,15 @@ const Tree = ({
   onOpenInSidePanel,
   onOpenInNewTab,
 }: Props) => {
-  const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];
-  const navigate = useNavigate();
-  const params = useParams();
+  const { name, id, items, handleOpenChat, isActive } = useTreeLogic(item);
 
   if (!items.length) {
     return (
       <SidebarMenuButton
-        isActive={id === params.id}
+        isActive={isActive}
         className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
           data-[active=true]:font-normal"
-        onClick={() => {
-          const currentSearch = window.location.search;
-          navigate(`${AppRoutes.Chat(id)}${currentSearch}`);
-        }}
+        onClick={handleOpenChat}
       >
         <MessageSquare className="stroke-[1.5px]" />
         <ThemedSpan className="text-primary block truncate">{name}</ThemedSpan>

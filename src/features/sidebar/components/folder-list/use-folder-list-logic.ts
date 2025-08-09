@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from 'react-router';
 
-import { AppRoutes } from '@shared/constants/router';
+import { AppRoutes, SearchParams } from '@shared/constants/router';
+
+import { useUrlParams } from '@shared/hooks/use-url-params';
 
 import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
 import { useGetChats } from '@features/chat/hooks/use-get-chats';
@@ -13,9 +15,14 @@ export const useFolderListLogic = () => {
   const location = useLocation();
   const { deleteChat, isLoading: isDeleting } = useDeleteChat();
   const { openChatInSidePanel, openChatInNewTab } = useChatActions();
+  const { value: splitChatId, removeValue } = useUrlParams(SearchParams.Split);
 
   const handleDelete = async (chatId: string) => {
     await deleteChat(chatId);
+
+    if (splitChatId === chatId) {
+      removeValue();
+    }
 
     const currentChatId = location.pathname.split('/').pop();
     const updatedChats = (chats || []).filter(c => c.id !== chatId);

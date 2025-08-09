@@ -13,3 +13,8 @@ export type Team = {
 };
 
 export type BranchContext = components['schemas']['ConversationBranchContextDto'];
+
+export type TreeItem = {
+  id: string;
+  name: string;
+};
