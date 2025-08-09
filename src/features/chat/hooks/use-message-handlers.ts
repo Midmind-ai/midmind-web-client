@@ -6,7 +6,6 @@ import { useUrlParams } from '@shared/hooks/use-url-params';
 
 import type { BranchContext } from '@shared/types/entities';
 
-import { useSplitChatLogic } from '@features/chat/components/split-chat/use-split-chat-logic';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
   CreateBranchArgs,
@@ -20,7 +19,6 @@ export const useMessageHandlers = () => {
   const navigate = useNavigate();
   const { id: chatId = '' } = useParams();
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
-  const { isSplitMode, childChatId } = useSplitChatLogic();
 
   const { createChat } = useCreateChat();
 
@@ -34,7 +32,7 @@ export const useMessageHandlers = () => {
 
     const textToUse = selectionContext?.selectedText || content;
 
-    const parentChatId = isSplitMode && chatId === childChatId ? childChatId : chatId;
+    const parentChatId = chatId;
 
     const branchContext: BranchContext = {
       parent_chat_id: parentChatId,
