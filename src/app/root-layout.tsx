@@ -6,7 +6,7 @@ import Sidebar from '@features/sidebar/sidebar';
 
 const RootLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <SidebarProvider>
         <Sidebar />
         <SplitLayout />

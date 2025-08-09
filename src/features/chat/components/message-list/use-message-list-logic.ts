@@ -66,5 +66,6 @@ export const useMessageListLogic = (chatId: string) => {
     chatActions,
     messageActions,
     handleScroll,
+    handleAutoScroll,
   };
 };

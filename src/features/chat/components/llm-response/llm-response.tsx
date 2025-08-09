@@ -102,7 +102,7 @@ const LLMResponse = ({
             })}
           </div>
           {!isStreaming && isLastMessage && (
-            <div className="mb-8 flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2.5">
               <QuickActionButton
                 icon={<GitBranchPlus className="text-foreground size-6" />}
                 label="New attached branch"

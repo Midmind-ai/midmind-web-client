@@ -1,11 +1,11 @@
 import { useParams } from 'react-router';
 
-import ChatView from '@features/chat/components/chat-view/chat-view';
+import Chat from '@features/chat/chat';
 
-const Chat = () => {
+const ChatPage = () => {
   const { id: chatId = '' } = useParams();
 
-  return <ChatView chatId={chatId} />;
+  return <Chat chatId={chatId} />;
 };
 
-export default Chat;
+export default ChatPage;

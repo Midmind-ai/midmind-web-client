@@ -12,7 +12,7 @@ import { useUrlParams } from '@shared/hooks/use-url-params';
 
 import { cn } from '@shared/utils/cn';
 
-import ChatView from '@features/chat/components/chat-view/chat-view';
+import Chat from '@features/chat/chat';
 import { useBranchContext } from '@features/chat/hooks/use-branch-context';
 
 const SplitLayout = () => {
@@ -20,10 +20,7 @@ const SplitLayout = () => {
   const { branchContext } = useBranchContext(chatId);
 
   return (
-    <ResizablePanelGroup
-      className="flex flex-1"
-      direction="horizontal"
-    >
+    <ResizablePanelGroup direction="horizontal">
       <ResizablePanel
         id="main-panel"
         order={1}
@@ -35,15 +32,14 @@ const SplitLayout = () => {
       <ResizableHandle />
       {chatId && (
         <ResizablePanel
-          id="split-chat-panel"
+          id="side-panel"
           order={2}
           minSize={40}
           className="w-1/2"
         >
-          <ChatView
+          <Chat
             chatId={chatId}
             branchContext={branchContext}
-            showCloseButton={true}
           />
         </ResizablePanel>
       )}

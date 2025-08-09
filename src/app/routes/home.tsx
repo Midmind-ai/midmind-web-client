@@ -7,10 +7,9 @@ import { AppRoutes } from '@shared/constants/router';
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
+import SectionWithHeader from '@features/section-with-header/section-with-header';
 
-import SectionWithHeader from '@/features/section-with-header/section-with-header';
-
-const Home = () => {
+const HomePage = () => {
   const navigate = useNavigate();
   const { createChat } = useCreateChat();
 
@@ -38,4 +37,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;

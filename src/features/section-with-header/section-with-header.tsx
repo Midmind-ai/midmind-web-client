@@ -1,16 +1,18 @@
+import type { PropsWithChildren } from 'react';
+
 import { BoxSelectIcon, XIcon } from 'lucide-react';
 
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@shared/components/ui/button';
 
-import Breadcrumbs from './components/breadcrumbs';
+import Breadcrumbs from '@features/section-with-header/components/breadcrumbs';
 
-type Props = React.PropsWithChildren<{
+type Props = {
   onClose?: VoidFunction;
-}>;
+} & PropsWithChildren;
 
-export default function SectionWithHeader({ onClose, children }: Props) {
+const SectionWithHeader = ({ onClose, children }: Props) => {
   return (
-    <section className="flex h-full flex-col">
+    <div className="flex h-full flex-col">
       <header className="flex items-center justify-between border-b py-3 pr-2.5 pl-4">
         <Breadcrumbs />
         <div className="flex items-center gap-2">
@@ -22,14 +24,15 @@ export default function SectionWithHeader({ onClose, children }: Props) {
             <Button
               variant="outline"
               onClick={onClose}
-              className=""
             >
               <XIcon />
             </Button>
           )}
         </div>
       </header>
-      <div className="flex h-full flex-col">{children}</div>
-    </section>
+      {children}
+    </div>
   );
-}
+};
+
+export default SectionWithHeader;
