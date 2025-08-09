@@ -1,4 +1,4 @@
-import type { components } from '@shared/services/types/generated';
+import type { components } from 'generated/api-types';
 
 export type ConversationWithAIRequestDto = components['schemas']['CreateConversationDto'];
 

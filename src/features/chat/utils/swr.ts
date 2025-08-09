@@ -4,7 +4,6 @@ import { SWRCacheKeys } from '@shared/constants/api';
 
 import { BranchContextService } from '@shared/services/branch-context/branch-context-service';
 import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
-import type { components } from '@shared/services/types/generated';
 
 import type { PaginatedResponse } from '@shared/types/common';
 import type { ChatMessage } from '@shared/types/entities';
@@ -12,6 +11,8 @@ import type { ChatMessage } from '@shared/types/entities';
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type { LLModel } from '@features/chat/types/chat-types';
 import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
+
+import type { components } from 'generated/api-types';
 
 type ChatDetails = components['schemas']['ChatDto'];
 type TitleChunk = components['schemas']['CreateConversationResponseTitleDto'];
