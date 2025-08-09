@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useLocation } from 'react-router';
 
 import { AppRoutes, SearchParams } from '@shared/constants/router';
 
@@ -17,10 +17,18 @@ import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter'
 
 export const useMessageHandlers = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id: chatId = '' } = useParams();
   const { value: currentModel } = useUrlParams<LLModel>(SearchParams.Model);
 
   const { createChat } = useCreateChat();
+
+  const openChatInSplitView = (chatId: string) => {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set(SearchParams.Split, chatId);
+
+    navigate(`${location.pathname}${currentUrl.search}`);
+  };
 
   const createBranch = async ({
     content,
@@ -53,7 +61,7 @@ export const useMessageHandlers = () => {
       model: currentModel,
     });
 
-    navigate(`${AppRoutes.Chat(newChatId)}?${SearchParams.Model}=${currentModel}`);
+    openChatInSplitView(newChatId);
   };
 
   const handleNewAttachedBranch = (
@@ -91,24 +99,26 @@ export const useMessageHandlers = () => {
     alert('Coming soon');
   };
 
-  const handleNewSetOfBranches = (_messageId: string) => {
+  const createNewSetOfBranches = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
   };
 
-  const handleOpenBranch = (_messageId: string) => {
+  const openChat = (chatId: string) => {
     // eslint-disable-next-line no-alert
-    alert('Coming soon');
+    alert(chatId);
   };
 
-  const handleOpenInSidePanel = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
+  const openChatInSidePanel = (chatId: string) => {
+    openChatInSplitView(chatId);
   };
 
-  const handleOpenInNewTab = (_messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
+  const openChatInNewTab = (chatId: string) => {
+    window.open(
+      `${AppRoutes.Chat(chatId)}?${SearchParams.Model}=${currentModel}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const handleNewNote = (_messageId: string) => {
@@ -121,10 +131,10 @@ export const useMessageHandlers = () => {
     handleNewAttachedBranch,
     handleNewDetachedBranch,
     handleNewTemporaryBranch,
-    handleNewSetOfBranches,
-    handleOpenBranch,
-    handleOpenInSidePanel,
-    handleOpenInNewTab,
+    createNewSetOfBranches,
+    openChat,
+    openChatInSidePanel,
+    openChatInNewTab,
     handleNewNote,
   };
 };

@@ -6,7 +6,11 @@ import LLMResponse from '@features/chat/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat/components/user-message/user-message';
 
-const MessageList = () => {
+type Props = {
+  chatId: string;
+};
+
+const MessageList = ({ chatId }: Props) => {
   const {
     messages,
     scrollAreaRef,
@@ -15,12 +19,12 @@ const MessageList = () => {
     handleNewAttachedBranch,
     handleNewDetachedBranch,
     handleNewTemporaryBranch,
-    handleNewSetOfBranches,
-    handleOpenBranch,
-    handleOpenInSidePanel,
-    handleOpenInNewTab,
+    createNewSetOfBranches,
+    openChat,
+    openChatInSidePanel,
+    openChatInNewTab,
     handleNewNote,
-  } = useMessageListLogic();
+  } = useMessageListLogic(chatId);
 
   return (
     <ScrollArea
@@ -42,7 +46,7 @@ const MessageList = () => {
               onNewAttachedBranch={() => handleNewAttachedBranch(id, content)}
               onNewDetachedBranch={() => handleNewDetachedBranch(id, content)}
               onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-              onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+              onNewSetOfBranches={() => createNewSetOfBranches(id)}
             />
           );
         }
@@ -54,9 +58,9 @@ const MessageList = () => {
             isLastMessage={isLastMessage}
             onCopyText={copyText}
             onReply={() => handleReply(id)}
-            onOpenBranch={() => handleOpenBranch(id)}
-            onOpenInSidePanel={() => handleOpenInSidePanel(id)}
-            onOpenInNewTab={() => handleOpenInNewTab(id)}
+            onOpenBranch={() => openChat(id)}
+            onOpenInSidePanel={() => openChatInSidePanel(id)}
+            onOpenInNewTab={() => openChatInNewTab(id)}
             onNewAttachedBranch={branchContext =>
               handleNewAttachedBranch(id, content, branchContext)
             }
@@ -64,7 +68,7 @@ const MessageList = () => {
               handleNewDetachedBranch(id, content, branchContext)
             }
             onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
-            onNewSetOfBranches={() => handleNewSetOfBranches(id)}
+            onNewSetOfBranches={() => createNewSetOfBranches(id)}
             onNewNote={() => handleNewNote(id)}
           />
         );

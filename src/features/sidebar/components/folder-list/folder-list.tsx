@@ -9,7 +9,14 @@ import { useFolderListLogic } from '@features/sidebar/components/folder-list/use
 import Tree, { type TreeItem } from '@features/sidebar/components/tree/tree';
 
 const FolderList = () => {
-  const { chats, isLoading, isDeleting, handleDelete } = useFolderListLogic();
+  const {
+    chats,
+    isLoading,
+    isDeleting,
+    handleDelete,
+    openChatInNewTab,
+    openChatInSidePanel,
+  } = useFolderListLogic();
 
   return (
     <SidebarGroup>
@@ -30,8 +37,10 @@ const FolderList = () => {
               <Tree
                 key={index}
                 item={item as TreeItem}
-                onDelete={() => handleDelete(item.id)}
                 isDeleting={isDeleting}
+                onDelete={() => handleDelete(item.id)}
+                onOpenInNewTab={() => openChatInNewTab(item.id)}
+                onOpenInSidePanel={() => openChatInSidePanel(item.id)}
               />
             ))}
         </SidebarMenu>
