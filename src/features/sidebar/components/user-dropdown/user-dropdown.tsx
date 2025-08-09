@@ -3,6 +3,7 @@ import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -15,9 +16,13 @@ import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
 
+import { useTheme } from '@/app/providers/theme-provider';
+
 const UserDropdown = () => {
   const { avatar, email, first_name, last_name, isMobile, handleLogout } =
     useUserDropdownLogic();
+
+  const { theme, setTheme } = useTheme();
 
   const nameAbbreviation = `${first_name[0]}${last_name[0]}`.toUpperCase();
 
@@ -83,6 +88,29 @@ const UserDropdown = () => {
             Notifications
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Theme Appearance</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          checked={theme === 'system'}
+          disabled={theme === 'system'}
+          onCheckedChange={() => setTheme('system')}
+        >
+          System
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={theme === 'light'}
+          disabled={theme === 'light'}
+          onCheckedChange={() => setTheme('light')}
+        >
+          Light
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={theme === 'dark'}
+          disabled={theme === 'dark'}
+          onCheckedChange={() => setTheme('dark')}
+        >
+          Dark
+        </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut />
