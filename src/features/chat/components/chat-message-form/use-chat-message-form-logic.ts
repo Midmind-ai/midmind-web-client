@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef, useEffect } from 'react';
+import { type KeyboardEvent, useRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -30,7 +30,7 @@ export const useChatMessageFormLogic = ({
 }: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
 
-  const hasFirstMessageInNewBranchSent = useRef(false);
+  const lastProcessedContextRef = useRef<string>('');
 
   const {
     register,
@@ -71,8 +71,9 @@ export const useChatMessageFormLogic = ({
       });
     } else {
       // For existing chat
+      const currentContext = `${actualChatId}:${branchContext?.parent_message_id || ''}`;
       const shouldIncludeThreadContext =
-        branchContext && !hasFirstMessageInNewBranchSent.current;
+        branchContext && currentContext !== lastProcessedContextRef.current;
 
       conversationWithAI({
         chat_id: actualChatId,
@@ -83,7 +84,7 @@ export const useChatMessageFormLogic = ({
       });
 
       if (shouldIncludeThreadContext) {
-        hasFirstMessageInNewBranchSent.current = true;
+        lastProcessedContextRef.current = currentContext;
       }
     }
 
@@ -100,10 +101,6 @@ export const useChatMessageFormLogic = ({
       handleSubmit(handleFormSubmit)();
     }
   };
-
-  useEffect(() => {
-    hasFirstMessageInNewBranchSent.current = false;
-  }, [branchContext, actualChatId]);
 
   return {
     hasActiveRequest,

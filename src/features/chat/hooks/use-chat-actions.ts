@@ -18,9 +18,9 @@ export const useChatActions = (actualChatId?: string) => {
   const location = useLocation();
   const { id: urlChatId = '' } = useParams();
 
-  const chatId = actualChatId || urlChatId;
-
   const { createChat } = useCreateChat();
+
+  const chatId = actualChatId || urlChatId;
 
   const openChatInSplitView = (newChatId: string) => {
     const currentUrl = new URL(window.location.href);

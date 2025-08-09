@@ -27,7 +27,8 @@ const HomePage = () => {
     <div className="h-screen">
       <NavigationHeader />
       <div
-        className="mx-auto flex h-full w-full max-w-[768px] flex-col justify-center gap-8"
+        className="mx-auto flex h-full w-full max-w-[768px] flex-col justify-center gap-8
+          p-2.5"
       >
         <ThemedH1 className="text-center text-3xl font-semibold">
           What should we do next?
