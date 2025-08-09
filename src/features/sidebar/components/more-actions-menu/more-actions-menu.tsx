@@ -14,7 +14,7 @@ import { cn } from '@shared/utils/cn';
 type Props = {
   triggerClassNames: string;
   isDeleting: boolean;
-  onDelete: VoidFunction;
+  onDelete: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 const MoreActionsMenu = ({ triggerClassNames, isDeleting, onDelete }: Props) => {
