@@ -15,7 +15,7 @@ const FolderActions = () => {
   const navigate = useNavigate();
 
   const buttonClassNames =
-    'size-8 p-1 rounded-xs flex items-center justify-center cursor-pointer';
+    'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
 
   return (
     <div className="flex justify-between border-b-1 p-1">

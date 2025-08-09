@@ -8,6 +8,8 @@ import ChatMessageForm from '@features/chat/components/chat-message-form/chat-me
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 
+import SectionWithHeader from '@/features/section-with-header/section-with-header';
+
 const Home = () => {
   const navigate = useNavigate();
   const { createChat } = useCreateChat();
@@ -23,14 +25,16 @@ const Home = () => {
   };
 
   return (
-    <div className="flex h-full items-center justify-center">
-      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-8">
-        <ThemedH1 className="text-center text-3xl font-semibold">
-          What should we do next?
-        </ThemedH1>
-        <ChatMessageForm onSubmit={handleSubmit} />
+    <SectionWithHeader>
+      <div className="flex h-full items-center justify-center">
+        <div className="mx-auto flex w-full max-w-[768px] flex-col gap-8">
+          <ThemedH1 className="text-center text-3xl font-semibold">
+            What should we do next?
+          </ThemedH1>
+          <ChatMessageForm onSubmit={handleSubmit} />
+        </div>
       </div>
-    </div>
+    </SectionWithHeader>
   );
 };
 

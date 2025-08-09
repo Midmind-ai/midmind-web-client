@@ -38,7 +38,8 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="outline-input flex items-center gap-2 rounded-lg p-2 pl-2.5 outline-1"
+      className="outline-input bg-background-accent flex items-center gap-2 rounded-lg p-2
+        pl-2.5 outline-1"
     >
       <Select
         value={currentModel}
@@ -76,8 +77,8 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
         {...register('content')}
         autoComplete="off"
         placeholder="Write a message..."
-        className="flex resize-none items-center overflow-y-auto border-none px-0
-          shadow-none focus-visible:ring-0"
+        className="bg-background-accent! flex max-h-[600px] resize-none items-center
+          overflow-y-auto border-none px-0 shadow-none focus-visible:ring-0"
         disabled={hasActiveRequest}
         autoFocus
         onKeyDown={handleKeyDown}
