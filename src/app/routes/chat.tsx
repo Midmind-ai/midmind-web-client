@@ -8,7 +8,7 @@ const Chat = () => {
     isSplitMode,
     parentChatId,
     childChatId,
-    threadContext,
+    branchContext,
     isParentFullscreen,
     isChildFullscreen,
     handleToggleParentFullscreen,
@@ -21,7 +21,7 @@ const Chat = () => {
         <SplitChat
           parentChatId={parentChatId}
           childChatId={childChatId}
-          threadContext={threadContext}
+          branchContext={branchContext}
           isParentFullscreen={isParentFullscreen}
           isChildFullscreen={isChildFullscreen}
           onToggleParentFullscreen={handleToggleParentFullscreen}

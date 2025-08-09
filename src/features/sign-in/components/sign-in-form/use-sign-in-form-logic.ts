@@ -44,7 +44,7 @@ export const useSignInFormLogic = () => {
 
       await mutate(SWRCacheKeys.CurrentUser);
 
-      navigate(AppRoutes.Home);
+      navigate(AppRoutes.Home, { replace: true });
     },
     onError: error => {
       console.error('Google OAuth error:', error);
@@ -59,7 +59,7 @@ export const useSignInFormLogic = () => {
 
         await mutate(SWRCacheKeys.CurrentUser);
 
-        navigate(AppRoutes.Home);
+        navigate(AppRoutes.Home, { replace: true });
       },
       onError: error => {
         console.error('Sign in error:', error);

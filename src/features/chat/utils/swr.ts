@@ -2,8 +2,8 @@ import { unstable_serialize } from 'swr/infinite';
 
 import { SWRCacheKeys } from '@shared/constants/api';
 
+import { BranchContextService } from '@shared/services/branch-context/branch-context-service';
 import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
-import { ThreadContextService } from '@shared/services/thread-context/thread-context-service';
 import type { components } from '@shared/services/types/generated';
 
 import type { PaginatedResponse } from '@shared/types/common';
@@ -72,7 +72,7 @@ export const handleLLMResponse = async (
                 content: chunk.body,
                 role: 'model',
                 created_at: new Date().toISOString(),
-                threads: [],
+                branches: [],
                 llm_model: model,
               },
               ...messages,
@@ -152,8 +152,8 @@ export const handleLLMResponse = async (
       createdMessages.delete(chunk.id);
 
       if (parentChatId && parentMessageId) {
-        const threadContext =
-          await ThreadContextService.getThreadContext(parentMessageId);
+        const branchContext =
+          await BranchContextService.getBranchContext(parentMessageId);
 
         await mutate(
           getInfiniteKey(parentChatId),
@@ -167,7 +167,7 @@ export const handleLLMResponse = async (
               data:
                 page.data?.map(message =>
                   message.id === parentMessageId
-                    ? { ...message, threads: threadContext }
+                    ? { ...message, branches: branchContext }
                     : message
                 ) || [],
             }));

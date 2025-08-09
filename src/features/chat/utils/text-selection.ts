@@ -1,6 +1,6 @@
 import type {
   HighlightTextNodeArgs,
-  ThreadContext,
+  BranchContext,
 } from '@features/chat/types/chat-types';
 
 export const captureSelection = (messageElement: Element) => {
@@ -32,8 +32,8 @@ export const captureSelection = (messageElement: Element) => {
 
 export const highlightSelection = (
   messageElement: Element,
-  selection: ThreadContext,
-  onSelectionClick: (threadId: string) => void
+  selection: BranchContext,
+  onSelectionClick: (branchId: string) => void
 ) => {
   // Get all text nodes that intersect with the selection
   const textNodesToHighlight = getIntersectingTextNodes(messageElement, selection);
@@ -43,11 +43,11 @@ export const highlightSelection = (
     const { textNode, highlightStart, highlightEnd } = textNodesToHighlight[i];
     highlightTextNode({
       textNode,
-      threadContext: {
+      branchContext: {
         endPosition: highlightEnd,
         startPosition: highlightStart,
         color: selection.color,
-        threadId: selection.threadId,
+        branchId: selection.branchId,
         connectionType: selection.connectionType,
       },
       onSelectionClick,
@@ -87,7 +87,7 @@ const normalizeTextNodes = (element: Element): void => {
 
 const getIntersectingTextNodes = (
   messageElement: Element,
-  selection: ThreadContext
+  selection: BranchContext
 ): Array<{ textNode: Text; highlightStart: number; highlightEnd: number }> => {
   const walker = document.createTreeWalker(messageElement, NodeFilter.SHOW_TEXT, null);
 
@@ -127,7 +127,7 @@ const getIntersectingTextNodes = (
 
 const highlightTextNode = ({
   textNode,
-  threadContext,
+  branchContext,
   onSelectionClick,
 }: HighlightTextNodeArgs): void => {
   const parent = textNode.parentNode;
@@ -137,13 +137,13 @@ const highlightTextNode = ({
   }
 
   const beforeText =
-    textNode.textContent?.substring(0, threadContext.startPosition) || '';
+    textNode.textContent?.substring(0, branchContext.startPosition) || '';
   const selectedText =
     textNode.textContent?.substring(
-      threadContext.startPosition,
-      threadContext.endPosition
+      branchContext.startPosition,
+      branchContext.endPosition
     ) || '';
-  const afterText = textNode.textContent?.substring(threadContext.endPosition) || '';
+  const afterText = textNode.textContent?.substring(branchContext.endPosition) || '';
 
   const fragments: Node[] = [];
 
@@ -155,15 +155,15 @@ const highlightTextNode = ({
   highlightSpan.style.cursor = 'pointer';
   highlightSpan.textContent = selectedText;
   highlightSpan.className = 'text-selection-highlight';
-  highlightSpan.dataset.threadId = threadContext.threadId;
-  highlightSpan.style.borderBottom = `2px ${threadContext.connectionType === 'attached' ? 'solid' : 'dotted'} ${threadContext.color}`;
+  highlightSpan.dataset.branchId = branchContext.branchId;
+  highlightSpan.style.borderBottom = `2px ${branchContext.connectionType === 'attached' ? 'solid' : 'dotted'} ${branchContext.color}`;
 
   const setHighlightHover = (hover: boolean) => {
     const highlights = document.querySelectorAll(
-      `.text-selection-highlight[data-thread-id="${threadContext.threadId}"]`
+      `.text-selection-highlight[data-branch-id="${branchContext.branchId}"]`
     );
     highlights.forEach(el => {
-      (el as HTMLElement).style.backgroundColor = hover ? `${threadContext.color}22` : '';
+      (el as HTMLElement).style.backgroundColor = hover ? `${branchContext.color}22` : '';
     });
   };
 
@@ -172,7 +172,7 @@ const highlightTextNode = ({
 
   highlightSpan.addEventListener('click', e => {
     e.stopPropagation();
-    onSelectionClick(threadContext.threadId);
+    onSelectionClick(branchContext.branchId);
   });
 
   fragments.push(highlightSpan);

@@ -4,6 +4,8 @@ import { AppRoutes, SearchParams } from '@shared/constants/router';
 
 import { useUrlParams } from '@shared/hooks/use-url-params';
 
+import type { BranchContext } from '@shared/types/entities';
+
 import { useSplitChatLogic } from '@features/chat/components/split-chat/use-split-chat-logic';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
@@ -12,7 +14,7 @@ import type {
   ContextType,
   LLModel,
 } from '@features/chat/types/chat-types';
-import { emitThreadCreated } from '@features/chat/utils/thread-creation-emitter';
+import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 
 export const useMessageHandlers = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ export const useMessageHandlers = () => {
 
     const parentChatId = isSplitMode && chatId === childChatId ? childChatId : chatId;
 
-    const threadContext = {
+    const branchContext: BranchContext = {
       parent_chat_id: parentChatId,
       parent_message_id: messageId,
       connection_type: connectionType,
@@ -46,7 +48,7 @@ export const useMessageHandlers = () => {
       }),
     };
 
-    emitThreadCreated({ threadContext });
+    emitBranchCreated({ branchContext });
 
     const newChatId = await createChat({
       content: textToUse,

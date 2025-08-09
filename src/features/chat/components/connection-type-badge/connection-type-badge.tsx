@@ -12,7 +12,7 @@ import { darkenColor } from '@shared/utils/colors';
 type Props = {
   connectionType: string;
   bgColor: string;
-  threadChatId: string;
+  branchChatId: string;
 };
 
 const CONNECTION_LABELS = {
@@ -20,7 +20,7 @@ const CONNECTION_LABELS = {
   detached: 'Attach',
 };
 
-const ConnectionTypeBadge = ({ bgColor, connectionType, threadChatId }: Props) => {
+const ConnectionTypeBadge = ({ bgColor, connectionType, branchChatId }: Props) => {
   const isDetached = connectionType === 'detached';
   const label = CONNECTION_LABELS[connectionType as keyof typeof CONNECTION_LABELS];
 
@@ -38,7 +38,7 @@ const ConnectionTypeBadge = ({ bgColor, connectionType, threadChatId }: Props) =
 
   return (
     <Link
-      to={`${AppRoutes.Chat(threadChatId)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
+      to={`${AppRoutes.Chat(branchChatId)}?${SearchParams.Model}=gemini-2.0-flash-lite`}
       target="_blank"
       className={cn(
         'group inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1',

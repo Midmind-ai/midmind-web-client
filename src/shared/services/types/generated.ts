@@ -212,15 +212,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/messages/{id}/thread-context': {
+  '/api/messages/{id}/branch-context': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get thread context by message id */
-    get: operations['ThreadContextController_getThreadContextByMessage'];
+    /** Get a branch context by message id */
+    get: operations['BranchContextController_getBranchContextByMessage'];
     put?: never;
     post?: never;
     delete?: never;
@@ -315,7 +315,7 @@ export interface components {
       /** @enum {string} */
       type: 'error' | 'title' | 'content' | 'complete';
     };
-    ConversationThreadContextDto: {
+    ConversationBranchContextDto: {
       /** Format: uuid */
       parent_chat_id: string;
       /** Format: uuid */
@@ -340,7 +340,7 @@ export interface components {
         | 'gemini-2.0-flash'
         | 'gemini-2.5-flash'
         | 'gemini-2.5-pro';
-      thread_context?: components['schemas']['ConversationThreadContextDto'];
+      branch_context?: components['schemas']['ConversationBranchContextDto'];
     };
     ChatDto: {
       /** Format: uuid */
@@ -350,7 +350,7 @@ export interface components {
     UpdateChatDto: {
       name?: string;
     };
-    AppMessageThreadDto: {
+    AppMessageBranchDto: {
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -371,9 +371,9 @@ export interface components {
       /** @enum {string} */
       role: 'model' | 'user';
       llm_model: string | null;
-      threads: components['schemas']['AppMessageThreadDto'][];
+      branches: components['schemas']['AppMessageBranchDto'][];
     };
-    ThreadContextByMessageIdDto: {
+    BranchContextByMessageIdDto: {
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -777,7 +777,7 @@ export interface operations {
       };
     };
   };
-  ThreadContextController_getThreadContextByMessage: {
+  BranchContextController_getBranchContextByMessage: {
     parameters: {
       query?: never;
       header?: never;
@@ -793,7 +793,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ThreadContextByMessageIdDto'][];
+          'application/json': components['schemas']['BranchContextByMessageIdDto'][];
         };
       };
     };

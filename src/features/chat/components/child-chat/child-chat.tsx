@@ -18,7 +18,7 @@ import { useMessageHandlers } from '@features/chat/hooks/use-message-handlers';
 
 type Props = {
   chatId: string;
-  threadContext: ConversationWithAIRequestDto['thread_context'];
+  branchContext: ConversationWithAIRequestDto['branch_context'];
   isFullscreen: boolean;
   isHidden: boolean;
   onToggleFullscreen: VoidFunction;
@@ -26,7 +26,7 @@ type Props = {
 
 const ChildChat = ({
   chatId,
-  threadContext,
+  branchContext,
   isFullscreen,
   isHidden,
   onToggleFullscreen,
@@ -138,7 +138,7 @@ const ChildChat = ({
       <div className={cn(isFullscreen && 'mx-auto w-full max-w-[768px]', 'pb-3')}>
         <ChatMessageForm
           chatId={chatId}
-          threadContext={threadContext}
+          branchContext={branchContext}
         />
       </div>
     </div>

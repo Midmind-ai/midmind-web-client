@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import circleDependency from 'vite-plugin-circular-dependency';
 import svgr from 'vite-plugin-svgr';
 
 import type { NodePath, PluginObj, PluginPass } from '@babel/core';
@@ -41,6 +42,10 @@ export default defineConfig({
           },
         ],
       },
+    }),
+    circleDependency({
+      include: ['src/**/*'],
+      exclude: ['node_modules/**', 'dist/**', '**/*.d.ts'],
     }),
     tailwindcss(),
   ],

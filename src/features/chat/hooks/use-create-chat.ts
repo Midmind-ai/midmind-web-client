@@ -59,7 +59,7 @@ export const useCreateChat = () => {
         id: messageId,
         content: content,
         role: 'user',
-        threads: [],
+        branches: [],
         llm_model: model,
         created_at: new Date().toISOString(),
       };

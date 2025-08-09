@@ -6,7 +6,7 @@ import ParentChat from '@features/chat/components/parent-chat/parent-chat';
 type Props = {
   parentChatId: string;
   childChatId: string;
-  threadContext: ConversationWithAIRequestDto['thread_context'];
+  branchContext: ConversationWithAIRequestDto['branch_context'];
   isParentFullscreen: boolean;
   isChildFullscreen: boolean;
   onToggleParentFullscreen: VoidFunction;
@@ -16,7 +16,7 @@ type Props = {
 const SplitChat = ({
   parentChatId,
   childChatId,
-  threadContext,
+  branchContext,
   isParentFullscreen,
   isChildFullscreen,
   onToggleParentFullscreen,
@@ -32,7 +32,7 @@ const SplitChat = ({
       />
       <ChildChat
         chatId={childChatId}
-        threadContext={threadContext}
+        branchContext={branchContext}
         isFullscreen={isChildFullscreen}
         isHidden={isParentFullscreen}
         onToggleFullscreen={onToggleChildFullscreen}

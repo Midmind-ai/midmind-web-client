@@ -4,16 +4,16 @@ import { useParams } from 'react-router';
 
 import { usePageTitle } from '@shared/hooks/use-page-title';
 
-import { useThreadContext } from '@features/chat/hooks/use-thread-context';
+import { useBranchContext } from '@features/chat/hooks/use-branch-context';
 
 export const useSplitChatLogic = () => {
   const { id: currentChatId = '' } = useParams();
-  const { threadContext, clearThreadContext } = useThreadContext(currentChatId);
+  const { branchContext, clearBranchContext } = useBranchContext(currentChatId);
 
   const [isParentFullscreen, setIsParentFullscreen] = useState(false);
   const [isChildFullscreen, setIsChildFullscreen] = useState(false);
 
-  const parentChatId = threadContext?.parent_chat_id;
+  const parentChatId = branchContext?.parent_chat_id;
   const childChatId = currentChatId;
 
   const isSplitMode = Boolean(
@@ -39,11 +39,11 @@ export const useSplitChatLogic = () => {
   usePageTitle('New chat');
 
   return {
-    threadContext,
+    branchContext,
     isSplitMode,
     parentChatId,
     childChatId,
-    clearThreadContext,
+    clearBranchContext,
     isParentFullscreen,
     isChildFullscreen,
     handleToggleParentFullscreen,

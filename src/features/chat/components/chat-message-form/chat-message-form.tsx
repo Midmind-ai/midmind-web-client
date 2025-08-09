@@ -19,10 +19,10 @@ import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 type Props = {
   chatId?: string;
   onSubmit?: (data: OnSubmitArgs) => void;
-  threadContext?: ConversationWithAIRequestDto['thread_context'];
+  branchContext?: ConversationWithAIRequestDto['branch_context'];
 };
 
-const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
+const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
   const {
     currentModel,
     isValid,
@@ -33,7 +33,7 @@ const ChatMessageForm = ({ chatId, onSubmit, threadContext }: Props) => {
     handleModelChange,
     abortCurrentRequest,
     handleKeyDown,
-  } = useChatMessageFormLogic({ chatId, onSubmit, threadContext });
+  } = useChatMessageFormLogic({ chatId, onSubmit, branchContext });
 
   return (
     <form

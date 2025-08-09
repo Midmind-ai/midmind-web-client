@@ -99,11 +99,42 @@ const validateCodeStyle = async () => {
 //   });
 // };
 
+const buildProject = async () => {
+  return new Promise<void>((resolve, reject) => {
+    const loaderInterval = loader('Building project');
+
+    exec('yarn build', (error, stdout, stderr) => {
+      clearInterval(loaderInterval);
+      emptyLine();
+
+      if (error) {
+        console.log(chalk.red('✖ yarn build\n'));
+
+        if (stdout) {
+          console.log(stdout);
+        }
+        if (stderr) {
+          console.log(stderr);
+        }
+
+        console.log(chalk.red('Build Error Details:'));
+        console.log(error.message);
+
+        reject(new Error('❌ Project build failed\n'));
+      } else {
+        logSuccess('Project built successfully 🎉');
+        resolve();
+      }
+    });
+  });
+};
+
 const runPreCommitScripts = async () => {
   try {
     await validateTypes();
     await validateCodeStyle();
     // await runTests();
+    await buildProject();
   } catch (error) {
     if (error instanceof Error) {
       logError(error.message);

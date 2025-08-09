@@ -36,8 +36,8 @@ export const useConversationWithAI = (chatId: string) => {
             chatId,
             arg.model,
             chunk,
-            arg.thread_context?.parent_message_id,
-            arg.thread_context?.parent_chat_id
+            arg.branch_context?.parent_message_id,
+            arg.branch_context?.parent_chat_id
           );
         },
         abortController.signal
@@ -58,7 +58,7 @@ export const useConversationWithAI = (chatId: string) => {
       created_at: new Date().toISOString(),
       content: body.content,
       role: 'user',
-      threads: [],
+      branches: [],
       llm_model: body.model,
     };
 

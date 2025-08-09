@@ -10,7 +10,7 @@ import MessageContextMenu from '@features/chat/components/message-context-menu/m
 import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
 import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
 import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
-import type { ChatThreadContext } from '@features/chat/types/chat-types';
+import type { ChatBranchContext } from '@features/chat/types/chat-types';
 import { captureSelection } from '@features/chat/utils/text-selection';
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
   content: string;
   isLastMessage: boolean;
   llm_model: string | null;
-  threads: ChatMessage['threads'];
+  branches: ChatMessage['branches'];
   onReply: VoidFunction;
   onNewNote: VoidFunction;
   onCopyText: VoidFunction;
@@ -27,14 +27,14 @@ type Props = {
   onOpenInSidePanel: VoidFunction;
   onNewSetOfBranches: VoidFunction;
   onNewTemporaryBranch: VoidFunction;
-  onNewAttachedBranch: (selectionContext?: ChatThreadContext) => void;
-  onNewDetachedBranch: (selectionContext?: ChatThreadContext) => void;
+  onNewAttachedBranch: (selectionContext?: ChatBranchContext) => void;
+  onNewDetachedBranch: (selectionContext?: ChatBranchContext) => void;
 };
 
 const LLMResponse = ({
   id,
   content,
-  threads,
+  branches,
   llm_model,
   isLastMessage,
   onReply,
@@ -48,19 +48,20 @@ const LLMResponse = ({
   onNewDetachedBranch,
   onNewTemporaryBranch,
 }: Props) => {
-  let selectionContext: ChatThreadContext | undefined;
+  let selectionContext: ChatBranchContext | undefined;
 
-  const onSelectionClick = (threadId: string) => {
+  const onSelectionClick = (branchId: string) => {
     // eslint-disable-next-line no-alert
-    alert(`You clicked on thread: ${threadId}`);
+    alert(`You clicked on branch: ${branchId}`);
   };
+
   const { currentModel, streamingContent, isStreaming } = useLLMResponseLogic(
     id,
     content,
     isLastMessage
   );
   const { messageRef } = useTextHighlight({
-    threads,
+    branches,
     onSelectionClick,
   });
 
@@ -92,7 +93,7 @@ const LLMResponse = ({
             <ReactMarkdown content={streamingContent} />
           </div>
           <div className="mb-4 flex items-center gap-2.5">
-            {threads.map(({ id, connection_color, connection_type, child_chat_id }) => {
+            {branches.map(({ id, connection_color, connection_type, child_chat_id }) => {
               if (connection_type === 'temporary') {
                 return null;
               }
@@ -101,7 +102,7 @@ const LLMResponse = ({
                 <ConnectionTypeBadge
                   key={id}
                   bgColor={connection_color}
-                  threadChatId={child_chat_id}
+                  branchChatId={child_chat_id}
                   connectionType={connection_type}
                 />
               );

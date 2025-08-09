@@ -12,4 +12,4 @@ export type Team = {
   plan: string;
 };
 
-export type ThreadContext = components['schemas']['ConversationThreadContextDto'];
+export type BranchContext = components['schemas']['ConversationBranchContextDto'];

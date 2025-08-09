@@ -34,7 +34,15 @@ export default tseslint.config([
       'import/order': [
         'error',
         {
-          groups: ['external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+          groups: [
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
           pathGroups: [
             {
               pattern: 'react',

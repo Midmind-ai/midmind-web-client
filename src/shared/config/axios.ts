@@ -1,12 +1,10 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 
-import router from '@app/router';
-
 import { ApiErrorCodes } from '@shared/constants/api';
 import { LocalStorageKeys } from '@shared/constants/local-storage';
 import { AppRoutes } from '@shared/constants/router';
 
-import { AuthService } from '@shared/services/auth/auth-service';
+import type { TokenResponse } from '@shared/services/auth/auth-dtos';
 
 import {
   getFromStorage,
@@ -95,7 +93,8 @@ baseAxiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { access_token } = await AuthService.refreshToken();
+        const { data } = await authAxiosInstance.post<TokenResponse>('/refresh');
+        const { access_token } = data;
 
         setToStorage(LocalStorageKeys.AccessToken, access_token);
 
@@ -108,7 +107,8 @@ baseAxiosInstance.interceptors.response.use(
         processQueue(refreshError, '');
 
         removeFromStorage(LocalStorageKeys.AccessToken);
-        router.navigate(AppRoutes.SignIn, { replace: true });
+
+        window.history.replaceState({}, '', AppRoutes.SignIn);
 
         return Promise.reject(refreshError);
       } finally {

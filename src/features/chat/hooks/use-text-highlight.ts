@@ -2,27 +2,27 @@ import { useEffect, useRef } from 'react';
 
 import type { ChatMessage } from '@shared/types/entities';
 
-import type { DefiniteThreads } from '@features/chat/types/chat-types';
+import type { DefiniteBranches } from '@features/chat/types/chat-types';
 import { clearHighlights, highlightSelection } from '@features/chat/utils/text-selection';
 
 type Args = {
-  threads: ChatMessage['threads'];
+  branches: ChatMessage['branches'];
   onSelectionClick: (chatId: string) => void;
 };
 
-export const useTextHighlight = ({ threads, onSelectionClick }: Args) => {
+export const useTextHighlight = ({ branches, onSelectionClick }: Args) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
-  const textSelections = threads
+  const textSelections = branches
     .filter(
-      (thread): thread is DefiniteThreads => thread.context_type === 'text_selection'
+      (branch): branch is DefiniteBranches => branch.context_type === 'text_selection'
     )
-    .map(thread => ({
-      endPosition: thread.end_position,
-      threadId: thread.child_chat_id,
-      color: thread.connection_color,
-      startPosition: thread.start_position,
-      connectionType: thread.connection_type,
+    .map(branch => ({
+      endPosition: branch.end_position,
+      branchId: branch.child_chat_id,
+      color: branch.connection_color,
+      startPosition: branch.start_position,
+      connectionType: branch.connection_type,
     }))
     .sort((a, b) => a.startPosition - b.startPosition);
 

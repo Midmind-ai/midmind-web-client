@@ -21,14 +21,14 @@ type ChatMessageFormData = {
 
 type UseChatMessageFormLogicProps = {
   chatId?: string;
-  threadContext?: ConversationWithAIRequestDto['thread_context'];
+  branchContext?: ConversationWithAIRequestDto['branch_context'];
   onSubmit?: (data: OnSubmitArgs) => void;
 };
 
 export const useChatMessageFormLogic = ({
   chatId,
   onSubmit,
-  threadContext,
+  branchContext,
 }: UseChatMessageFormLogicProps) => {
   const { id: urlChatId = '' } = useParams();
   const { value: currentModel, setValue: setModel } = useUrlParams<LLModel>(
@@ -71,14 +71,14 @@ export const useChatMessageFormLogic = ({
     } else {
       // For existing chat
       const shouldIncludeThreadContext =
-        threadContext && !hasFirstMessageInNewBranchSent.current;
+        branchContext && !hasFirstMessageInNewBranchSent.current;
 
       conversationWithAI({
         chat_id: actualChatId,
         message_id: uuidv4(),
         content: data.content,
         model: currentModel,
-        ...(shouldIncludeThreadContext && { thread_context: threadContext }),
+        ...(shouldIncludeThreadContext && { branch_context: branchContext }),
       });
 
       if (shouldIncludeThreadContext) {
@@ -99,7 +99,7 @@ export const useChatMessageFormLogic = ({
 
   useEffect(() => {
     hasFirstMessageInNewBranchSent.current = false;
-  }, [threadContext, actualChatId]);
+  }, [branchContext, actualChatId]);
 
   return {
     hasActiveRequest,

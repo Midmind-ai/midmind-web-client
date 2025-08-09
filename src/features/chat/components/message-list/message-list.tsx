@@ -57,11 +57,11 @@ const MessageList = () => {
             onOpenBranch={() => handleOpenBranch(id)}
             onOpenInSidePanel={() => handleOpenInSidePanel(id)}
             onOpenInNewTab={() => handleOpenInNewTab(id)}
-            onNewAttachedBranch={selectionContext =>
-              handleNewAttachedBranch(id, content, selectionContext)
+            onNewAttachedBranch={branchContext =>
+              handleNewAttachedBranch(id, content, branchContext)
             }
-            onNewDetachedBranch={selectionContext =>
-              handleNewDetachedBranch(id, content, selectionContext)
+            onNewDetachedBranch={branchContext =>
+              handleNewDetachedBranch(id, content, branchContext)
             }
             onNewTemporaryBranch={() => handleNewTemporaryBranch(id, content)}
             onNewSetOfBranches={() => handleNewSetOfBranches(id)}

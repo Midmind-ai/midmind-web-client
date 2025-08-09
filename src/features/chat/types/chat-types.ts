@@ -17,9 +17,9 @@ export type OnSubmitArgs = {
   model: LLModel;
 };
 
-export type ThreadContext = {
+export type BranchContext = {
   color: string;
-  threadId: string;
+  branchId: string;
   endPosition: number;
   startPosition: number;
   connectionType: ConnectionType;
@@ -27,8 +27,8 @@ export type ThreadContext = {
 
 export type HighlightTextNodeArgs = {
   textNode: Text;
-  threadContext: ThreadContext;
-  onSelectionClick: (threadId: string) => void;
+  branchContext: BranchContext;
+  onSelectionClick: (branchId: string) => void;
 };
 
 export type UseMessageSelectionContextT = {
@@ -44,13 +44,13 @@ export type CreateBranchArgs = {
   selectionContext?: UseMessageSelectionContextT;
 };
 
-export type ChatThreadContext = {
+export type ChatBranchContext = {
   endPosition: number;
   selectedText: string;
   startPosition: number;
 };
 
-export type DefiniteThreads = {
+export type DefiniteBranches = {
   connection_color: string;
   end_position: number;
   id: string;
