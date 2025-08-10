@@ -23,7 +23,7 @@ type Props = {
   onCopyText: VoidFunction;
   onOpenBranch: VoidFunction;
   onOpenInNewTab: VoidFunction;
-  onOpenInSidePanel: VoidFunction;
+  onOpenInSidePanel: (chatId: string) => void;
   onNewSetOfBranches: VoidFunction;
   onNewTemporaryBranch: VoidFunction;
   onNewAttachedBranch: (selectionContext?: ChatBranchContext) => void;
@@ -132,7 +132,7 @@ const LLMResponse = ({
         onCopyText={onCopyText}
         onOpenBranch={onOpenBranch}
         onOpenInNewTab={onOpenInNewTab}
-        onOpenInSidePanel={onOpenInSidePanel}
+        onOpenInSidePanel={() => onOpenInSidePanel(id)}
         onNewSetOfBranches={onNewSetOfBranches}
         onNewTemporaryBranch={onNewTemporaryBranch}
         onNewAttachedBranch={() => onNewAttachedBranch(selectionContext)}

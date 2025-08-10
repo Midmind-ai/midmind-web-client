@@ -1,100 +1,149 @@
-# 🚀 Midmind — Front-end project documentation
+# 🚀 Midmind Web Client
 
-Here you'll find the key rules, conventions, and patterns to follow when developing features for this project. This guide helps keep our codebase clean, consistent, and easy to scale.
+A modern React-based web application built with TypeScript, featuring a clean architecture and comprehensive UI components.
 
 ## 🧱 Tech Stack
 
-Before diving into the code, let’s take a quick look at the front-end stack used in this project.
-
 ### ⚙️ Core Libraries
 
-- **React / React DOM** — UI rendering and component logic.
-- **React Router** — Client-side routing and navigation.
+- **React 19** — Latest React with concurrent features
+- **React Router 7** — Modern client-side routing
+- **TypeScript 5.8** — Type-safe development
 
 ### 🗃️ State Management
 
-- **Zustand** — Lightweight global state management store.
+- **Zustand 5** — Lightweight global state management
+- **SWR 2** — Remote data fetching and caching with revalidation
 
-### 📡 API
+### 📡 API & Communication
 
-- **Axios** — HTTP client for API communication.
-- **SWR** — Remote data fetching and caching with revalidation.
-- **Socket.io Client** — Real-time WebSocket communication.
+- **Axios** — HTTP client for API communication
+- **Socket.io Client** — Real-time WebSocket communication
+- **OpenAPI Typescript** — Auto-generated API types
 
-### 🎨 Styling
+### 🎨 Styling & UI
 
-- **Tailwind CSS** — Utility-first CSS framework for styling.
-- **Shadcn/UI** — Accessible, unstyled UI components built on Radix UI primitives.
+- **Tailwind CSS 4** — Utility-first CSS framework
+- **Shadcn/UI** — Accessible UI components built on Radix UI primitives
+- **Radix UI** — Unstyled, accessible UI primitives
+- **Lucide React** — Beautiful, customizable icons
 
 ### 🧠 Forms & Validation
 
-- **React Hook Form** — Flexible and performant form management.
-- **Zod** — Schema-based form and data validation with TypeScript support.
+- **React Hook Form** — Flexible and performant form management
+- **Zod** — Schema-based validation with TypeScript support
+- **@hookform/resolvers** — Form validation resolvers
+
+### 🛠️ Build Tools
+
+- **Vite 7** — Fast build tool and dev server
+- **ESLint 9** — Code linting and quality
+- **Prettier** — Code formatting
+- **Husky** — Git hooks for code quality
 
 ## 📁 Project Structure
 
-The codebase strives for a clear separation between application setup, shared resources, and individual features.
+The codebase follows a feature-based architecture with clear separation of concerns:
 
-```sh
-src
-|
-+- app                               # Global application logic (wrapping all features)
-|  |
-|  +- providers                      # App-wide providers (e.g., ThemeProvider, AuthProvider)
-|  +- routes                         # Pages (e.g., Home, SignIn)
-|  +- App.tsx                        # Root component
-|  +- RootProvider.tsx               # Top-level provider
-|  +- Router.tsx                     # Application router (e.g., defines routes for Home and Chat)
-|
-+- shared                            # Reusable elements not tied to specific features
-|  |
-|  +- theme                          # Tailwind theme config (e.g., fontFamily, color palette)
-|  +- services                       # API requests (e.g., userService, authService)
-|  +- assets                         # Global assets (e.g., app logo, generic icons)
-|  +- config                         # Library configurations (e.g., axios instance, i18n setup)
-|  +- components                     # Global UI components (e.g., Button, Modal)
-|  +- constants                      # Shared constants (e.g., API endpoints, route names)
-|  +- hooks                          # Global hooks (e.g., useDebounce, useOutsideClick)
-|  +- utils                          # Utility functions (e.g., cn for classNames, formatDate)
-|  +- types                          # Global types (e.g., User, Role)
-|  +- stores                         # Global state stores (e.g., useUserStore, useThemeStore)
-|
-+- features                          # Application features (feature-based logic)
-|  |
-|  +- SignIn                         # Sign-in feature
-|  |  |
-|  |  +- components                  # Sign-in UI components (e.g., SignInForm, OAuthButton)
-|  |  |  |
-|  |  |  +- SignInForm
-|  |  |     |
-|  |  |     +- SignInForm.tsx             # Main component entry point
-|  |  |     +- useSignInLogic.ts     # Custom hook encapsulating component logic
-|  |  |
-|  |  +-- assets                     # Sign-in images/icons (e.g., Google logo, login illustration)
-|  |  +-- hooks                      # Sign-in logic (e.g., useSignIn, useLoginRedirect)
-|  |  +-- stores                     # Sign-in related stores (e.g., useSignInFormStore)
-|  |  +-- types                      # Sign-in-specific types (e.g., SignInFormData, SignInError)
-|  |  +-- utils                      # Sign-in helpers (e.g., parseAuthErrors, transformPayload)
-|  |
-|  +- Chat                           # Chat feature
-|  |  |
-|  |  +- components                  # Chat UI components (e.g., Messages, SendMessageForm)
-|  |  |  |
-|  |  |  +- Messages
-|  |  |     |
-|  |  |     +- Messages.tsx             # Main component entry point
-|  |  |     +- useMessagesLogic.ts   # Custom hook encapsulating component logic
-|  |  |
-|  |  +- assets                      # Chat-specific assets (e.g., user avatar placeholder, chat icons)
-|  |  +- hooks                       # Chat logic (e.g., useMessages, useSendMessage)
-|  |  +- stores                      # Chat state stores (e.g., useChatStore, useTypingStore)
-|  |  +- types                       # Chat-related types (e.g., Message, ChatThread)
-|  |  +- utils                       # Chat utilities (e.g., groupMessagesByDate, formatMessageTime)
+```
+src/
+├── app/                           # Application core and routing
+│   ├── providers/                 # App-wide providers (SWR, Theme)
+│   ├── routes/                    # Page components
+│   │   ├── home.tsx              # Home page
+│   │   ├── chat.tsx              # Chat interface
+│   │   ├── sign-in.tsx           # Authentication
+│   │   ├── sign-up.tsx           # User registration
+│   │   ├── forgot-password.tsx   # Password recovery
+│   │   └── not-found.tsx         # 404 page
+│   ├── app.tsx                   # Root component
+│   ├── router.tsx                # Application routing
+│   ├── root-layout.tsx           # Root layout wrapper
+│   ├── root-provider.tsx         # Top-level providers
+│   ├── split-layout.tsx          # Split view layout
+│   └── modals-renderer.tsx       # Modal management
+│
+├── features/                      # Feature-based modules
+│   ├── chat/                     # Chat functionality
+│   │   ├── components/           # Chat UI components
+│   │   │   ├── chat-message-form/
+│   │   │   ├── connection-type-badge/
+│   │   │   ├── highlighted-text-wrapper/
+│   │   │   ├── llm-response/
+│   │   │   ├── message-context-menu/
+│   │   │   ├── message-list/
+│   │   │   ├── quick-action-button/
+│   │   │   ├── react-markdown/
+│   │   │   └── user-message/
+│   │   ├── hooks/                # Chat logic hooks
+│   │   ├── types/                # Chat-specific types
+│   │   ├── utils/                # Chat utilities
+│   │   └── constants/            # AI models configuration
+│   │
+│   ├── sidebar/                   # Sidebar navigation
+│   │   ├── components/            # Sidebar UI components
+│   │   │   ├── create-directory-modal/
+│   │   │   ├── folder-actions/
+│   │   │   ├── folder-list/
+│   │   │   ├── more-actions-menu/
+│   │   │   ├── organization-switcher/
+│   │   │   ├── sidebar-header/
+│   │   │   ├── sidebar-tabs/
+│   │   │   ├── tree/
+│   │   │   └── user-dropdown/
+│   │   ├── hooks/                 # Sidebar logic hooks
+│   │   └── sidebar.tsx            # Main sidebar component
+│   │
+│   ├── navigation-header/         # Top navigation
+│   │   ├── components/            # Navigation components
+│   │   │   ├── breadcrumb-item/
+│   │   │   └── breadcrumbs/
+│   │   └── navigation-header.tsx  # Main navigation component
+│   │
+│   └── sign-in/                   # Authentication
+│       ├── components/             # Auth UI components
+│       │   ├── protected-route/
+│       │   └── sign-in-form/
+│       ├── hooks/                  # Authentication logic
+│       ├── assets/                 # Auth-related assets
+│       └── sign-in.tsx             # Main sign-in component
+│
+├── shared/                        # Reusable components and utilities
+│   ├── components/ui/             # Base UI components
+│   │   ├── avatar.tsx
+│   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── dialog.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── input.tsx
+│   │   ├── select.tsx
+│   │   ├── textarea.tsx
+│   │   ├── themed-*.tsx           # Typography components
+│   │   └── ...                    # Other UI components
+│   ├── services/                  # API services
+│   │   ├── auth/                  # Authentication service
+│   │   ├── chats/                 # Chat management
+│   │   ├── conversations/         # Conversation handling
+│   │   ├── directories/           # Directory management
+│   │   ├── messages/              # Message handling
+│   │   └── users/                 # User management
+│   ├── hooks/                     # Global hooks
+│   ├── stores/                    # Global state stores
+│   ├── types/                     # Shared type definitions
+│   ├── utils/                     # Utility functions
+│   ├── config/                    # Configuration files
+│   ├── constants/                 # Shared constants
+│   └── theme/                     # Theme configuration
+│
+└── generated/                     # Auto-generated files
+    └── api-types.ts               # OpenAPI generated types
 ```
 
-## 🧩 Component Style
+## 🧩 Component Architecture
 
-All components follow a consistent and simple style guide to improve readability and maintainability:
+### Component Structure
+
+All components follow a consistent pattern with separated logic:
 
 ```tsx
 type Props = {
@@ -102,42 +151,60 @@ type Props = {
 };
 
 const MyComponent = ({ someProp }: Props) => {
-  const data = useMyComponentLogic();
+  const { data, handlers } = useMyComponentLogic();
 
-  return <div>MyComponent</div>;
+  return <div className="component-wrapper">{/* Component JSX */}</div>;
 };
 
 export default MyComponent;
 ```
 
-### ✍️ Key points
+### Logic Separation
 
-- ✅ **Type-safe props** — Component props are always explicitly typed using type, and the name is always **Props** for consistency.
-- ✅ **Arrow functions** — Functional components are written as arrow functions for consistency.
-- ✅ **Encapsulated logic** — All component-related logic is extracted into a separate hook named in the format use[ComponentName]Logic.ts (e.g. `useSignInFormLogic.ts`) to ensure separation of concerns and cleaner JSX.
-- ✅ **Default export** — Components use export default to keep imports clean and predictable.
+Component logic is extracted into custom hooks following the pattern:
+
+- **Hook naming**: `use[ComponentName]Logic.ts`
+- **File location**: `components/[component-name]/use-[component-name]-logic.ts`
+- **Logic encapsulation**: All business logic, state management, and event handlers
+
+### Key Patterns
+
+- ✅ **Type-safe props** — Explicit Props type definition
+- ✅ **Arrow functions** — Consistent functional component syntax
+- ✅ **Logic separation** — Custom hooks for component logic
+- ✅ **Default exports** — Clean import statements
+- ✅ **Tailwind classes** — Utility-first styling approach
 
 ## 🏷️ Naming Conventions
 
-### 🧬 Variables, Functions & Types
+### 🧬 Code Elements
 
-- ✅ Use **camelCase** for variables and functions. Examples: `isPasswordVisible`, `getUserData`.
-- ✅ Use **PascalCase** for types, enum-like objects and components. Examples: `ChatHeader`, `UserRoles`.
-- ✅ Follow `VerbNounRequest` / `VerbNounResponse` naming for API types. Example: for `getCurrentUser()`, use `GetCurrentUserRequest` and `GetCurrentUserResponse`
+- **Variables & Functions**: `camelCase` (e.g., `isPasswordVisible`, `getUserData`)
+- **Types & Components**: `PascalCase` (e.g., `ChatHeader`, `UserRoles`)
+- **API Types**: `VerbNounRequest`/`VerbNounResponse` pattern (e.g., `GetCurrentUserRequest`)
 
 ### 📦 Files & Folders
 
-- ✅ Use **PascalCase** for components folders, types (e.g. `UserCard`, `ChatHeader`)
-- ✅ Use **kebab-case** for general-purpose folders (e.g. `api-client`, `form-utils`)
-- ✅ Use **camelCase** for individual file names (especially utilities and logic files e.g. `locaStotage.ts`, `timeHelpers.ts`)
+- **Components**: `PascalCase` (e.g., `UserCard/`, `ChatHeader/`)
+- **General folders**: `kebab-case` (e.g., `api-client/`, `form-utils/`)
+- **Files**: `camelCase` for utilities, `PascalCase` for components (e.g., `localStorage.ts`, `UserCard.tsx`)
 
-## 🛠️ Project Setup and Run
+### 🎯 Event Handlers
 
-This project uses **Yarn** as the package manager.
+- **Click events**: `handleClick`, `handleButtonClick`
+- **Form events**: `handleSubmit`, `handleInputChange`
+- **Keyboard events**: `handleKeyDown`, `handleKeyPress`
 
-### 📋 Steps to get started
+## 🛠️ Development Setup
 
-1. **Clone the repository and navigate to the project folder**
+### Prerequisites
+
+- **Node.js** 18+
+- **Yarn** package manager
+
+### 📋 Getting Started
+
+1. **Clone and navigate to project**
 
 ```bash
 git clone https://github.com/Midmind-ai/midmind-web-client.git
@@ -150,19 +217,100 @@ cd midmind-web-client
 yarn install
 ```
 
-3. **Create environment variables file**
+3. **Environment configuration**
+   Create `.env.dev` file in the root directory with required environment variables.
 
-Create a file named `.env.dev` in the root of the project.
-Ask one of your teammates for the contents of this file, as it contains important configuration variables needed for local development.
-
-4. **Start the development server**
+4. **Start development server**
 
 ```bash
 yarn dev
 ```
 
-Once the server starts, open your browser and navigate to http://localhost:5173/ (or the port shown in the terminal).
+The application will be available at `http://localhost:5173/`
 
-If you run into any issues, reach out to a teammate for help.
+### 📜 Available Scripts
 
-🎉 Enjoy coding and have fun building awesome stuff! 🚀
+- **`yarn dev`** — Start development server
+- **`yarn build`** — Build for production
+- **`yarn preview`** — Preview production build
+- **`yarn lint`** — Run ESLint with auto-fix
+- **`yarn format`** — Format code with Prettier
+- **`yarn types:check`** — TypeScript type checking
+- **`yarn types:generate`** — Generate API types from OpenAPI spec
+
+### 🔧 Development Tools
+
+- **ESLint** — Code quality and consistency
+- **Prettier** — Code formatting
+- **Husky** — Git hooks for code quality
+- **TypeScript** — Static type checking
+- **Vite** — Fast development and building
+
+## 🎨 UI Component System
+
+### Base Components
+
+Built on Radix UI primitives with Tailwind CSS styling:
+
+- **Form Elements**: Input, Select, Textarea, Button
+- **Layout**: Dialog, Sheet, Sidebar, Resizable panels
+- **Navigation**: Breadcrumbs, Dropdown menus, Context menus
+- **Feedback**: Badge, Skeleton, Tooltip, Avatar
+
+### Themed Components
+
+Custom typography components with consistent styling:
+
+- **Headings**: `ThemedH1`, `ThemedH2`, `ThemedH3`
+- **Text**: `ThemedP`, `ThemedSpan`
+
+### Styling Approach
+
+- **Tailwind CSS 4** for utility-first styling
+- **CSS Variables** for theme customization
+- **Responsive design** with mobile-first approach
+- **Accessibility** built into all components
+
+## 🚀 Key Features
+
+### 💬 Chat System
+
+- Real-time messaging with AI models
+- Message context and threading
+- Markdown rendering support
+- Quick action buttons
+- Message highlighting and selection
+
+### 📁 File Management
+
+- Hierarchical directory structure
+- Folder creation and management
+- Chat organization by directories
+- Tree-based navigation
+
+### 🔐 Authentication
+
+- OAuth integration (Google, GitHub)
+- Protected routes
+- User session management
+- Organization switching
+
+### 🎯 Navigation
+
+- Breadcrumb navigation
+- Responsive sidebar
+- Split view layouts
+- Modal management system
+
+## 🤝 Contributing
+
+1. Follow the established naming conventions
+2. Use the component architecture patterns
+3. Extract logic into custom hooks
+4. Ensure proper TypeScript typing
+5. Follow the established folder structure
+6. Run linting and type checking before commits
+
+---
+
+🎉 Happy coding! Build something amazing! 🚀

@@ -1,4 +1,3 @@
-import NestedModal from '@app/nested-modal';
 import TestModal, { type TestModalProps } from '@app/test-modal';
 
 import CreateDirectoryModal, {
@@ -12,15 +11,13 @@ export type BaseModalProps = {
 };
 
 export type ModalPropsMap = {
-  TestModal: Omit<TestModalProps, keyof BaseModalProps>;
-  NestedModal: null;
   CreateDirectoryModal: Omit<CreateDirectoryModalProps, keyof BaseModalProps>;
+  TestModal: Omit<TestModalProps, keyof BaseModalProps>;
 };
 
 // modal name must be unique
 export const Modals = {
   TestModal,
-  NestedModal,
   CreateDirectoryModal,
 } as const;
 

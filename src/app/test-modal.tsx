@@ -18,7 +18,7 @@ export type TestModalProps = {
 } & BaseModalProps;
 
 const TestModal = ({ open, onAnimationEnd, title, description }: TestModalProps) => {
-  const { openModal, closeModal } = useModalActions();
+  const { closeModal } = useModalActions();
 
   return (
     <Dialog
@@ -40,13 +40,6 @@ const TestModal = ({ open, onAnimationEnd, title, description }: TestModalProps)
             variant="outline"
           >
             Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            onClick={() => openModal('NestedModal')}
-          >
-            Open nested modal
           </Button>
         </DialogFooter>
       </DialogContent>
