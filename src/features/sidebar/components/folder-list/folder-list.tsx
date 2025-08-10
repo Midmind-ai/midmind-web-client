@@ -5,14 +5,12 @@ import {
 } from '@shared/components/ui/sidebar';
 import { Skeleton } from '@shared/components/ui/skeleton';
 
-import type { TreeItem } from '@shared/types/entities';
-
 import { useFolderListLogic } from '@features/sidebar/components/folder-list/use-folder-list-logic';
-import Tree from '@features/sidebar/components/tree/tree';
+import TreeNode from '@features/sidebar/components/tree-node/tree-node';
 
 const FolderList = () => {
   const {
-    chats,
+    treeNodes,
     isLoading,
     isDeleting,
     handleDelete,
@@ -35,14 +33,14 @@ const FolderList = () => {
             </div>
           )}
           {!isLoading &&
-            chats?.map((item, index) => (
-              <Tree
-                key={index}
-                item={item as TreeItem}
+            treeNodes?.map(node => (
+              <TreeNode
+                key={node.id}
+                node={node}
                 isDeleting={isDeleting}
-                onDelete={() => handleDelete(item.id)}
-                onOpenInNewTab={() => openChatInNewTab(item.id)}
-                onOpenInSidePanel={() => openChatInSidePanel(item.id)}
+                onDelete={() => handleDelete(node.id)}
+                onOpenInNewTab={() => openChatInNewTab(node.id)}
+                onOpenInSidePanel={() => openChatInSidePanel(node.id)}
               />
             ))}
         </SidebarMenu>

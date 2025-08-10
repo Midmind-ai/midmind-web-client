@@ -7,6 +7,10 @@ export const SWRCacheKeys = {
   CurrentUser: 'currentUser',
   CreateChat: 'createChat',
   GetChats: 'getChats',
+  GetChatsWithParent: (parentDirectoryId?: string) =>
+    parentDirectoryId ? `getChats/${parentDirectoryId}` : 'getChats',
+  GetDirectories: (parentId?: string) =>
+    parentId ? `getDirectories/${parentId}` : 'getDirectories',
   GetChatDetails: (id: string) => `getChatDetails/${id}`,
   UpdateChatDetails: 'updateChatDetails',
   DeleteChat: 'deleteChat',

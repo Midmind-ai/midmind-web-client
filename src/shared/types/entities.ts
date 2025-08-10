@@ -4,6 +4,8 @@ export type User = components['schemas']['UserDto'];
 
 export type Chat = components['schemas']['ChatDto'];
 
+export type Directory = components['schemas']['GetDirectoryDto'];
+
 export type ChatMessage = components['schemas']['AppMessageDto'];
 
 export type Team = {

@@ -4,16 +4,20 @@ import { SWRCacheKeys } from '@shared/constants/api';
 
 import { ChatsService } from '@shared/services/chats/chats-service';
 
-export const useGetChats = () => {
+export const useGetChatsByDirectory = (parentDirectoryId?: string) => {
   const {
     data: chats,
     isLoading,
     error,
-  } = useSWR(SWRCacheKeys.GetChats, () => ChatsService.getChats());
+    mutate,
+  } = useSWR(SWRCacheKeys.GetChatsWithParent(parentDirectoryId), () =>
+    ChatsService.getChats(parentDirectoryId)
+  );
 
   return {
-    isLoading,
     chats,
+    isLoading,
     error,
+    mutate,
   };
 };
