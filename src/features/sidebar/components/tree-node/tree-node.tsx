@@ -45,7 +45,7 @@ const TreeNode = ({
     return (
       <SidebarMenuButton
         isActive={isActive}
-        className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
+        className="group/item relative cursor-pointer gap-1.5 rounded-sm p-1.5 hover:pr-8
           data-[active=true]:font-normal"
         onClick={handleClick}
       >
@@ -83,10 +83,11 @@ const TreeNode = ({
         open={isOpen}
         onOpenChange={setIsOpen}
       >
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
           <CollapsibleTrigger asChild>
             <ChevronRight
-              className="hover:bg-accent cursor-pointer rounded p-1 transition-transform"
+              className="hover:bg-sidebar-accent cursor-pointer rounded p-1
+                transition-transform"
               onClick={e => {
                 e.stopPropagation();
                 setIsOpen(!isOpen);
@@ -95,7 +96,8 @@ const TreeNode = ({
           </CollapsibleTrigger>
           <SidebarMenuButton
             isActive={isActive}
-            className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
+            className="group/item relative cursor-pointer gap-1.5 rounded-sm p-1.5
+              group-has-data-[sidebar=menu-action]/menu-item:pr-1.5 hover:pr-8
               data-[active=true]:font-normal"
             onClick={handleClick}
           >
@@ -104,7 +106,7 @@ const TreeNode = ({
             ) : (
               <Folder className="stroke-[1.5px]" />
             )}
-            <span className="block truncate">{node.name}</span>
+            <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
             <MoreActionsMenu
               triggerClassNames="opacity-0 group-hover/item:opacity-100"
               isDeleting={isDeleting}
@@ -121,7 +123,7 @@ const TreeNode = ({
           </SidebarMenuButton>
         </div>
         <CollapsibleContent>
-          <SidebarMenuSub>
+          <SidebarMenuSub className="ml-2.5 pl-3.5">
             {isLoadingChildren && (
               <div className="space-y-2 pl-6">
                 {[...Array(3)].map((_, idx) => (
