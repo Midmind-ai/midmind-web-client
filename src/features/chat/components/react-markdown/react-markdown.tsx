@@ -74,10 +74,7 @@ const ReactMarkdown = ({ content }: Props) => {
           </code>
         ),
         pre: ({ children }) => (
-          <pre
-            className="mb-4 overflow-x-auto rounded-lg border border-gray-200 bg-gray-50
-              p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
-          >
+          <pre className="mb-4 overflow-x-auto rounded-lg border-1 p-4">
             <code className="font-mono text-xs leading-6">{children}</code>
           </pre>
         ),
@@ -106,12 +103,7 @@ const ReactMarkdown = ({ content }: Props) => {
         hr: () => <hr className="my-6 border-gray-200 dark:border-gray-700" />,
         table: ({ children }) => (
           <div className="mb-4 overflow-x-auto">
-            <table
-              className="min-w-full rounded-lg border border-gray-200
-                dark:border-gray-700"
-            >
-              {children}
-            </table>
+            <table className="min-w-full rounded-lg border-1">{children}</table>
           </div>
         ),
         th: ({ children }) => (

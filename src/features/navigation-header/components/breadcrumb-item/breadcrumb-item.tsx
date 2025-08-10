@@ -22,7 +22,7 @@ const BreadcrumbItem = ({ title, type, isActive, href }: Props) => {
     <ShadcnBreadcrumbItem>
       <BreadcrumbLink
         className="group hover:bg-sidebar-accent hover:text-foreground flex cursor-pointer
-          items-center gap-1 rounded-sm px-2 py-1"
+          items-center gap-1.5 rounded-sm px-2 py-1"
         asChild
       >
         <Link

@@ -34,7 +34,7 @@ export const renderEntityIcon = (
     [EntityEnum.Mindlet]: (
       <BoxIcon
         className={size}
-        color="green"
+        color="oklch(62.7% 0.194 149.214)"
         {...iconProps}
       />
     ),
