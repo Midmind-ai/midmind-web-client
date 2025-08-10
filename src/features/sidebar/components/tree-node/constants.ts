@@ -9,7 +9,7 @@ export const NODE_STYLES = {
   icon: `stroke-[1.5px]`,
   nodeText: `text-primary block truncate`,
   moreActionsMenu: `opacity-0 group-hover/item:opacity-100`,
-  childrenContainer: `ml-2.5 pl-3.5`,
+  childrenContainer: `ml-2.5 pl-3.5 pb-0`,
   loadingContainer: `space-y-2`,
   expandContainer: `flex items-center gap-[3px]`,
 } as const;

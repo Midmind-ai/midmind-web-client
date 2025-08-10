@@ -21,7 +21,7 @@ const FolderList = () => {
   return (
     <SidebarGroup>
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="gap-[2px]">
           {isLoading && (
             <div className="mt-2 space-y-2">
               {[...Array(4)].map((_, idx) => (
