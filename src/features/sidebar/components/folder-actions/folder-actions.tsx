@@ -11,9 +11,12 @@ import { SidebarMenuButton } from '@shared/components/ui/sidebar';
 
 import { AppRoutes } from '@shared/constants/router';
 
+import { useModalActions } from '@shared/hooks/use-modal-actions';
+
 const FolderActions = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { openModal } = useModalActions();
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -25,6 +28,13 @@ const FolderActions = () => {
     navigate(url);
   };
 
+  const handleCreateDirectory = () => {
+    // Open modal for creating root directory (no parent)
+    openModal('CreateDirectoryModal', {
+      parentDirectoryId: undefined,
+    });
+  };
+
   return (
     <div className="flex justify-between border-b-1 p-1">
       <SidebarMenuButton className={buttonClassNames}>
@@ -34,7 +44,10 @@ const FolderActions = () => {
         <SidebarMenuButton className={buttonClassNames}>
           <FilePlus2 className="size-5.5! stroke-1" />
         </SidebarMenuButton>
-        <SidebarMenuButton className={buttonClassNames}>
+        <SidebarMenuButton
+          className={buttonClassNames}
+          onClick={handleCreateDirectory}
+        >
           <FolderPlus className="size-5.5! stroke-1" />
         </SidebarMenuButton>
         <SidebarMenuButton

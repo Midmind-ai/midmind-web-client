@@ -2,27 +2,83 @@ import { useNavigate, useParams } from 'react-router';
 
 import { AppRoutes } from '@shared/constants/router';
 
+import {
+  useGetChatsByParentChat,
+  useGetChatsByParentDirectory,
+} from '@features/sidebar/hooks/use-get-chats-by-parent';
+import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
-import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
 export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
   const navigate = useNavigate();
   const { id: chatId = '' } = useParams();
 
-  // Determine what parent ID to use for fetching children
-  // For directories: use directory ID
-  // For chats with children: use chat ID as parent_directory_id
-  const parentIdForChildren =
-    node.type === 'directory'
-      ? node.id
-      : node.type === 'chat' && node.hasChildren
-        ? node.id
-        : undefined;
+  const shouldFetch = isOpen && node.hasChildren;
 
-  // Only fetch children when expanded and has children
-  const { treeNodes: childNodes, isLoading: isLoadingChildren } = useTreeData(
-    isOpen && node.hasChildren ? parentIdForChildren : undefined
+  // For directories: fetch directories and chats with parent_directory_id
+  // Pass null to disable SWR when we don't want to fetch
+  const { directories, isLoading: isLoadingDirectories } = useGetDirectories(
+    shouldFetch && node.type === 'directory' ? node.id : null
   );
+
+  const { chats: chatsFromDirectory, isLoading: isLoadingChatsFromDirectory } =
+    useGetChatsByParentDirectory(
+      shouldFetch && node.type === 'directory' ? node.id : null
+    );
+
+  // For chats with children: fetch sub-chats with parent_chat_id
+  const { chats: chatsFromChat, isLoading: isLoadingChatsFromChat } =
+    useGetChatsByParentChat(shouldFetch && node.type === 'chat' ? node.id : null);
+
+  // Combine child nodes based on node type
+  const childNodes: TreeNode[] = [];
+
+  if (shouldFetch && node.type === 'directory') {
+    // Add directories first
+    childNodes.push(
+      ...(directories || []).map(
+        (dir): TreeNode => ({
+          id: dir.id,
+          name: dir.name,
+          type: 'directory',
+          hasChildren: dir.has_children,
+          originalData: dir,
+        })
+      )
+    );
+
+    // Add chats
+    childNodes.push(
+      ...(chatsFromDirectory || []).map(
+        (chat): TreeNode => ({
+          id: chat.id,
+          name: chat.name,
+          type: 'chat',
+          hasChildren: chat.has_children,
+          parentDirectoryId: chat.parent_directory_id,
+          originalData: chat,
+        })
+      )
+    );
+  } else if (shouldFetch && node.type === 'chat') {
+    // Add sub-chats only
+    childNodes.push(
+      ...(chatsFromChat || []).map(
+        (chat): TreeNode => ({
+          id: chat.id,
+          name: chat.name,
+          type: 'chat',
+          hasChildren: chat.has_children,
+          parentDirectoryId: chat.parent_directory_id,
+          originalData: chat,
+        })
+      )
+    );
+  }
+
+  const isLoadingChildren =
+    shouldFetch &&
+    (isLoadingDirectories || isLoadingChatsFromDirectory || isLoadingChatsFromChat);
 
   const isActive = node.type === 'chat' && node.id === chatId;
 
@@ -38,7 +94,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
   return {
     isActive,
     handleClick,
-    childNodes: isOpen ? childNodes : [],
-    isLoadingChildren: isOpen && isLoadingChildren,
+    childNodes,
+    isLoadingChildren,
   };
 };

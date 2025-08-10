@@ -18,7 +18,7 @@ const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
         showCloseButton={showCloseButton}
         onClose={onClose}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden pt-9">
         <MessageList chatId={chatId} />
       </div>
       <div className="mx-auto w-full max-w-[768px] pb-3">

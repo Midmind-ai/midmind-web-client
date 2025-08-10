@@ -1,6 +1,6 @@
 import type { Chat, Directory } from '@shared/types/entities';
 
-import { useGetChatsByDirectory } from '@features/sidebar/hooks/use-get-chats-by-directory';
+import { useGetChatsByParentDirectory } from '@features/sidebar/hooks/use-get-chats-by-parent';
 import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 
 export type TreeNode = {
@@ -25,7 +25,7 @@ export const useTreeData = (parentId?: string) => {
     chats,
     isLoading: isLoadingChats,
     error: chatsError,
-  } = useGetChatsByDirectory(parentId);
+  } = useGetChatsByParentDirectory(parentId);
 
   // Combine directories and chats into tree nodes
   const treeNodes: TreeNode[] = [

@@ -3,6 +3,8 @@ import { baseAxiosInstance } from '@shared/config/axios';
 import type { components } from 'generated/api-types';
 
 export type Directory = components['schemas']['GetDirectoryDto'];
+export type CreateDirectoryDto = components['schemas']['CreateDirectoryDto'];
+export type MessageDto = components['schemas']['MessageDto'];
 
 export class DirectoriesService {
   static async getDirectories(parentId?: string) {
@@ -11,6 +13,12 @@ export class DirectoriesService {
     const { data } = await baseAxiosInstance.get<Directory[]>('/directories', {
       params,
     });
+
+    return data;
+  }
+
+  static async createDirectory(body: CreateDirectoryDto) {
+    const { data } = await baseAxiosInstance.post<MessageDto>('/directories', body);
 
     return data;
   }

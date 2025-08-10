@@ -6,8 +6,16 @@ import type { MessageResponse } from '@shared/types/common';
 import type { Chat } from '@shared/types/entities';
 
 export class ChatsService {
-  static async getChats(parentDirectoryId?: string) {
-    const params = parentDirectoryId ? { parent_directory_id: parentDirectoryId } : {};
+  static async getChats(options?: { parentDirectoryId?: string; parentChatId?: string }) {
+    const params: Record<string, string> = {};
+
+    if (options?.parentDirectoryId) {
+      params.parent_directory_id = options.parentDirectoryId;
+    }
+
+    if (options?.parentChatId) {
+      params.parent_chat_id = options.parentChatId;
+    }
 
     const { data } = await baseAxiosInstance.get<Chat[]>('/chats', {
       params,
