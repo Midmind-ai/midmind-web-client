@@ -10,7 +10,6 @@ import MessageContextMenu from '@features/chat/components/message-context-menu/m
 import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
 import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
 import type { ChatBranchContext } from '@features/chat/types/chat-types';
-import { captureSelection } from '@features/chat/utils/text-selection';
 
 type Props = {
   id: string;
@@ -47,15 +46,8 @@ const LLMResponse = ({
   onNewDetachedBranch,
   onNewTemporaryBranch,
 }: Props) => {
-  let selectionContext: ChatBranchContext | undefined;
-
-  const { streamingContent, isStreaming, messageRef } = useLLMResponseLogic(
-    id,
-    content,
-    isLastMessage,
-    branches,
-    onOpenInSidePanel
-  );
+  const { streamingContent, isStreaming, messageRef, getCurrentSelectionContext } =
+    useLLMResponseLogic(id, content, isLastMessage, branches, onOpenInSidePanel);
 
   return (
     <ContextMenu>
@@ -76,12 +68,7 @@ const LLMResponse = ({
           <div
             ref={messageRef}
             className="text-base leading-relaxed font-light"
-            onMouseUp={() => {
-              if (messageRef.current) {
-                const capturedSelection = captureSelection(messageRef.current);
-                selectionContext = capturedSelection;
-              }
-            }}
+            onClick={getCurrentSelectionContext}
           >
             <ReactMarkdown content={streamingContent} />
           </div>
@@ -106,12 +93,12 @@ const LLMResponse = ({
               <QuickActionButton
                 icon={<GitBranchPlus className="text-foreground size-6" />}
                 label="New attached branch"
-                onClick={onNewAttachedBranch}
+                onClick={() => onNewAttachedBranch(getCurrentSelectionContext())}
               />
               <QuickActionButton
                 icon={<GitCommitVertical className="text-foreground size-6" />}
                 label="New detached branch"
-                onClick={onNewDetachedBranch}
+                onClick={() => onNewDetachedBranch(getCurrentSelectionContext())}
               />
               <QuickActionButton
                 icon={<Glasses className="text-foreground size-6" />}
@@ -135,8 +122,8 @@ const LLMResponse = ({
         onOpenInSidePanel={() => onOpenInSidePanel(id)}
         onNewSetOfBranches={onNewSetOfBranches}
         onNewTemporaryBranch={onNewTemporaryBranch}
-        onNewAttachedBranch={() => onNewAttachedBranch(selectionContext)}
-        onNewDetachedBranch={() => onNewDetachedBranch(selectionContext)}
+        onNewAttachedBranch={() => onNewAttachedBranch(getCurrentSelectionContext())}
+        onNewDetachedBranch={() => onNewDetachedBranch(getCurrentSelectionContext())}
       />
     </ContextMenu>
   );

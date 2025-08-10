@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
+import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@radix-ui/react-collapsible';
-import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
-
+} from '@shared/components/ui/collapsible';
 import {
   SidebarMenuButton,
   SidebarMenuItem,

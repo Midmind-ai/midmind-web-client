@@ -4,13 +4,14 @@ import { useParams } from 'react-router';
 
 import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
 
+import type { ChatMessage } from '@shared/types/entities';
+
 import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
 } from '@features/chat/utils/llm-response-emitter';
-
-import type { ChatMessage } from '@/shared/types/entities';
+import { captureSelection } from '@features/chat/utils/text-selection';
 
 export const useLLMResponseLogic = (
   id: string,
@@ -30,6 +31,12 @@ export const useLLMResponseLogic = (
 
   const [isStreaming, setIsStreaming] = useState(isNewMessage);
   const [streamingContent, setStreamingContent] = useState(content);
+
+  const getCurrentSelectionContext = () => {
+    if (messageRef.current) {
+      return captureSelection(messageRef.current);
+    }
+  };
 
   useEffect(() => {
     const handleResponseChunk = (chunk: ConversationWithAIResponseDto) => {
@@ -54,5 +61,6 @@ export const useLLMResponseLogic = (
     messageRef,
     streamingContent,
     isStreaming,
+    getCurrentSelectionContext,
   };
 };
