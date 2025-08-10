@@ -23,7 +23,7 @@ type Props = {
   onCopyText: VoidFunction;
   onOpenBranch: VoidFunction;
   onOpenInNewTab: VoidFunction;
-  onOpenInSidePanel: (chatId: string) => void;
+  onOpenInSidePanel: (branchChatId: string) => void;
   onNewSetOfBranches: VoidFunction;
   onNewTemporaryBranch: VoidFunction;
   onNewAttachedBranch: (selectionContext?: ChatBranchContext) => void;

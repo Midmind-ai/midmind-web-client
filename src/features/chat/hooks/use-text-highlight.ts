@@ -7,7 +7,7 @@ import { clearHighlights, highlightSelection } from '@features/chat/utils/text-s
 
 type Args = {
   branches: ChatMessage['branches'];
-  onOpenInSidePanel: (chatId: string) => void;
+  onOpenInSidePanel: (branchChatId: string) => void;
 };
 
 export const useTextHighlight = ({ branches, onOpenInSidePanel }: Args) => {

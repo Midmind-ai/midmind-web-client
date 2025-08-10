@@ -17,7 +17,7 @@ export const useLLMResponseLogic = (
   content: string,
   isLastMessage: boolean,
   branches: ChatMessage['branches'],
-  onOpenInSidePanel: (chatId: string) => void
+  onOpenInSidePanel: (branchChatId: string) => void
 ) => {
   const isNewMessage = isLastMessage && content.length < 10;
 

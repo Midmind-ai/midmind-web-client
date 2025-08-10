@@ -32,9 +32,9 @@ const MessageList = ({ chatId }: Props) => {
                 onReply={() => messageActions.replyToMessage(id)}
                 onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
                 onNewDetachedBranch={() => chatActions.createDetachedBranch(id, content)}
-                onNewTemporaryBranch={() =>
-                  chatActions.createTemporaryBranch(id, content)
-                }
+                onNewTemporaryBranch={() => {
+                  chatActions.createTemporaryBranch(id, content);
+                }}
                 onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
               />
             );
@@ -48,14 +48,16 @@ const MessageList = ({ chatId }: Props) => {
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id)}
               onOpenBranch={() => {}}
-              onOpenInSidePanel={() => chatActions.openChatInSidePanel(id)}
+              onOpenInSidePanel={(branchChatId: string) => {
+                chatActions.openChatInSidePanel(branchChatId);
+              }}
               onOpenInNewTab={() => chatActions.openChatInNewTab(id)}
-              onNewAttachedBranch={branchContext =>
-                chatActions.createAttachedBranch(id, content, branchContext)
-              }
-              onNewDetachedBranch={branchContext =>
-                chatActions.createDetachedBranch(id, content, branchContext)
-              }
+              onNewAttachedBranch={branchContext => {
+                chatActions.createAttachedBranch(id, content, branchContext);
+              }}
+              onNewDetachedBranch={branchContext => {
+                chatActions.createDetachedBranch(id, content, branchContext);
+              }}
               onNewTemporaryBranch={() => chatActions.createTemporaryBranch(id, content)}
               onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
               onNewNote={() => {}}
