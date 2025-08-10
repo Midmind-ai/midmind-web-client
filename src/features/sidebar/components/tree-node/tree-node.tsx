@@ -45,7 +45,8 @@ const TreeNode = ({
     return (
       <SidebarMenuButton
         isActive={isActive}
-        className="group/item relative cursor-pointer gap-1.5 rounded-sm p-1.5 hover:pr-8
+        className="group/item relative cursor-pointer gap-1.5 rounded-sm p-1.5
+          group-has-data-[sidebar=menu-action]/menu-item:pr-1.5 hover:pr-8
           data-[active=true]:font-normal"
         onClick={handleClick}
       >
