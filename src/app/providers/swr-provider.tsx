@@ -1,6 +1,7 @@
 import { type PropsWithChildren } from 'react';
 
 import { SWRConfig } from 'swr';
+import { SWRDevTools } from 'swr-devtools';
 
 import { TIMEOUT } from '@shared/constants/api';
 
@@ -14,7 +15,7 @@ export const SWRProvider = ({ children }: PropsWithChildren) => {
         dedupingInterval: TIMEOUT,
       }}
     >
-      {children}
+      <SWRDevTools>{children}</SWRDevTools>
     </SWRConfig>
   );
 };
