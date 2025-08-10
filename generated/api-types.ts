@@ -143,6 +143,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/directories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get root or nested directories by passing or omitting parentId param */
+        get: operations["DirectoryController_getDirectories"];
+        put?: never;
+        /** Create a directory */
+        post: operations["DirectoryController_createDirectory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/directories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a directory */
+        put: operations["DirectoryController_updateDirectory"];
+        post?: never;
+        /** Delete a directory */
+        delete: operations["DirectoryController_deleteDirectory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/directories/{id}/location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change directory location */
+        put: operations["DirectoryController_changeDirectoryLocation"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/conversations": {
         parameters: {
             query?: never;
@@ -186,7 +239,7 @@ export interface paths {
         };
         get?: never;
         /** Update a chat data */
-        put: operations["ChatController_updateChatData"];
+        put: operations["ChatController_updateChat"];
         post?: never;
         /** Delete the chat */
         delete: operations["ChatController_deleteChat"];
@@ -292,6 +345,32 @@ export interface components {
             data: unknown[][];
             meta: components["schemas"]["PaginationMetadata"];
         };
+        CreateDirectoryDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            parent_directory_id?: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+        };
+        UpdateDirectoryDto: {
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+        };
+        ChangeDirectoryLocationRequestDto: {
+            /** Format: uuid */
+            target_parent_id?: string;
+        };
+        GetDirectoryDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+            has_children: boolean;
+        };
         CreateConversationResponseTitleDto: {
             title: string;
             chat_id: string;
@@ -341,10 +420,13 @@ export interface components {
         ChatDto: {
             /** Format: uuid */
             id: string;
-            name: string | null;
+            name: string;
+            parent_directory_id: string | null;
+            has_children: boolean;
         };
         UpdateChatDto: {
             name?: string;
+            directory_id?: string;
         };
         AppMessageBranchDto: {
             /** Format: uuid */
@@ -649,6 +731,121 @@ export interface operations {
             };
         };
     };
+    DirectoryController_getDirectories: {
+        parameters: {
+            query?: {
+                parent_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetDirectoryDto"][];
+                };
+            };
+        };
+    };
+    DirectoryController_createDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDirectoryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    DirectoryController_updateDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDirectoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    DirectoryController_deleteDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    DirectoryController_changeDirectoryLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeDirectoryLocationRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
     ConversationController_initiateConversation: {
         parameters: {
             query?: never;
@@ -680,7 +877,9 @@ export interface operations {
     };
     ChatController_getUserChats: {
         parameters: {
-            query?: never;
+            query?: {
+                parent_directory_id?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -697,7 +896,7 @@ export interface operations {
             };
         };
     };
-    ChatController_updateChatData: {
+    ChatController_updateChat: {
         parameters: {
             query?: never;
             header?: never;

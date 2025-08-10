@@ -41,6 +41,8 @@ export const useCreateChat = () => {
     const newChat: Chat = {
       id: chatId,
       name: 'New chat',
+      parent_directory_id: null,
+      has_children: false,
     };
 
     await mutate(
