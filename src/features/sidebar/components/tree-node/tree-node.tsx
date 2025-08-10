@@ -125,8 +125,8 @@ const TreeNode = ({
         <CollapsibleContent>
           <SidebarMenuSub className="ml-2.5 pl-3.5">
             {isLoadingChildren && (
-              <div className="space-y-2 pl-6">
-                {[...Array(3)].map((_, idx) => (
+              <div className="space-y-2">
+                {[...Array(1)].map((_, idx) => (
                   <Skeleton
                     key={idx}
                     className="h-6 w-full rounded"
