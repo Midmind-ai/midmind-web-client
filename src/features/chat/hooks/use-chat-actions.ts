@@ -61,12 +61,13 @@ export const useChatActions = (actualChatId?: string) => {
       }),
     };
 
-    emitBranchCreated({ branchContext });
-
     const newChatId = await createChat({
       content: textToUse,
       model: DEFAULT_AI_MODEL,
+      parentChatId: parentChatId,
     });
+
+    emitBranchCreated({ branchContext });
 
     openChatInSplitView(newChatId);
   };

@@ -17,6 +17,7 @@ type Props = {
   onDelete: (e: React.MouseEvent<HTMLElement>) => void;
   onOpenInSidePanel: (e: React.MouseEvent<HTMLElement>) => void;
   onOpenInNewTab: (e: React.MouseEvent<HTMLElement>) => void;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const MoreActionsMenu = ({
@@ -25,9 +26,10 @@ const MoreActionsMenu = ({
   onDelete,
   onOpenInSidePanel,
   onOpenInNewTab,
+  onOpenChange,
 }: Props) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <SidebarMenuAction
           asChild

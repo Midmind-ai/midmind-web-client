@@ -1,20 +1,21 @@
-import type { FC, HTMLAttributes } from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 
 import { cn } from '@shared/utils/cn';
 
-const ThemedSpan: FC<HTMLAttributes<HTMLSpanElement>> = ({
-  className,
-  children,
-  ...props
-}) => {
-  return (
-    <span
-      className={cn('text-foreground', className)}
-      {...props}
-    >
-      {children}
-    </span>
-  );
-};
+const ThemedSpan = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        className={cn('text-foreground', className)}
+        {...props}
+      >
+        {children}
+      </span>
+    );
+  }
+);
+
+ThemedSpan.displayName = 'ThemedSpan';
 
 export { ThemedSpan };

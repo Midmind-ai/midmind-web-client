@@ -1,8 +1,4 @@
-import {
-  Sidebar as ShadcnSidebar,
-  SidebarContent,
-  SidebarRail,
-} from '@shared/components/ui/sidebar';
+import { Sidebar as ShadcnSidebar, SidebarContent } from '@shared/components/ui/sidebar';
 
 import FoldersActions from '@features/sidebar/components/folder-actions/folder-actions';
 import FolderList from '@features/sidebar/components/folder-list/folder-list';
@@ -24,7 +20,6 @@ const Sidebar = () => {
           <FolderList />
         </SidebarContent>
       </div>
-      <SidebarRail />
     </ShadcnSidebar>
   );
 };

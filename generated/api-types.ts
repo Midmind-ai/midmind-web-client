@@ -879,6 +879,7 @@ export interface operations {
         parameters: {
             query?: {
                 parent_directory_id?: string;
+                parent_chat_id?: string;
             };
             header?: never;
             path?: never;

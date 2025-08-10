@@ -24,8 +24,12 @@ import {
 } from '@shared/components/ui/tooltip';
 
 import { useIsMobile } from '@shared/hooks/use-mobile';
+import { useSidebarWidth } from '@shared/hooks/use-sidebar-width';
 
 import { cn } from '@shared/utils/cn';
+
+import { SidebarWidthContext, useSidebarWidthContext } from './sidebar-context';
+import SidebarResizeHandle from './sidebar-resize-handle';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -70,6 +74,8 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
+  const [isResizing, setIsResizing] = React.useState(false);
+  const { width, setWidth } = useSidebarWidth();
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
@@ -126,28 +132,35 @@ function SidebarProvider({
     [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
   );
 
+  const widthContextValue = React.useMemo(
+    () => ({ width, setWidth, isResizing, setIsResizing }),
+    [width, setWidth, isResizing, setIsResizing]
+  );
+
   return (
     <SidebarContext.Provider value={contextValue}>
-      <TooltipProvider delayDuration={0}>
-        <div
-          data-slot="sidebar-wrapper"
-          style={
-            {
-              '--sidebar-width': SIDEBAR_WIDTH,
-              '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
-              ...style,
-            } as React.CSSProperties
-          }
-          className={cn(
-            `group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh
-            w-full`,
-            className
-          )}
-          {...props}
-        >
-          {children}
-        </div>
-      </TooltipProvider>
+      <SidebarWidthContext.Provider value={widthContextValue}>
+        <TooltipProvider delayDuration={0}>
+          <div
+            data-slot="sidebar-wrapper"
+            style={
+              {
+                '--sidebar-width': isMobile ? SIDEBAR_WIDTH : `${width}px`,
+                '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
+                ...style,
+              } as React.CSSProperties
+            }
+            className={cn(
+              `group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh
+              w-full`,
+              className
+            )}
+            {...props}
+          >
+            {children}
+          </div>
+        </TooltipProvider>
+      </SidebarWidthContext.Provider>
     </SidebarContext.Provider>
   );
 }
@@ -165,6 +178,7 @@ function Sidebar({
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isResizing } = useSidebarWidthContext();
 
   if (collapsible === 'none') {
     return (
@@ -224,8 +238,8 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          `relative w-(--sidebar-width) bg-transparent transition-[width] duration-200
-          ease-linear`,
+          'relative w-(--sidebar-width) bg-transparent',
+          !isResizing && 'transition-[width] duration-200 ease-linear',
           'group-data-[collapsible=offcanvas]:w-0',
           'group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
@@ -236,8 +250,8 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          `fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width)
-          transition-[left,right,width] duration-200 ease-linear md:flex`,
+          'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) md:flex',
+          !isResizing && 'transition-[left,right,width] duration-200 ease-linear',
           side === 'left'
             ? `left-0
               group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]`
@@ -256,11 +270,13 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex
-            h-full w-full flex-col group-data-[variant=floating]:rounded-lg
+          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border
+            relative flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg
             group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
+          {/* Add resize handle for desktop - only when expanded */}
+          {state === 'expanded' && !isMobile && <SidebarResizeHandle />}
         </div>
       </div>
     </div>
@@ -756,4 +772,5 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
+  useSidebarWidthContext,
 };
