@@ -18,7 +18,7 @@ const MessageList = ({ chatId }: Props) => {
       className="h-full"
       onScroll={handleScroll}
     >
-      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-6">
+      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-9">
         {messages?.map((message, index) => {
           const { id, content } = message;
           const isLastMessage = index === messages.length - 1;
