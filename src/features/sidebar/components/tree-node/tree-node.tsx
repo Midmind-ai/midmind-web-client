@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
 } from '@shared/components/ui/sidebar';
+import { Skeleton } from '@shared/components/ui/skeleton';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
@@ -78,14 +79,26 @@ const TreeNode = ({
   return (
     <SidebarMenuItem>
       <Collapsible
-        className="group/collapsible
-          [&[data-state=open]>button>svg:first-child]:rotate-90"
+        className="group/collapsible [&[data-state=open]>div>svg:first-child]:rotate-90"
         open={isOpen}
         onOpenChange={setIsOpen}
       >
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton className="group/item hover:pr-8">
-            <ChevronRight className="transition-transform" />
+        <div className="flex items-center">
+          <CollapsibleTrigger asChild>
+            <ChevronRight
+              className="hover:bg-accent cursor-pointer rounded p-1 transition-transform"
+              onClick={e => {
+                e.stopPropagation();
+                setIsOpen(!isOpen);
+              }}
+            />
+          </CollapsibleTrigger>
+          <SidebarMenuButton
+            isActive={isActive}
+            className="group/item relative cursor-pointer rounded-sm p-1.5 hover:pr-8
+              data-[active=true]:font-normal"
+            onClick={handleClick}
+          >
             {node.type === 'chat' ? (
               <MessageSquare className="stroke-[1.5px]" />
             ) : (
@@ -106,10 +119,19 @@ const TreeNode = ({
               }}
             />
           </SidebarMenuButton>
-        </CollapsibleTrigger>
+        </div>
         <CollapsibleContent>
           <SidebarMenuSub>
-            {isLoadingChildren && <div className="px-4 py-2 text-sm">Loading...</div>}
+            {isLoadingChildren && (
+              <div className="space-y-2 pl-6">
+                {[...Array(3)].map((_, idx) => (
+                  <Skeleton
+                    key={idx}
+                    className="h-6 w-full rounded"
+                  />
+                ))}
+              </div>
+            )}
             {!isLoadingChildren &&
               childNodes?.map(childNode => (
                 <TreeNode
