@@ -3,7 +3,7 @@ import { Skeleton } from '@shared/components/ui/skeleton';
 
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
 
-import { NODE_STYLES, SKELETON_COUNT } from './constants';
+import { SKELETON_COUNT } from './constants';
 
 type Props = {
   isLoadingChildren: boolean;
@@ -31,9 +31,9 @@ const ChildrenList = ({
   TreeNodeComponent,
 }: Props) => {
   return (
-    <SidebarMenuSub className={NODE_STYLES.childrenContainer}>
+    <SidebarMenuSub className="ml-3.5 pb-0 pl-3.5">
       {isLoadingChildren && (
-        <div className={NODE_STYLES.loadingContainer}>
+        <div className="space-y-2">
           {[...Array(SKELETON_COUNT)].map((_, idx) => (
             <Skeleton
               key={idx}

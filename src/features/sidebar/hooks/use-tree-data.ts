@@ -6,7 +6,7 @@ import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 export type TreeNode = {
   id: string;
   name: string;
-  type: 'directory' | 'chat';
+  type: 'directory' | 'chat' | 'chats';
   hasChildren: boolean;
   parentDirectoryId?: string | null;
   originalData: Directory | Chat;

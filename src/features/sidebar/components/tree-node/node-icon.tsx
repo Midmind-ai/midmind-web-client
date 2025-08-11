@@ -1,19 +1,21 @@
-import { Folder, MessageSquare } from 'lucide-react';
+import { Folder, MessageSquare, MessagesSquare } from 'lucide-react';
 
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
-
-import { NODE_STYLES } from './constants';
 
 type Props = {
   nodeType: TreeNode['type'];
 };
 
 const NodeIcon = ({ nodeType }: Props) => {
-  return nodeType === 'chat' ? (
-    <MessageSquare className={NODE_STYLES.icon} />
-  ) : (
-    <Folder className={NODE_STYLES.icon} />
-  );
+  if (nodeType === 'chat') {
+    return <MessageSquare className="size-4 stroke-[1.5px]" />;
+  }
+
+  if (nodeType === 'chats') {
+    return <MessagesSquare className="size-4 stroke-[1.5px]" />;
+  }
+
+  return <Folder className="size-4 stroke-[1.5px]" />;
 };
 
 export default NodeIcon;

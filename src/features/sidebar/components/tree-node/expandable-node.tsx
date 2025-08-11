@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,7 +14,6 @@ import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
 
 import ChildrenList from './children-list';
-import { NODE_STYLES } from './constants';
 import NodeIcon from './node-icon';
 import TooltipWrapper from './tooltip-wrapper';
 import { useTreeNodeActions } from './use-tree-node-actions';
@@ -52,6 +53,8 @@ const ExpandableNode = ({
   onClick,
   TreeNodeComponent,
 }: Props) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const { handleDelete, handleOpenInSidePanel, handleOpenInNewTab } = useTreeNodeActions({
     nodeId: node.id,
     onDelete,
@@ -67,27 +70,46 @@ const ExpandableNode = ({
   return (
     <SidebarMenuItem>
       <Collapsible
-        className={NODE_STYLES.collapsible}
+        className="group/collapsible [&[data-state=open]>div>svg:first-child]:rotate-90"
         open={isOpen}
         onOpenChange={setIsOpen}
       >
-        <div className={NODE_STYLES.expandContainer}>
-          <CollapsibleTrigger asChild>
+        <div className="flex items-center gap-[3px]">
+          {/* <CollapsibleTrigger asChild>
             <ChevronRight
               className={NODE_STYLES.chevron}
               onClick={handleChevronClick}
             />
-          </CollapsibleTrigger>
+          </CollapsibleTrigger> */}
           <TooltipWrapper content={node.name}>
             <SidebarMenuButton
               isActive={isActive}
-              className={NODE_STYLES.menuButton}
+              className="group/item relative cursor-pointer gap-1.5 rounded-sm p-1 pr-8
+                data-[active=true]:font-normal"
               onClick={onClick}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
-              <NodeIcon nodeType={node.type} />
-              <ThemedSpan className={NODE_STYLES.nodeText}>{node.name}</ThemedSpan>
+              <CollapsibleTrigger asChild>
+                <div
+                  onClick={handleChevronClick}
+                  className="hover:bg-sidebar relative flex size-6 flex-shrink-0
+                    cursor-pointer items-center justify-center rounded-[4px]
+                    transition-colors"
+                >
+                  <ChevronRight
+                    className={`absolute size-5 stroke-[1.5px] transition-transform
+                      ${isOpen ? 'rotate-90' : ''}
+                      ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                  <div className={`${isHovered ? 'opacity-0' : 'opacity-100'}`}>
+                    <NodeIcon nodeType={'chats'} />
+                  </div>
+                </div>
+              </CollapsibleTrigger>
+              <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
               <MoreActionsMenu
-                triggerClassNames={NODE_STYLES.moreActionsMenu}
+                triggerClassNames="opacity-0 group-hover/item:opacity-100"
                 isDeleting={isDeleting}
                 onDelete={handleDelete}
                 onOpenInSidePanel={handleOpenInSidePanel}
