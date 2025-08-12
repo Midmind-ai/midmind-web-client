@@ -1,9 +1,19 @@
 import { copyText } from '@shared/utils/copy-text';
 
-export const useMessageActions = () => {
-  const replyToMessage = (messageId: string) => {
-    // eslint-disable-next-line no-alert
-    alert(`Coming soon for message ${messageId}`);
+import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
+
+export const useMessageActions = (chatId: string) => {
+  const replyToMessage = (messageId: string, content: string) => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().trim();
+
+    emitMessageReply({
+      replyTo: {
+        id: messageId,
+        content: selectedText || content,
+      },
+      targetChatId: chatId,
+    });
   };
 
   return {

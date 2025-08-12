@@ -60,7 +60,7 @@ export const useConversationWithAI = (chatId: string) => {
       role: 'user',
       branches: [],
       llm_model: body.model,
-      reply_content: null,
+      reply_content: body.reply_to?.content || null,
     };
 
     await mutate(

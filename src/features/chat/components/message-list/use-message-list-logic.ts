@@ -19,7 +19,7 @@ export const useMessageListLogic = (chatId: string) => {
   const previousScrollTopPositionRef = useRef(0);
 
   const chatActions = useChatActions(chatId);
-  const messageActions = useMessageActions();
+  const messageActions = useMessageActions(chatId);
 
   const handleAutoScroll = (withAnimation = false) => {
     if (scrollAreaRef.current) {
