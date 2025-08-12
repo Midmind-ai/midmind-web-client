@@ -14,6 +14,7 @@ const FolderList = () => {
     isLoading,
     isDeleting,
     handleDelete,
+    handleRename,
     openChatInNewTab,
     openChatInSidePanel,
   } = useFolderListLogic();
@@ -39,6 +40,7 @@ const FolderList = () => {
                 node={node}
                 isDeleting={isDeleting}
                 onDelete={() => handleDelete(node.id)}
+                onRename={() => handleRename(node.id)}
                 onOpenInNewTab={() => openChatInNewTab(node.id)}
                 onOpenInSidePanel={() => openChatInSidePanel(node.id)}
               />

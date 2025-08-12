@@ -111,11 +111,8 @@ export const useCreateChat = () => {
         reply_content: null,
       };
 
-      // Build the messages cache key with pagination
-      const messagesKey = [
-        ...SWRCacheKeys.GetMessagesPaginated(chatId, 0),
-        `?skip=0&take=${ITEMS_PER_PAGE}`,
-      ];
+      // Build the messages cache key to match useGetChatMessages format
+      const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
 
       await mutate(
         messagesKey,

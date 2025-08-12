@@ -10,12 +10,14 @@ type Props = {
   childNodes?: TreeNodeType[];
   isDeleting: boolean;
   onDelete: VoidFunction;
+  onRename?: VoidFunction;
   onOpenInSidePanel: (id: string) => void;
   onOpenInNewTab: (id: string) => void;
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
     isDeleting: boolean;
     onDelete: VoidFunction;
+    onRename?: VoidFunction;
     onOpenInSidePanel: (id: string) => void;
     onOpenInNewTab: (id: string) => void;
   }>;
@@ -26,6 +28,7 @@ const ChildrenList = ({
   childNodes,
   isDeleting,
   onDelete,
+  onRename,
   onOpenInSidePanel,
   onOpenInNewTab,
   TreeNodeComponent,
@@ -51,6 +54,7 @@ const ChildrenList = ({
             node={childNode}
             isDeleting={isDeleting}
             onDelete={onDelete}
+            onRename={onRename}
             onOpenInSidePanel={onOpenInSidePanel}
             onOpenInNewTab={onOpenInNewTab}
           />

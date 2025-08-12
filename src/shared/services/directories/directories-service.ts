@@ -29,4 +29,10 @@ export class DirectoriesService {
 
     return data;
   }
+
+  static async deleteDirectory(id: string) {
+    const { data } = await baseAxiosInstance.delete<MessageDto>(`/directories/${id}`);
+
+    return data;
+  }
 }

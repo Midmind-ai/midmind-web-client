@@ -1,12 +1,11 @@
 import { SidebarMenuButton } from '@shared/components/ui/sidebar';
 import { ThemedSpan } from '@shared/components/ui/themed-span';
 
-import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
+import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
 
 import NodeIcon from './node-icon';
 import TooltipWrapper from './tooltip-wrapper';
-import { useTreeNodeActions } from './use-tree-node-actions';
 
 type Props = {
   node: TreeNode;
@@ -27,12 +26,18 @@ const LeafNode = ({
   onOpenInNewTab,
   onClick,
 }: Props) => {
-  const { handleDelete, handleOpenInSidePanel, handleOpenInNewTab } = useTreeNodeActions({
-    nodeId: node.id,
-    onDelete,
-    onOpenInSidePanel,
-    onOpenInNewTab,
-  });
+  // Map tree node types to entity types
+  const getEntityType = () => {
+    if (node.type === 'directory') {
+      return 'folder' as const;
+    }
+    if (node.type === 'chat') {
+      return 'chat' as const;
+    }
+
+    // Add mappings for other types as needed
+    return 'folder' as const; // fallback
+  };
 
   return (
     <TooltipWrapper content={node.name}>
@@ -52,12 +57,15 @@ const LeafNode = ({
           />
         </div>
         <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
-        <MoreActionsMenu
-          triggerClassNames="opacity-0 group-hover/item:opacity-100"
-          onDelete={handleDelete}
+        <EntityActionsMenu
+          entityType={getEntityType()}
+          handlers={{
+            onDelete: onDelete,
+            onOpenInNewTab: () => onOpenInNewTab(node.id),
+            onOpenInSidePanel: () => onOpenInSidePanel(node.id),
+          }}
           isDeleting={isDeleting}
-          onOpenInSidePanel={handleOpenInSidePanel}
-          onOpenInNewTab={handleOpenInNewTab}
+          triggerClassName="opacity-0 group-hover/item:opacity-100"
         />
       </SidebarMenuButton>
     </TooltipWrapper>

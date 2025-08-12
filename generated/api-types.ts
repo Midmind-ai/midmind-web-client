@@ -176,6 +176,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/chats/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get chat details */
+    get: operations['ChatController_getChatDetails'];
+    /** Update a chat data */
+    put: operations['ChatController_updateChat'];
+    post?: never;
+    /** Delete the chat */
+    delete: operations['ChatController_deleteChat'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/chats': {
     parameters: {
       query?: never;
@@ -188,24 +207,6 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/chats/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** Update a chat data */
-    put: operations['ChatController_updateChat'];
-    post?: never;
-    /** Delete the chat */
-    delete: operations['ChatController_deleteChat'];
     options?: never;
     head?: never;
     patch?: never;
@@ -397,6 +398,10 @@ export interface components {
       reply_to?: components['schemas']['ReplyToDto'];
       branch_context?: components['schemas']['ConversationBranchContextDto'];
     };
+    UpdateChatDto: {
+      name?: string;
+      directory_id?: string;
+    };
     ChatDto: {
       /** Format: uuid */
       id: string;
@@ -404,9 +409,10 @@ export interface components {
       parent_directory_id: string | null;
       has_children: boolean;
     };
-    UpdateChatDto: {
-      name?: string;
-      directory_id?: string;
+    GetChatDetailsDto: {
+      /** Format: uuid */
+      id: string;
+      name: string;
     };
     PaginationMetadata: {
       total: number;
@@ -461,7 +467,7 @@ export interface components {
       id: string;
       name: string;
       /** @enum {string} */
-      type: 'folder' | 'mindlet' | 'root_chat' | 'branch';
+      type: 'folder' | 'mindlet' | 'chat' | 'branch';
     };
   };
   responses: never;
@@ -769,14 +775,13 @@ export interface operations {
       };
     };
   };
-  ChatController_getUserChats: {
+  ChatController_getChatDetails: {
     parameters: {
-      query?: {
-        parent_directory_id?: string;
-        parent_chat_id?: string;
-      };
+      query?: never;
       header?: never;
-      path?: never;
+      path: {
+        id: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
@@ -786,7 +791,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ChatDto'][];
+          'application/json': components['schemas']['GetChatDetailsDto'];
         };
       };
     };
@@ -833,6 +838,28 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['MessageDto'];
+        };
+      };
+    };
+  };
+  ChatController_getUserChats: {
+    parameters: {
+      query?: {
+        parent_directory_id?: string;
+        parent_chat_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ChatDto'][];
         };
       };
     };

@@ -15,6 +15,7 @@ import LeafNode from './leaf-node';
 type Props = {
   node: TreeNodeType;
   onDelete: VoidFunction;
+  onRename?: VoidFunction;
   isDeleting: boolean;
   onOpenInSidePanel: (id: string) => void;
   onOpenInNewTab: (id: string) => void;
@@ -23,6 +24,7 @@ type Props = {
 const TreeNode = ({
   node,
   onDelete,
+  onRename,
   isDeleting,
   onOpenInSidePanel,
   onOpenInNewTab,
@@ -81,6 +83,7 @@ const TreeNode = ({
       childNodes={childNodes}
       isLoadingChildren={isLoadingChildren}
       onDelete={onDelete}
+      onRename={onRename}
       onOpenInSidePanel={onOpenInSidePanel}
       onOpenInNewTab={onOpenInNewTab}
       onClick={handleClick}

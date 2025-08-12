@@ -15,7 +15,7 @@ import { ThemedSpan } from '@shared/components/ui/themed-span';
 
 import type { TreeItem } from '@shared/types/entities';
 
-import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
+import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import { useTreeLogic } from '@features/sidebar/components/tree/use-tree-logic';
 
 export type DataType = {
@@ -68,21 +68,15 @@ const Tree = ({
       >
         <MessageSquare className="stroke-[1.5px]" />
         <ThemedSpan className="text-primary block truncate">{name}</ThemedSpan>
-        <MoreActionsMenu
-          triggerClassNames="opacity-0 group-hover/item:opacity-100"
-          onDelete={e => {
-            e.stopPropagation();
-            onDelete();
+        <EntityActionsMenu
+          entityType="chat"
+          handlers={{
+            onDelete: onDelete,
+            onOpenInNewTab: () => onOpenInNewTab(id),
+            onOpenInSidePanel: () => onOpenInSidePanel(id),
           }}
           isDeleting={isDeleting}
-          onOpenInSidePanel={e => {
-            e.stopPropagation();
-            onOpenInSidePanel(id);
-          }}
-          onOpenInNewTab={e => {
-            e.stopPropagation();
-            onOpenInNewTab(id);
-          }}
+          triggerClassName="opacity-0 group-hover/item:opacity-100"
         />
       </SidebarMenuButton>
     );
@@ -100,18 +94,15 @@ const Tree = ({
             <ChevronRight className="transition-transform" />
             <Folder />
             <span className="block truncate">{name}</span>
-            <MoreActionsMenu
-              triggerClassNames="opacity-0 group-hover/item:opacity-100"
+            <EntityActionsMenu
+              entityType="folder"
+              handlers={{
+                onDelete: onDelete,
+                onOpenInNewTab: () => onOpenInNewTab(id),
+                onOpenInSidePanel: () => onOpenInSidePanel(id),
+              }}
               isDeleting={isDeleting}
-              onDelete={onDelete}
-              onOpenInSidePanel={e => {
-                e.stopPropagation();
-                onOpenInSidePanel(id);
-              }}
-              onOpenInNewTab={e => {
-                e.stopPropagation();
-                onOpenInNewTab(id);
-              }}
+              triggerClassName="opacity-0 group-hover/item:opacity-100"
             />
           </SidebarMenuButton>
         </CollapsibleTrigger>

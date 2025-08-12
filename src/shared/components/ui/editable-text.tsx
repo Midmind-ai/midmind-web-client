@@ -113,6 +113,10 @@ const EditableText = ({
       e.preventDefault();
       handleCancel();
     }
+
+    // Prevent all key events from bubbling up to parent components
+    // This stops space/other keys from triggering parent hover effects
+    e.stopPropagation();
   };
 
   const handleBlur = () => {
@@ -139,12 +143,24 @@ const EditableText = ({
         onMouseDown={e => {
           e.stopPropagation(); // Prevent parent mouse handlers
         }}
+        onKeyUp={e => {
+          e.stopPropagation(); // Prevent keyup from bubbling
+        }}
+        onKeyPress={e => {
+          e.stopPropagation(); // Prevent keypress from bubbling
+        }}
+        onFocus={e => {
+          e.stopPropagation(); // Prevent focus from bubbling
+        }}
+        onInput={e => {
+          e.stopPropagation(); // Prevent input events from bubbling
+        }}
         placeholder={placeholder}
         disabled={isSubmitting}
         className={`w-full border-0 bg-transparent outline-none ${className} ${
           isSubmitting ? 'cursor-wait opacity-50' : ''
         }`}
-        autoFocus={autoFocus} // Try native autoFocus as backup
+        // autoFocus={autoFocus} // Try native autoFocus as backup
       />
     );
   }

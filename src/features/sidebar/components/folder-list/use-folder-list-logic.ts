@@ -4,7 +4,10 @@ import { AppRoutes, SearchParams } from '@shared/constants/router';
 
 import { useUrlParams } from '@shared/hooks/use-url-params';
 
+import { useInlineEditStore } from '@shared/stores/use-inline-edit-store';
+
 import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
+import { useDeleteDirectory } from '@features/sidebar/hooks/use-delete-directory';
 import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
 import { useChatActions } from '@/features/chat/hooks/use-chat-actions';
@@ -15,14 +18,15 @@ export const useFolderListLogic = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { deleteChat, isLoading: isDeleting } = useDeleteChat();
+  const { deleteChat, isLoading: isDeletingChat } = useDeleteChat();
+  const { deleteDirectory, isDeleting: isDeletingDirectory } = useDeleteDirectory();
   const { openChatInSidePanel, openChatInNewTab } = useChatActions();
   const { value: splitChatId, removeValue } = useUrlParams(SearchParams.Split);
+  const { startEditing } = useInlineEditStore();
 
   const handleDelete = async (nodeId: string) => {
-    // For now, only handle chat deletion
-    // TODO: Add directory deletion when API supports it
     const node = treeNodes.find(n => n.id === nodeId);
+
     if (node?.type === 'chat') {
       await deleteChat(nodeId);
 
@@ -43,14 +47,28 @@ export const useFolderListLogic = () => {
           navigate(AppRoutes.Home);
         }
       }
+    } else if (node?.type === 'directory') {
+      await deleteDirectory({
+        id: nodeId,
+        parentDirectoryId: node.parentDirectoryId ?? undefined,
+      });
+    }
+  };
+
+  const handleRename = (nodeId: string) => {
+    const node = treeNodes.find(n => n.id === nodeId);
+
+    if (node?.type === 'directory' || node?.type === 'chat') {
+      startEditing(nodeId);
     }
   };
 
   return {
     treeNodes,
     isLoading,
-    isDeleting,
+    isDeleting: isDeletingChat || isDeletingDirectory,
     handleDelete,
+    handleRename,
     openChatInSidePanel,
     openChatInNewTab,
   };
