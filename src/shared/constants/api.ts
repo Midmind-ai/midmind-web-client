@@ -1,30 +1,41 @@
+import { createCacheKey } from '@shared/utils/cache-selectors';
+
 export const TIMEOUT = 10000; // 10 seconds
 
+// New array-based cache keys for better cache management
 export const SWRCacheKeys = {
-  SignIn: 'signIn',
-  Logout: 'logout',
-  RefreshToken: 'refreshToken',
-  CurrentUser: 'currentUser',
-  CreateChat: 'createChat',
-  CreateDirectory: 'createDirectory',
-  GetChats: 'getChats',
+  // Auth keys
+  SignIn: createCacheKey('auth', 'signIn'),
+  Logout: createCacheKey('auth', 'logout'),
+  RefreshToken: createCacheKey('auth', 'refreshToken'),
+  CurrentUser: createCacheKey('auth', 'user'),
+
+  // Mutation keys
+  CreateChat: createCacheKey('mutation', 'createChat'),
+  CreateDirectory: createCacheKey('mutation', 'createDirectory'),
+  UpdateChatDetails: createCacheKey('mutation', 'updateChatDetails'),
+  DeleteChat: createCacheKey('mutation', 'deleteChat'),
+  SendMessageToChat: (chatId: string) =>
+    createCacheKey('mutation', 'sendMessage', chatId),
+
+  // Query keys
+  GetChats: createCacheKey('chats'),
   GetChatsWithParent: (parentDirectoryId?: string, parentChatId?: string) => {
     if (parentDirectoryId) {
-      return `getChats?parent_directory_id=${parentDirectoryId}`;
+      return createCacheKey('chats', 'directory', parentDirectoryId);
     }
     if (parentChatId) {
-      return `getChats?parent_chat_id=${parentChatId}`;
+      return createCacheKey('chats', 'chat', parentChatId);
     }
 
-    return 'getChats';
+    return createCacheKey('chats');
   },
   GetDirectories: (parentId?: string) =>
-    parentId ? `getDirectories/${parentId}` : 'getDirectories',
-  GetChatDetails: (id: string) => `getChatDetails/${id}`,
-  UpdateChatDetails: 'updateChatDetails',
-  DeleteChat: 'deleteChat',
-  GetMessages: (chatId: string) => `getMessages/${chatId}`,
-  SendMessageToChat: (chatId: string) => `sendMessageToChat/${chatId}`,
+    parentId ? createCacheKey('directories', parentId) : createCacheKey('directories'),
+  GetChatDetails: (id: string) => createCacheKey('chat', id),
+  GetMessages: (chatId: string) => createCacheKey('messages', chatId),
+  GetMessagesPaginated: (chatId: string, pageIndex: number) =>
+    createCacheKey('messages', chatId, pageIndex),
 } as const;
 
 export const ApiErrorCodes = {

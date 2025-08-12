@@ -96,6 +96,7 @@ const handleContentChunk = (params: ChunkHandlerParams): void => {
           created_at: new Date().toISOString(),
           branches: [],
           llm_model: model,
+          reply_content: null,
         });
       }),
       { revalidate: false, populateCache: true }

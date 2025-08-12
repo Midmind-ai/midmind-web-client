@@ -8,6 +8,8 @@ import { ChatsService } from '@shared/services/chats/chats-service';
 
 import type { Chat } from '@shared/types/entities';
 
+import { CacheSelectors } from '@shared/utils/cache-selectors';
+
 type DeleteChatFetcherArgs = {
   arg: {
     id: string;
@@ -22,7 +24,7 @@ export const useDeleteChat = () => {
     error,
   } = useSWRMutation(
     SWRCacheKeys.DeleteChat,
-    async (_key: string, { arg }: DeleteChatFetcherArgs) => {
+    async (_key: readonly unknown[], { arg }: DeleteChatFetcherArgs) => {
       return ChatsService.deleteChat(arg.id);
     }
   );
@@ -32,8 +34,9 @@ export const useDeleteChat = () => {
       { id: chatId },
       {
         onSuccess: () => {
+          // Update all chat lists (root, directory-based, and branch-based)
           mutate(
-            SWRCacheKeys.GetChats,
+            CacheSelectors.allChats,
             produce((draft?: Chat[]) => {
               if (!draft) {
                 return;
@@ -47,6 +50,12 @@ export const useDeleteChat = () => {
             }),
             false
           );
+
+          // Also invalidate the specific chat details cache
+          mutate(CacheSelectors.specificChatDetails(chatId), undefined, false);
+
+          // Invalidate message cache for this chat
+          mutate(CacheSelectors.chatMessages(chatId), undefined, false);
         },
       }
     );

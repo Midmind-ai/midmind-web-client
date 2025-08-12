@@ -4,6 +4,10 @@ import ChatMessageForm from '@features/chat/components/chat-message-form/chat-me
 import MessageList from '@features/chat/components/message-list/message-list';
 import NavigationHeader from '@features/navigation-header/navigation-header';
 
+import { usePageTitle } from '@/shared/hooks/use-page-title';
+
+import { useGetChatDetails } from './hooks/use-get-chat-details';
+
 type Props = {
   chatId: string;
   showCloseButton?: boolean;
@@ -12,6 +16,9 @@ type Props = {
 };
 
 const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
+  const { chatDetails } = useGetChatDetails(chatId);
+  usePageTitle(chatDetails?.name || '');
+
   return (
     <div className="flex h-screen flex-col">
       <NavigationHeader

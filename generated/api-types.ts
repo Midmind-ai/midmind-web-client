@@ -100,44 +100,7 @@ export interface paths {
         /** Update current user */
         put: operations["UserController_updateCurrentUser"];
         post?: never;
-        /** Delete current user */
-        delete: operations["UserController_deleteCurrentUser"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all users */
-        get: operations["UserController_getAllUsers"];
-        put?: never;
-        post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/users/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a user by id */
-        get: operations["UserController_getUserById"];
-        /** Update user information */
-        put: operations["UserController_updateUser"];
-        post?: never;
-        /** Delete a user */
-        delete: operations["UserController_deleteUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -282,6 +245,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/chats/{id}/breadcrumbs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get breadcrumbs for a chat */
+        get: operations["BreadcrumbsController_getBreadcrumbsForChat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -333,18 +313,6 @@ export interface components {
             /** Format: date-time */
             last_seen?: string;
         };
-        PaginationMetadata: {
-            total: number;
-            lastPage: number;
-            currentPage: number;
-            perPage: number;
-            prev: number | null;
-            next: number | null;
-        };
-        PaginatedResult: {
-            data: unknown[][];
-            meta: components["schemas"]["PaginationMetadata"];
-        };
         CreateDirectoryDto: {
             /** Format: uuid */
             id: string;
@@ -394,6 +362,11 @@ export interface components {
             /** @enum {string} */
             type: "error" | "title" | "content" | "complete";
         };
+        ReplyToDto: {
+            /** Format: uuid */
+            id: string;
+            content: string;
+        };
         ConversationBranchContextDto: {
             /** Format: uuid */
             parent_chat_id: string;
@@ -412,9 +385,12 @@ export interface components {
             chat_id: string;
             /** Format: uuid */
             message_id: string;
-            content: string;
+            /** Format: uuid */
+            directory_id?: string;
             /** @enum {string} */
             model: "gemini-2.0-flash-lite" | "gemini-2.0-flash" | "gemini-2.5-flash" | "gemini-2.5-pro";
+            content: string;
+            reply_to?: components["schemas"]["ReplyToDto"];
             branch_context?: components["schemas"]["ConversationBranchContextDto"];
         };
         ChatDto: {
@@ -427,6 +403,18 @@ export interface components {
         UpdateChatDto: {
             name?: string;
             directory_id?: string;
+        };
+        PaginationMetadata: {
+            total: number;
+            lastPage: number;
+            currentPage: number;
+            perPage: number;
+            prev: number | null;
+            next: number | null;
+        };
+        PaginatedResult: {
+            data: unknown[][];
+            meta: components["schemas"]["PaginationMetadata"];
         };
         AppMessageBranchDto: {
             /** Format: uuid */
@@ -449,6 +437,7 @@ export interface components {
             /** @enum {string} */
             role: "model" | "user";
             llm_model: string | null;
+            reply_content: string | null;
             branches: components["schemas"]["AppMessageBranchDto"][];
         };
         BranchContextByMessageIdDto: {
@@ -462,6 +451,13 @@ export interface components {
             context_type: "full_message" | "text_selection";
             end_position: number | null;
             start_position: number | null;
+        };
+        ChatBreadcrumbsDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet" | "root_chat" | "branch";
         };
     };
     responses: never;
@@ -610,116 +606,6 @@ export interface operations {
                 "application/json": components["schemas"]["UpdateUserDto"];
             };
         };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageDto"];
-                };
-            };
-        };
-    };
-    UserController_deleteCurrentUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageDto"];
-                };
-            };
-        };
-    };
-    UserController_getAllUsers: {
-        parameters: {
-            query?: {
-                skip?: number;
-                take?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResult"] & {
-                        data?: components["schemas"]["UserDto"][];
-                    };
-                };
-            };
-        };
-    };
-    UserController_getUserById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserDto"];
-                };
-            };
-        };
-    };
-    UserController_updateUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageDto"];
-                };
-            };
-        };
-    };
-    UserController_deleteUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -986,6 +872,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BranchContextByMessageIdDto"][];
+                };
+            };
+        };
+    };
+    BreadcrumbsController_getBreadcrumbsForChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatBreadcrumbsDto"][];
                 };
             };
         };

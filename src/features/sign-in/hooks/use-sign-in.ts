@@ -16,7 +16,7 @@ export const useSignIn = () => {
     error,
   } = useSWRMutation(
     SWRCacheKeys.SignIn,
-    async (_key: string, { arg }: SignInFetcherArgs) => {
+    async (_key: readonly unknown[], { arg }: SignInFetcherArgs) => {
       return AuthService.signIn(arg);
     }
   );
