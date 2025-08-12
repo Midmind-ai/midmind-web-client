@@ -46,7 +46,10 @@ const LeafNode = ({
           className="flex size-6 flex-shrink-0 cursor-pointer items-center justify-center
             rounded-[4px] transition-colors"
         >
-          <NodeIcon nodeType={node.type} />
+          <NodeIcon
+            nodeType={node.type}
+            hasChildren={node.hasChildren}
+          />
         </div>
         <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
         <MoreActionsMenu

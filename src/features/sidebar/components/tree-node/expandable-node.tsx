@@ -7,11 +7,15 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 
+import EditableText from '@shared/components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@shared/components/ui/sidebar';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
+
+import { useInlineEditStore } from '@shared/stores/use-inline-edit-store';
 
 import MoreActionsMenu from '@features/sidebar/components/more-actions-menu/more-actions-menu';
+import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
+import { useUpdateDirectory } from '@features/sidebar/hooks/use-update-directory';
 
 import ChildrenList from './children-list';
 import NodeIcon from './node-icon';
@@ -55,6 +59,11 @@ const ExpandableNode = ({
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  const { updateDirectory } = useUpdateDirectory();
+  const { finalizeDirectoryCreation, removeTemporaryDirectory } = useCreateDirectory();
+  const { isEditing } = useInlineEditStore();
+  const isCurrentlyEditing = isEditing(node.id);
+
   const { handleDelete, handleOpenInSidePanel, handleOpenInNewTab } = useTreeNodeActions({
     nodeId: node.id,
     onDelete,
@@ -62,8 +71,35 @@ const ExpandableNode = ({
     onOpenInNewTab,
   });
 
+  const handleDirectoryRename = async (newName: string) => {
+    if (node.type === 'directory') {
+      // Check if this is a new directory (empty name means it was just created)
+      if (node.name === '') {
+        // This is a new directory being named for the first time
+        await finalizeDirectoryCreation(node.id, newName);
+      } else {
+        // This is an existing directory being renamed
+        await updateDirectory({ id: node.id, name: newName });
+      }
+    }
+  };
+
+  const handleDirectoryCancel = async () => {
+    if (node.type === 'directory' && node.name === '') {
+      // This is a new directory being canceled - remove from cache
+      const parentDirectoryId = node.parentDirectoryId || undefined;
+      await removeTemporaryDirectory(node.id, parentDirectoryId);
+    }
+  };
+
   const handleChevronClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Prevent expand/collapse when in edit mode
+    if (isCurrentlyEditing) {
+      return;
+    }
+
     setIsOpen(!isOpen);
   };
 
@@ -72,15 +108,9 @@ const ExpandableNode = ({
       <Collapsible
         className="group/collapsible [&[data-state=open]>div>svg:first-child]:rotate-90"
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={isCurrentlyEditing ? undefined : setIsOpen}
       >
         <div className="flex items-center gap-[3px]">
-          {/* <CollapsibleTrigger asChild>
-            <ChevronRight
-              className={NODE_STYLES.chevron}
-              onClick={handleChevronClick}
-            />
-          </CollapsibleTrigger> */}
           <TooltipWrapper content={node.name}>
             <SidebarMenuButton
               isActive={isActive}
@@ -93,21 +123,36 @@ const ExpandableNode = ({
               <CollapsibleTrigger asChild>
                 <div
                   onClick={handleChevronClick}
-                  className="hover:bg-sidebar relative flex size-6 flex-shrink-0
-                    cursor-pointer items-center justify-center rounded-[4px]
-                    transition-colors"
+                  className={`relative flex size-6 flex-shrink-0 items-center
+                    justify-center rounded-[4px] transition-colors ${
+                      isCurrentlyEditing
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'hover:bg-sidebar cursor-pointer'
+                    }`}
                 >
                   <ChevronRight
                     className={`absolute size-5 stroke-[1.5px] transition-transform
                       ${isOpen ? 'rotate-90' : ''}
-                      ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+                      ${isHovered && !isCurrentlyEditing ? 'opacity-100' : 'opacity-0'}`}
                   />
-                  <div className={`${isHovered ? 'opacity-0' : 'opacity-100'}`}>
-                    <NodeIcon nodeType={'chats'} />
+                  <div
+                    className={`${isHovered && !isCurrentlyEditing ? 'opacity-0' : 'opacity-100'}`}
+                  >
+                    <NodeIcon
+                      nodeType={node.type}
+                      hasChildren={node.hasChildren}
+                    />
                   </div>
                 </div>
               </CollapsibleTrigger>
-              <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
+              <EditableText
+                entityId={node.id}
+                currentValue={node.name}
+                onSave={handleDirectoryRename}
+                onCancel={handleDirectoryCancel}
+                className="text-primary block truncate"
+                placeholder="Directory name..."
+              />
               <MoreActionsMenu
                 triggerClassNames="opacity-0 group-hover/item:opacity-100"
                 isDeleting={isDeleting}

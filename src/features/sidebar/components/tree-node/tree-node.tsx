@@ -55,8 +55,8 @@ const TreeNode = ({
     };
   }, [node.id, setExpanded]);
 
-  // For leaf nodes (chats without children or directories without children)
-  if (!node.hasChildren) {
+  // For leaf nodes (only for future entity types - directories and chats are always expandable)
+  if (!node.hasChildren && node.type !== 'directory' && node.type !== 'chat') {
     return (
       <LeafNode
         node={node}
@@ -70,7 +70,7 @@ const TreeNode = ({
     );
   }
 
-  // For nodes with children (expandable)
+  // For expandable nodes (directories and chats are always expandable)
   return (
     <ExpandableNode
       node={node}

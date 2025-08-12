@@ -11,8 +11,10 @@ export const useGetDirectories = (parentId?: string | null) => {
     error,
     mutate,
   } = useSWR(
-    parentId !== null ? SWRCacheKeys.GetDirectories(parentId) : null,
-    parentId !== null ? () => DirectoriesService.getDirectories(parentId) : null
+    parentId !== null ? SWRCacheKeys.GetDirectories(parentId || undefined) : null,
+    parentId !== null
+      ? () => DirectoriesService.getDirectories(parentId || undefined)
+      : null
   );
 
   return {

@@ -11,12 +11,15 @@ import { SidebarMenuButton } from '@shared/components/ui/sidebar';
 
 import { AppRoutes } from '@shared/constants/router';
 
-import { useModalActions } from '@shared/hooks/use-modal-actions';
+import { useInlineEditStore } from '@shared/stores/use-inline-edit-store';
+
+import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
 
 const FolderActions = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { openModal } = useModalActions();
+  const { startEditing } = useInlineEditStore();
+  const { createDirectoryInline } = useCreateDirectory();
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -28,11 +31,16 @@ const FolderActions = () => {
     navigate(url);
   };
 
-  const handleCreateDirectory = () => {
-    // Open modal for creating root directory (no parent)
-    openModal('CreateDirectoryModal', {
-      parentDirectoryId: undefined,
-    });
+  const handleCreateDirectory = async () => {
+    // Create new directory inline (no parent - root level)
+    const newDirectoryId = await createDirectoryInline();
+
+    if (newDirectoryId) {
+      // Add small delay to ensure component renders before focusing
+      setTimeout(() => {
+        startEditing(newDirectoryId);
+      }, 50);
+    }
   };
 
   return (

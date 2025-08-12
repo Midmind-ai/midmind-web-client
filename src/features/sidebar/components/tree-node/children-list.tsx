@@ -43,7 +43,9 @@ const ChildrenList = ({
         </div>
       )}
       {!isLoadingChildren &&
-        childNodes?.map(childNode => (
+        childNodes &&
+        childNodes.length > 0 &&
+        childNodes.map(childNode => (
           <TreeNodeComponent
             key={childNode.id}
             node={childNode}
@@ -53,6 +55,11 @@ const ChildrenList = ({
             onOpenInNewTab={onOpenInNewTab}
           />
         ))}
+      {!isLoadingChildren && (!childNodes || childNodes.length === 0) && (
+        <div className="text-muted-foreground ml-3 px-2 py-1 text-sm opacity-45">
+          Empty
+        </div>
+      )}
     </SidebarMenuSub>
   );
 };

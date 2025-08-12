@@ -4,6 +4,7 @@ import type { components } from 'generated/api-types';
 
 export type Directory = components['schemas']['GetDirectoryDto'];
 export type CreateDirectoryDto = components['schemas']['CreateDirectoryDto'];
+export type UpdateDirectoryDto = components['schemas']['UpdateDirectoryDto'];
 export type MessageDto = components['schemas']['MessageDto'];
 
 export class DirectoriesService {
@@ -19,6 +20,12 @@ export class DirectoriesService {
 
   static async createDirectory(body: CreateDirectoryDto) {
     const { data } = await baseAxiosInstance.post<MessageDto>('/directories', body);
+
+    return data;
+  }
+
+  static async updateDirectory(id: string, body: UpdateDirectoryDto) {
+    const { data } = await baseAxiosInstance.put<MessageDto>(`/directories/${id}`, body);
 
     return data;
   }
