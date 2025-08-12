@@ -2,9 +2,11 @@ import { ContextMenu, ContextMenuTrigger } from '@shared/components/ui/context-m
 import { ThemedP } from '@shared/components/ui/themed-p';
 
 import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
+import MessageReply from '@features/chat/components/message-reply/message-reply';
 
 type Props = {
   content: string;
+  reply_content: string | null;
   onCopyText: VoidFunction;
   onReply: VoidFunction;
   onNewAttachedBranch: VoidFunction;
@@ -15,6 +17,7 @@ type Props = {
 
 const UserMessage = ({
   content,
+  reply_content,
   onCopyText,
   onReply,
   onNewAttachedBranch,
@@ -29,11 +32,17 @@ const UserMessage = ({
           className="data-[state=open]:bg-muted/50 w-full bg-transparent p-2.5
             transition-colors duration-200"
         >
-          <div
-            className="bg-accent ml-auto w-fit max-w-[465px] rounded-[10px] p-2.5
-              select-text"
-          >
-            <ThemedP className="text-base font-light">{content}</ThemedP>
+          <div className="ml-auto w-fit max-w-[465px]">
+            {reply_content && (
+              <MessageReply
+                content={reply_content}
+                className="mx-4"
+                placement="message"
+              />
+            )}
+            <div className="bg-accent rounded-[10px] p-2.5 select-text">
+              <ThemedP className="text-base font-light">{content}</ThemedP>
+            </div>
           </div>
         </div>
       </ContextMenuTrigger>

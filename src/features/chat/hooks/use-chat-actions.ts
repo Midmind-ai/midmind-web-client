@@ -12,6 +12,7 @@ import type {
   ContextType,
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
+import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
 
 export const useChatActions = (actualChatId?: string) => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ export const useChatActions = (actualChatId?: string) => {
     selectionContext,
   }: CreateBranchArgs) => {
     const contextType: ContextType = selectionContext ? 'text_selection' : 'full_message';
+    const isTextSelection = contextType === 'text_selection';
 
     const textToUse = selectionContext?.selectedText || content;
 
@@ -54,7 +56,7 @@ export const useChatActions = (actualChatId?: string) => {
       parent_message_id: messageId,
       connection_type: connectionType,
       context_type: contextType,
-      ...(contextType === 'text_selection' && {
+      ...(isTextSelection && {
         selected_text: textToUse,
         start_position: selectionContext?.startPosition,
         end_position: selectionContext?.endPosition,
@@ -70,6 +72,19 @@ export const useChatActions = (actualChatId?: string) => {
     emitBranchCreated({ branchContext });
 
     openChatInSplitView(newChatId);
+
+    if (isTextSelection) {
+      // setTimeout is used to ensure the component has time to render and subscribe
+      setTimeout(() => {
+        emitMessageReply({
+          replyTo: {
+            id: messageId,
+            content: textToUse,
+          },
+          targetChatId: newChatId,
+        });
+      }, 500);
+    }
   };
 
   const createAttachedBranch = (

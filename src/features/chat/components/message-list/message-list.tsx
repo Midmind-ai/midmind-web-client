@@ -27,9 +27,9 @@ const MessageList = ({ chatId }: Props) => {
             return (
               <UserMessage
                 key={id}
-                content={content}
+                {...message}
                 onCopyText={() => messageActions.copyText(content)}
-                onReply={() => messageActions.replyToMessage(id)}
+                onReply={() => messageActions.replyToMessage(id, content)}
                 onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
                 onNewDetachedBranch={() => chatActions.createDetachedBranch(id, content)}
                 onNewTemporaryBranch={() => {
@@ -46,7 +46,7 @@ const MessageList = ({ chatId }: Props) => {
               {...message}
               isLastMessage={isLastMessage}
               onCopyText={() => messageActions.copyText(content)}
-              onReply={() => messageActions.replyToMessage(id)}
+              onReply={() => messageActions.replyToMessage(id, content)}
               onOpenBranch={() => {}}
               onOpenInSidePanel={(branchChatId: string) => {
                 chatActions.openChatInSidePanel(branchChatId);

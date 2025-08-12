@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef } from 'react';
+import { type KeyboardEvent, useRef, useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -11,10 +11,19 @@ import type { ConversationWithAIRequestDto } from '@shared/services/conversation
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useConversationWithAI } from '@features/chat/hooks/use-conversation-with-ai';
 import type { OnSubmitArgs, LLModel } from '@features/chat/types/chat-types';
+import {
+  subscribeToMessageReply,
+  unsubscribeFromMessageReply,
+  type MessageReplyEvent,
+} from '@features/chat/utils/message-reply-emitter';
 
 type ChatMessageFormData = {
   content: string;
   model: LLModel;
+  replyInfo?: {
+    id: string;
+    content: string;
+  };
 };
 
 type UseChatMessageFormLogicProps = {
@@ -37,27 +46,37 @@ export const useChatMessageFormLogic = ({
     handleSubmit,
     reset,
     control,
+    setValue,
+    watch,
     formState: { isValid },
   } = useForm<ChatMessageFormData>({
     resolver: zodResolver(
       z.object({
-        content: z.string().min(1).trim(),
+        content: z.string().min(1, 'Message cannot be empty'),
         model: z.enum([
           'gemini-2.0-flash-lite',
           'gemini-2.0-flash',
           'gemini-2.5-flash',
           'gemini-2.5-pro',
         ]),
+        replyInfo: z
+          .object({
+            content: z.string(),
+            id: z.string(),
+          })
+          .optional(),
       })
     ),
-    defaultValues: {
+    values: {
       content: '',
       model: DEFAULT_AI_MODEL,
+      replyInfo: undefined,
     },
     mode: 'onChange',
   });
 
   const actualChatId = chatId || urlChatId;
+  const replyInfo = watch('replyInfo');
 
   const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
     useConversationWithAI(actualChatId);
@@ -72,7 +91,7 @@ export const useChatMessageFormLogic = ({
     } else {
       // For existing chat
       const currentContext = `${actualChatId}:${branchContext?.parent_message_id || ''}`;
-      const shouldIncludeThreadContext =
+      const shouldIncludeBranchContext =
         branchContext && currentContext !== lastProcessedContextRef.current;
 
       conversationWithAI({
@@ -80,10 +99,11 @@ export const useChatMessageFormLogic = ({
         message_id: uuidv4(),
         content: data.content,
         model: data.model,
-        ...(shouldIncludeThreadContext && { branch_context: branchContext }),
+        ...(data.replyInfo && { reply_to: data.replyInfo }),
+        ...(shouldIncludeBranchContext && { branch_context: branchContext }),
       });
 
-      if (shouldIncludeThreadContext) {
+      if (shouldIncludeBranchContext) {
         lastProcessedContextRef.current = currentContext;
       }
     }
@@ -91,6 +111,7 @@ export const useChatMessageFormLogic = ({
     reset({
       content: '',
       model: data.model,
+      replyInfo: undefined,
     });
   };
 
@@ -100,15 +121,46 @@ export const useChatMessageFormLogic = ({
 
       handleSubmit(handleFormSubmit)();
     }
+
+    if (event.key === 'Escape') {
+      reset({
+        replyInfo: undefined,
+      });
+    }
   };
 
+  useEffect(() => {
+    // For home page
+    if (!actualChatId) {
+      return;
+    }
+
+    const handleMessageReply = (event: MessageReplyEvent) => {
+      if (event.targetChatId && event.targetChatId !== actualChatId) {
+        return;
+      }
+
+      setValue('replyInfo', {
+        id: event.replyTo.id,
+        content: event.replyTo.content,
+      });
+    };
+
+    subscribeToMessageReply(handleMessageReply);
+
+    return () => {
+      unsubscribeFromMessageReply(handleMessageReply);
+    };
+  }, [setValue, actualChatId]);
+
   return {
-    hasActiveRequest,
     isValid,
+    hasActiveRequest,
     isLoading,
     error,
-    register,
     control,
+    replyInfo,
+    register,
     handleSubmit,
     handleFormSubmit,
     abortCurrentRequest,
