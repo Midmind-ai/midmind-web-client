@@ -22,8 +22,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useSidebarWidth } from '@/hooks/use-sidebar-width';
+import { useIsMobile } from '@/hooks/utils/use-mobile';
+import { useSidebarWidth } from '@/hooks/utils/use-sidebar-width';
 import { cn } from '@/utils/cn';
 
 import { SidebarWidthContext, useSidebarWidthContext } from './sidebar-context';

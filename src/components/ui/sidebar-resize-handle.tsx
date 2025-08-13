@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { clampWidth } from '@/hooks/use-sidebar-width';
+import { clampWidth } from '@/hooks/utils/use-sidebar-width';
 import { cn } from '@/utils/cn';
 
 import { useSidebarWidthContext } from './sidebar-context';

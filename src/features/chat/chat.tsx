@@ -2,7 +2,7 @@ import ChatMessageForm from '@features/chat/components/chat-message-form/chat-me
 import MessageList from '@features/chat/components/message-list/message-list';
 import NavigationHeader from '@features/navigation-header/navigation-header';
 
-import { usePageTitle } from '@/hooks/use-page-title';
+import { usePageTitle } from '@/hooks/utils/use-page-title';
 import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
 
 import { useGetChatDetails } from './hooks/use-get-chat-details';

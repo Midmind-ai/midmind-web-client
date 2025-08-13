@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import type { BaseModalProps } from '@/constants/modals';
-import { useModalActions } from '@/hooks/use-modal-actions';
+import { useModalOperations } from '@/hooks/logic/use-modal-operations';
 
 export type TestModalProps = {
   title: string;
@@ -16,7 +16,7 @@ export type TestModalProps = {
 } & BaseModalProps;
 
 const TestModal = ({ open, onAnimationEnd, title, description }: TestModalProps) => {
-  const { closeModal } = useModalActions();
+  const { closeModal } = useModalOperations();
 
   return (
     <Dialog

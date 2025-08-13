@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/resizable';
 import { LocalStorageKeys } from '@/constants/local-storage';
 import { SearchParams } from '@/constants/router';
-import { useUrlParams } from '@/hooks/use-url-params';
+import { useUrlParams } from '@/hooks/utils/use-url-params';
 import { cn } from '@/utils/cn';
 import { getFromStorage, setToStorage } from '@/utils/local-storage';
 

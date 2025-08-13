@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { BaseModalProps } from '@/constants/modals';
-import { useModalActions } from '@/hooks/use-modal-actions';
+import { useModalOperations } from '@/hooks/logic/use-modal-operations';
 
 const createDirectorySchema = z.object({
   name: z.string().min(1, 'Directory name is required').trim(),
@@ -33,7 +33,7 @@ const CreateDirectoryModal = ({
   onAnimationEnd,
   parentDirectoryId,
 }: CreateDirectoryModalProps) => {
-  const { closeModal } = useModalActions();
+  const { closeModal } = useModalOperations();
   const { createDirectory, isCreating } = useCreateDirectory();
 
   const {

@@ -6,8 +6,7 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { SWRCacheKeys } from '@/constants/api';
 import { LocalStorageKeys } from '@/constants/local-storage';
 import { AppRoutes } from '@/constants/router';
-import { useCurrentUser } from '@/hooks/use-current-user';
-import { useLogout } from '@/hooks/use-logout';
+import { useCurrentUser, useLogout } from '@/hooks/logic/use-auth-operations';
 import { removeFromStorage } from '@/utils/local-storage';
 
 export const useUserDropdownLogic = () => {

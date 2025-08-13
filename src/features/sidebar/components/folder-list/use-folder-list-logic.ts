@@ -6,7 +6,7 @@ import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
 import { AppRoutes, SearchParams } from '@/constants/router';
 import { useChatActions } from '@/features/chat/hooks/use-chat-actions';
-import { useUrlParams } from '@/hooks/use-url-params';
+import { useUrlParams } from '@/hooks/utils/use-url-params';
 import { useInlineEditStore } from '@/stores/use-inline-edit-store';
 
 export const useFolderListLogic = () => {
