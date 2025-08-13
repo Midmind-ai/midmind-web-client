@@ -17,6 +17,7 @@ export const CACHE_KEYS = {
       return ['chats'];
     },
     details: (id: string) => ['chat', id],
+    breadcrumbs: (id: string) => ['breadcrumbs', id],
   },
   directories: {
     all: ['directories'],

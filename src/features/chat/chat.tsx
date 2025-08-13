@@ -16,6 +16,7 @@ type Props = {
 
 const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
   const { chatDetails } = useGetChatDetails(chatId);
+
   usePageTitle(chatDetails?.name || '');
 
   return (

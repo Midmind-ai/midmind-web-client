@@ -1,17 +1,17 @@
 import {
-  AsteriskIcon,
+  // AsteriskIcon,
   BoxIcon,
-  BoxSelectIcon,
-  CodeXml,
-  CommandIcon,
+  // BoxSelectIcon,
+  // CodeXml,
+  // CommandIcon,
   FolderIcon,
   GitMergeIcon,
   MessageSquare,
-  Text,
+  // Text,
   type LucideProps,
 } from 'lucide-react';
 
-import { EntityEnum, type EntityType } from '@shared-types/entity';
+import type { EntityType } from '@shared-types/entity';
 
 export const renderEntityIcon = (
   type: EntityType,
@@ -19,61 +19,61 @@ export const renderEntityIcon = (
   iconProps?: LucideProps
 ) => {
   const icons: Record<EntityType, React.ReactElement> = {
-    [EntityEnum.Workspace]: (
-      <CommandIcon
-        className={size}
-        {...iconProps}
-      />
-    ),
-    [EntityEnum.Folder]: (
+    // workspace: (
+    //   <CommandIcon
+    //     className={size}
+    //     {...iconProps}
+    //   />
+    // ),
+    folder: (
       <FolderIcon
         className={size}
         {...iconProps}
       />
     ),
-    [EntityEnum.Mindlet]: (
+    mindlet: (
       <BoxIcon
         className={size}
         color="oklch(62.7% 0.194 149.214)"
         {...iconProps}
       />
     ),
-    [EntityEnum.Map]: (
-      <BoxSelectIcon
-        className={size}
-        {...iconProps}
-      />
-    ),
-    [EntityEnum.RootChat]: (
-      <AsteriskIcon
-        className={size}
-        {...iconProps}
-      />
-    ),
-    [EntityEnum.BranchChat]: (
+    // map: (
+    //   <BoxSelectIcon
+    //     className={size}
+    //     {...iconProps}
+    //   />
+    // ),
+    // rootChat: (
+    //   <AsteriskIcon
+    //     className={size}
+    //     {...iconProps}
+    //   />
+    // ),
+    branch: (
       <GitMergeIcon
         className={size}
         {...iconProps}
       />
     ),
-    [EntityEnum.Chat]: (
+    chat: (
       <MessageSquare
         className={size}
         {...iconProps}
       />
     ),
-    [EntityEnum.Note]: (
-      <Text
-        className={size}
-        {...iconProps}
-      />
-    ),
-    [EntityEnum.Prompt]: (
-      <CodeXml
-        className={size}
-        {...iconProps}
-      />
-    ),
+    // note: (
+    //   <Text
+    //     className={size}
+    //     {...iconProps}
+    //   />
+    // ),
+    // prompt: (
+    //   <CodeXml
+    //     className={size}
+    //     {...iconProps}
+    //   />
+    // ),
   };
 
   return icons[type];

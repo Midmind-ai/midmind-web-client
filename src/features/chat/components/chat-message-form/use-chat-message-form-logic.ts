@@ -115,6 +115,12 @@ export const useChatMessageFormLogic = ({
     });
   };
 
+  const handleCloseReply = () => {
+    reset({
+      replyInfo: undefined,
+    });
+  };
+
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -123,9 +129,7 @@ export const useChatMessageFormLogic = ({
     }
 
     if (event.key === 'Escape') {
-      reset({
-        replyInfo: undefined,
-      });
+      handleCloseReply();
     }
   };
 
@@ -165,5 +169,6 @@ export const useChatMessageFormLogic = ({
     handleFormSubmit,
     abortCurrentRequest,
     handleKeyDown,
+    handleCloseReply,
   };
 };
