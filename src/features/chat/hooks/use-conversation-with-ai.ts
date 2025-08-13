@@ -4,7 +4,7 @@ import useSWRMutation from 'swr/mutation';
 
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { MUTATION_KEYS } from '@/hooks/cache-keys';
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
@@ -21,7 +21,7 @@ export const useConversationWithAI = (chatId: string) => {
     isMutating: isLoading,
     error,
   } = useSWRMutation(
-    SWRCacheKeys.SendMessageToChat(chatId),
+    MUTATION_KEYS.chats.sendMessage(chatId),
     async (_, { arg }: { arg: ConversationWithAIRequestDto }) => {
       const abortController = createAbortController(chatId);
 

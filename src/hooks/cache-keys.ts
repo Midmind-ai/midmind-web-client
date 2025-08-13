@@ -4,6 +4,29 @@ export const CACHE_KEYS = {
     refreshToken: ['auth', 'refreshToken'],
     signIn: ['auth', 'signIn'],
   },
+  chats: {
+    all: ['chats'],
+    withParent: (parentDirectoryId?: string, parentChatId?: string) => {
+      if (parentDirectoryId) {
+        return ['chats', 'directory', parentDirectoryId];
+      }
+      if (parentChatId) {
+        return ['chats', 'chat', parentChatId];
+      }
+
+      return ['chats'];
+    },
+    details: (id: string) => ['chat', id],
+  },
+  directories: {
+    all: ['directories'],
+    withParent: (parentId?: string) =>
+      parentId ? ['directories', parentId] : ['directories'],
+  },
+  messages: {
+    chat: (chatId: string) => ['messages', chatId],
+    paginated: (chatId: string, pageIndex: number) => ['messages', chatId, pageIndex],
+  },
 } as const;
 
 export const MUTATION_KEYS = {
@@ -11,6 +34,15 @@ export const MUTATION_KEYS = {
     logout: 'auth:logout',
     signIn: 'auth:signIn',
     refreshToken: 'auth:refreshToken',
+  },
+  chats: {
+    create: 'mutation:createChat',
+    updateDetails: 'mutation:updateChatDetails',
+    delete: 'mutation:deleteChat',
+    sendMessage: (chatId: string) => `mutation:sendMessage:${chatId}`,
+  },
+  directories: {
+    create: 'mutation:createDirectory',
   },
 } as const;
 

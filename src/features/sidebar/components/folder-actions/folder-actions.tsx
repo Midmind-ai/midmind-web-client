@@ -10,7 +10,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
 
 import { SidebarMenuButton } from '@/components/ui/sidebar';
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 import { useInlineEditStore } from '@/stores/use-inline-edit-store';
 
 const FolderActions = () => {

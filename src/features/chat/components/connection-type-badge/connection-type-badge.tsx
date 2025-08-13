@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { ThemedSpan } from '@/components/ui/themed-span';
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 import { cn } from '@/utils/cn';
 import { darkenColor } from '@/utils/colors';
 

@@ -1,9 +1,9 @@
 import { produce } from 'immer';
 import { mutate } from 'swr';
 
+import { invalidateCachePattern } from '@/hooks/cache-keys';
 import { DirectoriesService } from '@/services/directories/directories-service';
 import type { Directory } from '@/types/entities';
-import { CacheSelectors } from '@/utils/cache-selectors';
 
 type UpdateDirectoryParams = {
   id: string;
@@ -14,7 +14,7 @@ export const useUpdateDirectory = () => {
   const updateDirectory = async ({ id, name }: UpdateDirectoryParams) => {
     // Optimistically update all directory caches that might contain this directory
     await mutate(
-      CacheSelectors.allDirectories,
+      invalidateCachePattern(['directories']),
       produce((draft?: Directory[]) => {
         if (!draft) {
           return draft;

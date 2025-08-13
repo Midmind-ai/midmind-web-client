@@ -1,11 +1,8 @@
-import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { MUTATION_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
 import { ChatsService } from '@/services/chats/chats-service';
-import type { Chat } from '@/types/entities';
-import { CacheSelectors } from '@/utils/cache-selectors';
 
 type DeleteChatFetcherArgs = {
   arg: {
@@ -20,8 +17,8 @@ export const useDeleteChat = () => {
     isMutating: isLoading,
     error,
   } = useSWRMutation(
-    SWRCacheKeys.DeleteChat,
-    async (_key: readonly unknown[], { arg }: DeleteChatFetcherArgs) => {
+    MUTATION_KEYS.chats.delete,
+    async (_key: string, { arg }: DeleteChatFetcherArgs) => {
       return ChatsService.deleteChat(arg.id);
     }
   );
@@ -31,28 +28,16 @@ export const useDeleteChat = () => {
       { id: chatId },
       {
         onSuccess: () => {
-          // Update all chat lists (root, directory-based, and branch-based)
-          mutate(
-            CacheSelectors.allChats,
-            produce((draft?: Chat[]) => {
-              if (!draft) {
-                return;
-              }
+          // Invalidate all chat-related caches to let SWR refetch correctly
+          mutate(invalidateCachePattern(['chats'])); // Root chats
+          mutate(invalidateCachePattern(['chats', 'directory', '*'])); // Directory chats
+          mutate(invalidateCachePattern(['chats', 'chat', '*'])); // Branch chats
 
-              const chatIndex = draft.findIndex(chat => chat.id === chatId);
-
-              if (chatIndex !== -1) {
-                draft.splice(chatIndex, 1);
-              }
-            }),
-            false
-          );
-
-          // Also invalidate the specific chat details cache
-          mutate(CacheSelectors.specificChatDetails(chatId), undefined, false);
+          // Invalidate the specific chat details cache
+          mutate(['chat', chatId], undefined, false);
 
           // Invalidate message cache for this chat
-          mutate(CacheSelectors.chatMessages(chatId), undefined, false);
+          mutate(invalidateCachePattern(['messages', chatId, '*']));
         },
       }
     );

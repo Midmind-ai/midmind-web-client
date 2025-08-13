@@ -3,9 +3,9 @@ import { useSWRConfig } from 'swr';
 
 import { useTheme } from '@/app/providers/theme-provider';
 import { useSidebar } from '@/components/ui/sidebar';
-import { SWRCacheKeys } from '@/constants/api';
 import { LocalStorageKeys } from '@/constants/local-storage';
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
+import { CACHE_KEYS } from '@/hooks/cache-keys';
 import { useCurrentUser, useLogout } from '@/hooks/logic/use-auth-operations';
 import { removeFromStorage } from '@/utils/local-storage';
 
@@ -20,7 +20,7 @@ export const useUserDropdownLogic = () => {
   const handleLogout = async () => {
     await logout(null, {
       onSuccess: async () => {
-        await mutate(SWRCacheKeys.CurrentUser);
+        await mutate(CACHE_KEYS.auth.currentUser);
 
         removeFromStorage(LocalStorageKeys.AccessToken);
 

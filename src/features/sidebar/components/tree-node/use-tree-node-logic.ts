@@ -7,7 +7,7 @@ import {
 import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
 
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 import type { Chat, Directory } from '@/types/entities';
 
 export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {

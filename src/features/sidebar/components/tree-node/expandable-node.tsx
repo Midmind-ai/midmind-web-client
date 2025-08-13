@@ -28,8 +28,8 @@ type Props = {
   setIsOpen: (open: boolean) => void;
   childNodes?: TreeNodeType[];
   isLoadingChildren: boolean;
-  onDelete: VoidFunction;
-  onRename?: VoidFunction;
+  onDelete: (id: string) => void;
+  onRename?: (id: string) => void;
   onOpenInSidePanel: (id: string) => void;
   onOpenInNewTab: (id: string) => void;
   onClick: VoidFunction;
@@ -212,7 +212,7 @@ const ExpandableNode = ({
               <EntityActionsMenu
                 entityType={getEntityType()}
                 handlers={{
-                  onDelete: onDelete,
+                  onDelete: () => onDelete(node.id),
                   onRename: handleRenameAction,
                   onOpenInNewTab: () => onOpenInNewTab(node.id),
                   onOpenInSidePanel: () => onOpenInSidePanel(node.id),
@@ -229,8 +229,8 @@ const ExpandableNode = ({
             isLoadingChildren={isLoadingChildren}
             childNodes={childNodes}
             isDeleting={isDeleting}
-            onDelete={onDelete}
-            onRename={onRename}
+            onDelete={() => onDelete(node.id)}
+            onRename={onRename ? () => onRename(node.id) : undefined}
             onOpenInSidePanel={onOpenInSidePanel}
             onOpenInNewTab={onOpenInNewTab}
             TreeNodeComponent={TreeNodeComponent}

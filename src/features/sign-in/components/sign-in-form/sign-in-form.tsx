@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ThemedP } from '@/components/ui/themed-p';
 import { ThemedSpan } from '@/components/ui/themed-span';
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 
 const SignInForm = () => {
   const { errors, isSubmitting, register, handleSubmit, loginWithGoogle } =

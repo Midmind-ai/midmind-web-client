@@ -11,7 +11,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS } from '@/hooks/cache-keys';
 import { BranchContextService } from '@/services/branch-context/branch-context-service';
 import type { ConversationWithAIResponseDto } from '@/services/conversations/conversations-dtos';
 import type { PaginatedResponse } from '@/types/common';
@@ -26,7 +26,7 @@ export const getInfiniteKey = (chatId: string) => {
 
       const skip = pageIndex * ITEMS_PER_PAGE;
 
-      return `${SWRCacheKeys.GetMessages(chatId)}?page=${pageIndex}&skip=${skip}&take=${ITEMS_PER_PAGE}`;
+      return `${CACHE_KEYS.messages.chat(chatId)}?page=${pageIndex}&skip=${skip}&take=${ITEMS_PER_PAGE}`;
     }
   );
 };
@@ -114,7 +114,7 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
   document.title = titleChunk.title;
 
   mutate(
-    SWRCacheKeys.GetChatDetails(titleChunk.chat_id),
+    CACHE_KEYS.chats.details(titleChunk.chat_id),
     produce((draft?: ChatDetails) => {
       if (draft) {
         draft.name = titleChunk.title;
@@ -124,7 +124,7 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
   );
 
   mutate(
-    SWRCacheKeys.GetChats,
+    CACHE_KEYS.chats.all,
     produce((draft?: ChatDetails[]) => {
       if (draft) {
         const chatIndex = draft.findIndex(

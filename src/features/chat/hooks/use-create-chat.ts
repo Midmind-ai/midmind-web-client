@@ -7,7 +7,7 @@ import type { LLModel } from '@features/chat/types/chat-types';
 import { handleLLMResponse } from '@features/chat/utils/swr';
 import { useExpandedNodesStore } from '@features/sidebar/stores/use-expanded-nodes-store';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
@@ -15,7 +15,6 @@ import type {
 import { ConversationsService } from '@/services/conversations/conversations-service';
 import { useAbortControllerStore } from '@/stores/use-abort-controller-store';
 import type { Chat, ChatMessage } from '@/types/entities';
-import { CacheSelectors } from '@/utils/cache-selectors';
 
 type CreateChatArgs = {
   content: string;
@@ -53,8 +52,8 @@ export const useCreateChat = () => {
 
     // Determine the correct cache key based on whether this is a branch chat or root chat
     const cacheKey = parentChatId
-      ? SWRCacheKeys.GetChatsWithParent(undefined, parentChatId)
-      : SWRCacheKeys.GetChats;
+      ? CACHE_KEYS.chats.withParent(undefined, parentChatId)
+      : CACHE_KEYS.chats.all;
 
     // Optimistically update the specific cache
     await mutate(
@@ -71,23 +70,10 @@ export const useCreateChat = () => {
 
     // If this is a branch chat, we need to update the parent chat's has_children property
     if (parentChatId) {
-      // Update parent chat's has_children property in all chat lists
-      mutate(
-        CacheSelectors.allChats,
-        produce((draft?: Chat[]) => {
-          if (!draft) {
-            return draft;
-          }
-
-          const parentChatIndex = draft.findIndex(chat => chat.id === parentChatId);
-          if (parentChatIndex !== -1) {
-            draft[parentChatIndex].has_children = true;
-          }
-
-          return draft;
-        }),
-        { revalidate: false }
-      );
+      // Invalidate chat lists to refetch parent chat with updated has_children
+      mutate(invalidateCachePattern(['chats'])); // Root chats
+      mutate(invalidateCachePattern(['chats', 'directory', '*'])); // Directory chats
+      mutate(invalidateCachePattern(['chats', 'chat', '*'])); // Branch chats
 
       // Auto-expand the parent node after all cache updates are complete
       // Use setTimeout to ensure the component re-renders with updated has_children state
@@ -108,7 +94,7 @@ export const useCreateChat = () => {
       };
 
       // Build the messages cache key to match useGetChatMessages format
-      const messagesKey = `${SWRCacheKeys.GetMessages(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+      const messagesKey = `${CACHE_KEYS.messages.chat(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
 
       await mutate(
         messagesKey,

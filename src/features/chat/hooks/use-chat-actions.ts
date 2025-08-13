@@ -10,7 +10,7 @@ import type {
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
 
-import { AppRoutes, SearchParams } from '@/constants/router';
+import { AppRoutes, SearchParams } from '@/constants/paths';
 import type { BranchContext } from '@/types/entities';
 
 export const useChatActions = (actualChatId?: string) => {

@@ -6,7 +6,7 @@ import type { OnSubmitArgs } from '@features/chat/types/chat-types';
 import NavigationHeader from '@features/navigation-header/navigation-header';
 
 import { ThemedH1 } from '@/components/ui/themed-h1';
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 
 const HomePage = () => {
   const navigate = useNavigate();

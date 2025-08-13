@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router';
 
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 import { useCheckAuth } from '@/hooks/logic/use-auth-operations';
 
 const ProtectedRoute = () => {

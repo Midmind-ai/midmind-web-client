@@ -1,13 +1,15 @@
 import { useLocation, useNavigate } from 'react-router';
+import { useSWRConfig } from 'swr';
 
 import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
 import { useDeleteDirectory } from '@features/sidebar/hooks/use-delete-directory';
 import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
-import { AppRoutes, SearchParams } from '@/constants/router';
+import { AppRoutes, SearchParams } from '@/constants/paths';
 import { useChatActions } from '@/features/chat/hooks/use-chat-actions';
 import { useUrlParams } from '@/hooks/utils/use-url-params';
 import { useInlineEditStore } from '@/stores/use-inline-edit-store';
+import type { Chat } from '@/types/entities';
 
 export const useFolderListLogic = () => {
   // Get root level directories and chats (no parent)
@@ -15,14 +17,70 @@ export const useFolderListLogic = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { cache } = useSWRConfig();
   const { deleteChat, isLoading: isDeletingChat } = useDeleteChat();
   const { deleteDirectory, isDeleting: isDeletingDirectory } = useDeleteDirectory();
   const { openChatInSidePanel, openChatInNewTab } = useChatActions();
   const { value: splitChatId, removeValue } = useUrlParams(SearchParams.Split);
   const { startEditing } = useInlineEditStore();
 
+  // Helper function to find a chat across all cached data
+  const findChatInAllCaches = (chatId: string): Chat | null => {
+    const keys = Array.from(cache.keys());
+
+    for (const key of keys) {
+      // Handle both string keys (with @) and array keys
+      let isChatsKey = false;
+      if (typeof key === 'string' && key.includes('chats')) {
+        isChatsKey = true;
+      } else if (Array.isArray(key) && key[0] === 'chats') {
+        isChatsKey = true;
+      }
+
+      if (isChatsKey) {
+        const data = cache.get(key);
+
+        // Handle SWR response object (has .data property) vs direct array
+        let actualData: unknown = data;
+        if (
+          data &&
+          typeof data === 'object' &&
+          'data' in data &&
+          Array.isArray((data as { data: unknown }).data)
+        ) {
+          actualData = (data as { data: Chat[] }).data;
+        }
+
+        if (Array.isArray(actualData)) {
+          const chat = (actualData as Chat[]).find((item: Chat) => item.id === chatId);
+          if (chat) {
+            return chat;
+          }
+        }
+      }
+    }
+
+    return null;
+  };
+
   const handleDelete = async (nodeId: string) => {
-    const node = treeNodes.find(n => n.id === nodeId);
+    // First try to find in current treeNodes (for directories and root chats)
+    let node = treeNodes.find(n => n.id === nodeId);
+
+    // If not found and it might be a chat, search across all caches
+    if (!node) {
+      const chatFromCache = findChatInAllCaches(nodeId);
+      if (chatFromCache) {
+        node = {
+          id: chatFromCache.id,
+          name: chatFromCache.name,
+          type: 'chat' as const,
+          hasChildren: chatFromCache.has_children,
+          parentDirectoryId: chatFromCache.parent_directory_id,
+          originalData: chatFromCache,
+        };
+      }
+    }
 
     if (node?.type === 'chat') {
       await deleteChat(nodeId);
@@ -31,18 +89,10 @@ export const useFolderListLogic = () => {
         removeValue();
       }
 
+      // Only navigate if we're currently viewing the deleted chat
       const currentChatId = location.pathname.split('/').pop();
-      const remainingChats = treeNodes.filter(n => n.type === 'chat' && n.id !== nodeId);
-
       if (currentChatId === nodeId) {
-        if (remainingChats.length > 0) {
-          const currentSearch = location.search;
-          navigate(
-            `${AppRoutes.Chat(remainingChats[remainingChats.length - 1].id)}${currentSearch}`
-          );
-        } else {
-          navigate(AppRoutes.Home);
-        }
+        navigate(AppRoutes.Home);
       }
     } else if (node?.type === 'directory') {
       await deleteDirectory({

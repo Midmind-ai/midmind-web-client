@@ -1,12 +1,9 @@
-import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS, MUTATION_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
 import type { UpdateChatDetailsRequestDto } from '@/services/chats/chats-dtos';
 import { ChatsService } from '@/services/chats/chats-service';
-import type { Chat } from '@/types/entities';
-import { CacheSelectors } from '@/utils/cache-selectors';
 
 type UpdateChatDetailsFetcherArgs = {
   arg: {
@@ -22,8 +19,8 @@ export const useUpdateChatDetails = () => {
     isMutating: isLoading,
     error,
   } = useSWRMutation(
-    SWRCacheKeys.UpdateChatDetails,
-    async (_key: readonly unknown[], { arg }: UpdateChatDetailsFetcherArgs) => {
+    MUTATION_KEYS.chats.updateDetails,
+    async (_key: string, { arg }: UpdateChatDetailsFetcherArgs) => {
       return ChatsService.updateChatDetails(arg.id, arg.body);
     }
   );
@@ -34,24 +31,13 @@ export const useUpdateChatDetails = () => {
       {
         onSuccess: () => {
           // Update the specific chat details cache
-          mutate(SWRCacheKeys.GetChatDetails(id), { ...body, id }, false);
+          mutate(CACHE_KEYS.chats.details(id), { ...body, id }, false);
 
-          // Also update the chat name in all chat lists if the name changed
+          // Also invalidate chat lists if the name changed
           if (body.name) {
-            mutate(
-              CacheSelectors.allChats,
-              produce((draft?: Chat[]) => {
-                if (!draft) {
-                  return;
-                }
-
-                const chatIndex = draft.findIndex(chat => chat.id === id);
-                if (chatIndex !== -1 && body.name) {
-                  draft[chatIndex].name = body.name;
-                }
-              }),
-              false
-            );
+            mutate(invalidateCachePattern(['chats'])); // Root chats
+            mutate(invalidateCachePattern(['chats', 'directory', '*'])); // Directory chats
+            mutate(invalidateCachePattern(['chats', 'chat', '*'])); // Branch chats
           }
         },
       }

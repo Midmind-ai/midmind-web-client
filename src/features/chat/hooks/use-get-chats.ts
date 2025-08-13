@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS } from '@/hooks/cache-keys';
 import { ChatsService } from '@/services/chats/chats-service';
 
 export const useGetChats = () => {
@@ -8,7 +8,7 @@ export const useGetChats = () => {
     data: chats,
     isLoading,
     error,
-  } = useSWR(SWRCacheKeys.GetChats, () => ChatsService.getChats());
+  } = useSWR(CACHE_KEYS.chats.all, () => ChatsService.getChats());
 
   return {
     isLoading,

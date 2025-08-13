@@ -35,8 +35,8 @@ const FolderList = () => {
                 key={node.id}
                 node={node}
                 isDeleting={isDeleting}
-                onDelete={() => handleDelete(node.id)}
-                onRename={() => handleRename(node.id)}
+                onDelete={handleDelete}
+                onRename={handleRename}
                 onOpenInNewTab={() => openChatInNewTab(node.id)}
                 onOpenInSidePanel={() => openChatInSidePanel(node.id)}
               />

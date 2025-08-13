@@ -11,7 +11,7 @@ type Props = {
   node: TreeNode;
   isActive: boolean;
   isDeleting: boolean;
-  onDelete: VoidFunction;
+  onDelete: (id: string) => void;
   onOpenInSidePanel: (id: string) => void;
   onOpenInNewTab: (id: string) => void;
   onClick: VoidFunction;
@@ -60,7 +60,7 @@ const LeafNode = ({
         <EntityActionsMenu
           entityType={getEntityType()}
           handlers={{
-            onDelete: onDelete,
+            onDelete: () => onDelete(node.id),
             onOpenInNewTab: () => onOpenInNewTab(node.id),
             onOpenInSidePanel: () => onOpenInSidePanel(node.id),
           }}

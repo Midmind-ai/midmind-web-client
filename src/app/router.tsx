@@ -10,7 +10,7 @@ import SignUpPage from '@app/routes/sign-up';
 
 import ProtectedRoute from '@features/sign-in/components/protected-route/protected-route';
 
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 
 const router = createBrowserRouter([
   {

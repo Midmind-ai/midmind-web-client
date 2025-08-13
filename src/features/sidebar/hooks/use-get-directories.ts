@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS } from '@/hooks/cache-keys';
 import { DirectoriesService } from '@/services/directories/directories-service';
 
 export const useGetDirectories = (parentId?: string | null) => {
@@ -10,7 +10,7 @@ export const useGetDirectories = (parentId?: string | null) => {
     error,
     mutate,
   } = useSWR(
-    parentId !== null ? SWRCacheKeys.GetDirectories(parentId || undefined) : null,
+    parentId !== null ? CACHE_KEYS.directories.withParent(parentId || undefined) : null,
     parentId !== null
       ? () => DirectoriesService.getDirectories(parentId || undefined)
       : null

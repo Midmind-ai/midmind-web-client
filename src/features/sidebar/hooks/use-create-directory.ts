@@ -4,10 +4,9 @@ import { produce } from 'immer';
 import { mutate } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { CACHE_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
 import { DirectoriesService } from '@/services/directories/directories-service';
 import type { Directory } from '@/types/entities';
-import { CacheSelectors } from '@/utils/cache-selectors';
 
 type CreateDirectoryParams = {
   name: string;
@@ -33,7 +32,7 @@ export const useCreateDirectory = () => {
       };
 
       // Optimistically update the cache using new cache selector system
-      const cacheKey = SWRCacheKeys.GetDirectories(parentDirectoryId);
+      const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
       await mutate(
         cacheKey,
@@ -60,7 +59,7 @@ export const useCreateDirectory = () => {
       // If this directory has a parent, update the parent's has_children flag
       if (parentDirectoryId) {
         await mutate(
-          CacheSelectors.allDirectories,
+          invalidateCachePattern(['directories']),
           produce((draft?: Directory[]) => {
             if (!draft) {
               return draft;
@@ -97,7 +96,7 @@ export const useCreateDirectory = () => {
     };
 
     // Add to cache immediately at the top of the list
-    const cacheKey = SWRCacheKeys.GetDirectories(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
     await mutate(
       cacheKey,
@@ -120,7 +119,7 @@ export const useCreateDirectory = () => {
   ) => {
     try {
       // Update the cache with the final name
-      const cacheKey = SWRCacheKeys.GetDirectories(parentDirectoryId);
+      const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
       await mutate(
         cacheKey,
@@ -148,7 +147,7 @@ export const useCreateDirectory = () => {
       // If this directory has a parent, update the parent's has_children flag
       if (parentDirectoryId) {
         await mutate(
-          CacheSelectors.allDirectories,
+          invalidateCachePattern(['directories']),
           produce((draft?: Directory[]) => {
             if (!draft) {
               return draft;
@@ -169,7 +168,7 @@ export const useCreateDirectory = () => {
   };
 
   const removeTemporaryDirectory = async (id: string, parentDirectoryId?: string) => {
-    const cacheKey = SWRCacheKeys.GetDirectories(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
     await mutate(
       cacheKey,

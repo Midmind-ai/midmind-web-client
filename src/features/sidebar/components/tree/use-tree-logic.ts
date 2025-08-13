@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 
-import { AppRoutes } from '@/constants/router';
+import { AppRoutes } from '@/constants/paths';
 import type { TreeItem } from '@/types/entities';
 
 export const useTreeLogic = (item: TreeItem) => {

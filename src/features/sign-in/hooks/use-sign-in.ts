@@ -1,6 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 
-import { SWRCacheKeys } from '@/constants/api';
+import { MUTATION_KEYS } from '@/hooks/cache-keys';
 import type { SignInRequest } from '@/services/auth/auth-dtos';
 import { AuthService } from '@/services/auth/auth-service';
 
@@ -14,8 +14,8 @@ export const useSignIn = () => {
     isMutating: isLoading,
     error,
   } = useSWRMutation(
-    SWRCacheKeys.SignIn,
-    async (_key: readonly unknown[], { arg }: SignInFetcherArgs) => {
+    MUTATION_KEYS.auth.signIn,
+    async (_key: string, { arg }: SignInFetcherArgs) => {
       return AuthService.signIn(arg);
     }
   );
