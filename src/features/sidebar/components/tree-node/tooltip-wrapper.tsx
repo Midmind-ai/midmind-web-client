@@ -1,8 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
-import { TooltipContent, TooltipProvider, TooltipTrigger } from '@components/ui/tooltip';
-
-import { TOOLTIP_DELAY } from '@features/sidebar/components/tree-node/constants';
+import { TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
 
 type Props = {
   content: string;
@@ -12,17 +10,15 @@ type Props = {
 
 const TooltipWrapper = ({ content, children }: Props) => {
   return (
-    <TooltipProvider delayDuration={TOOLTIP_DELAY}>
-      <TooltipPrimitive.Root open={false}>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent
-          side="right"
-          sideOffset={8}
-        >
-          {content}
-        </TooltipContent>
-      </TooltipPrimitive.Root>
-    </TooltipProvider>
+    <TooltipPrimitive.Root open={false}>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        side="right"
+        sideOffset={8}
+      >
+        {content}
+      </TooltipContent>
+    </TooltipPrimitive.Root>
   );
 };
 

@@ -5,14 +5,9 @@ import {
   BreadcrumbLink,
 } from '@components/ui/breadcrumb';
 import { ThemedSpan } from '@components/ui/themed-span';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
 
-import { useTextTruncation } from '@hooks/utils/use-is-text-truncated';
+import { useIsTextTruncated } from '@hooks/utils/use-is-text-truncated';
 
 import { type EntityType } from '@shared-types/entity';
 
@@ -27,7 +22,7 @@ type Props = {
 };
 
 const BreadcrumbItem = ({ title, type, isActive, href }: Props) => {
-  const { textRef, isTruncated } = useTextTruncation(title);
+  const { textRef, isTruncated } = useIsTextTruncated(title);
 
   const breadcrumbContent = (
     <div className="flex min-w-0 items-center gap-1.5">
@@ -56,14 +51,12 @@ const BreadcrumbItem = ({ title, type, isActive, href }: Props) => {
           to={href}
         >
           {isTruncated ? (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>{breadcrumbContent}</TooltipTrigger>
-                <TooltipContent>
-                  <p>{title}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>{breadcrumbContent}</TooltipTrigger>
+              <TooltipContent>
+                <p>{title}</p>
+              </TooltipContent>
+            </Tooltip>
           ) : (
             breadcrumbContent
           )}

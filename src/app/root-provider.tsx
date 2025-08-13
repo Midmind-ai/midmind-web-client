@@ -6,7 +6,11 @@ import { SWRProvider } from '@app/providers/swr-provider';
 import { ThemeProvider } from '@app/providers/theme-provider';
 import router from '@app/router';
 
+import { TooltipProvider } from '@components/ui/tooltip';
+
 import { LocalStorageKeys } from '@constants/local-storage';
+
+import { TOOLTIP_DELAY } from '@features/sidebar/components/tree-node/constants';
 
 const RootProvider = () => {
   return (
@@ -16,8 +20,10 @@ const RootProvider = () => {
         storageKey={LocalStorageKeys.Theme}
       >
         <SWRProvider>
-          <RouterProvider router={router} />
-          <ModalsRenderer />
+          <TooltipProvider delayDuration={TOOLTIP_DELAY}>
+            <RouterProvider router={router} />
+            <ModalsRenderer />
+          </TooltipProvider>
         </SWRProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>
