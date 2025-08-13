@@ -36,6 +36,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
     handleFormSubmit,
     abortCurrentRequest,
     handleKeyDown,
+    handleCloseReply,
   } = useChatMessageFormLogic({ chatId, onSubmit, branchContext });
 
   return (
@@ -44,6 +45,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
         <MessageReply
           content={replyInfo.content}
           className="mx-4"
+          onClose={handleCloseReply}
         />
       )}
       <form

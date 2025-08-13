@@ -1,9 +1,10 @@
 import { BoxSelectIcon, SidebarIcon, XIcon } from 'lucide-react';
+import { useParams } from 'react-router';
 
 import { Button } from '@components/ui/button';
 import { useSidebar } from '@components/ui/sidebar';
 
-import Breadcrumbs from '@features/navigation-header/components/breadcrumbs/breadcrumbs';
+import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
 
 type Props = {
   showCloseButton?: boolean;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 const NavigationHeader = ({ showCloseButton, onClose }: Props) => {
+  const { id = '' } = useParams();
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -22,7 +24,7 @@ const NavigationHeader = ({ showCloseButton, onClose }: Props) => {
         >
           <SidebarIcon />
         </Button>
-        <Breadcrumbs />
+        <Breadcrumbs id={id} />
       </div>
       <div className="flex items-center gap-2">
         <Button variant="outline">
