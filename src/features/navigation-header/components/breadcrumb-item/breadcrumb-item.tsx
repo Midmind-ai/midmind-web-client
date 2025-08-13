@@ -3,12 +3,10 @@ import { Link } from 'react-router';
 import {
   BreadcrumbItem as ShadcnBreadcrumbItem,
   BreadcrumbLink,
-} from '@shared/components/ui/breadcrumb';
-
-import { type EntityType } from '@shared/types/entity';
-
-import { cn } from '@shared/utils/cn';
-import { renderEntityIcon } from '@shared/utils/entity-icons';
+} from '@/components/ui/breadcrumb';
+import { type EntityType } from '@/types/entity';
+import { cn } from '@/utils/cn';
+import { renderEntityIcon } from '@/utils/entity-icons';
 
 type Props = {
   title: string;

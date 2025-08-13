@@ -1,13 +1,14 @@
 import { useNavigate, useParams } from 'react-router';
 
-import { AppRoutes } from '@shared/constants/router';
-
 import {
   useGetChatsByParentChat,
   useGetChatsByParentDirectory,
 } from '@features/sidebar/hooks/use-get-chats-by-parent';
 import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
+
+import { AppRoutes } from '@/constants/router';
+import type { Chat, Directory } from '@/types/entities';
 
 export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
     // Add directories first
     childNodes.push(
       ...(directories || []).map(
-        (dir): TreeNode => ({
+        (dir: Directory): TreeNode => ({
           id: dir.id,
           name: dir.name,
           type: 'directory',
@@ -50,7 +51,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
     // Add chats
     childNodes.push(
       ...(chatsFromDirectory || []).map(
-        (chat): TreeNode => ({
+        (chat: Chat): TreeNode => ({
           id: chat.id,
           name: chat.name,
           type: 'chat',
@@ -64,7 +65,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
     // Add sub-chats only
     childNodes.push(
       ...(chatsFromChat || []).map(
-        (chat): TreeNode => ({
+        (chat: Chat): TreeNode => ({
           id: chat.id,
           name: chat.name,
           type: 'chat',

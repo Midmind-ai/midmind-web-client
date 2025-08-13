@@ -1,13 +1,11 @@
 import { GitMerge } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { Button } from '@shared/components/ui/button';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
-
-import { AppRoutes } from '@shared/constants/router';
-
-import { cn } from '@shared/utils/cn';
-import { darkenColor } from '@shared/utils/colors';
+import { Button } from '@/components/ui/button';
+import { ThemedSpan } from '@/components/ui/themed-span';
+import { AppRoutes } from '@/constants/router';
+import { cn } from '@/utils/cn';
+import { darkenColor } from '@/utils/colors';
 
 type Props = {
   connectionType: string;

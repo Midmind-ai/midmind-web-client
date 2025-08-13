@@ -2,14 +2,11 @@ import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import type { UpdateChatDetailsRequestDto } from '@shared/services/chats/chats-dtos';
-import { ChatsService } from '@shared/services/chats/chats-service';
-
-import type { Chat } from '@shared/types/entities';
-
-import { CacheSelectors } from '@shared/utils/cache-selectors';
+import { SWRCacheKeys } from '@/constants/api';
+import type { UpdateChatDetailsRequestDto } from '@/services/chats/chats-dtos';
+import { ChatsService } from '@/services/chats/chats-service';
+import type { Chat } from '@/types/entities';
+import { CacheSelectors } from '@/utils/cache-selectors';
 
 type UpdateChatDetailsFetcherArgs = {
   arg: {

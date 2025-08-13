@@ -1,10 +1,9 @@
-import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
-
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import MessageList from '@features/chat/components/message-list/message-list';
 import NavigationHeader from '@features/navigation-header/navigation-header';
 
-import { usePageTitle } from '@/shared/hooks/use-page-title';
+import { usePageTitle } from '@/hooks/use-page-title';
+import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
 
 import { useGetChatDetails } from './hooks/use-get-chat-details';
 

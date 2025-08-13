@@ -1,6 +1,6 @@
-import { copyText } from '@shared/utils/copy-text';
-
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
+
+import { copyText } from '@/utils/copy-text';
 
 export const useMessageActions = (chatId: string) => {
   const replyToMessage = (messageId: string, content: string) => {

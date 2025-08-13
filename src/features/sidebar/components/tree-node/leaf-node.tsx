@@ -1,8 +1,8 @@
-import { SidebarMenuButton } from '@shared/components/ui/sidebar';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
-
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
+
+import { SidebarMenuButton } from '@/components/ui/sidebar';
+import { ThemedSpan } from '@/components/ui/themed-span';
 
 import NodeIcon from './node-icon';
 import TooltipWrapper from './tooltip-wrapper';

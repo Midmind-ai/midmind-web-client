@@ -1,7 +1,7 @@
-import { SidebarMenuSub } from '@shared/components/ui/sidebar';
-import { Skeleton } from '@shared/components/ui/skeleton';
-
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
+
+import { SidebarMenuSub } from '@/components/ui/sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { SKELETON_COUNT } from './constants';
 

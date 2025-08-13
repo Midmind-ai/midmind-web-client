@@ -31,45 +31,259 @@ src/
 ├── app/                           # Global application logic
 │   ├── providers/                 # App-wide providers (ThemeProvider, AuthProvider)
 │   ├── routes/                    # Page components (Home.tsx, SignIn.tsx, Chat.tsx)
-│   ├── App.tsx                    # Root component
-│   ├── RootProvider.tsx           # Top-level provider composition
-│   └── Router.tsx                 # Application routing configuration
+│   ├── app.tsx                    # Root component
+│   ├── root-provider.tsx          # Top-level provider composition
+│   └── router.tsx                 # Application routing configuration
 │
-├── shared/                        # Reusable elements not tied to specific features
-│   ├── theme/                     # Tailwind theme configuration
-│   ├── services/                  # API service layers (userService, authService)
-│   ├── assets/                    # Global assets (logo, fonts, icons)
-│   ├── config/                    # Library configurations (axios instance)
-│   ├── components/                # Global UI components (Button, Modal, Input)
-│   ├── constants/                 # Shared constants (API endpoints, route names)
-│   ├── hooks/                     # Global hooks (useDebounce, useOutsideClick)
-│   ├── utils/                     # Utility functions (cn, formatDate)
-│   ├── types/                     # Global TypeScript types (User, Role)
-│   └── stores/                    # Global Zustand stores (useUserStore, useThemeStore)
+├── assets/                        # Global assets (logo, fonts, icons)
+├── components/                    # Global UI components (Button, Modal, Input)
+│   └── ui/                        # Shadcn/UI components
+├── config/                        # Library and global configurations
+│   ├── api.ts                     # API settings (timeout, base URL, headers)
+│   ├── axios.ts                   # Axios instances with interceptors
+│   ├── swr.ts                     # SWR global configuration
+│   ├── theme-colors.css           # Tailwind color scheme configuration
+│   └── theme-fonts.css            # Font face definitions
+├── constants/                     # Shared constants (cache keys, route names)
+├── hooks/                         # Global hooks (useDebounce, useOutsideClick)
+├── services/                      # API service layers (userService, authService)
+├── stores/                        # Global Zustand stores (useUserStore, useThemeStore)
+├── types/                         # Global TypeScript types (User, Role)
+├── utils/                         # Utility functions (cn, formatDate)
 │
 └── features/                      # Feature-based modules
-    ├── SignIn/
+    ├── sign-in/
     │   ├── components/            # Feature-specific components
-    │   │   └── SignInForm/
-    │   │       ├── SignInForm.tsx         # Component implementation
-    │   │       └── useSignInFormLogic.ts  # Component logic hook
+    │   │   └── sign-in-form/
+    │   │       ├── sign-in-form.tsx       # Component implementation
+    │   │       └── use-sign-in-form-logic.ts # Component logic hook
     │   ├── assets/                # Feature-specific assets
     │   ├── hooks/                 # Feature-specific hooks
     │   ├── stores/                # Feature-specific stores
     │   ├── types/                 # Feature-specific types
     │   └── utils/                 # Feature-specific utilities
     │
-    └── Chat/
+    └── chat/
         ├── components/
-        │   └── Messages/
-        │       ├── Messages.tsx
-        │       └── useMessagesLogic.ts
+        │   └── messages/
+        │       ├── messages.tsx
+        │       └── use-messages-logic.ts
         ├── assets/
         ├── hooks/
         ├── stores/
         ├── types/
         └── utils/
 ```
+
+## ⚙️ Configuration Architecture
+
+### Centralized Configuration Management
+
+All library configurations and global settings are centralized in the `src/config/` folder:
+
+```typescript
+src/config/
+├── api.ts              # API settings (timeout, baseUrl, headers)
+├── axios.ts            # Axios instances with auth interceptors  
+├── swr.ts              # SWR global configuration
+├── theme-colors.css    # Tailwind color scheme
+└── theme-fonts.css     # Font face definitions
+
+// Usage example - direct imports only:
+import { apiConfig } from '@/config/api';
+import { swrConfig } from '@/config/swr';
+import { baseAxiosInstance } from '@/config/axios';
+```
+
+### Configuration vs Constants
+
+- **Configurations** (`src/config/`): Settings that configure libraries or global behavior
+- **Constants** (`src/constants/`): Static values like cache keys, route names, storage keys
+
+## 🏗️ Service Layer Architecture
+
+### Core Principle: One Service Per Entity
+
+Each database entity has its own dedicated service class following the single responsibility principle:
+
+```typescript
+// ✅ Good: Dedicated service for each entity
+src/services/
+├── messages/
+│   ├── messages-service.ts      # Messages only
+│   └── messages-dtos.ts         # Message types
+├── chats/
+│   ├── chats-service.ts         # Chats only  
+│   └── chats-dtos.ts            # Chat types
+├── directories/
+│   └── directories-service.ts   # Directories only
+└── users/
+    └── users-service.ts         # Users only
+
+// ❌ Bad: Combined service handling multiple entities
+src/services/
+└── combined-service.ts          # Multiple HTTP clients in one service
+```
+
+## 🔄 Hooks Architecture
+
+### Two-Layer Architecture with Explicit Separation
+
+The hooks system uses a **strict two-layer approach** with clear boundaries:
+
+```
+src/features/[feature]/hooks/
+├── data/                        # Layer 1: Pure SWR operations
+│   ├── use-get-[entity].ts      # GET operations by cache key
+│   ├── use-create-[entity].ts   # CREATE mutations by cache key
+│   ├── use-update-[entity].ts   # UPDATE mutations by cache key
+│   └── use-delete-[entity].ts   # DELETE mutations by cache key
+└── logic/                       # Layer 2: Business logic operations
+    ├── use-[entity]-actions.ts  # Business operations using data hooks
+    └── use-[feature]-logic.ts   # Feature-specific business logic
+
+src/hooks/
+├── use-debounce.ts              # Shared utility hooks
+├── use-url-params.ts            # Common functionality
+└── cache-keys.ts                # Centralized cache key management
+```
+
+### Layer 1: Data Hooks (Pure SWR Operations)
+
+**Purpose**: Direct mapping to service calls, no business logic
+**Location**: `src/features/[feature]/hooks/data/`
+
+```typescript
+// src/features/chat/hooks/data/use-get-chats.ts
+import useSWR from 'swr';
+import { ChatsService } from '@/services/chats/chats-service';
+import { SWRCacheKeys } from '@/constants/swr-cache-keys';
+
+// ✅ Pure data fetching - no business logic
+export function useGetChats(parentDirectoryId?: string) {
+  return useSWR(
+    SWRCacheKeys.GetChats(parentDirectoryId),
+    () => ChatsService.getChats({ parentDirectoryId }),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+    }
+  );
+}
+
+export function useGetChatById(id: string | null | undefined) {
+  return useSWR(
+    id ? SWRCacheKeys.GetChatById(id) : null,
+    id ? () => ChatsService.getChatById(id) : null
+  );
+}
+```
+
+```typescript
+// src/features/chat/hooks/data/use-create-chat.ts
+import { useSWRMutation } from 'swr/mutation';
+import { ChatsService } from '@/services/chats/chats-service';
+import { SWRCacheKeys } from '@/constants/swr-cache-keys';
+
+// ✅ Pure mutation - no business logic, just cache invalidation
+export function useCreateChat() {
+  return useSWRMutation(
+    SWRCacheKeys.CreateChat(),
+    async (_, { arg }: { arg: CreateChatDto }) => {
+      const result = await ChatsService.createChat(arg);
+      // Only handle cache invalidation here
+      return result;
+    }
+  );
+}
+```
+
+### Layer 2: Business Logic Hooks
+
+**Purpose**: Add business value, orchestrate data hooks, handle complex workflows
+**Location**: `src/features/[feature]/hooks/logic/`
+
+```typescript
+// src/features/chat/hooks/logic/use-chat-actions.ts
+import { useNavigate } from 'react-router';
+import { AppRoutes, SearchParams } from '@/constants/router';
+import { useUrlParams } from '@/hooks/use-url-params';
+import { useCreateChat } from '../data/use-create-chat';
+import { useDeleteChat } from '../data/use-delete-chat';
+
+// ✅ Business logic that orchestrates data hooks
+export const useChatActions = () => {
+  const navigate = useNavigate();
+  const { setValue: setSplitChatId } = useUrlParams(SearchParams.Split);
+  const { trigger: createChat } = useCreateChat();
+  const { trigger: deleteChat } = useDeleteChat();
+
+  const openChatInNewTab = (chatId: string) => {
+    window.open(AppRoutes.Chat(chatId), '_blank');
+  };
+
+  const openChatInSidePanel = (chatId: string) => {
+    setSplitChatId(chatId);
+  };
+
+  const navigateToChat = (chatId: string) => {
+    navigate(AppRoutes.Chat(chatId));
+  };
+
+  // ✅ Complex business workflow using data hooks
+  const createAndNavigateToChat = async (name: string, parentDirectoryId?: string) => {
+    try {
+      const newChat = await createChat({ name, parentDirectoryId });
+      navigateToChat(newChat.id);
+      return newChat;
+    } catch (error) {
+      console.error('Failed to create chat:', error);
+      throw error;
+    }
+  };
+
+  const deleteAndRedirect = async (chatId: string) => {
+    await deleteChat(chatId);
+    navigate(AppRoutes.Home);
+  };
+
+  return {
+    // Simple actions
+    openChatInNewTab,
+    openChatInSidePanel,
+    navigateToChat,
+    // Complex business workflows
+    createAndNavigateToChat,
+    deleteAndRedirect,
+  };
+};
+```
+
+### Strict Layer Boundaries
+
+**❌ Data hooks MUST NOT contain:**
+- Navigation logic
+- Complex business workflows
+- UI state management
+- Feature-specific logic
+
+**❌ Business logic hooks MUST NOT contain:**
+- Direct SWR calls
+- Service calls
+- Cache key definitions
+
+**✅ Data hooks SHOULD only:**
+- Call services
+- Handle cache keys
+- Return raw SWR responses
+- Manage loading/error states from SWR
+
+**✅ Business logic hooks SHOULD:**
+- Import and use data hooks
+- Orchestrate multiple operations
+- Handle navigation and routing
+- Manage complex workflows
+- Add business-specific transformations
 
 ## 🎨 Component Style Guide
 

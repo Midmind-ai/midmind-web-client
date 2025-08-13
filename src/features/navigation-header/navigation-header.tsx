@@ -1,9 +1,9 @@
 import { BoxSelectIcon, SidebarIcon, XIcon } from 'lucide-react';
 
-import { Button } from '@shared/components/ui/button';
-import { useSidebar } from '@shared/components/ui/sidebar';
-
 import Breadcrumbs from '@features/navigation-header/components/breadcrumbs/breadcrumbs';
+
+import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
 
 type Props = {
   showCloseButton?: boolean;

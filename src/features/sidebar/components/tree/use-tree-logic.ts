@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from 'react-router';
 
-import type { TreeItem } from '@shared/types/entities';
-
-import { AppRoutes } from '@/shared/constants/router';
+import { AppRoutes } from '@/constants/router';
+import type { TreeItem } from '@/types/entities';
 
 export const useTreeLogic = (item: TreeItem) => {
   const [{ name, id }, ...items] = Array.isArray(item) ? item : [item];

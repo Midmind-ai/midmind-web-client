@@ -1,12 +1,11 @@
+import BreadcrumbItem from '@features/navigation-header/components/breadcrumb-item/breadcrumb-item';
+
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '@shared/components/ui/breadcrumb';
-
-import { EntityEnum } from '@shared/types/entity';
-
-import BreadcrumbItem from '@features/navigation-header/components/breadcrumb-item/breadcrumb-item';
+} from '@/components/ui/breadcrumb';
+import { EntityEnum } from '@/types/entity';
 
 const Breadcrumbs = () => {
   return (

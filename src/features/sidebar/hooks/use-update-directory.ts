@@ -1,11 +1,9 @@
 import { produce } from 'immer';
 import { mutate } from 'swr';
 
-import { DirectoriesService } from '@shared/services/directories/directories-service';
-
-import type { Directory } from '@shared/types/entities';
-
-import { CacheSelectors } from '@shared/utils/cache-selectors';
+import { DirectoriesService } from '@/services/directories/directories-service';
+import type { Directory } from '@/types/entities';
+import { CacheSelectors } from '@/utils/cache-selectors';
 
 type UpdateDirectoryParams = {
   id: string;

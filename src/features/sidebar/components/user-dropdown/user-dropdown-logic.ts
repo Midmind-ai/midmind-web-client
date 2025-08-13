@@ -1,18 +1,14 @@
 import { useNavigate } from 'react-router';
 import { useSWRConfig } from 'swr';
 
-import { useSidebar } from '@shared/components/ui/sidebar';
-
-import { SWRCacheKeys } from '@shared/constants/api';
-import { LocalStorageKeys } from '@shared/constants/local-storage';
-import { AppRoutes } from '@shared/constants/router';
-
-import { useCurrentUser } from '@shared/hooks/use-current-user';
-import { useLogout } from '@shared/hooks/use-logout';
-
-import { removeFromStorage } from '@shared/utils/local-storage';
-
 import { useTheme } from '@/app/providers/theme-provider';
+import { useSidebar } from '@/components/ui/sidebar';
+import { SWRCacheKeys } from '@/constants/api';
+import { LocalStorageKeys } from '@/constants/local-storage';
+import { AppRoutes } from '@/constants/router';
+import { useCurrentUser } from '@/hooks/use-current-user';
+import { useLogout } from '@/hooks/use-logout';
+import { removeFromStorage } from '@/utils/local-storage';
 
 export const useUserDropdownLogic = () => {
   const navigate = useNavigate();

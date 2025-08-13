@@ -6,17 +6,16 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight, Folder, MessageSquare } from 'lucide-react';
 
+import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
+import { useTreeLogic } from '@features/sidebar/components/tree/use-tree-logic';
+
 import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-} from '@shared/components/ui/sidebar';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
-
-import type { TreeItem } from '@shared/types/entities';
-
-import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
-import { useTreeLogic } from '@features/sidebar/components/tree/use-tree-logic';
+} from '@/components/ui/sidebar';
+import { ThemedSpan } from '@/components/ui/themed-span';
+import type { TreeItem } from '@/types/entities';
 
 export type DataType = {
   tree: TreeType;

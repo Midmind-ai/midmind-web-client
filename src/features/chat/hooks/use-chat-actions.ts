@@ -1,9 +1,5 @@
 import { useNavigate, useParams, useLocation } from 'react-router';
 
-import { AppRoutes, SearchParams } from '@shared/constants/router';
-
-import type { BranchContext } from '@shared/types/entities';
-
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
@@ -13,6 +9,9 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
+
+import { AppRoutes, SearchParams } from '@/constants/router';
+import type { BranchContext } from '@/types/entities';
 
 export const useChatActions = (actualChatId?: string) => {
   const navigate = useNavigate();

@@ -1,10 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
-import {
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@shared/components/ui/tooltip';
+import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { TOOLTIP_DELAY } from './constants';
 

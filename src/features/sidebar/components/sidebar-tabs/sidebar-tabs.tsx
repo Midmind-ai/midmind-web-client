@@ -1,6 +1,6 @@
 import { Folders, Home, Search } from 'lucide-react';
 
-import { SidebarContent, SidebarMenuButton } from '@shared/components/ui/sidebar';
+import { SidebarContent, SidebarMenuButton } from '@/components/ui/sidebar';
 
 const SidebarTabs = () => {
   return (

@@ -5,16 +5,14 @@ import { useNavigate } from 'react-router';
 import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-import { LocalStorageKeys } from '@shared/constants/local-storage';
-import { AppRoutes } from '@shared/constants/router';
-
-import type { SignInRequest } from '@shared/services/auth/auth-dtos';
-import { AuthService } from '@shared/services/auth/auth-service';
-
-import { setToStorage } from '@shared/utils/local-storage';
-
 import { useSignIn } from '@features/sign-in/hooks/use-sign-in';
+
+import { SWRCacheKeys } from '@/constants/api';
+import { LocalStorageKeys } from '@/constants/local-storage';
+import { AppRoutes } from '@/constants/router';
+import type { SignInRequest } from '@/services/auth/auth-dtos';
+import { AuthService } from '@/services/auth/auth-service';
+import { setToStorage } from '@/utils/local-storage';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),

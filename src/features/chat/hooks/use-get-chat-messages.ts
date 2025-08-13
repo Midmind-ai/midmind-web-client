@@ -1,11 +1,9 @@
 import useSWRInfinite from 'swr/infinite';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import { MessagesService } from '@shared/services/messages/messages-service';
-
-import type { PaginatedResponse } from '@shared/types/common';
-import type { ChatMessage } from '@shared/types/entities';
+import { SWRCacheKeys } from '@/constants/api';
+import { MessagesService } from '@/services/messages/messages-service';
+import type { PaginatedResponse } from '@/types/common';
+import type { ChatMessage } from '@/types/entities';
 
 export const ITEMS_PER_PAGE = 20;
 

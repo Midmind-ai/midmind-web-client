@@ -5,11 +5,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@shared/components/ui/dropdown-menu';
-import { SidebarMenuAction } from '@shared/components/ui/sidebar';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
-
-import { cn } from '@shared/utils/cn';
+} from '@/components/ui/dropdown-menu';
+import { SidebarMenuAction } from '@/components/ui/sidebar';
+import { ThemedSpan } from '@/components/ui/themed-span';
+import { cn } from '@/utils/cn';
 
 import { useEntityActions } from '../hooks/use-entity-actions';
 

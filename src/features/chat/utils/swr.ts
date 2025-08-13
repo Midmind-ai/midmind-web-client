@@ -2,14 +2,6 @@ import { produce } from 'immer';
 import { mutate } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import { BranchContextService } from '@shared/services/branch-context/branch-context-service';
-import type { ConversationWithAIResponseDto } from '@shared/services/conversations/conversations-dtos';
-
-import type { PaginatedResponse } from '@shared/types/common';
-import type { ChatMessage } from '@shared/types/entities';
-
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type {
   ChunkHandlerParams,
@@ -18,6 +10,12 @@ import type {
   ChatDetails,
 } from '@features/chat/types/chat-types';
 import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
+
+import { SWRCacheKeys } from '@/constants/api';
+import { BranchContextService } from '@/services/branch-context/branch-context-service';
+import type { ConversationWithAIResponseDto } from '@/services/conversations/conversations-dtos';
+import type { PaginatedResponse } from '@/types/common';
+import type { ChatMessage } from '@/types/entities';
 
 export const getInfiniteKey = (chatId: string) => {
   return unstable_serialize(

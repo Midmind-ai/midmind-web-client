@@ -3,13 +3,10 @@ import { useState } from 'react';
 import { produce } from 'immer';
 import { mutate } from 'swr';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import { DirectoriesService } from '@shared/services/directories/directories-service';
-
-import type { Directory } from '@shared/types/entities';
-
-import { CacheSelectors } from '@shared/utils/cache-selectors';
+import { SWRCacheKeys } from '@/constants/api';
+import { DirectoriesService } from '@/services/directories/directories-service';
+import type { Directory } from '@/types/entities';
+import { CacheSelectors } from '@/utils/cache-selectors';
 
 type DeleteDirectoryParams = {
   id: string;

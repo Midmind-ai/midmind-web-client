@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router';
 
-import { Button } from '@shared/components/ui/button';
-import { ThemedH1 } from '@shared/components/ui/themed-h1';
-import { ThemedP } from '@shared/components/ui/themed-p';
-
-import { AppRoutes } from '@shared/constants/router';
+import { Button } from '@/components/ui/button';
+import { ThemedH1 } from '@/components/ui/themed-h1';
+import { ThemedP } from '@/components/ui/themed-p';
+import { AppRoutes } from '@/constants/router';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();

@@ -16,15 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@shared/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@shared/components/ui/sidebar';
-
-import type { Team } from '@shared/types/entities';
+} from '@/components/ui/sidebar';
+import type { Team } from '@/types/entities';
 
 const data = {
   user: {

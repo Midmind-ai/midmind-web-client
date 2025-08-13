@@ -1,6 +1,6 @@
-import { SidebarHeader as ShadcnSidebarHeader } from '@shared/components/ui/sidebar';
-
 import OrganizationSwitcher from '@features/sidebar/components/organization-switcher/organization-switcher';
+
+import { SidebarHeader as ShadcnSidebarHeader } from '@/components/ui/sidebar';
 
 const SidebarHeader = () => {
   return (

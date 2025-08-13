@@ -7,16 +7,15 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 
-import EditableText from '@shared/components/ui/editable-text';
-import { SidebarMenuButton, SidebarMenuItem } from '@shared/components/ui/sidebar';
-
-import { useInlineEditStore } from '@shared/stores/use-inline-edit-store';
-
 import { useUpdateChatDetails } from '@features/chat/hooks/use-update-chat-details';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
 import { useUpdateDirectory } from '@features/sidebar/hooks/use-update-directory';
+
+import EditableText from '@/components/ui/editable-text';
+import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useInlineEditStore } from '@/stores/use-inline-edit-store';
 
 import ChildrenList from './children-list';
 import NodeIcon from './node-icon';

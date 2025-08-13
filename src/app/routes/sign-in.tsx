@@ -1,13 +1,12 @@
-import LogoIcon from '@shared/assets/icons/logo.svg';
-
-import { ThemedH1 } from '@shared/components/ui/themed-h1';
-import { ThemedH2 } from '@shared/components/ui/themed-h2';
-import { ThemedP } from '@shared/components/ui/themed-p';
-import { ThemedSpan } from '@shared/components/ui/themed-span';
-
 import ChatTreeIcon from '@features/sign-in/assets/icons/chat-tree.svg';
 import LogoBackgroundIcon from '@features/sign-in/assets/icons/logo-background.svg';
 import SignIn from '@features/sign-in/sign-in';
+
+import LogoIcon from '@/assets/icons/logo.svg';
+import { ThemedH1 } from '@/components/ui/themed-h1';
+import { ThemedH2 } from '@/components/ui/themed-h2';
+import { ThemedP } from '@/components/ui/themed-p';
+import { ThemedSpan } from '@/components/ui/themed-span';
 
 const SignInPage = () => {
   return (

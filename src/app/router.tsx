@@ -8,9 +8,9 @@ import NotFoundPage from '@app/routes/not-found';
 import SignInPage from '@app/routes/sign-in';
 import SignUpPage from '@app/routes/sign-up';
 
-import { AppRoutes } from '@shared/constants/router';
-
 import ProtectedRoute from '@features/sign-in/components/protected-route/protected-route';
+
+import { AppRoutes } from '@/constants/router';
 
 const router = createBrowserRouter([
   {

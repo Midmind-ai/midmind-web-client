@@ -6,8 +6,6 @@ import { useParams } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
-import type { ConversationWithAIRequestDto } from '@shared/services/conversations/conversations-dtos';
-
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useConversationWithAI } from '@features/chat/hooks/use-conversation-with-ai';
 import type { OnSubmitArgs, LLModel } from '@features/chat/types/chat-types';
@@ -16,6 +14,8 @@ import {
   unsubscribeFromMessageReply,
   type MessageReplyEvent,
 } from '@features/chat/utils/message-reply-emitter';
+
+import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
 
 type ChatMessageFormData = {
   content: string;

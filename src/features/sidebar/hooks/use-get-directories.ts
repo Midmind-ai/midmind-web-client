@@ -1,8 +1,7 @@
 import useSWR from 'swr';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import { DirectoriesService } from '@shared/services/directories/directories-service';
+import { SWRCacheKeys } from '@/constants/api';
+import { DirectoriesService } from '@/services/directories/directories-service';
 
 export const useGetDirectories = (parentId?: string | null) => {
   const {

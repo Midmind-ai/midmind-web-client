@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import LibReactMarkDown from 'react-markdown';
 
-import { ThemedP } from '@shared/components/ui/themed-p';
+import { ThemedP } from '@/components/ui/themed-p';
 
 /**
   ReactMarkdown is moved to a separate file and memoised for a few reasons:

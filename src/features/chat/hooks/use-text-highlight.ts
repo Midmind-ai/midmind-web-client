@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-import type { ChatMessage } from '@shared/types/entities';
-
 import type { DefiniteBranches } from '@features/chat/types/chat-types';
 import { clearHighlights, highlightSelection } from '@features/chat/utils/text-selection';
+
+import type { ChatMessage } from '@/types/entities';
 
 type Args = {
   branches: ChatMessage['branches'];

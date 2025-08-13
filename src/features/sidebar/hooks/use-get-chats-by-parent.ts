@@ -1,8 +1,7 @@
 import useSWR from 'swr';
 
-import { SWRCacheKeys } from '@shared/constants/api';
-
-import { ChatsService } from '@shared/services/chats/chats-service';
+import { SWRCacheKeys } from '@/constants/api';
+import { ChatsService } from '@/services/chats/chats-service';
 
 // Hook for getting chats by parent directory
 export const useGetChatsByParentDirectory = (parentDirectoryId?: string | null) => {

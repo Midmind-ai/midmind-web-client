@@ -7,13 +7,11 @@ import {
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { SidebarMenuButton } from '@shared/components/ui/sidebar';
-
-import { AppRoutes } from '@shared/constants/router';
-
-import { useInlineEditStore } from '@shared/stores/use-inline-edit-store';
-
 import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
+
+import { SidebarMenuButton } from '@/components/ui/sidebar';
+import { AppRoutes } from '@/constants/router';
+import { useInlineEditStore } from '@/stores/use-inline-edit-store';
 
 const FolderActions = () => {
   const navigate = useNavigate();
