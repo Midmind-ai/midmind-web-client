@@ -1,8 +1,9 @@
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { MUTATION_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
-import { ChatsService } from '@/services/chats/chats-service';
+import { MUTATION_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+
+import { ChatsService } from '@services/chats/chats-service';
 
 type DeleteChatFetcherArgs = {
   arg: {

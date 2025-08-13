@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { User } from '@/types/entities';
+import type { User } from '@shared-types/entities';
 
 type UserState = {
   user: User | null;

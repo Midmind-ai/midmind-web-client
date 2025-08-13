@@ -1,8 +1,8 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 
-import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { TooltipContent, TooltipProvider, TooltipTrigger } from '@components/ui/tooltip';
 
-import { TOOLTIP_DELAY } from './constants';
+import { TOOLTIP_DELAY } from '@features/sidebar/components/tree-node/constants';
 
 type Props = {
   content: string;

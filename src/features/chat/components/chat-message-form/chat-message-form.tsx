@@ -1,22 +1,23 @@
 import { ChevronDownIcon, CircleStop, PaperclipIcon, SendHorizonal } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
-import { useChatMessageFormLogic } from '@features/chat/components/chat-message-form/use-chat-message-form-logic';
-import MessageReply from '@features/chat/components/message-reply/message-reply';
-import { AI_MODELS } from '@features/chat/constants/ai-models';
-import type { OnSubmitArgs } from '@features/chat/types/chat-types';
-
-import { Button } from '@/components/ui/button';
+import { Button } from '@components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
-import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
+} from '@components/ui/select';
+import { Separator } from '@components/ui/separator';
+import { Textarea } from '@components/ui/textarea';
+
+import { useChatMessageFormLogic } from '@features/chat/components/chat-message-form/use-chat-message-form-logic';
+import MessageReply from '@features/chat/components/message-reply/message-reply';
+import { AI_MODELS } from '@features/chat/constants/ai-models';
+import type { OnSubmitArgs } from '@features/chat/types/chat-types';
+
+import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type Props = {
   chatId?: string;

@@ -1,11 +1,11 @@
-import { baseAxiosInstance } from '@/config/axios';
+import { baseAxiosInstance } from '@config/axios';
 
-import type { components } from 'generated/api-types';
-
-export type Directory = components['schemas']['GetDirectoryDto'];
-export type CreateDirectoryDto = components['schemas']['CreateDirectoryDto'];
-export type UpdateDirectoryDto = components['schemas']['UpdateDirectoryDto'];
-export type MessageDto = components['schemas']['MessageDto'];
+import type {
+  CreateDirectoryDto,
+  Directory,
+  MessageDto,
+  UpdateDirectoryDto,
+} from '@services/directories/directories-dtos';
 
 export class DirectoriesService {
   static async getDirectories(parentId?: string) {

@@ -1,5 +1,7 @@
 import { useNavigate, useParams } from 'react-router';
 
+import { AppRoutes } from '@constants/paths';
+
 import {
   useGetChatsByParentChat,
   useGetChatsByParentDirectory,
@@ -7,8 +9,7 @@ import {
 import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
 
-import { AppRoutes } from '@/constants/paths';
-import type { Chat, Directory } from '@/types/entities';
+import type { Chat, Directory } from '@shared-types/entities';
 
 export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
   const navigate = useNavigate();

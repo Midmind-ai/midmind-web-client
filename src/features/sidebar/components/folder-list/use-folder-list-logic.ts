@@ -1,15 +1,18 @@
 import { useLocation, useNavigate } from 'react-router';
 import { useSWRConfig } from 'swr';
 
+import { AppRoutes, SearchParams } from '@constants/paths';
+
+import { useChatActions } from '@features/chat/hooks/use-chat-actions';
 import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
 import { useDeleteDirectory } from '@features/sidebar/hooks/use-delete-directory';
 import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
-import { AppRoutes, SearchParams } from '@/constants/paths';
-import { useChatActions } from '@/features/chat/hooks/use-chat-actions';
-import { useUrlParams } from '@/hooks/utils/use-url-params';
-import { useInlineEditStore } from '@/stores/use-inline-edit-store';
-import type { Chat } from '@/types/entities';
+import { useUrlParams } from '@hooks/utils/use-url-params';
+
+import { useInlineEditStore } from '@stores/use-inline-edit-store';
+
+import type { Chat } from '@shared-types/entities';
 
 export const useFolderListLogic = () => {
   // Get root level directories and chats (no parent)

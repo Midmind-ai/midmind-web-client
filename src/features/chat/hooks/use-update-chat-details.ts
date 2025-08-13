@@ -1,9 +1,10 @@
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { CACHE_KEYS, MUTATION_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
-import type { UpdateChatDetailsRequestDto } from '@/services/chats/chats-dtos';
-import { ChatsService } from '@/services/chats/chats-service';
+import { CACHE_KEYS, MUTATION_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+
+import type { UpdateChatDetailsRequestDto } from '@services/chats/chats-dtos';
+import { ChatsService } from '@services/chats/chats-service';
 
 type UpdateChatDetailsFetcherArgs = {
   arg: {

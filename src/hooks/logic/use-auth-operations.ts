@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
-import { useSwrCurrentUser } from '@/hooks/swr/use-swr-auth';
-import { useSwrLogout } from '@/hooks/swr/use-swr-logout';
-import { useUserStore } from '@/stores/use-user-store';
+import { useSwrCurrentUser } from '@hooks/swr/use-swr-auth';
+import { useSwrLogout } from '@hooks/swr/use-swr-logout';
+
+import { useUserStore } from '@stores/use-user-store';
 
 // Business logic hook that combines auth checking with user store management
 export const useCheckAuth = () => {

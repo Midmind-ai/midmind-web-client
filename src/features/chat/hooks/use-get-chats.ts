@@ -1,7 +1,8 @@
 import useSWR from 'swr';
 
-import { CACHE_KEYS } from '@/hooks/cache-keys';
-import { ChatsService } from '@/services/chats/chats-service';
+import { CACHE_KEYS } from '@hooks/cache-keys';
+
+import { ChatsService } from '@services/chats/chats-service';
 
 export const useGetChats = () => {
   const {

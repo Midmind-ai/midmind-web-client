@@ -1,17 +1,18 @@
 import { Link } from 'react-router';
 
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
+import { Label } from '@components/ui/label';
+import { Separator } from '@components/ui/separator';
+import { ThemedP } from '@components/ui/themed-p';
+import { ThemedSpan } from '@components/ui/themed-span';
+
+import { AppRoutes } from '@constants/paths';
+
 import AppleIcon from '@features/sign-in/assets/icons/apple.svg';
 import GitHubIcon from '@features/sign-in/assets/icons/github.svg';
 import GoogleIcon from '@features/sign-in/assets/icons/google.svg';
 import { useSignInFormLogic } from '@features/sign-in/components/sign-in-form/use-sign-in-form-logic';
-
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ThemedP } from '@/components/ui/themed-p';
-import { ThemedSpan } from '@/components/ui/themed-span';
-import { AppRoutes } from '@/constants/paths';
 
 const SignInForm = () => {
   const { errors, isSubmitting, register, handleSubmit, loginWithGoogle } =

@@ -1,5 +1,6 @@
-import { baseAxiosInstance } from '@/config/axios';
-import type { User } from '@/types/entities';
+import { baseAxiosInstance } from '@config/axios';
+
+import type { User } from '@shared-types/entities';
 
 export class UsersService {
   static async getCurrentUser() {

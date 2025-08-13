@@ -1,5 +1,6 @@
-import { baseAxiosInstance } from '@/config/axios';
-import type { GetBranchContextResponse } from '@/services/branch-context/branch-context-dtos';
+import { baseAxiosInstance } from '@config/axios';
+
+import type { GetBranchContextResponse } from '@services/branch-context/branch-context-dtos';
 
 export class BranchContextService {
   static async getBranchContext(messageId: string) {

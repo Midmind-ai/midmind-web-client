@@ -1,18 +1,21 @@
 import { Outlet } from 'react-router';
 
-import Chat from '@features/chat/chat';
-import { useBranchContext } from '@features/chat/hooks/use-branch-context';
-
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@/components/ui/resizable';
-import { LocalStorageKeys } from '@/constants/local-storage';
-import { SearchParams } from '@/constants/paths';
-import { useUrlParams } from '@/hooks/utils/use-url-params';
-import { cn } from '@/utils/cn';
-import { getFromStorage, setToStorage } from '@/utils/local-storage';
+} from '@components/ui/resizable';
+
+import { LocalStorageKeys } from '@constants/local-storage';
+import { SearchParams } from '@constants/paths';
+
+import Chat from '@features/chat/chat';
+import { useBranchContext } from '@features/chat/hooks/use-branch-context';
+
+import { useUrlParams } from '@hooks/utils/use-url-params';
+
+import { cn } from '@utils/cn';
+import { getFromStorage, setToStorage } from '@utils/local-storage';
 
 const SplitLayout = () => {
   const { value: chatId = '', removeValue } = useUrlParams(SearchParams.Split);

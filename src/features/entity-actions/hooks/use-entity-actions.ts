@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
+import type { ActionConfig } from '@features/entity-actions/types/action-config';
+import type { EntityActionHandlers } from '@features/entity-actions/types/entity-action-handlers';
 import {
   createFolderActions,
   createChatActions,
   createBranchActions,
   createMindletActions,
-} from '../utils/action-creators';
+} from '@features/entity-actions/utils/action-creators';
 
-import type { ActionConfig } from '../types/action-config';
-import type { EntityActionHandlers } from '../types/entity-action-handlers';
 import type { components } from 'generated/api-types';
 
 // Use the breadcrumbs type which has all entity types

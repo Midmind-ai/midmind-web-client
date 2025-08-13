@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { ThemedSpan } from '@/components/ui/themed-span';
-import { useInlineEditStore } from '@/stores/use-inline-edit-store';
+import { ThemedSpan } from '@components/ui/themed-span';
+
+import { useInlineEditStore } from '@stores/use-inline-edit-store';
 
 type Props = {
   entityId: string;

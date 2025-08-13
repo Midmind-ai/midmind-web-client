@@ -1,7 +1,8 @@
 import { Fragment } from 'react';
 
-import { Modals } from '@/constants/modals';
-import { useModalsStore } from '@/stores/use-modals-store';
+import { Modals } from '@constants/modals';
+
+import { useModalsStore } from '@stores/use-modals-store';
 
 const ModalsRenderer = () => {
   const { modals, closingModals, finishClosing } = useModalsStore();
@@ -10,7 +11,7 @@ const ModalsRenderer = () => {
     <>
       {modals.map(modal => {
         const modalName = modal.name;
-        const Component = Modals[modalName];
+        const Component = Modals[modalName as keyof typeof Modals];
         const isClosing = closingModals.has(modalName);
 
         if (!Component) {
@@ -19,7 +20,6 @@ const ModalsRenderer = () => {
 
         return (
           <Fragment key={modalName}>
-            {/* @ts-expect-error props are type-checked in openModal function */}
             <Component
               {...modal.props}
               open={!isClosing}

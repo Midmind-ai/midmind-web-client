@@ -5,29 +5,33 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@components/ui/button';
+import { Input } from '@components/ui/input';
+import { Separator } from '@components/ui/separator';
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@components/ui/sheet';
+import {
+  SidebarWidthContext,
+  useSidebarWidthContext,
+} from '@components/ui/sidebar-context';
+import SidebarResizeHandle from '@components/ui/sidebar-resize-handle';
+import { Skeleton } from '@components/ui/skeleton';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/utils/use-mobile';
-import { useSidebarWidth } from '@/hooks/utils/use-sidebar-width';
-import { cn } from '@/utils/cn';
+} from '@components/ui/tooltip';
 
-import { SidebarWidthContext, useSidebarWidthContext } from './sidebar-context';
-import SidebarResizeHandle from './sidebar-resize-handle';
+import { useIsMobile } from '@hooks/utils/use-mobile';
+import { useSidebarWidth } from '@hooks/utils/use-sidebar-width';
+
+import { cn } from '@utils/cn';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

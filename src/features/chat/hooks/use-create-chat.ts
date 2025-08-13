@@ -7,14 +7,17 @@ import type { LLModel } from '@features/chat/types/chat-types';
 import { handleLLMResponse } from '@features/chat/utils/swr';
 import { useExpandedNodesStore } from '@features/sidebar/stores/use-expanded-nodes-store';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
+import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
-} from '@/services/conversations/conversations-dtos';
-import { ConversationsService } from '@/services/conversations/conversations-service';
-import { useAbortControllerStore } from '@/stores/use-abort-controller-store';
-import type { Chat, ChatMessage } from '@/types/entities';
+} from '@services/conversations/conversations-dtos';
+import { ConversationsService } from '@services/conversations/conversations-service';
+
+import { useAbortControllerStore } from '@stores/use-abort-controller-store';
+
+import type { Chat, ChatMessage } from '@shared-types/entities';
 
 type CreateChatArgs = {
   content: string;

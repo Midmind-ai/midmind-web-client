@@ -11,7 +11,7 @@ import {
   type LucideProps,
 } from 'lucide-react';
 
-import { EntityEnum, type EntityType } from '@/types/entity';
+import { EntityEnum, type EntityType } from '@shared-types/entity';
 
 export const renderEntityIcon = (
   type: EntityType,

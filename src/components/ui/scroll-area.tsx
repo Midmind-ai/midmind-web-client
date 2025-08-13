@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@utils/cn';
 
 type ScrollAreaProps = React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;

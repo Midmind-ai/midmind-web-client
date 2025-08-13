@@ -15,7 +15,7 @@ import {
   type MessageReplyEvent,
 } from '@features/chat/utils/message-reply-emitter';
 
-import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
+import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type ChatMessageFormData = {
   content: string;

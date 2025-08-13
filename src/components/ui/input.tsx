@@ -3,8 +3,9 @@ import { useState } from 'react';
 
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/utils/cn';
+import { Button } from '@components/ui/button';
+
+import { cn } from '@utils/cn';
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);

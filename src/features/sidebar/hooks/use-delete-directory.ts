@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { produce } from 'immer';
 import { mutate } from 'swr';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
-import { DirectoriesService } from '@/services/directories/directories-service';
-import type { Directory } from '@/types/entities';
+import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+
+import { DirectoriesService } from '@services/directories/directories-service';
+
+import type { Directory } from '@shared-types/entities';
 
 type DeleteDirectoryParams = {
   id: string;

@@ -5,12 +5,11 @@ import {
   unsubscribeFromBranchCreated,
 } from '@features/chat/utils/branch-creation-emitter';
 import type { BranchEvent } from '@features/chat/utils/branch-creation-emitter';
+import ExpandableNode from '@features/sidebar/components/tree-node/expandable-node';
+import LeafNode from '@features/sidebar/components/tree-node/leaf-node';
 import { useTreeNodeLogic } from '@features/sidebar/components/tree-node/use-tree-node-logic';
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
 import { useExpandedNodesStore } from '@features/sidebar/stores/use-expanded-nodes-store';
-
-import ExpandableNode from './expandable-node';
-import LeafNode from './leaf-node';
 
 type Props = {
   node: TreeNodeType;

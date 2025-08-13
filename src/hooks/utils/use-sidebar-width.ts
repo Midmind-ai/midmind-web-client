@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@utils/debounce';
 
 // Constants for sidebar width constraints
 export const DEFAULT_SIDEBAR_WIDTH = 352; // 22rem in pixels

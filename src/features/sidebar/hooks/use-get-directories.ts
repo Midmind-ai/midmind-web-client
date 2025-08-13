@@ -1,7 +1,8 @@
 import useSWR from 'swr';
 
-import { CACHE_KEYS } from '@/hooks/cache-keys';
-import { DirectoriesService } from '@/services/directories/directories-service';
+import { CACHE_KEYS } from '@hooks/cache-keys';
+
+import { DirectoriesService } from '@services/directories/directories-service';
 
 export const useGetDirectories = (parentId?: string | null) => {
   const {

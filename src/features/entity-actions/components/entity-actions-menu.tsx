@@ -5,14 +5,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { SidebarMenuAction } from '@/components/ui/sidebar';
-import { ThemedSpan } from '@/components/ui/themed-span';
-import { cn } from '@/utils/cn';
+} from '@components/ui/dropdown-menu';
+import { SidebarMenuAction } from '@components/ui/sidebar';
+import { ThemedSpan } from '@components/ui/themed-span';
 
-import { useEntityActions } from '../hooks/use-entity-actions';
+import { useEntityActions } from '@features/entity-actions/hooks/use-entity-actions';
+import type { EntityActionHandlers } from '@features/entity-actions/types/entity-action-handlers';
 
-import type { EntityActionHandlers } from '../types/entity-action-handlers';
+import { cn } from '@utils/cn';
+
 import type { components } from 'generated/api-types';
 
 // Use the breadcrumbs type which has all entity types

@@ -1,6 +1,6 @@
 import { ExternalLink, Loader2, Pencil, PanelRight, Trash2 } from 'lucide-react';
 
-import type { ActionConfig } from '../types/action-config';
+import type { ActionConfig } from '@features/entity-actions/types/action-config';
 
 type FolderActionHandlers = {
   onRename: () => void;

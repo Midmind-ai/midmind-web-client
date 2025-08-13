@@ -1,11 +1,11 @@
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import MessageList from '@features/chat/components/message-list/message-list';
+import { useGetChatDetails } from '@features/chat/hooks/use-get-chat-details';
 import NavigationHeader from '@features/navigation-header/navigation-header';
 
-import { usePageTitle } from '@/hooks/utils/use-page-title';
-import type { ConversationWithAIRequestDto } from '@/services/conversations/conversations-dtos';
+import { usePageTitle } from '@hooks/utils/use-page-title';
 
-import { useGetChatDetails } from './hooks/use-get-chat-details';
+import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type Props = {
   chatId: string;

@@ -1,6 +1,6 @@
 import type { FC, HTMLAttributes } from 'react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@utils/cn';
 
 const ThemedP: FC<HTMLAttributes<HTMLParagraphElement>> = ({
   className,

@@ -1,4 +1,4 @@
-import { apiConfig } from '@/config/api';
+import { apiConfig } from '@config/api';
 
 import type { SWRConfiguration } from 'swr';
 

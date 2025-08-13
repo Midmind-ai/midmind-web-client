@@ -11,11 +11,13 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
 
-import { CACHE_KEYS } from '@/hooks/cache-keys';
-import { BranchContextService } from '@/services/branch-context/branch-context-service';
-import type { ConversationWithAIResponseDto } from '@/services/conversations/conversations-dtos';
-import type { PaginatedResponse } from '@/types/common';
-import type { ChatMessage } from '@/types/entities';
+import { CACHE_KEYS } from '@hooks/cache-keys';
+
+import { BranchContextService } from '@services/branch-context/branch-context-service';
+import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
+
+import type { PaginatedResponse } from '@shared-types/common';
+import type { ChatMessage } from '@shared-types/entities';
 
 export const getInfiniteKey = (chatId: string) => {
   return unstable_serialize(

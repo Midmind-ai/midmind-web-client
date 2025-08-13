@@ -1,8 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
-import { LocalStorageKeys } from '@/constants/local-storage';
-import { getFromStorage, setToStorage } from '@/utils/local-storage';
+import { LocalStorageKeys } from '@constants/local-storage';
+
+import { getFromStorage, setToStorage } from '@utils/local-storage';
 
 type Theme = 'dark' | 'light' | 'system';
 

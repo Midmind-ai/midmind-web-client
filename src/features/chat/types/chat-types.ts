@@ -1,6 +1,6 @@
 import { AI_MODELS } from '@features/chat/constants/ai-models';
 
-import type { ConversationWithAIResponseDto } from '@/services/conversations/conversations-dtos';
+import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
 
 import type { components } from 'generated/api-types';
 

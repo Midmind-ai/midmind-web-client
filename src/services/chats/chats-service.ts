@@ -1,7 +1,9 @@
-import { baseAxiosInstance } from '@/config/axios';
-import type { UpdateChatDetailsRequestDto } from '@/services/chats/chats-dtos';
-import type { MessageResponse } from '@/types/common';
-import type { Chat } from '@/types/entities';
+import { baseAxiosInstance } from '@config/axios';
+
+import type { UpdateChatDetailsRequestDto } from '@services/chats/chats-dtos';
+
+import type { MessageResponse } from '@shared-types/common';
+import type { Chat } from '@shared-types/entities';
 
 export class ChatsService {
   static async getChats(options?: { parentDirectoryId?: string; parentChatId?: string }) {

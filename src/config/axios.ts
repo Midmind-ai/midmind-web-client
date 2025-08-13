@@ -1,7 +1,6 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
 
-// eslint-disable-next-line import/order
-import { apiConfig } from '@/config/api';
+import { apiConfig } from '@config/api';
 
 const ApiErrorCodes = {
   Unauthorized: 401,
@@ -9,10 +8,12 @@ const ApiErrorCodes = {
   NotFound: 404,
 } as const;
 
-import { LocalStorageKeys } from '@/constants/local-storage';
-import { AppRoutes } from '@/constants/paths';
-import type { TokenResponse } from '@/services/auth/auth-dtos';
-import { getFromStorage, removeFromStorage, setToStorage } from '@/utils/local-storage';
+import { LocalStorageKeys } from '@constants/local-storage';
+import { AppRoutes } from '@constants/paths';
+
+import type { TokenResponse } from '@services/auth/auth-dtos';
+
+import { getFromStorage, removeFromStorage, setToStorage } from '@utils/local-storage';
 
 type RefreshQueueItem = {
   resolve: (value: string) => void;

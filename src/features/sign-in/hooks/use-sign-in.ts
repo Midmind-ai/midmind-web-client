@@ -1,8 +1,9 @@
 import useSWRMutation from 'swr/mutation';
 
-import { MUTATION_KEYS } from '@/hooks/cache-keys';
-import type { SignInRequest } from '@/services/auth/auth-dtos';
-import { AuthService } from '@/services/auth/auth-service';
+import { MUTATION_KEYS } from '@hooks/cache-keys';
+
+import type { SignInRequest } from '@services/auth/auth-dtos';
+import { AuthService } from '@services/auth/auth-service';
 
 type SignInFetcherArgs = {
   arg: SignInRequest;

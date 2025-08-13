@@ -2,9 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
-
-import { Button } from '@/components/ui/button';
+import { Button } from '@components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,11 +10,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import type { BaseModalProps } from '@/constants/modals';
-import { useModalOperations } from '@/hooks/logic/use-modal-operations';
+} from '@components/ui/dialog';
+import { Input } from '@components/ui/input';
+import { Label } from '@components/ui/label';
+
+import type { BaseModalProps } from '@constants/modals';
+
+import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
+
+import { useModalOperations } from '@hooks/logic/use-modal-operations';
 
 const createDirectorySchema = z.object({
   name: z.string().min(1, 'Directory name is required').trim(),

@@ -7,18 +7,18 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 
+import EditableText from '@components/ui/editable-text';
+import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
+
 import { useUpdateChatDetails } from '@features/chat/hooks/use-update-chat-details';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
+import ChildrenList from '@features/sidebar/components/tree-node/children-list';
+import NodeIcon from '@features/sidebar/components/tree-node/node-icon';
 import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
 import { useUpdateDirectory } from '@features/sidebar/hooks/use-update-directory';
 
-import EditableText from '@/components/ui/editable-text';
-import { SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { useInlineEditStore } from '@/stores/use-inline-edit-store';
-
-import ChildrenList from './children-list';
-import NodeIcon from './node-icon';
+import { useInlineEditStore } from '@stores/use-inline-edit-store';
 
 type Props = {
   node: TreeNodeType;

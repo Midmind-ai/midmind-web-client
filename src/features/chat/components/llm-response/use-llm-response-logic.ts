@@ -9,8 +9,9 @@ import {
 } from '@features/chat/utils/llm-response-emitter';
 import { captureSelection } from '@features/chat/utils/text-selection';
 
-import type { ConversationWithAIResponseDto } from '@/services/conversations/conversations-dtos';
-import type { ChatMessage } from '@/types/entities';
+import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
+
+import type { ChatMessage } from '@shared-types/entities';
 
 export const useLLMResponseLogic = (
   id: string,

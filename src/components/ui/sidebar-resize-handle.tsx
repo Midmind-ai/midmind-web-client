@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { clampWidth } from '@/hooks/utils/use-sidebar-width';
-import { cn } from '@/utils/cn';
+import { useSidebarWidthContext } from '@components/ui/sidebar-context';
 
-import { useSidebarWidthContext } from './sidebar-context';
+import { clampWidth } from '@hooks/utils/use-sidebar-width';
+
+import { cn } from '@utils/cn';
 
 type Props = {
   className?: string;

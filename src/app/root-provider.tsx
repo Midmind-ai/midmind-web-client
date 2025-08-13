@@ -6,7 +6,7 @@ import { SWRProvider } from '@app/providers/swr-provider';
 import { ThemeProvider } from '@app/providers/theme-provider';
 import router from '@app/router';
 
-import { LocalStorageKeys } from '@/constants/local-storage';
+import { LocalStorageKeys } from '@constants/local-storage';
 
 const RootProvider = () => {
   return (

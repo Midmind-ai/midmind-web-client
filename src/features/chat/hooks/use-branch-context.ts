@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-import type { BranchEvent } from '@features/chat/utils/branch-creation-emitter';
 import {
   subscribeToBranchCreated,
   unsubscribeFromBranchCreated,
 } from '@features/chat/utils/branch-creation-emitter';
+import type { BranchEvent } from '@features/chat/utils/branch-creation-emitter';
 
 export const useBranchContext = (chatId: string) => {
   const branchContextRef = useRef<BranchEvent['branchContext'] | undefined>(undefined);

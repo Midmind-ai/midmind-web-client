@@ -1,8 +1,8 @@
+import { ScrollArea } from '@components/ui/scroll-area';
+
 import LLMResponse from '@features/chat/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat/components/user-message/user-message';
-
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Props = {
   chatId: string;

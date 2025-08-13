@@ -4,15 +4,18 @@ import useSWRMutation from 'swr/mutation';
 
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
 
-import { MUTATION_KEYS } from '@/hooks/cache-keys';
+import { MUTATION_KEYS } from '@hooks/cache-keys';
+
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
-} from '@/services/conversations/conversations-dtos';
-import { ConversationsService } from '@/services/conversations/conversations-service';
-import { useAbortControllerStore } from '@/stores/use-abort-controller-store';
-import type { PaginatedResponse } from '@/types/common';
-import type { ChatMessage } from '@/types/entities';
+} from '@services/conversations/conversations-dtos';
+import { ConversationsService } from '@services/conversations/conversations-service';
+
+import { useAbortControllerStore } from '@stores/use-abort-controller-store';
+
+import type { PaginatedResponse } from '@shared-types/common';
+import type { ChatMessage } from '@shared-types/entities';
 
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();

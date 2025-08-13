@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { ThemedSpan } from '@/components/ui/themed-span';
+import { Button } from '@components/ui/button';
+import { ThemedSpan } from '@components/ui/themed-span';
 
 type Props = {
   icon: React.ReactNode;

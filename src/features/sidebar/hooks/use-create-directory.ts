@@ -4,9 +4,11 @@ import { produce } from 'immer';
 import { mutate } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@/hooks/cache-keys';
-import { DirectoriesService } from '@/services/directories/directories-service';
-import type { Directory } from '@/types/entities';
+import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+
+import { DirectoriesService } from '@services/directories/directories-service';
+
+import type { Directory } from '@shared-types/entities';
 
 type CreateDirectoryParams = {
   name: string;

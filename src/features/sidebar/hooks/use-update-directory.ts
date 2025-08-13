@@ -1,9 +1,11 @@
 import { produce } from 'immer';
 import { mutate } from 'swr';
 
-import { invalidateCachePattern } from '@/hooks/cache-keys';
-import { DirectoriesService } from '@/services/directories/directories-service';
-import type { Directory } from '@/types/entities';
+import { invalidateCachePattern } from '@hooks/cache-keys';
+
+import { DirectoriesService } from '@services/directories/directories-service';
+
+import type { Directory } from '@shared-types/entities';
 
 type UpdateDirectoryParams = {
   id: string;

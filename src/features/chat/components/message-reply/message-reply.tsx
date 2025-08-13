@@ -1,7 +1,8 @@
 import { Reply } from 'lucide-react';
 
-import { ThemedP } from '@/components/ui/themed-p';
-import { cn } from '@/utils/cn';
+import { ThemedP } from '@components/ui/themed-p';
+
+import { cn } from '@utils/cn';
 
 type Props = {
   content: string;

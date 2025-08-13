@@ -1,8 +1,6 @@
 import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from 'lucide-react';
 
-import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -12,9 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { SidebarMenuButton } from '@/components/ui/sidebar';
-import { ThemedSpan } from '@/components/ui/themed-span';
+} from '@components/ui/dropdown-menu';
+import { SidebarMenuButton } from '@components/ui/sidebar';
+import { ThemedSpan } from '@components/ui/themed-span';
+
+import { useUserDropdownLogic } from '@features/sidebar/components/user-dropdown/user-dropdown-logic';
 
 const UserDropdown = () => {
   const {

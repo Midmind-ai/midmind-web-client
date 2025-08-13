@@ -1,7 +1,7 @@
 import { useGetChatsByParentDirectory } from '@features/sidebar/hooks/use-get-chats-by-parent';
 import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 
-import type { Chat, Directory } from '@/types/entities';
+import type { Chat, Directory } from '@shared-types/entities';
 
 export type TreeNode = {
   id: string;

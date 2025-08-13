@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3';
 
-import type { BranchContext } from '@/types/entities';
+import type { BranchContext } from '@shared-types/entities';
 
 export type BranchEvent = {
   branchContext: BranchContext;

@@ -55,52 +55,22 @@ export default tseslint.config([
               position: 'before',
             },
             {
-              pattern: '@shared/assets/**',
+              pattern: '@assets/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@shared/components/**',
+              pattern: '@components/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@shared/config/**',
+              pattern: '@config/**',
               group: 'internal',
               position: 'before',
             },
             {
-              pattern: '@shared/constants/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/hooks/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/services/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/stores/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/theme/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/types/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared/utils/**',
+              pattern: '@constants/**',
               group: 'internal',
               position: 'before',
             },
@@ -110,7 +80,27 @@ export default tseslint.config([
               position: 'before',
             },
             {
-              pattern: '@/**',
+              pattern: '@hooks/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@services/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@stores/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@shared-types/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@utils/**',
               group: 'internal',
               position: 'before',
             },
