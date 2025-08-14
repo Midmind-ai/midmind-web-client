@@ -1,10 +1,9 @@
-import { Fragment } from 'react';
-
-import { Modals } from '@constants/modals';
-
-import { useModalsStore } from '@stores/use-modals-store';
-
 const ModalsRenderer = () => {
+  // No modals currently registered - return null
+  // When modals are added, uncomment the implementation below
+  return null;
+
+  /* Implementation for when modals are registered:
   const { modals, closingModals, finishClosing } = useModalsStore();
 
   return (
@@ -34,6 +33,7 @@ const ModalsRenderer = () => {
       })}
     </>
   );
+  */
 };
 
 export default ModalsRenderer;
