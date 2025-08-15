@@ -60,8 +60,8 @@ const LLMResponse = ({
             p-2.5 transition-colors duration-100"
         >
           <h6
-            className="mb-4 text-xs font-medium text-blue-500 uppercase opacity-0
-              transition-opacity group-hover:opacity-100"
+            className="text-muted-foreground mb-4 text-xs font-light uppercase opacity-0
+              transition-opacity group-hover:opacity-70"
           >
             {llm_model}
           </h6>

@@ -44,14 +44,14 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
       {replyInfo?.id && (
         <MessageReply
           content={replyInfo.content}
-          className="mx-4"
+          className="mx-4 shadow-md"
           onClose={handleCloseReply}
         />
       )}
       <form
         onSubmit={handleSubmit(handleFormSubmit)}
         className="outline-input bg-background-accent flex items-center gap-2 rounded-lg
-          p-2 pl-2.5 outline-1"
+          p-2 pl-2.5 shadow-sm outline-1"
       >
         <Controller
           name="model"

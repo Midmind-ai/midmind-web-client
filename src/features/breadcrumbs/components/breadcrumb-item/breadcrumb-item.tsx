@@ -38,30 +38,46 @@ const BreadcrumbItem = ({ title, type, isActive, href }: Props) => {
 
   return (
     <ShadcnBreadcrumbItem>
-      <BreadcrumbLink
-        className="group hover:bg-sidebar-accent hover:text-foreground flex max-w-[250px]
-          cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1"
-        asChild
-      >
-        <Link
-          className={cn(
-            isActive && 'text-foreground',
-            'group-hover:text-primary transition-none'
-          )}
-          to={href}
+      {isTruncated ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <BreadcrumbLink
+              className="group hover:bg-sidebar-accent hover:text-foreground flex
+                max-w-[250px] cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1"
+              asChild
+            >
+              <Link
+                className={cn(
+                  isActive && 'text-foreground',
+                  'group-hover:text-primary transition-none'
+                )}
+                to={href}
+              >
+                {breadcrumbContent}
+              </Link>
+            </BreadcrumbLink>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{title}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <BreadcrumbLink
+          className="group hover:bg-sidebar-accent hover:text-foreground flex
+            max-w-[250px] cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1"
+          asChild
         >
-          {isTruncated ? (
-            <Tooltip>
-              <TooltipTrigger asChild>{breadcrumbContent}</TooltipTrigger>
-              <TooltipContent>
-                <p>{title}</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            breadcrumbContent
-          )}
-        </Link>
-      </BreadcrumbLink>
+          <Link
+            className={cn(
+              isActive && 'text-foreground',
+              'group-hover:text-primary transition-none'
+            )}
+            to={href}
+          >
+            {breadcrumbContent}
+          </Link>
+        </BreadcrumbLink>
+      )}
     </ShadcnBreadcrumbItem>
   );
 };

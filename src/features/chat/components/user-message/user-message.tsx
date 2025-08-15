@@ -36,11 +36,11 @@ const UserMessage = ({
             {reply_content && (
               <MessageReply
                 content={reply_content}
-                className="mx-4"
+                className="mx-4 shadow-md"
                 placement="message"
               />
             )}
-            <div className="bg-accent rounded-[10px] p-2.5 select-text">
+            <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
               <ThemedP className="text-base font-light">{content}</ThemedP>
             </div>
           </div>
