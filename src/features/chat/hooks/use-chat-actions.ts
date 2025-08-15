@@ -3,7 +3,6 @@ import { useNavigate, useParams, useLocation } from 'react-router';
 import { AppRoutes, SearchParams } from '@constants/paths';
 
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
-import { useCreateChat } from '@features/chat/hooks/use-create-chat';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
@@ -11,6 +10,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
+import { useCreateChat } from '@features/sidebar/hooks/use-create-chat';
 
 import type { BranchContext } from '@shared-types/entities';
 

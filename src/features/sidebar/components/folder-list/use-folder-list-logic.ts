@@ -4,7 +4,7 @@ import { useSWRConfig } from 'swr';
 import { AppRoutes, SearchParams } from '@constants/paths';
 
 import { useChatActions } from '@features/chat/hooks/use-chat-actions';
-import { useDeleteChat } from '@features/chat/hooks/use-delete-chat';
+import { useDeleteChat } from '@features/sidebar/hooks/use-delete-chat';
 import { useDeleteDirectory } from '@features/sidebar/hooks/use-delete-directory';
 import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
 
@@ -21,7 +21,7 @@ export const useFolderListLogic = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { cache } = useSWRConfig();
-  const { deleteChat, isLoading: isDeletingChat } = useDeleteChat();
+  const { deleteChat, isDeleting: isDeletingChat } = useDeleteChat();
   const { deleteDirectory, isDeleting: isDeletingDirectory } = useDeleteDirectory();
   const { openChatInSidePanel, openChatInNewTab } = useChatActions();
   const { value: splitChatId, removeValue } = useUrlParams(SearchParams.Split);
@@ -86,7 +86,10 @@ export const useFolderListLogic = () => {
     }
 
     if (node?.type === 'chat') {
-      await deleteChat(nodeId);
+      await deleteChat({
+        id: nodeId,
+        parentDirectoryId: node.parentDirectoryId ?? undefined,
+      });
 
       if (splitChatId === nodeId) {
         removeValue();

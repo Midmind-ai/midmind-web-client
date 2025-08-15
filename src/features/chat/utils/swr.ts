@@ -11,7 +11,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitResponseChunk } from '@features/chat/utils/llm-response-emitter';
 
-import { CACHE_KEYS } from '@hooks/cache-keys';
+import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
 
 import { BranchContextService } from '@services/branch-context/branch-context-service';
 import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
@@ -115,6 +115,7 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
 
   document.title = titleChunk.title;
 
+  // Update individual chat details cache
   mutate(
     CACHE_KEYS.chats.details(titleChunk.chat_id),
     produce((draft?: ChatDetails) => {
@@ -125,8 +126,13 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
     { revalidate: false, populateCache: true }
   );
 
+  // Update all chat list caches that might contain this chat
+  // This includes:
+  // - ['chats'] - root level chats
+  // - ['chats', 'directory', directoryId] - chats in directories
+  // - ['chats', 'chat', parentChatId] - branch chats
   mutate(
-    CACHE_KEYS.chats.all,
+    invalidateCachePattern(['chats']),
     produce((draft?: ChatDetails[]) => {
       if (draft) {
         const chatIndex = draft.findIndex(
