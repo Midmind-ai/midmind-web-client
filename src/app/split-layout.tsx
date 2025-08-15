@@ -50,6 +50,7 @@ const SplitLayout = () => {
           <Chat
             chatId={chatId}
             showCloseButton
+            showSidebarToggle={false}
             onClose={removeValue}
             branchContext={branchContext}
           />

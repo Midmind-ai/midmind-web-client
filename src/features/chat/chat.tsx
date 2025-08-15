@@ -10,11 +10,18 @@ import type { ConversationWithAIRequestDto } from '@services/conversations/conve
 type Props = {
   chatId: string;
   showCloseButton?: boolean;
+  showSidebarToggle?: boolean;
   onClose?: VoidFunction;
   branchContext?: ConversationWithAIRequestDto['branch_context'];
 };
 
-const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
+const Chat = ({
+  chatId,
+  showCloseButton,
+  showSidebarToggle,
+  onClose,
+  branchContext,
+}: Props) => {
   const { chatDetails } = useGetChatDetails(chatId);
 
   usePageTitle(chatDetails?.name || '');
@@ -23,6 +30,7 @@ const Chat = ({ chatId, showCloseButton, onClose, branchContext }: Props) => {
     <div className="flex h-screen flex-col">
       <NavigationHeader
         showCloseButton={showCloseButton}
+        showSidebarToggle={showSidebarToggle}
         onClose={onClose}
       />
       <div className="flex-1 overflow-hidden">

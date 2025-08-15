@@ -1,4 +1,4 @@
-import { BoxSelectIcon, SidebarIcon, XIcon } from 'lucide-react';
+import { SidebarIcon, XIcon } from 'lucide-react';
 import { useParams } from 'react-router';
 
 import { Button } from '@components/ui/button';
@@ -8,29 +8,39 @@ import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
 
 type Props = {
   showCloseButton?: boolean;
+  showSidebarToggle?: boolean;
   onClose?: VoidFunction;
 };
 
-const NavigationHeader = ({ showCloseButton, onClose }: Props) => {
+const NavigationHeader = ({
+  showCloseButton,
+  showSidebarToggle = true,
+  onClose,
+}: Props) => {
   const { id = '' } = useParams();
   const { toggleSidebar } = useSidebar();
 
   return (
     <header className="flex items-center justify-between border-b py-3 pr-2.5 pl-4">
       <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          onClick={toggleSidebar}
-        >
-          <SidebarIcon />
-        </Button>
+        {showSidebarToggle && (
+          <>
+            <Button
+              variant="ghost"
+              onClick={toggleSidebar}
+            >
+              <SidebarIcon />
+            </Button>
+            <div className="relative h-[15px] w-0 border" />
+          </>
+        )}
         <Breadcrumbs id={id} />
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline">
+        {/* <Button variant="outline">
           <BoxSelectIcon />
           Map
-        </Button>
+        </Button> */}
         {showCloseButton && (
           <Button
             variant="outline"
