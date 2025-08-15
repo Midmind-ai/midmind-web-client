@@ -1,5 +1,5 @@
-import { useGetChatsByParentDirectory } from '@features/sidebar/hooks/use-get-chats-by-parent';
-import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
+import { useSwrGetChatsByParentDirectory } from '@hooks/swr/use-swr-get-chats';
+import { useSwrGetDirectories } from '@hooks/swr/use-swr-get-directories';
 
 import type { Chat, Directory } from '@shared-types/entities';
 
@@ -18,14 +18,14 @@ export const useTreeData = (parentId?: string) => {
     directories,
     isLoading: isLoadingDirectories,
     error: directoriesError,
-  } = useGetDirectories(parentId);
+  } = useSwrGetDirectories(parentId);
 
   // Fetch chats for this level
   const {
     chats,
     isLoading: isLoadingChats,
     error: chatsError,
-  } = useGetChatsByParentDirectory(parentId);
+  } = useSwrGetChatsByParentDirectory(parentId);
 
   // Combine directories and chats into tree nodes
   const treeNodes: TreeNode[] = [

@@ -5,7 +5,7 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 import { ChatsService } from '@services/chats/chats-service';
 
 // Hook for getting chats by parent directory
-export const useGetChatsByParentDirectory = (parentDirectoryId?: string | null) => {
+export const useSwrGetChatsByParentDirectory = (parentDirectoryId?: string | null) => {
   const {
     data: chats,
     isLoading,
@@ -27,7 +27,7 @@ export const useGetChatsByParentDirectory = (parentDirectoryId?: string | null) 
 };
 
 // Hook for getting chats by parent chat (sub-chats)
-export const useGetChatsByParentChat = (parentChatId?: string | null) => {
+export const useSwrGetChatsByParentChat = (parentChatId?: string | null) => {
   const {
     data: chats,
     isLoading,

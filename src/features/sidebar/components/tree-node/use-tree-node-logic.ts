@@ -2,12 +2,13 @@ import { useNavigate, useParams } from 'react-router';
 
 import { AppRoutes } from '@constants/paths';
 
-import {
-  useGetChatsByParentChat,
-  useGetChatsByParentDirectory,
-} from '@features/sidebar/hooks/use-get-chats-by-parent';
-import { useGetDirectories } from '@features/sidebar/hooks/use-get-directories';
 import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
+
+import {
+  useSwrGetChatsByParentChat,
+  useSwrGetChatsByParentDirectory,
+} from '@hooks/swr/use-swr-get-chats';
+import { useSwrGetDirectories } from '@hooks/swr/use-swr-get-directories';
 
 import type { Chat, Directory } from '@shared-types/entities';
 
@@ -19,18 +20,18 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
 
   // For directories: fetch directories and chats with parent_directory_id
   // Pass null to disable SWR when we don't want to fetch
-  const { directories, isLoading: isLoadingDirectories } = useGetDirectories(
+  const { directories, isLoading: isLoadingDirectories } = useSwrGetDirectories(
     shouldFetch && node.type === 'directory' ? node.id : null
   );
 
   const { chats: chatsFromDirectory, isLoading: isLoadingChatsFromDirectory } =
-    useGetChatsByParentDirectory(
+    useSwrGetChatsByParentDirectory(
       shouldFetch && node.type === 'directory' ? node.id : null
     );
 
   // For chats with children: fetch sub-chats with parent_chat_id
   const { chats: chatsFromChat, isLoading: isLoadingChatsFromChat } =
-    useGetChatsByParentChat(shouldFetch && node.type === 'chat' ? node.id : null);
+    useSwrGetChatsByParentChat(shouldFetch && node.type === 'chat' ? node.id : null);
 
   // Combine child nodes based on node type
   const childNodes: TreeNode[] = [];

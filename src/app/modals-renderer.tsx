@@ -1,16 +1,18 @@
-const ModalsRenderer = () => {
-  // No modals currently registered - return null
-  // When modals are added, uncomment the implementation below
-  return null;
+import { Fragment } from 'react';
 
-  /* Implementation for when modals are registered:
+import { Modals, type ModalNames } from '@constants/modals';
+
+import { useModalsStore } from '@stores/use-modals-store';
+
+const ModalsRenderer = () => {
   const { modals, closingModals, finishClosing } = useModalsStore();
 
   return (
     <>
       {modals.map(modal => {
-        const modalName = modal.name;
-        const Component = Modals[modalName as keyof typeof Modals];
+        const modalName = modal.name as ModalNames;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const Component = Modals[modalName] as React.ComponentType<any>;
         const isClosing = closingModals.has(modalName);
 
         if (!Component) {
@@ -20,7 +22,8 @@ const ModalsRenderer = () => {
         return (
           <Fragment key={modalName}>
             <Component
-              {...modal.props}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              {...(modal.props as any)}
               open={!isClosing}
               onAnimationEnd={() => {
                 if (isClosing) {
@@ -33,7 +36,6 @@ const ModalsRenderer = () => {
       })}
     </>
   );
-  */
 };
 
 export default ModalsRenderer;

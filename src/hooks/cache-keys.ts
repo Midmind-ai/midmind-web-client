@@ -47,15 +47,30 @@ export const MUTATION_KEYS = {
   },
 } as const;
 
+/**
+ * Creates a filter function that matches cache keys starting with the given pattern.
+ * Used with SWR's mutate() to update multiple cache entries at once.
+ *
+ * @example
+ * invalidateCachePattern(['directories']) matches:
+ * - ['directories'] ✅
+ * - ['directories', 'abc-123'] ✅
+ * - ['directories', 'xyz-456'] ✅
+ * - ['chats'] ❌
+ * - ['messages', 'directories'] ❌
+ *
+ * The mutation will run on ALL matching caches simultaneously.
+ */
 export const invalidateCachePattern = (pattern: string[]) => {
   return (key: unknown) => {
     if (!Array.isArray(key)) {
       return false;
     }
 
+    // Check if the key starts with the pattern
     return pattern.every((part, index) => {
       if (part === '*') {
-        return true;
+        return true; // Wildcard matches anything
       }
 
       return key[index] === part;

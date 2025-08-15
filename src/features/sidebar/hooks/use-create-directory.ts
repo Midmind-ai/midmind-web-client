@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { produce } from 'immer';
 import { mutate } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,82 +8,8 @@ import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
 
-type CreateDirectoryParams = {
-  name: string;
-  parentDirectoryId?: string;
-};
-
 export const useCreateDirectory = () => {
-  const [isCreating, setIsCreating] = useState(false);
-
-  const createDirectory = async ({ name, parentDirectoryId }: CreateDirectoryParams) => {
-    setIsCreating(true);
-
-    try {
-      // Generate a unique ID for the new directory
-      const newDirectoryId = uuidv4();
-
-      // Create the directory object that will be added to cache
-      const newDirectory: Directory = {
-        id: newDirectoryId,
-        name,
-        type: 'folder',
-        has_children: false,
-      };
-
-      // Optimistically update the cache using new cache selector system
-      const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
-
-      await mutate(
-        cacheKey,
-        produce((draft?: Directory[]) => {
-          if (!draft) {
-            return [newDirectory];
-          }
-          draft.unshift(newDirectory); // Add to top of list
-        }),
-        {
-          revalidate: false,
-          rollbackOnError: true,
-        }
-      );
-
-      // Make the API call
-      await DirectoriesService.createDirectory({
-        id: newDirectoryId,
-        name,
-        type: 'folder',
-        parent_directory_id: parentDirectoryId,
-      });
-
-      // If this directory has a parent, update the parent's has_children flag
-      if (parentDirectoryId) {
-        await mutate(
-          invalidateCachePattern(['directories']),
-          produce((draft?: Directory[]) => {
-            if (!draft) {
-              return draft;
-            }
-
-            const parentIndex = draft.findIndex(dir => dir.id === parentDirectoryId);
-            if (parentIndex !== -1) {
-              draft[parentIndex].has_children = true;
-            }
-          }),
-          { revalidate: false }
-        );
-      }
-
-      return newDirectory;
-    } catch (error) {
-      console.error('Failed to create directory:', error);
-      throw error;
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  const createDirectoryInline = async (parentDirectoryId?: string) => {
+  const createTemporaryDirectory = async (parentDirectoryId?: string) => {
     // Generate a unique ID for the new directory
     const newDirectoryId = uuidv4();
 
@@ -148,17 +72,28 @@ export const useCreateDirectory = () => {
 
       // If this directory has a parent, update the parent's has_children flag
       if (parentDirectoryId) {
+        // IMPORTANT: This updates ALL cache keys that start with ['directories']
+        // The invalidateCachePattern(['directories']) creates a filter function that matches:
+        // - ['directories'] - root directories
+        // - ['directories', 'some-id'] - directories within a specific parent
+        // - ['directories', 'another-id'] - directories within another parent
+        // ALL of these caches will be updated with the same mutation
         await mutate(
+          // This function returns true for any cache key starting with ['directories']
           invalidateCachePattern(['directories']),
+          // This mutation function runs on EVERY matching cache
           produce((draft?: Directory[]) => {
             if (!draft) {
               return draft;
             }
 
+            // In each cache, find the parent directory by ID
             const parentIndex = draft.findIndex(dir => dir.id === parentDirectoryId);
+            // If the parent exists in this particular cache, update its has_children flag
             if (parentIndex !== -1) {
               draft[parentIndex].has_children = true;
             }
+            // If parent doesn't exist in this cache, nothing happens (no error)
           }),
           { revalidate: false }
         );
@@ -186,10 +121,8 @@ export const useCreateDirectory = () => {
   };
 
   return {
-    createDirectory,
-    createDirectoryInline,
+    createTemporaryDirectory,
     finalizeDirectoryCreation,
     removeTemporaryDirectory,
-    isCreating,
   };
 };

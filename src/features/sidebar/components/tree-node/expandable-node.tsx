@@ -10,13 +10,13 @@ import { ChevronRight } from 'lucide-react';
 import EditableText from '@components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 
-import { useUpdateChatDetails } from '@features/chat/hooks/use-update-chat-details';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import ChildrenList from '@features/sidebar/components/tree-node/children-list';
 import NodeIcon from '@features/sidebar/components/tree-node/node-icon';
 import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
+import { useRenameChat } from '@features/sidebar/hooks/use-rename-chat';
+import { useRenameDirectory } from '@features/sidebar/hooks/use-rename-directory';
 import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
-import { useUpdateDirectory } from '@features/sidebar/hooks/use-update-directory';
 
 import { useInlineEditStore } from '@stores/use-inline-edit-store';
 
@@ -61,8 +61,8 @@ const ExpandableNode = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { updateDirectory } = useUpdateDirectory();
-  const { updateChatDetails } = useUpdateChatDetails();
+  const { renameDirectory } = useRenameDirectory();
+  const { renameChat } = useRenameChat();
   const { finalizeDirectoryCreation, removeTemporaryDirectory } = useCreateDirectory();
   const { isEditing, startEditing } = useInlineEditStore();
   const isCurrentlyEditing = isEditing(node.id);
@@ -84,11 +84,11 @@ const ExpandableNode = ({
         await finalizeDirectoryCreation(node.id, newName);
       } else {
         // This is an existing directory being renamed
-        await updateDirectory({ id: node.id, name: newName });
+        await renameDirectory({ id: node.id, name: newName });
       }
     } else if (node.type === 'chat') {
       // Handle chat renaming
-      await updateChatDetails(node.id, { name: newName });
+      await renameChat(node.id, newName);
     }
   };
 

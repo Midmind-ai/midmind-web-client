@@ -19,7 +19,7 @@ const FolderActions = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { startEditing } = useInlineEditStore();
-  const { createDirectoryInline } = useCreateDirectory();
+  const { createTemporaryDirectory } = useCreateDirectory();
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -33,7 +33,7 @@ const FolderActions = () => {
 
   const handleCreateDirectory = async () => {
     // Create new directory inline (no parent - root level)
-    const newDirectoryId = await createDirectoryInline();
+    const newDirectoryId = await createTemporaryDirectory();
 
     if (newDirectoryId) {
       // Add small delay to ensure component renders before focusing
