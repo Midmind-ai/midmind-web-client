@@ -18,9 +18,9 @@ interface UseLLMResponseLogicArgs {
   content: string;
   isLastMessage: boolean;
   branches: ChatMessage['branches'];
-  onOpenInSidePanel: (branchChatId: string) => void;
   onStreamingStart: VoidFunction;
   onStreamingEnd: VoidFunction;
+  onOpenInSidePanel: (branchChatId: string) => void;
 }
 
 export const useLLMResponseLogic = ({
