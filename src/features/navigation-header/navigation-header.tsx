@@ -3,6 +3,7 @@ import { useParams } from 'react-router';
 
 import { Button } from '@components/ui/button';
 import { useSidebar } from '@components/ui/sidebar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
 
 import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
 
@@ -25,12 +26,17 @@ const NavigationHeader = ({
       <div className="flex items-center gap-2">
         {showSidebarToggle && (
           <>
-            <Button
-              variant="ghost"
-              onClick={toggleSidebar}
-            >
-              <SidebarIcon />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  onClick={toggleSidebar}
+                >
+                  <SidebarIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Toggle sidebar</TooltipContent>
+            </Tooltip>
             <div className="relative h-[15px] w-0 border" />
           </>
         )}

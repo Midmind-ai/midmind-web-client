@@ -13,7 +13,7 @@ import type { ConversationWithAIResponseDto } from '@services/conversations/conv
 
 import type { ChatMessage } from '@shared-types/entities';
 
-interface UseLLMResponseLogicArgs {
+type UseLLMResponseLogicArgs = {
   id: string;
   content: string;
   isLastMessage: boolean;
@@ -21,7 +21,7 @@ interface UseLLMResponseLogicArgs {
   onStreamingEnd: VoidFunction;
   onStreamingStart: VoidFunction;
   onOpenInSidePanel: (branchChatId: string) => void;
-}
+};
 
 export const useLLMResponseLogic = ({
   id,
