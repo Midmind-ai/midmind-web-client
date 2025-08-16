@@ -13,21 +13,12 @@ import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded
 
 type Props = {
   node: TreeNodeType;
-  onDelete: (id: string) => void;
   onRename?: (id: string) => void;
-  isDeleting: boolean;
   onOpenInSidePanel: (id: string) => void;
   onOpenInNewTab: (id: string) => void;
 };
 
-const TreeNode = ({
-  node,
-  onDelete,
-  onRename,
-  isDeleting,
-  onOpenInSidePanel,
-  onOpenInNewTab,
-}: Props) => {
+const TreeNode = ({ node, onRename, onOpenInSidePanel, onOpenInNewTab }: Props) => {
   const { isExpanded, setExpanded } = useExpandedNodesStore();
   const isOpen = isExpanded(node.id);
 
@@ -62,8 +53,6 @@ const TreeNode = ({
       <LeafNode
         node={node}
         isActive={isActive}
-        isDeleting={isDeleting}
-        onDelete={onDelete}
         onOpenInSidePanel={onOpenInSidePanel}
         onOpenInNewTab={onOpenInNewTab}
         onClick={handleClick}
@@ -76,12 +65,10 @@ const TreeNode = ({
     <ExpandableNode
       node={node}
       isActive={isActive}
-      isDeleting={isDeleting}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       childNodes={childNodes}
       isLoadingChildren={isLoadingChildren}
-      onDelete={onDelete}
       onRename={onRename}
       onOpenInSidePanel={onOpenInSidePanel}
       onOpenInNewTab={onOpenInNewTab}

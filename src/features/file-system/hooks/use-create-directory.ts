@@ -62,7 +62,6 @@ export const useCreateDirectory = () => {
         { revalidate: false, rollbackOnError: true }
       );
 
-      // Make the API call
       await DirectoriesService.createDirectory({
         id,
         name,
@@ -70,30 +69,22 @@ export const useCreateDirectory = () => {
         parent_directory_id: parentDirectoryId,
       });
 
-      // If this directory has a parent, update the parent's has_children flag
+      await mutate(CACHE_KEYS.directories.withParent(id), [], { revalidate: false });
+
+      await mutate(CACHE_KEYS.chats.withParent(id, undefined), [], { revalidate: false });
+
       if (parentDirectoryId) {
-        // IMPORTANT: This updates ALL cache keys that start with ['directories']
-        // The invalidateCachePattern(['directories']) creates a filter function that matches:
-        // - ['directories'] - root directories
-        // - ['directories', 'some-id'] - directories within a specific parent
-        // - ['directories', 'another-id'] - directories within another parent
-        // ALL of these caches will be updated with the same mutation
         await mutate(
-          // This function returns true for any cache key starting with ['directories']
           invalidateCachePattern(['directories']),
-          // This mutation function runs on EVERY matching cache
           produce((draft?: Directory[]) => {
             if (!draft) {
               return draft;
             }
 
-            // In each cache, find the parent directory by ID
             const parentIndex = draft.findIndex(dir => dir.id === parentDirectoryId);
-            // If the parent exists in this particular cache, update its has_children flag
             if (parentIndex !== -1) {
               draft[parentIndex].has_children = true;
             }
-            // If parent doesn't exist in this cache, nothing happens (no error)
           }),
           { revalidate: false }
         );

@@ -40,10 +40,12 @@ export const MUTATION_KEYS = {
     create: 'mutation:createChat',
     updateDetails: 'mutation:updateChatDetails',
     delete: 'mutation:deleteChat',
+    move: 'mutation:moveChat',
     sendMessage: (chatId: string) => `mutation:sendMessage:${chatId}`,
   },
   directories: {
     create: 'mutation:createDirectory',
+    move: 'mutation:moveDirectory',
   },
 } as const;
 

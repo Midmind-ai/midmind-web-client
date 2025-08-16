@@ -5,6 +5,7 @@ import type {
   Directory,
   MessageDto,
   UpdateDirectoryDto,
+  MoveDirectoryDto,
 } from '@services/directories/directories-dtos';
 
 export class DirectoriesService {
@@ -32,6 +33,15 @@ export class DirectoriesService {
 
   static async deleteDirectory(id: string) {
     const { data } = await baseAxiosInstance.delete<MessageDto>(`/directories/${id}`);
+
+    return data;
+  }
+
+  static async moveDirectory(id: string, body: MoveDirectoryDto) {
+    const { data } = await baseAxiosInstance.put<MessageDto>(
+      `/directories/${id}/location`,
+      body
+    );
 
     return data;
   }

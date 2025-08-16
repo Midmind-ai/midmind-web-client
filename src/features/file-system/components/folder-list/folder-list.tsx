@@ -2,48 +2,57 @@ import { SidebarGroup, SidebarGroupContent, SidebarMenu } from '@components/ui/s
 import { Skeleton } from '@components/ui/skeleton';
 
 import { useFolderListLogic } from '@features/file-system/components/folder-list/use-folder-list-logic';
+import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
+import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-provider';
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
+import type { DroppableData } from '@features/file-system/hooks/use-tree-dnd-logic';
 
 const FolderList = () => {
-  const {
-    treeNodes,
-    isLoading,
-    isDeleting,
-    handleDelete,
-    handleRename,
-    openChatInNewTab,
-    openChatInSidePanel,
-  } = useFolderListLogic();
+  const { treeNodes, isLoading, handleRename, openChatInNewTab, openChatInSidePanel } =
+    useFolderListLogic();
+
+  // Root drop zone configuration - accepts items to move to root level (null parent)
+  const rootDroppableData: DroppableData = {
+    type: 'root',
+    id: 'root-drop-zone',
+    nodeType: 'directory',
+    accepts: ['chat', 'directory'], // Root can accept both chats and directories
+  };
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent>
-        <SidebarMenu className="gap-[2px]">
-          {isLoading && (
-            <div className="mt-2 space-y-2">
-              {[...Array(4)].map((_, idx) => (
-                <Skeleton
-                  key={idx}
-                  className="h-6 w-full rounded"
-                />
-              ))}
-            </div>
-          )}
-          {!isLoading &&
-            treeNodes?.map(node => (
-              <TreeNode
-                key={node.id}
-                node={node}
-                isDeleting={isDeleting}
-                onDelete={handleDelete}
-                onRename={handleRename}
-                onOpenInNewTab={() => openChatInNewTab(node.id)}
-                onOpenInSidePanel={() => openChatInSidePanel(node.id)}
-              />
-            ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <TreeDndProvider>
+      <DropZone
+        data={rootDroppableData}
+        className="flex flex-1 rounded-none ring-0"
+      >
+        <SidebarGroup className="flex flex-1">
+          <SidebarGroupContent className="flex flex-1">
+            <SidebarMenu className="flex flex-1 flex-col gap-[2px]">
+              {isLoading && (
+                <div className="mt-2 space-y-2">
+                  {[...Array(4)].map((_, idx) => (
+                    <Skeleton
+                      key={idx}
+                      className="h-6 w-full rounded"
+                    />
+                  ))}
+                </div>
+              )}
+              {!isLoading &&
+                treeNodes?.map(node => (
+                  <TreeNode
+                    key={node.id}
+                    node={node}
+                    onRename={handleRename}
+                    onOpenInNewTab={() => openChatInNewTab(node.id)}
+                    onOpenInSidePanel={() => openChatInSidePanel(node.id)}
+                  />
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </DropZone>
+    </TreeDndProvider>
   );
 };
 

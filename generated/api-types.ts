@@ -330,7 +330,7 @@ export interface components {
     };
     ChangeDirectoryLocationRequestDto: {
       /** Format: uuid */
-      target_parent_id?: string;
+      target_parent_id?: string | null;
     };
     GetDirectoryDto: {
       /** Format: uuid */

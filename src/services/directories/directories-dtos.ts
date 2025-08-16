@@ -7,3 +7,5 @@ export type CreateDirectoryDto = components['schemas']['CreateDirectoryDto'];
 export type UpdateDirectoryDto = components['schemas']['UpdateDirectoryDto'];
 
 export type MessageDto = components['schemas']['MessageDto'];
+
+export type MoveDirectoryDto = components['schemas']['ChangeDirectoryLocationRequestDto'];

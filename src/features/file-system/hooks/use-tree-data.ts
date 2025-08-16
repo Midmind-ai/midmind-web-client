@@ -36,6 +36,7 @@ export const useTreeData = (parentId?: string) => {
         name: dir.name,
         type: 'directory',
         hasChildren: dir.has_children,
+        parentDirectoryId: parentId || null,
         originalData: dir,
       })
     ),

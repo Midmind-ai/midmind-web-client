@@ -1,13 +1,10 @@
 import { useState } from 'react';
 
-import { produce } from 'immer';
 import { mutate } from 'swr';
 
 import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
-
-import type { Directory } from '@shared-types/entities';
 
 type DeleteDirectoryParams = {
   id: string;
@@ -22,19 +19,13 @@ export const useDeleteDirectory = () => {
 
     try {
       // Optimistically remove from cache
-      const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+      const parentDirectoryCacheKey =
+        CACHE_KEYS.directories.withParent(parentDirectoryId);
 
-      await mutate(
-        cacheKey,
-        produce((draft?: Directory[]) => {
-          if (!draft) {
-            return draft;
-          }
-
-          return draft.filter(dir => dir.id !== id);
-        }),
-        { revalidate: false, rollbackOnError: true }
-      );
+      await mutate(parentDirectoryCacheKey, undefined, {
+        revalidate: false,
+        rollbackOnError: true,
+      });
 
       // Make the API call
       await DirectoriesService.deleteDirectory(id);
