@@ -22,9 +22,11 @@ type Props = {
   onCopyText: VoidFunction;
   onOpenBranch: VoidFunction;
   onOpenInNewTab: VoidFunction;
-  onOpenInSidePanel: (branchChatId: string) => void;
+  onStreamingEnd: VoidFunction;
+  onStreamingStart: VoidFunction;
   onNewSetOfBranches: VoidFunction;
   onNewTemporaryBranch: VoidFunction;
+  onOpenInSidePanel: (branchChatId: string) => void;
   onNewAttachedBranch: (selectionContext?: ChatBranchContext) => void;
   onNewDetachedBranch: (selectionContext?: ChatBranchContext) => void;
 };
@@ -40,6 +42,8 @@ const LLMResponse = ({
   onCopyText,
   onOpenBranch,
   onOpenInNewTab,
+  onStreamingEnd,
+  onStreamingStart,
   onOpenInSidePanel,
   onNewSetOfBranches,
   onNewAttachedBranch,
@@ -47,7 +51,15 @@ const LLMResponse = ({
   onNewTemporaryBranch,
 }: Props) => {
   const { streamingContent, isStreaming, messageRef, getCurrentSelectionContext } =
-    useLLMResponseLogic(id, content, isLastMessage, branches, onOpenInSidePanel);
+    useLLMResponseLogic({
+      id,
+      content,
+      branches,
+      isLastMessage,
+      onStreamingEnd,
+      onStreamingStart,
+      onOpenInSidePanel,
+    });
 
   return (
     <ContextMenu>

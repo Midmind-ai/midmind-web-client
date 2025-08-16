@@ -20,15 +20,14 @@ const Breadcrumbs = ({ id }: Props) => {
     <Breadcrumb>
       <BreadcrumbList className="gap-1 sm:gap-1">
         {data?.map(({ id, name, type }, index) => (
-          <>
+          <div key={id}>
             <BreadcrumbItem
-              key={id}
               title={name}
               type={type}
               href={AppRoutes.Chat(id)}
             />
             {index < data.length - 1 && <BreadcrumbSeparator />}
-          </>
+          </div>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
