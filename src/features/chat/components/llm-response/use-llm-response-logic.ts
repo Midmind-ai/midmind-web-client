@@ -18,8 +18,8 @@ interface UseLLMResponseLogicArgs {
   content: string;
   isLastMessage: boolean;
   branches: ChatMessage['branches'];
-  onStreamingStart: VoidFunction;
   onStreamingEnd: VoidFunction;
+  onStreamingStart: VoidFunction;
   onOpenInSidePanel: (branchChatId: string) => void;
 }
 
