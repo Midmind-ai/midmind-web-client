@@ -9,8 +9,15 @@ type Props = {
 };
 
 const MessageList = ({ chatId }: Props) => {
-  const { messages, chatActions, messageActions, scrollAreaRef, handleScroll } =
-    useMessageListLogic(chatId);
+  const {
+    messages,
+    chatActions,
+    scrollAreaRef,
+    messageActions,
+    handleScroll,
+    scrollToBottom,
+    handleAutoScroll,
+  } = useMessageListLogic(chatId);
 
   return (
     <ScrollArea
@@ -28,6 +35,8 @@ const MessageList = ({ chatId }: Props) => {
               <UserMessage
                 key={id}
                 {...message}
+                isLastMessage={isLastMessage}
+                onAutoScroll={handleAutoScroll}
                 onCopyText={() => messageActions.copyText(content)}
                 onReply={() => messageActions.replyToMessage(id, content)}
                 onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
@@ -45,6 +54,8 @@ const MessageList = ({ chatId }: Props) => {
               key={id}
               {...message}
               isLastMessage={isLastMessage}
+              onStreamingStart={scrollToBottom}
+              onStreamingEnd={scrollToBottom}
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id, content)}
               onOpenBranch={() => {}}
