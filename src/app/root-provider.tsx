@@ -11,7 +11,7 @@ import { TooltipProvider } from '@components/ui/tooltip';
 
 import { LocalStorageKeys } from '@constants/local-storage';
 
-import { TOOLTIP_DELAY } from '@features/sidebar/components/tree-node/constants';
+import { TOOLTIP_DELAY } from '@features/file-system/components/tree-node/logic/constants';
 
 const RootProvider = () => {
   return (

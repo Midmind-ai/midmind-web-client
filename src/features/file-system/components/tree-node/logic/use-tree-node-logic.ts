@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { AppRoutes } from '@constants/paths';
 
-import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
+import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
 
 import {
   useSwrGetChatsByParentChat,

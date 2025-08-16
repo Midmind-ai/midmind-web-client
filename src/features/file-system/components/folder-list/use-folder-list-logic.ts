@@ -4,9 +4,9 @@ import { useSWRConfig } from 'swr';
 import { AppRoutes, SearchParams } from '@constants/paths';
 
 import { useChatActions } from '@features/chat/hooks/use-chat-actions';
-import { useDeleteChat } from '@features/sidebar/hooks/use-delete-chat';
-import { useDeleteDirectory } from '@features/sidebar/hooks/use-delete-directory';
-import { useTreeData } from '@features/sidebar/hooks/use-tree-data';
+import { useDeleteChat } from '@features/file-system/hooks/use-delete-chat';
+import { useDeleteDirectory } from '@features/file-system/hooks/use-delete-directory';
+import { useTreeData } from '@features/file-system/hooks/use-tree-data';
 
 import { useUrlParams } from '@hooks/utils/use-url-params';
 

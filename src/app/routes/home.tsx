@@ -6,7 +6,7 @@ import { AppRoutes } from '@constants/paths';
 
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
-import { useCreateChat } from '@features/sidebar/hooks/use-create-chat';
+import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
 
 const HomePage = () => {
   const navigate = useNavigate();

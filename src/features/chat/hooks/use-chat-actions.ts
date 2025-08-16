@@ -10,7 +10,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
-import { useCreateChat } from '@features/sidebar/hooks/use-create-chat';
+import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
 
 import type { BranchContext } from '@shared-types/entities';
 

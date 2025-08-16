@@ -2,9 +2,9 @@ import { SidebarMenuButton } from '@components/ui/sidebar';
 import { ThemedSpan } from '@components/ui/themed-span';
 
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
-import NodeIcon from '@features/sidebar/components/tree-node/node-icon';
-import TooltipWrapper from '@features/sidebar/components/tree-node/tooltip-wrapper';
-import type { TreeNode } from '@features/sidebar/hooks/use-tree-data';
+import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
+import TooltipWrapper from '@features/file-system/components/tree-node/ui/tooltip-wrapper';
+import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
 
 type Props = {
   node: TreeNode;

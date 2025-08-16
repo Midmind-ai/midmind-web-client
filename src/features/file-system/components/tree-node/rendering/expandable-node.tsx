@@ -11,12 +11,12 @@ import EditableText from '@components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
-import ChildrenList from '@features/sidebar/components/tree-node/children-list';
-import NodeIcon from '@features/sidebar/components/tree-node/node-icon';
-import { useCreateDirectory } from '@features/sidebar/hooks/use-create-directory';
-import { useRenameChat } from '@features/sidebar/hooks/use-rename-chat';
-import { useRenameDirectory } from '@features/sidebar/hooks/use-rename-directory';
-import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
+import ChildrenList from '@features/file-system/components/tree-node/rendering/children-list';
+import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
+import { useCreateDirectory } from '@features/file-system/hooks/use-create-directory';
+import { useRenameChat } from '@features/file-system/hooks/use-rename-chat';
+import { useRenameDirectory } from '@features/file-system/hooks/use-rename-directory';
+import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
 
 import { useInlineEditStore } from '@stores/use-inline-edit-store';
 

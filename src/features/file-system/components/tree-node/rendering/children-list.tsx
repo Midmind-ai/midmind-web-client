@@ -1,8 +1,8 @@
 import { SidebarMenuSub } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
 
-import { SKELETON_COUNT } from '@features/sidebar/components/tree-node/constants';
-import type { TreeNode as TreeNodeType } from '@features/sidebar/hooks/use-tree-data';
+import { SKELETON_COUNT } from '@features/file-system/components/tree-node/logic/constants';
+import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
 
 type Props = {
   isLoadingChildren: boolean;

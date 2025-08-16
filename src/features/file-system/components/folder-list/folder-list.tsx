@@ -1,8 +1,8 @@
 import { SidebarGroup, SidebarGroupContent, SidebarMenu } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
 
-import { useFolderListLogic } from '@features/sidebar/components/folder-list/use-folder-list-logic';
-import TreeNode from '@features/sidebar/components/tree-node/tree-node';
+import { useFolderListLogic } from '@features/file-system/components/folder-list/use-folder-list-logic';
+import TreeNode from '@features/file-system/components/tree-node/tree-node';
 
 const FolderList = () => {
   const {

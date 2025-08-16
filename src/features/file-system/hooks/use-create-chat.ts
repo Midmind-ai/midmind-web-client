@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type { LLModel } from '@features/chat/types/chat-types';
 import { handleLLMResponse, getInfiniteKey } from '@features/chat/utils/swr';
-import { useExpandedNodesStore } from '@features/sidebar/stores/use-expanded-nodes-store';
+import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes-store';
 
 import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
 
