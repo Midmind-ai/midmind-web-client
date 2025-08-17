@@ -1,9 +1,9 @@
 import EventEmitter from 'eventemitter3';
 
-import type { BranchContext } from '@shared-types/entities';
+import type { ConversationBranchContext } from '@shared-types/entities';
 
 export type BranchEvent = {
-  branchContext: BranchContext;
+  branchContext: ConversationBranchContext;
 };
 
 export const branchEventEmitter = new EventEmitter();

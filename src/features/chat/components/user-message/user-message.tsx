@@ -1,41 +1,40 @@
-import { useEffect } from 'react';
-
 import { ContextMenu, ContextMenuTrigger } from '@components/ui/context-menu';
 import { ThemedP } from '@components/ui/themed-p';
 
 import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
 import MessageReply from '@features/chat/components/message-reply/message-reply';
+import { useUserMessageLogic } from '@features/chat/components/user-message/use-user-message-logic';
+import type { UseMessageSelectionContextT } from '@features/chat/types/chat-types';
 
 type Props = {
   content: string;
   isLastMessage: boolean;
   reply_content: string | null;
-  onCopyText: VoidFunction;
   onReply: VoidFunction;
-  onNewAttachedBranch: VoidFunction;
-  onNewDetachedBranch: VoidFunction;
-  onNewTemporaryBranch: VoidFunction;
-  onNewSetOfBranches: VoidFunction;
+  onCopyText: VoidFunction;
   onAutoScroll: VoidFunction;
+  onNewSetOfBranches: VoidFunction;
+  onNewTemporaryBranch: VoidFunction;
+  onNewAttachedBranch: (selectionContext?: UseMessageSelectionContextT) => void;
+  onNewDetachedBranch: (selectionContext?: UseMessageSelectionContextT) => void;
 };
 
 const UserMessage = ({
   content,
   isLastMessage,
   reply_content,
-  onCopyText,
   onReply,
+  onCopyText,
+  onAutoScroll,
   onNewAttachedBranch,
   onNewDetachedBranch,
   onNewTemporaryBranch,
   onNewSetOfBranches,
-  onAutoScroll,
 }: Props) => {
-  useEffect(() => {
-    if (isLastMessage) {
-      onAutoScroll();
-    }
-  }, [onAutoScroll, isLastMessage]);
+  const { messageRef, getCurrentSelectionContext } = useUserMessageLogic({
+    isLastMessage,
+    onAutoScroll,
+  });
 
   return (
     <ContextMenu>
@@ -52,7 +51,11 @@ const UserMessage = ({
                 placement="message"
               />
             )}
-            <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
+            <div
+              ref={messageRef}
+              className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text"
+              onClick={getCurrentSelectionContext}
+            >
               <ThemedP className="text-base font-light">{content}</ThemedP>
             </div>
           </div>
@@ -61,8 +64,8 @@ const UserMessage = ({
       <MessageContextMenu
         onCopyText={onCopyText}
         onReply={onReply}
-        onNewAttachedBranch={onNewAttachedBranch}
-        onNewDetachedBranch={onNewDetachedBranch}
+        onNewAttachedBranch={() => onNewAttachedBranch(getCurrentSelectionContext())}
+        onNewDetachedBranch={() => onNewDetachedBranch(getCurrentSelectionContext())}
         onNewTemporaryBranch={onNewTemporaryBranch}
         onNewSetOfBranches={onNewSetOfBranches}
       />

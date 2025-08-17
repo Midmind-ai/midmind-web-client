@@ -29,6 +29,7 @@ const Chat = ({
   return (
     <div className="flex h-screen flex-col">
       <NavigationHeader
+        id={chatId}
         showCloseButton={showCloseButton}
         showSidebarToggle={showSidebarToggle}
         onClose={onClose}

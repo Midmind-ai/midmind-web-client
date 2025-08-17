@@ -1,6 +1,9 @@
 import { baseAxiosInstance } from '@config/axios';
 
-import type { UpdateChatDetailsRequestDto } from '@services/chats/chats-dtos';
+import type {
+  UpdateChatDetailsRequestDto,
+  CreateNewChatRequestDto,
+} from '@services/chats/chats-dtos';
 
 import type { MessageResponse } from '@shared-types/common';
 import type { Chat } from '@shared-types/entities';
@@ -20,6 +23,12 @@ export class ChatsService {
     const { data } = await baseAxiosInstance.get<Chat[]>('/chats', {
       params,
     });
+
+    return data;
+  }
+
+  static async createNewChat(body: CreateNewChatRequestDto) {
+    const { data } = await baseAxiosInstance.post<MessageResponse>('/chats', body);
 
     return data;
   }
