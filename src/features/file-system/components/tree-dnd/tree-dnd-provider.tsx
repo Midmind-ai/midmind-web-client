@@ -13,7 +13,7 @@ import {
 import { SidebarMenu } from '@components/ui/sidebar';
 
 import DragOverlayNode from '@features/file-system/components/tree-dnd/drag-overlay-node';
-import { useTreeDndLogic } from '@features/file-system/hooks/use-tree-dnd-logic';
+import { useTreeDndLogic } from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
 
 type Props = {
   children: React.ReactNode;

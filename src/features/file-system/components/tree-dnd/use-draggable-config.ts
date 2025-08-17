@@ -1,10 +1,10 @@
 import { useDraggable } from '@dnd-kit/core';
 
-import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
 import type {
   DraggableData,
   DroppableData,
-} from '@features/file-system/hooks/use-tree-dnd-logic';
+} from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
+import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
 
 type UseDraggableConfigProps = {
   node: TreeNode;
