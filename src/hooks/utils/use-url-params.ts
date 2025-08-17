@@ -1,10 +1,10 @@
 import { useSearchParams } from 'react-router';
 
-interface UseUrlParamsOptions<T> {
+type UseUrlParamsOptions<T> = {
   defaultValue?: T;
   serialize?: (value: T) => string;
   deserialize?: (value: string) => T;
-}
+};
 
 export const useUrlParams = <T = string>(
   key: string,

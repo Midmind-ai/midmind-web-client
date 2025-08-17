@@ -146,6 +146,20 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
     }),
     { revalidate: false, populateCache: true }
   );
+
+  mutate(
+    CACHE_KEYS.chats.breadcrumbs(titleChunk.chat_id),
+    produce((draft?: Array<{ id: string; name: string; type: string }>) => {
+      if (draft) {
+        const chatIndex = draft.findIndex(item => item.id === titleChunk.chat_id);
+
+        if (chatIndex !== -1) {
+          draft[chatIndex].name = titleChunk.title;
+        }
+      }
+    }),
+    { revalidate: false, populateCache: true }
+  );
 };
 
 const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> => {

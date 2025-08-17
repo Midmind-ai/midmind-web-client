@@ -39,8 +39,12 @@ const MessageList = ({ chatId }: Props) => {
                 onAutoScroll={handleAutoScroll}
                 onCopyText={() => messageActions.copyText(content)}
                 onReply={() => messageActions.replyToMessage(id, content)}
-                onNewAttachedBranch={() => chatActions.createAttachedBranch(id, content)}
-                onNewDetachedBranch={() => chatActions.createDetachedBranch(id, content)}
+                onNewAttachedBranch={selectionContext =>
+                  chatActions.createAttachedBranch(id, content, selectionContext)
+                }
+                onNewDetachedBranch={selectionContext =>
+                  chatActions.createDetachedBranch(id, content, selectionContext)
+                }
                 onNewTemporaryBranch={() => {
                   chatActions.createTemporaryBranch(id, content);
                 }}
@@ -63,11 +67,11 @@ const MessageList = ({ chatId }: Props) => {
                 chatActions.openChatInSidePanel(branchChatId);
               }}
               onOpenInNewTab={() => chatActions.openChatInNewTab(id)}
-              onNewAttachedBranch={branchContext => {
-                chatActions.createAttachedBranch(id, content, branchContext);
+              onNewAttachedBranch={selectionContext => {
+                chatActions.createAttachedBranch(id, content, selectionContext);
               }}
-              onNewDetachedBranch={branchContext => {
-                chatActions.createDetachedBranch(id, content, branchContext);
+              onNewDetachedBranch={selectionContext => {
+                chatActions.createDetachedBranch(id, content, selectionContext);
               }}
               onNewTemporaryBranch={() => chatActions.createTemporaryBranch(id, content)}
               onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}

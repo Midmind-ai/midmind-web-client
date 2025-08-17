@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-interface InlineEditState {
+type InlineEditState = {
   editingEntityId: string | null;
   startEditing: (entityId: string) => void;
   stopEditing: () => void;
   isEditing: (entityId: string) => boolean;
-}
+};
 
 export const useInlineEditStore = create<InlineEditState>((set, get) => ({
   editingEntityId: null,

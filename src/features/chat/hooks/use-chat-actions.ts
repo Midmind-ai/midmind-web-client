@@ -11,7 +11,7 @@ import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter'
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
 import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
 
-import type { BranchContext } from '@shared-types/entities';
+import type { ConversationBranchContext } from '@shared-types/entities';
 
 export const useChatActions = (actualChatId?: string) => {
   const navigate = useNavigate();
@@ -41,10 +41,11 @@ export const useChatActions = (actualChatId?: string) => {
     content,
     messageId,
     selectionContext,
+    connectionType,
   }: CreateBranchArgs) => {
     const textToUse = selectionContext?.selectedText || content;
 
-    const branchContext: BranchContext = {
+    const branchContext: ConversationBranchContext = {
       parent_message_id: messageId,
     };
 
@@ -52,6 +53,15 @@ export const useChatActions = (actualChatId?: string) => {
       content: textToUse,
       model: DEFAULT_AI_MODEL,
       parentChatId: chatId,
+      branchContext: {
+        parent_chat_id: chatId,
+        parent_message_id: messageId,
+        selected_text: selectionContext?.selectedText,
+        start_position: selectionContext?.startPosition,
+        end_position: selectionContext?.endPosition,
+        connection_type: connectionType,
+        context_type: selectionContext ? 'text_selection' : 'full_message',
+      },
     });
 
     emitBranchCreated({ branchContext });
@@ -81,6 +91,7 @@ export const useChatActions = (actualChatId?: string) => {
       content,
       messageId,
       selectionContext,
+      connectionType: 'attached',
     });
   };
 
@@ -93,11 +104,16 @@ export const useChatActions = (actualChatId?: string) => {
       content,
       messageId,
       selectionContext,
+      connectionType: 'detached',
     });
   };
 
   const createTemporaryBranch = (messageId: string, content: string) => {
-    createBranch({ messageId, content });
+    createBranch({
+      messageId,
+      content,
+      connectionType: 'temporary',
+    });
   };
 
   const createNewBranchSet = (_messageId: string) => {

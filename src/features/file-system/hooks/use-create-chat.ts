@@ -12,6 +12,7 @@ import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded
 
 import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
+import type { CreateNewChatRequestDto } from '@services/chats/chats-dtos';
 import { ChatsService } from '@services/chats/chats-service';
 import type {
   ConversationWithAIRequestDto,
@@ -21,7 +22,7 @@ import { ConversationsService } from '@services/conversations/conversations-serv
 
 import { useAbortControllerStore } from '@stores/use-abort-controller-store';
 
-import type { Chat, ChatMessage } from '@shared-types/entities';
+import type { ChatBranchContext, Chat, ChatMessage } from '@shared-types/entities';
 
 type CreateChatArgs = {
   content: string;
@@ -29,6 +30,7 @@ type CreateChatArgs = {
   sendMessage?: boolean;
   parentChatId?: string;
   parentDirectoryId?: string;
+  branchContext?: ChatBranchContext;
 };
 
 export const useCreateChat = () => {
@@ -51,10 +53,31 @@ export const useCreateChat = () => {
         sendMessage = false,
         parentChatId,
         parentDirectoryId,
+        branchContext,
       } = arg;
 
       const chatId = uuidv4();
       const messageId = uuidv4();
+
+      const newChatDto: CreateNewChatRequestDto = {
+        id: chatId,
+        name: 'New chat',
+        directory_id: parentDirectoryId,
+        ...(branchContext &&
+          parentChatId && {
+            branch_context: {
+              parent_chat_id: parentChatId,
+              parent_message_id: branchContext.parent_message_id,
+              selected_text: branchContext.selected_text,
+              start_position: branchContext.start_position,
+              end_position: branchContext.end_position,
+              connection_type: branchContext.connection_type,
+              context_type: branchContext.context_type,
+            },
+          }),
+      };
+
+      await ChatsService.createNewChat(newChatDto);
 
       const newChat: Chat = {
         id: chatId,
@@ -180,6 +203,11 @@ export const useCreateChat = () => {
           message_id: messageId,
           content,
           model,
+          ...(branchContext && {
+            branch_context: {
+              parent_message_id: branchContext.parent_message_id,
+            },
+          }),
         };
 
         const newAbortController = createAbortController(chatId);
@@ -211,6 +239,7 @@ export const useCreateChat = () => {
     sendMessage = false,
     parentChatId,
     parentDirectoryId,
+    branchContext,
   }: CreateChatArgs) => {
     return createChatSWR.trigger({
       content,
@@ -218,6 +247,7 @@ export const useCreateChat = () => {
       sendMessage,
       parentChatId,
       parentDirectoryId,
+      branchContext,
     });
   };
 

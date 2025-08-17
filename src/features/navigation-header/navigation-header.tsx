@@ -1,5 +1,4 @@
 import { SidebarIcon, XIcon } from 'lucide-react';
-import { useParams } from 'react-router';
 
 import { Button } from '@components/ui/button';
 import { useSidebar } from '@components/ui/sidebar';
@@ -8,17 +7,18 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip'
 import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
 
 type Props = {
+  id: string;
   showCloseButton?: boolean;
   showSidebarToggle?: boolean;
   onClose?: VoidFunction;
 };
 
 const NavigationHeader = ({
+  id,
   showCloseButton,
   showSidebarToggle = true,
   onClose,
 }: Props) => {
-  const { id = '' } = useParams();
   const { toggleSidebar } = useSidebar();
 
   return (

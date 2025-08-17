@@ -20,7 +20,10 @@ const Breadcrumbs = ({ id }: Props) => {
     <Breadcrumb>
       <BreadcrumbList className="gap-1 sm:gap-1">
         {data?.map(({ id, name, type }, index) => (
-          <div key={id}>
+          <div
+            className="flex items-center"
+            key={id}
+          >
             <BreadcrumbItem
               title={name}
               type={type}

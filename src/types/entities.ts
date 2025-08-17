@@ -14,7 +14,10 @@ export type Team = {
   plan: string;
 };
 
-export type BranchContext = components['schemas']['ConversationBranchContextDto'];
+export type ChatBranchContext = components['schemas']['CreateChatDto']['branch_context'];
+
+export type ConversationBranchContext =
+  components['schemas']['ConversationBranchContextDto'];
 
 export type TreeItem = {
   id: string;

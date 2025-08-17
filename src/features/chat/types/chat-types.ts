@@ -42,6 +42,7 @@ export type UseMessageSelectionContextT = {
 export type CreateBranchArgs = {
   content: string;
   messageId: string;
+  connectionType: ConnectionType;
   selectionContext?: UseMessageSelectionContextT;
 };
 
