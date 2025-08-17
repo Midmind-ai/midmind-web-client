@@ -1,53 +1,32 @@
-import { useDraggable } from '@dnd-kit/core';
-
 import { SidebarMenuButton } from '@components/ui/sidebar';
 import { ThemedSpan } from '@components/ui/themed-span';
 
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
+import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
 import TooltipWrapper from '@features/file-system/components/tree-node/ui/tooltip-wrapper';
 import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
-import type { DraggableData } from '@features/file-system/hooks/use-tree-dnd-logic';
+
+import { useInlineEditStore } from '@stores/use-inline-edit-store';
 
 import { useFolderListLogic } from '../../folder-list/use-folder-list-logic';
 
 type Props = {
   node: TreeNode;
   isActive: boolean;
-  onOpenInSidePanel: (id: string) => void;
-  onOpenInNewTab: (id: string) => void;
   onClick: VoidFunction;
 };
 
-const LeafNode = ({
-  node,
-  isActive,
-  onOpenInSidePanel,
-  onOpenInNewTab,
-  onClick,
-}: Props) => {
-  const { handleDelete, isDeleting } = useFolderListLogic();
+const LeafNode = ({ node, isActive, onClick }: Props) => {
+  const { deleteChat, deleteDirectory, openChatInSidePanel, openChatInNewTab } =
+    useFolderListLogic();
+  const { startEditing } = useInlineEditStore();
 
-  // Drag setup for LeafNode (draggable only, not droppable)
-  const draggableData: DraggableData = {
-    type: node.type as 'chat' | 'directory',
-    id: node.id,
-    parentDirectoryId: node.parentDirectoryId ?? undefined,
-    parentChatId: undefined, // TreeNode doesn't have parentChatId yet
-    node: node, // Pass the complete node for the overlay
-  };
-
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `draggable-${node.id}`,
-    data: draggableData,
+  // Drag and drop configuration (draggable only, not droppable for leaf nodes)
+  const { attributes, listeners, setNodeRef, dragStyle } = useDraggableConfig({
+    node,
+    isDisabled: false,
   });
-
-  const dragStyle = {
-    // Don't apply transform when using DragOverlay - it handles positioning
-    opacity: isDragging ? 0 : 1, // Hide original completely when dragging (overlay shows the full component)
-    cursor: isDragging ? 'grabbing' : 'grab', // Show grab cursor
-    pointerEvents: isDragging ? ('none' as const) : ('auto' as const), // Prevent interaction when dragging
-  };
 
   // Map tree node types to entity types
   const getEntityType = () => {
@@ -60,6 +39,11 @@ const LeafNode = ({
 
     // Add mappings for other types as needed
     return 'folder' as const; // fallback
+  };
+
+  // Handle rename action for this specific node
+  const handleRenameAction = () => {
+    startEditing(node.id);
   };
 
   return (
@@ -87,12 +71,24 @@ const LeafNode = ({
         <EntityActionsMenu
           entityType={getEntityType()}
           handlers={{
-            onDelete: () => handleDelete(node.id),
-            onOpenInNewTab: () => onOpenInNewTab(node.id),
-            onOpenInSidePanel: () => onOpenInSidePanel(node.id),
+            onDelete: async () => {
+              if (node.type === 'chat') {
+                await deleteChat({
+                  id: node.id,
+                  parentChatId: node.parentChatId ?? undefined,
+                  parentDirectoryId: node.parentDirectoryId ?? undefined,
+                });
+              } else if (node.type === 'directory') {
+                await deleteDirectory(node.id, node.parentDirectoryId ?? undefined);
+              }
+            },
+            onRename: handleRenameAction,
+            onOpenInNewTab: () => openChatInNewTab(node.id),
+            onOpenInSidePanel: () => openChatInSidePanel(node.id),
           }}
-          isDeleting={isDeleting}
+          isDeleting={false}
           triggerClassName="opacity-0 group-hover/item:opacity-100"
+          menuId={`leaf-node-${node.id}`}
         />
       </SidebarMenuButton>
     </TooltipWrapper>

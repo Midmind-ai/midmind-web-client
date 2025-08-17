@@ -1,9 +1,10 @@
-import { useState } from 'react';
-
 import { produce } from 'immer';
 import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+import { swrMutationConfig } from '@config/swr';
+
+import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
@@ -16,17 +17,10 @@ type DeleteChatParams = {
 };
 
 export const useDeleteChat = () => {
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const deleteChat = async ({
-    id,
-    parentDirectoryId,
-    parentChatId,
-  }: DeleteChatParams) => {
-    setIsDeleting(true);
-
-    try {
-      // Optimistically remove from the appropriate parent cache
+  const deleteChatSWR = useSWRMutation(
+    MUTATION_KEYS.chats.delete,
+    async (_, { arg }: { arg: DeleteChatParams }) => {
+      const { id, parentDirectoryId, parentChatId } = arg;
       const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
 
       await mutate(
@@ -38,7 +32,7 @@ export const useDeleteChat = () => {
 
           return draft.filter(chat => chat.id !== id);
         }),
-        { revalidate: false, rollbackOnError: true }
+        { revalidate: false }
       );
 
       // Make the API call
@@ -49,23 +43,30 @@ export const useDeleteChat = () => {
       await mutate(['chat', id], undefined, false);
 
       // Invalidate message cache for this chat
-      await mutate(invalidateCachePattern(['messages', id]));
+      await mutate(findCacheKeysByPattern(['messages', id]));
 
       // If this is a branch chat, the parent might need to update its has_branches flag
       if (parentChatId) {
         // Invalidate all chat caches to ensure has_branches is updated
-        await mutate(invalidateCachePattern(['chats']));
+        await mutate(findCacheKeysByPattern(['chats']));
       }
-    } catch (error) {
-      console.error('Failed to delete chat:', error);
-      throw error;
-    } finally {
-      setIsDeleting(false);
-    }
+
+      return { id, parentDirectoryId, parentChatId };
+    },
+    swrMutationConfig
+  );
+
+  const deleteChat = async ({
+    id,
+    parentDirectoryId,
+    parentChatId,
+  }: DeleteChatParams) => {
+    return deleteChatSWR.trigger({ id, parentDirectoryId, parentChatId });
   };
 
   return {
     deleteChat,
-    isDeleting,
+    isMutating: deleteChatSWR.isMutating,
+    error: deleteChatSWR.error,
   };
 };

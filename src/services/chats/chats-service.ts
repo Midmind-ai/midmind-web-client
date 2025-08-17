@@ -1,9 +1,6 @@
 import { baseAxiosInstance } from '@config/axios';
 
-import type {
-  UpdateChatDetailsRequestDto,
-  MoveChatDto,
-} from '@services/chats/chats-dtos';
+import type { UpdateChatDetailsRequestDto } from '@services/chats/chats-dtos';
 
 import type { MessageResponse } from '@shared-types/common';
 import type { Chat } from '@shared-types/entities';
@@ -44,15 +41,6 @@ export class ChatsService {
 
   static async deleteChat(chatId: string) {
     const { data } = await baseAxiosInstance.delete<MessageResponse>(`/chats/${chatId}`);
-
-    return data;
-  }
-
-  static async moveChat(chatId: string, body: MoveChatDto) {
-    const { data } = await baseAxiosInstance.put<MessageResponse>(
-      `/chats/${chatId}/move`,
-      body
-    );
 
     return data;
   }

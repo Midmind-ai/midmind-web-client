@@ -9,6 +9,7 @@ export type TreeNode = {
   type: 'directory' | 'chat' | 'chats';
   hasChildren: boolean;
   parentDirectoryId?: string | null;
+  parentChatId?: string | null;
   originalData: Directory | Chat;
 };
 

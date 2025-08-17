@@ -75,40 +75,41 @@ export const useCacheUtils = () => {
   };
 
   /**
-   * Extract parent ID from a cache key based on standard patterns
+   * Extract parent ID from a cache key based on its pattern
    * @param cacheKey - The cache key array
-   * @param entityType - Type of entity ('directory' or 'chat')
    * @returns The parent directory ID or null
    */
-  const extractParentFromCacheKey = (
-    cacheKey: unknown[],
-    entityType: 'directory' | 'chat'
-  ): string | null => {
-    if (entityType === 'directory') {
+  const extractParentFromCacheKey = (cacheKey: unknown[]): string | null => {
+    // Handle different cache key patterns:
+    // ['directories'] -> root (no parent)
+    // ['directories', parentId] -> nested directory
+    // ['chats'] -> root (no parent)
+    // ['chats', 'directory', parentId] -> chat in directory
+    // ['chats', 'chat', parentChatId] -> nested chat
+    // Add more patterns as needed for future entity types
+
+    const [entityType, modifier, parentId] = cacheKey;
+
+    if (entityType === 'directories') {
       // ['directories'] for root, ['directories', parentId] for nested
       return cacheKey.length > 1 ? (cacheKey[1] as string) : null;
     }
 
-    if (entityType === 'chat') {
-      // ['chats'] for root, ['chats', 'directory', parentId] for nested
-      if (cacheKey.length > 2 && cacheKey[1] === 'directory') {
-        return cacheKey[2] as string;
+    if (entityType === 'chats') {
+      // ['chats'] for root
+      // ['chats', 'directory', parentId] for chats in directory
+      // ['chats', 'chat', parentChatId] for nested chats
+      if (cacheKey.length > 2 && (modifier === 'directory' || modifier === 'chat')) {
+        return parentId as string;
       }
 
       return null;
     }
 
-    return null;
-  };
+    // Future entity types can be added here following similar patterns
+    // e.g., if (entityType === 'files') { ... }
 
-  /**
-   * Check if a cache entry exists for the given key
-   * @param cacheKey - The cache key to check
-   * @returns True if cache entry exists, false otherwise
-   */
-  const cacheExists = (cacheKey: unknown[]): boolean => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return cache.get(cacheKey as any) !== undefined;
+    return null;
   };
 
   return {
@@ -116,7 +117,6 @@ export const useCacheUtils = () => {
     findInCacheMultiple,
     getAllFromCache,
     extractParentFromCacheKey,
-    cacheExists,
     cache, // Expose cache for direct access if needed
   };
 };

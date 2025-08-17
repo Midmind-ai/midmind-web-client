@@ -4,36 +4,15 @@ import { Skeleton } from '@components/ui/skeleton';
 import { SKELETON_COUNT } from '@features/file-system/components/tree-node/logic/constants';
 import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
 
-import { useFolderListLogic } from '../../folder-list/use-folder-list-logic';
-
 type Props = {
   isLoadingChildren: boolean;
   childNodes?: TreeNodeType[];
-  isDeleting: boolean;
-  onRename?: VoidFunction;
-  onOpenInSidePanel: (id: string) => void;
-  onOpenInNewTab: (id: string) => void;
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
-    isDeleting: boolean;
-    onDelete: VoidFunction;
-    onRename?: VoidFunction;
-    onOpenInSidePanel: (id: string) => void;
-    onOpenInNewTab: (id: string) => void;
   }>;
 };
 
-const ChildrenList = ({
-  isLoadingChildren,
-  childNodes,
-  isDeleting,
-  onRename,
-  onOpenInSidePanel,
-  onOpenInNewTab,
-  TreeNodeComponent,
-}: Props) => {
-  const { handleDelete } = useFolderListLogic();
-
+const ChildrenList = ({ isLoadingChildren, childNodes, TreeNodeComponent }: Props) => {
   return (
     <SidebarMenuSub className="ml-3.5 pb-0 pl-3.5">
       {isLoadingChildren && (
@@ -53,11 +32,6 @@ const ChildrenList = ({
           <TreeNodeComponent
             key={childNode.id}
             node={childNode}
-            isDeleting={isDeleting}
-            onDelete={() => handleDelete(childNode.id)}
-            onRename={onRename}
-            onOpenInSidePanel={onOpenInSidePanel}
-            onOpenInNewTab={onOpenInNewTab}
           />
         ))}
       {!isLoadingChildren && (!childNodes || childNodes.length === 0) && (

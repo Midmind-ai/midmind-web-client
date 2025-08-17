@@ -1,8 +1,10 @@
 import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { CACHE_KEYS } from '@hooks/cache-keys';
-import { useCacheUtils } from '@hooks/use-cache-utils';
+import { swrMutationConfig } from '@config/swr';
+
+import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
@@ -17,30 +19,24 @@ type MoveChatParams = {
 
 export const useMoveChat = () => {
   const { mutate } = useSWRConfig();
-  const { cacheExists } = useCacheUtils();
 
-  const moveChat = async ({
-    chatId,
-    sourceParentDirectoryId,
-    sourceParentChatId,
-    targetParentDirectoryId,
-  }: MoveChatParams) => {
-    // Get cache keys for source and target
-    const sourceCacheKey = CACHE_KEYS.chats.withParent(
-      sourceParentDirectoryId,
-      sourceParentChatId
-    );
-    const targetCacheKey = CACHE_KEYS.chats.withParent(
-      targetParentDirectoryId ?? undefined
-    );
+  const moveChatSWR = useSWRMutation(
+    MUTATION_KEYS.chats.move,
+    async (_, { arg }: { arg: MoveChatParams }) => {
+      const {
+        chatId,
+        sourceParentDirectoryId,
+        sourceParentChatId,
+        targetParentDirectoryId,
+      } = arg;
 
-    // Console log will be added after we find the chat to move
+      const sourceCacheKey = CACHE_KEYS.chats.withParent(
+        sourceParentDirectoryId,
+        sourceParentChatId
+      );
+      const targetCacheKey = CACHE_KEYS.chats.withParent(targetParentDirectoryId);
 
-    // Find the chat to move first
-    let movedChat: Chat | null = null;
-
-    try {
-      // Step 1: Remove from source cache optimistically
+      let movedChat: Chat | undefined;
       await mutate(
         sourceCacheKey,
         produce((draft?: Chat[]) => {
@@ -58,14 +54,12 @@ export const useMoveChat = () => {
           return draft;
         }),
         {
-          rollbackOnError: true,
           populateCache: true,
           revalidate: false,
         }
       );
 
-      // Step 2: Add to target cache optimistically (only if cache exists)
-      if (movedChat && cacheExists(targetCacheKey)) {
+      if (movedChat) {
         await mutate(
           targetCacheKey,
           produce((draft?: Chat[]) => {
@@ -81,27 +75,37 @@ export const useMoveChat = () => {
             return [updatedChat, ...draft];
           }),
           {
-            rollbackOnError: true,
             populateCache: true,
             revalidate: false,
           }
         );
       }
 
-      // Step 3: Make API call
-      await ChatsService.moveChat(chatId, { parentDirectoryId: targetParentDirectoryId });
+      if (!movedChat) {
+        throw new Error('Chat not found in cache');
+      }
 
-      // Step 4: Revalidate both caches to ensure consistency
+      const chatToUpdate: Chat = movedChat;
+      await ChatsService.updateChatDetails(chatId, {
+        name: chatToUpdate.name,
+        directory_id: targetParentDirectoryId,
+      });
       mutate(sourceCacheKey);
       mutate(targetCacheKey);
-    } catch (error) {
-      console.error('Failed to move chat:', error);
-      // Rollback will happen automatically due to rollbackOnError: true
-      throw error;
-    }
-  };
+
+      return {
+        chatId,
+        sourceParentDirectoryId,
+        sourceParentChatId,
+        targetParentDirectoryId,
+      };
+    },
+    swrMutationConfig
+  );
 
   return {
-    moveChat,
+    moveChat: moveChatSWR.trigger,
+    isMutating: moveChatSWR.isMutating,
+    error: moveChatSWR.error,
   };
 };

@@ -285,6 +285,157 @@ export const useChatActions = () => {
 - Manage complex workflows
 - Add business-specific transformations
 
+## 🔄 SWR Mutations Best Practices
+
+### ✅ Preferred Approach: useSWRMutation
+
+For operations that modify server state (CREATE, UPDATE, DELETE), **always use `useSWRMutation`** instead of manual try/catch with `mutate()`.
+
+**✅ Correct Implementation:**
+```typescript
+import useSWRMutation from 'swr/mutation';
+import { swrMutationConfig } from '@config/swr';
+import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
+
+export const useMoveDirectory = () => {
+  const { mutate } = useSWRConfig();
+  
+  const moveDirectorySWR = useSWRMutation(
+    MUTATION_KEYS.directories.move,
+    async (_, { arg }: { arg: MoveDirectoryParams }) => {
+      const { directoryId, sourceParentDirectoryId, targetParentDirectoryId } = arg;
+
+      // Step 1: Optimistic cache updates
+      await mutate(sourceCacheKey, optimisticRemove, { revalidate: false });
+      await mutate(targetCacheKey, optimisticAdd, { revalidate: false });
+
+      // Step 2: API call - if this fails, SWR automatically rolls back all optimistic updates
+      await DirectoriesService.moveDirectory(directoryId, { 
+        target_parent_id: targetParentDirectoryId 
+      });
+
+      return { directoryId, sourceParentDirectoryId, targetParentDirectoryId };
+    },
+    swrMutationConfig  // Centralized config with rollbackOnError: true
+  );
+
+  return {
+    moveDirectory: moveDirectorySWR.trigger,
+    isMutating: moveDirectorySWR.isMutating,
+    error: moveDirectorySWR.error,
+  };
+};
+```
+
+**❌ Problematic Manual Approach:**
+```typescript
+// ❌ This does NOT provide proper rollback on API errors
+try {
+  await mutate(cacheKey, optimisticUpdate, { 
+    rollbackOnError: true  // Only watches mutate(), not API calls
+  });
+  
+  await APIService.call();  // If this fails, cache stays in wrong state!
+} catch (error) {
+  // Cache is inconsistent!
+}
+```
+
+### Why useSWRMutation is Superior
+
+**1. Automatic Rollback on Any Error**
+- If the API call fails, SWR automatically reverts ALL optimistic cache updates
+- No manual cache state management needed
+
+**2. Built-in Loading and Error States**
+- `isMutating` for loading indicators
+- `error` for error handling
+- `data` for success results
+
+**3. Centralized Configuration**
+```typescript
+// src/config/swr.ts
+export const swrMutationConfig = {
+  rollbackOnError: true,    // Auto-rollback on API errors
+  throwOnError: false,      // Errors via .error instead of throwing
+} as const;
+```
+
+**4. Clean Component Integration**
+```typescript
+const { moveDirectory, isMutating, error } = useMoveDirectory();
+
+// Simple usage:
+await moveDirectory({ directoryId: "123", targetParentDirectoryId: "456" });
+
+// Built-in states:
+if (isMutating) return <Spinner />;
+if (error) return <ErrorMessage error={error} />;
+```
+
+### Migration from Manual Approach
+
+Replace manual try/catch mutations with `useSWRMutation`:
+
+```typescript
+// Before: Manual approach
+const updateEntity = async (data) => {
+  try {
+    await mutate(key, optimisticUpdate, { rollbackOnError: true });
+    await EntityService.update(data);
+  } catch (error) {
+    // Manual error handling
+  }
+};
+
+// After: useSWRMutation approach  
+const updateEntitySWR = useSWRMutation(
+  'update-entity',
+  async (_, { arg }) => {
+    await mutate(key, optimisticUpdate, { revalidate: false });
+    return await EntityService.update(arg);
+  },
+  swrMutationConfig
+);
+
+return { updateEntity: updateEntitySWR.trigger };
+```
+
+### ✅ Always Use Centralized Cache Keys
+
+Never use hardcoded strings for mutation keys. Always import from the centralized `cache-keys.ts`:
+
+**✅ Correct:**
+```typescript
+import { MUTATION_KEYS, CACHE_KEYS } from '@hooks/cache-keys';
+
+// Use centralized mutation keys
+useSWRMutation(MUTATION_KEYS.directories.move, mutationFn)
+useSWRMutation(MUTATION_KEYS.chats.create, mutationFn)
+
+// Use centralized cache keys
+CACHE_KEYS.directories.withParent(parentId)
+CACHE_KEYS.chats.details(chatId)
+```
+
+**❌ Wrong:**
+```typescript
+// ❌ Hardcoded strings - hard to maintain and refactor
+useSWRMutation('move-directory', mutationFn)
+useSWRMutation('create-chat', mutationFn)
+
+// ❌ Inconsistent cache key patterns
+['directories', parentId]
+['chat-details', chatId]
+```
+
+**Benefits of Centralized Keys:**
+- **Type Safety**: TypeScript catches typos and missing keys
+- **Consistency**: All mutation keys follow the same pattern
+- **Maintainability**: Easy to update keys across the entire codebase
+- **Discoverability**: Developers can see all available keys in one place
+- **Refactoring**: IDE can safely rename and find all usages
+
 ## 🎨 Component Style Guide
 
 All components MUST follow this consistent pattern:

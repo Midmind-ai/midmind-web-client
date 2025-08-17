@@ -17,3 +17,15 @@ export const swrConfig: SWRConfiguration = {
   // Deduplication
   dedupingInterval: apiConfig.timeout,
 };
+
+/**
+ * Global SWR Mutation configuration
+ * @see https://swr.vercel.app/docs/mutation#global-configuration
+ */
+export const swrMutationConfig = {
+  // Automatically rollback optimistic updates on error
+  rollbackOnError: true,
+
+  // Don't throw errors in components, handle via mutation.error
+  throwOnError: false,
+} as const;

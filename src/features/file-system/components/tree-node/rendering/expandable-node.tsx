@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { useDraggable } from '@dnd-kit/core';
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,18 +12,16 @@ import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
+import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import ChildrenList from '@features/file-system/components/tree-node/rendering/children-list';
 import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
 import { useCreateDirectory } from '@features/file-system/hooks/use-create-directory';
 import { useRenameChat } from '@features/file-system/hooks/use-rename-chat';
 import { useRenameDirectory } from '@features/file-system/hooks/use-rename-directory';
 import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
-import type {
-  DraggableData,
-  DroppableData,
-} from '@features/file-system/hooks/use-tree-dnd-logic';
 
 import { useInlineEditStore } from '@stores/use-inline-edit-store';
+import { useMenuStateStore } from '@stores/use-menu-state-store';
 
 import { useFolderListLogic } from '../../folder-list/use-folder-list-logic';
 
@@ -35,17 +32,9 @@ type Props = {
   setIsOpen: (open: boolean) => void;
   childNodes?: TreeNodeType[];
   isLoadingChildren: boolean;
-  onRename?: (id: string) => void;
-  onOpenInSidePanel: (id: string) => void;
-  onOpenInNewTab: (id: string) => void;
   onClick: VoidFunction;
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
-    isDeleting: boolean;
-    onDelete: VoidFunction;
-    onRename?: VoidFunction;
-    onOpenInSidePanel: (id: string) => void;
-    onOpenInNewTab: (id: string) => void;
   }>;
 };
 
@@ -56,63 +45,37 @@ const ExpandableNode = ({
   setIsOpen,
   childNodes,
   isLoadingChildren,
-  onRename,
-  onOpenInSidePanel,
-  onOpenInNewTab,
   onClick,
   TreeNodeComponent,
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { handleDelete, isDeleting } = useFolderListLogic();
+  const { deleteChat, deleteDirectory, openChatInNewTab, openChatInSidePanel } =
+    useFolderListLogic();
   const { renameDirectory } = useRenameDirectory();
   const { renameChat } = useRenameChat();
   const { finalizeDirectoryCreation, removeTemporaryDirectory } = useCreateDirectory();
   const { isEditing, startEditing } = useInlineEditStore();
+  const { isMenuOpen } = useMenuStateStore();
   const isCurrentlyEditing = isEditing(node.id);
+  const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
 
-  // Drag and drop setup
-  const draggableData: DraggableData = {
-    type: node.type as 'chat' | 'directory',
-    id: node.id,
-    parentDirectoryId: node.parentDirectoryId ?? undefined,
-    parentChatId: undefined, // TreeNode doesn't have parentChatId yet
-    node: node, // Pass the complete node for the overlay
-  };
-
-  const droppableData: DroppableData = {
-    type: 'expandable-node',
-    id: node.id,
-    nodeType: node.type as 'chat' | 'directory',
-    accepts: ['chat', 'directory'], // ExpandableNodes can accept both chats and directories
-    targetName: node.name, // Include the target directory name for logging
-  };
-
+  // Drag and drop configuration
   const {
+    droppableData,
     attributes,
     listeners,
     setNodeRef: setDraggableNodeRef,
-    isDragging,
-  } = useDraggable({
-    id: `draggable-${node.id}`,
-    data: draggableData,
-    disabled: isCurrentlyEditing, // Disable dragging when editing
+    dragStyle,
+  } = useDraggableConfig({
+    node,
+    isDisabled: isCurrentlyEditing,
   });
-
-  const dragStyle = {
-    // Don't apply transform when using DragOverlay - it handles positioning
-    opacity: isDragging ? 0 : 1, // Hide original completely when dragging (overlay shows the full component)
-    cursor: isDragging ? 'grabbing' : 'grab', // Show grab cursor
-    pointerEvents: isDragging ? ('none' as const) : ('auto' as const), // Prevent interaction when dragging
-  };
 
   // Reset hover state when entering edit mode
   useEffect(() => {
     if (isCurrentlyEditing) {
       setIsHovered(false);
-    } else if (!isCurrentlyEditing) {
-      setIsMenuOpen(false);
     }
   }, [isCurrentlyEditing]);
 
@@ -188,7 +151,7 @@ const ExpandableNode = ({
               className={`${isCurrentlyEditing ? '[&:active]:bg-transparent [&:active]:text-current' : 'group/item'}
                 relative cursor-pointer gap-1.5 rounded-sm p-1 pr-8
                 data-[active=true]:font-normal`}
-              onClick={isCurrentlyEditing ? undefined : onClick}
+              onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onKeyDown={
@@ -231,10 +194,10 @@ const ExpandableNode = ({
                   <ChevronRight
                     className={`absolute size-5 stroke-[1.5px] transition-transform
                       ${isOpen ? 'rotate-90' : ''}
-                      ${isHovered && !isCurrentlyEditing && !isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+                      ${isHovered && !isCurrentlyEditing ? 'opacity-100' : 'opacity-0'}`}
                   />
                   <div
-                    className={`${isHovered && !isCurrentlyEditing && !isMenuOpen ? 'opacity-0' : 'opacity-100'}`}
+                    className={`${isHovered && !isCurrentlyEditing ? 'opacity-0' : 'opacity-100'}`}
                   >
                     <NodeIcon
                       nodeType={node.type}
@@ -257,14 +220,27 @@ const ExpandableNode = ({
                 <EntityActionsMenu
                   entityType={getEntityType()}
                   handlers={{
-                    onDelete: () => handleDelete(node.id),
+                    onDelete: async () => {
+                      if (node.type === 'chat') {
+                        await deleteChat({
+                          id: node.id,
+                          parentChatId: node.parentChatId ?? undefined,
+                          parentDirectoryId: node.parentDirectoryId ?? undefined,
+                        });
+                      } else if (node.type === 'directory') {
+                        await deleteDirectory(
+                          node.id,
+                          node.parentDirectoryId ?? undefined
+                        );
+                      }
+                    },
                     onRename: handleRenameAction,
-                    onOpenInNewTab: () => onOpenInNewTab(node.id),
-                    onOpenInSidePanel: () => onOpenInSidePanel(node.id),
+                    onOpenInNewTab: () => openChatInNewTab(node.id),
+                    onOpenInSidePanel: () => openChatInSidePanel(node.id),
                   }}
-                  isDeleting={isDeleting}
+                  isDeleting={false}
                   triggerClassName="opacity-0 group-hover/item:opacity-100"
-                  onOpenChange={setIsMenuOpen}
+                  menuId={`expandable-node-${node.id}`}
                 />
               )}
             </SidebarMenuButton>
@@ -273,10 +249,6 @@ const ExpandableNode = ({
             <ChildrenList
               isLoadingChildren={isLoadingChildren}
               childNodes={childNodes}
-              isDeleting={isDeleting}
-              onRename={onRename ? () => onRename(node.id) : undefined}
-              onOpenInSidePanel={onOpenInSidePanel}
-              onOpenInNewTab={onOpenInNewTab}
               TreeNodeComponent={TreeNodeComponent}
             />
           </CollapsibleContent>

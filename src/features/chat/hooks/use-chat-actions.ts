@@ -6,7 +6,6 @@ import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
-  ContextType,
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
@@ -41,39 +40,25 @@ export const useChatActions = (actualChatId?: string) => {
   const createBranch = async ({
     content,
     messageId,
-    connectionType,
     selectionContext,
   }: CreateBranchArgs) => {
-    const contextType: ContextType = selectionContext ? 'text_selection' : 'full_message';
-    const isTextSelection = contextType === 'text_selection';
-
     const textToUse = selectionContext?.selectedText || content;
 
-    const parentChatId = chatId;
-
     const branchContext: BranchContext = {
-      parent_chat_id: parentChatId,
       parent_message_id: messageId,
-      connection_type: connectionType,
-      context_type: contextType,
-      ...(isTextSelection && {
-        selected_text: textToUse,
-        start_position: selectionContext?.startPosition,
-        end_position: selectionContext?.endPosition,
-      }),
     };
 
     const newChatId = await createChat({
       content: textToUse,
       model: DEFAULT_AI_MODEL,
-      parentChatId: parentChatId,
+      parentChatId: chatId,
     });
 
     emitBranchCreated({ branchContext });
 
     openChatInSplitView(newChatId);
 
-    if (isTextSelection) {
+    if (selectionContext) {
       // setTimeout is used to ensure the component has time to render and subscribe
       setTimeout(() => {
         emitMessageReply({
@@ -95,7 +80,6 @@ export const useChatActions = (actualChatId?: string) => {
     createBranch({
       content,
       messageId,
-      connectionType: 'attached',
       selectionContext,
     });
   };
@@ -108,13 +92,12 @@ export const useChatActions = (actualChatId?: string) => {
     createBranch({
       content,
       messageId,
-      connectionType: 'detached',
       selectionContext,
     });
   };
 
   const createTemporaryBranch = (messageId: string, content: string) => {
-    createBranch({ messageId, content, connectionType: 'temporary' });
+    createBranch({ messageId, content });
   };
 
   const createNewBranchSet = (_messageId: string) => {

@@ -148,7 +148,7 @@ export default tseslint.config([
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-unused-vars': 'off',
       eqeqeq: ['error', 'always'],
-      curly: ['error', 'all'],
+      curly: ['error', 'multi-line'],
       'no-debugger': 'error',
       'no-alert': 'error',
       'no-eval': 'error',

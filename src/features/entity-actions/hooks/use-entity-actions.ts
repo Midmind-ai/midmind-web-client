@@ -28,8 +28,6 @@ export const useEntityActions = ({
   return useMemo(() => {
     if (entityType === 'folder') {
       if (!handlers.onRename) {
-        console.warn('Folder actions require onRename handler');
-
         return [];
       }
 
@@ -44,10 +42,6 @@ export const useEntityActions = ({
 
     if (entityType === 'chat') {
       if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
-        console.warn(
-          'Chat actions require onOpenInNewTab and onOpenInSidePanel handlers'
-        );
-
         return [];
       }
 
@@ -64,10 +58,6 @@ export const useEntityActions = ({
 
     if (entityType === 'branch') {
       if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
-        console.warn(
-          'Branch actions require onOpenInNewTab and onOpenInSidePanel handlers'
-        );
-
         return [];
       }
 
@@ -83,10 +73,6 @@ export const useEntityActions = ({
 
     if (entityType === 'mindlet') {
       if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
-        console.warn(
-          'Mindlet actions require onOpenInNewTab and onOpenInSidePanel handlers'
-        );
-
         return [];
       }
 
@@ -100,7 +86,6 @@ export const useEntityActions = ({
       );
     }
 
-    // Return empty array for unknown entity types
     return [];
   }, [entityType, handlers, isDeleting]);
 };

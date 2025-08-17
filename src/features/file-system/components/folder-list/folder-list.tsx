@@ -8,8 +8,7 @@ import TreeNode from '@features/file-system/components/tree-node/tree-node';
 import type { DroppableData } from '@features/file-system/hooks/use-tree-dnd-logic';
 
 const FolderList = () => {
-  const { treeNodes, isLoading, handleRename, openChatInNewTab, openChatInSidePanel } =
-    useFolderListLogic();
+  const { treeNodes, isLoading } = useFolderListLogic();
 
   // Root drop zone configuration - accepts items to move to root level (null parent)
   const rootDroppableData: DroppableData = {
@@ -43,9 +42,6 @@ const FolderList = () => {
                   <TreeNode
                     key={node.id}
                     node={node}
-                    onRename={handleRename}
-                    onOpenInNewTab={() => openChatInNewTab(node.id)}
-                    onOpenInSidePanel={() => openChatInSidePanel(node.id)}
                   />
                 ))}
             </SidebarMenu>

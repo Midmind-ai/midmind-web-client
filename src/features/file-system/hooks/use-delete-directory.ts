@@ -1,10 +1,14 @@
-import { useState } from 'react';
-
+import { produce } from 'immer';
 import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+import { swrMutationConfig } from '@config/swr';
+
+import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
+
+import type { Directory } from '@shared-types/entities';
 
 type DeleteDirectoryParams = {
   id: string;
@@ -12,41 +16,40 @@ type DeleteDirectoryParams = {
 };
 
 export const useDeleteDirectory = () => {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteDirectorySWR = useSWRMutation(
+    MUTATION_KEYS.directories.delete,
+    async (_, { arg }: { arg: DeleteDirectoryParams }) => {
+      const { id, parentDirectoryId } = arg;
 
-  const deleteDirectory = async ({ id, parentDirectoryId }: DeleteDirectoryParams) => {
-    setIsDeleting(true);
+      await mutate(
+        CACHE_KEYS.directories.withParent(parentDirectoryId),
+        produce((draft: Directory[]) => {
+          if (!draft) return null;
 
-    try {
-      // Optimistically remove from cache
-      const parentDirectoryCacheKey =
-        CACHE_KEYS.directories.withParent(parentDirectoryId);
+          return draft.filter(item => item.id !== id);
+        }),
+        {
+          revalidate: false,
+        }
+      );
 
-      await mutate(parentDirectoryCacheKey, undefined, {
-        revalidate: false,
-        rollbackOnError: true,
-      });
-
-      // Make the API call
       await DirectoriesService.deleteDirectory(id);
 
-      // If this directory has a parent, check if parent should update has_children flag
-      if (parentDirectoryId) {
-        // Check if the parent has any remaining children
-        // Invalidate directory caches to refetch with updated has_children
-        await mutate(invalidateCachePattern(['directories'])); // Root directories
-        await mutate(invalidateCachePattern(['directories', '*'])); // All directory children
-      }
-    } catch (error) {
-      console.error('Failed to delete directory:', error);
-      throw error;
-    } finally {
-      setIsDeleting(false);
-    }
+      await mutate(findCacheKeysByPattern(['directories', id]), undefined);
+      await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
+
+      return { id, parentDirectoryId };
+    },
+    swrMutationConfig
+  );
+
+  const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
+    return deleteDirectorySWR.trigger({ id, parentDirectoryId });
   };
 
   return {
     deleteDirectory,
-    isDeleting,
+    isMutating: deleteDirectorySWR.isMutating,
+    error: deleteDirectorySWR.error,
   };
 };

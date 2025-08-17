@@ -1,7 +1,10 @@
 import { produce } from 'immer';
 import { mutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { invalidateCachePattern } from '@hooks/cache-keys';
+import { swrMutationConfig } from '@config/swr';
+
+import { MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
@@ -13,11 +16,14 @@ type RenameDirectoryParams = {
 };
 
 export const useRenameDirectory = () => {
-  const renameDirectory = async ({ id, name }: RenameDirectoryParams) => {
-    try {
+  const renameDirectorySWR = useSWRMutation(
+    MUTATION_KEYS.directories.rename,
+    async (_, { arg }: { arg: RenameDirectoryParams }) => {
+      const { id, name } = arg;
+
       // Optimistically update all directory caches that might contain this directory
       await mutate(
-        invalidateCachePattern(['directories']),
+        findCacheKeysByPattern(['directories']),
         produce((draft?: Directory[]) => {
           if (!draft) {
             return draft;
@@ -32,7 +38,6 @@ export const useRenameDirectory = () => {
         }),
         {
           revalidate: false,
-          rollbackOnError: true,
         }
       );
 
@@ -41,13 +46,19 @@ export const useRenameDirectory = () => {
         name,
         type: 'folder', // Assuming all directories are folders for now
       });
-    } catch (error) {
-      console.error('Failed to rename directory:', error);
-      throw error;
-    }
+
+      return { id, name };
+    },
+    swrMutationConfig
+  );
+
+  const renameDirectory = async ({ id, name }: RenameDirectoryParams) => {
+    return renameDirectorySWR.trigger({ id, name });
   };
 
   return {
     renameDirectory,
+    isMutating: renameDirectorySWR.isMutating,
+    error: renameDirectorySWR.error,
   };
 };

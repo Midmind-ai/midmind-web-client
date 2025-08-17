@@ -37,7 +37,7 @@ export const useConversationWithAI = (chatId: string) => {
             arg.model,
             chunk,
             arg.branch_context?.parent_message_id,
-            arg.branch_context?.parent_chat_id
+            undefined
           );
         },
         abortController.signal

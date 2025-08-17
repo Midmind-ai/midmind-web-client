@@ -1,13 +1,16 @@
 import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
 import { v4 as uuidv4 } from 'uuid';
+
+import { swrMutationConfig } from '@config/swr';
 
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type { LLModel } from '@features/chat/types/chat-types';
 import { handleLLMResponse, getInfiniteKey } from '@features/chat/utils/swr';
 import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes-store';
 
-import { CACHE_KEYS, invalidateCachePattern } from '@hooks/cache-keys';
+import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 import type {
@@ -39,29 +42,32 @@ export const useCreateChat = () => {
     state => state.createAbortController
   );
 
-  const createChat = async ({
-    content,
-    model,
-    sendMessage = false,
-    parentChatId,
-    parentDirectoryId,
-  }: CreateChatArgs) => {
-    const chatId = uuidv4();
-    const messageId = uuidv4();
+  const createChatSWR = useSWRMutation(
+    MUTATION_KEYS.chats.create,
+    async (_, { arg }: { arg: CreateChatArgs }) => {
+      const {
+        content,
+        model,
+        sendMessage = false,
+        parentChatId,
+        parentDirectoryId,
+      } = arg;
 
-    const newChat: Chat = {
-      id: chatId,
-      name: 'New chat',
-      parent_directory_id: parentDirectoryId || null,
-      has_children: false,
-    };
+      const chatId = uuidv4();
+      const messageId = uuidv4();
 
-    // If this is a branch chat, expand the parent first
-    if (parentChatId) {
-      try {
+      const newChat: Chat = {
+        id: chatId,
+        name: 'New chat',
+        parent_directory_id: parentDirectoryId || null,
+        has_children: false,
+      };
+
+      // If this is a branch chat, expand the parent first
+      if (parentChatId) {
         // Update parent chat's has_children flag first
         await mutate(
-          invalidateCachePattern(['chats']),
+          findCacheKeysByPattern(['chats']),
           produce((draft?: Chat[]) => {
             if (!draft) {
               return draft;
@@ -74,7 +80,7 @@ export const useCreateChat = () => {
 
             return draft;
           }),
-          { revalidate: false, rollbackOnError: true }
+          { revalidate: false }
         );
 
         // Expand the parent node immediately
@@ -93,17 +99,12 @@ export const useCreateChat = () => {
             // Start with existing chats from server, then add new chat at the beginning
             return [newChat, ...existingChats];
           }),
-          { revalidate: false, rollbackOnError: true }
+          { revalidate: false }
         );
-      } catch (error) {
-        console.error('Failed to create branch chat:', error);
-        throw error;
-      }
-    } else {
-      // For non-branch chats, determine cache key and add directly
-      const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
+      } else {
+        // For non-branch chats, determine cache key and add directly
+        const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
 
-      try {
         await mutate(
           cacheKey,
           produce((draft?: Chat[]) => {
@@ -113,33 +114,50 @@ export const useCreateChat = () => {
 
             draft.unshift(newChat);
           }),
-          { revalidate: false, rollbackOnError: true }
+          { revalidate: false }
         );
-      } catch (error) {
-        console.error('Failed to create chat:', error);
-        throw error;
       }
-    }
 
-    if (sendMessage) {
-      const userMessage: ChatMessage = {
-        id: messageId,
-        content: content,
-        role: 'user',
-        branches: [],
-        llm_model: model,
-        created_at: new Date().toISOString(),
-        reply_content: null,
-      };
+      if (sendMessage) {
+        const userMessage: ChatMessage = {
+          id: messageId,
+          content: content,
+          role: 'user',
+          branches: [],
+          llm_model: model,
+          created_at: new Date().toISOString(),
+          reply_content: null,
+        };
 
-      // Populate both the infinite key cache and direct string key cache
-      const infiniteKey = getInfiniteKey(chatId);
-      const messagesKey = `${CACHE_KEYS.messages.chat(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+        // Populate both the infinite key cache and direct string key cache
+        const infiniteKey = getInfiniteKey(chatId);
+        const messagesKey = `${CACHE_KEYS.messages.chat(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
 
-      // Populate infinite key cache (used by handleContentChunk)
-      await mutate(
-        infiniteKey,
-        [
+        // Populate infinite key cache (used by handleContentChunk)
+        await mutate(
+          infiniteKey,
+          [
+            {
+              data: [userMessage],
+              meta: {
+                total: 1,
+                lastPage: 1,
+                currentPage: 1,
+                perPage: 20,
+                prev: null,
+                next: null,
+              },
+            },
+          ],
+          {
+            revalidate: false,
+            populateCache: true,
+          }
+        );
+
+        // Also populate direct string key cache for compatibility
+        await mutate(
+          messagesKey,
           {
             data: [userMessage],
             meta: {
@@ -151,62 +169,61 @@ export const useCreateChat = () => {
               next: null,
             },
           },
-        ],
-        {
-          revalidate: false,
-          populateCache: true,
-        }
-      );
+          {
+            revalidate: false,
+            populateCache: true,
+          }
+        );
 
-      // Also populate direct string key cache for compatibility
-      await mutate(
-        messagesKey,
-        {
-          data: [userMessage],
-          meta: {
-            total: 1,
-            lastPage: 1,
-            currentPage: 1,
-            perPage: 20,
-            prev: null,
-            next: null,
+        const conversationBody: ConversationWithAIRequestDto = {
+          chat_id: chatId,
+          message_id: messageId,
+          content,
+          model,
+        };
+
+        const newAbortController = createAbortController(chatId);
+
+        ConversationsService.conversationWithAI(
+          conversationBody,
+          (chunk: ConversationWithAIResponseDto) => {
+            handleLLMResponse(
+              clearAbortController,
+              chatId,
+              model,
+              chunk,
+              messageId, // parentMessageId - the user message that triggered this
+              parentChatId // parentChatId - if this is a branch chat
+            );
           },
-        },
-        {
-          revalidate: false,
-          populateCache: true,
-        }
-      );
+          newAbortController.signal
+        );
+      }
 
-      const conversationBody: ConversationWithAIRequestDto = {
-        chat_id: chatId,
-        message_id: messageId,
-        content,
-        model,
-      };
+      return chatId;
+    },
+    swrMutationConfig
+  );
 
-      const newAbortController = createAbortController(chatId);
-
-      ConversationsService.conversationWithAI(
-        conversationBody,
-        (chunk: ConversationWithAIResponseDto) => {
-          handleLLMResponse(
-            clearAbortController,
-            chatId,
-            model,
-            chunk,
-            messageId, // parentMessageId - the user message that triggered this
-            parentChatId // parentChatId - if this is a branch chat
-          );
-        },
-        newAbortController.signal
-      );
-    }
-
-    return chatId;
+  const createChat = async ({
+    content,
+    model,
+    sendMessage = false,
+    parentChatId,
+    parentDirectoryId,
+  }: CreateChatArgs) => {
+    return createChatSWR.trigger({
+      content,
+      model,
+      sendMessage,
+      parentChatId,
+      parentDirectoryId,
+    });
   };
 
   return {
     createChat,
+    isMutating: createChatSWR.isMutating,
+    error: createChatSWR.error,
   };
 };

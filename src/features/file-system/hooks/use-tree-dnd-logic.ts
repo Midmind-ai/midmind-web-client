@@ -75,25 +75,19 @@ export const useTreeDndLogic = () => {
       return;
     }
 
-    try {
-      if (draggableData.type === 'chat') {
-        await moveChat({
-          chatId: draggableData.id,
-          sourceParentDirectoryId: draggableData.parentDirectoryId,
-          sourceParentChatId: draggableData.parentChatId,
-          targetParentDirectoryId,
-        });
-      } else if (draggableData.type === 'directory') {
-        await moveDirectory({
-          directoryId: draggableData.id,
-          sourceParentDirectoryId: draggableData.parentDirectoryId,
-          targetParentDirectoryId,
-        });
-      }
-    } catch (error) {
-      console.error('❌ Move failed:', error);
-      throw error;
-      // TODO: Add user notification for failed moves
+    if (draggableData.type === 'chat') {
+      await moveChat({
+        chatId: draggableData.id,
+        sourceParentDirectoryId: draggableData.parentDirectoryId,
+        sourceParentChatId: draggableData.parentChatId,
+        targetParentDirectoryId,
+      });
+    } else if (draggableData.type === 'directory') {
+      await moveDirectory({
+        directoryId: draggableData.id,
+        sourceParentDirectoryId: draggableData.parentDirectoryId,
+        targetParentDirectoryId,
+      });
     }
   };
 

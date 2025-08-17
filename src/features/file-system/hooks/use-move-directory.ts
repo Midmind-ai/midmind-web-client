@@ -1,9 +1,10 @@
-/* eslint-disable no-console */
 import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
+import useSWRMutation from 'swr/mutation';
 
-import { CACHE_KEYS } from '@hooks/cache-keys';
-import { useCacheUtils } from '@hooks/use-cache-utils';
+import { swrMutationConfig } from '@config/swr';
+
+import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
 
 import type { Directory } from '@services/directories/directories-dtos';
 import { DirectoriesService } from '@services/directories/directories-service';
@@ -16,58 +17,22 @@ type MoveDirectoryParams = {
 
 export const useMoveDirectory = () => {
   const { mutate } = useSWRConfig();
-  const { cacheExists, cache } = useCacheUtils();
 
-  const moveDirectory = async ({
-    directoryId,
-    sourceParentDirectoryId,
-    targetParentDirectoryId,
-  }: MoveDirectoryParams) => {
-    // Get cache keys for source and target
-    const sourceCacheKey = CACHE_KEYS.directories.withParent(sourceParentDirectoryId);
-    const targetCacheKey = CACHE_KEYS.directories.withParent(
-      targetParentDirectoryId ?? undefined
-    );
+  const moveDirectorySWR = useSWRMutation(
+    MUTATION_KEYS.directories.move,
+    async (_, { arg }: { arg: MoveDirectoryParams }) => {
+      const { directoryId, sourceParentDirectoryId, targetParentDirectoryId } = arg;
 
-    // Debug logging
-    console.log('🔧 useMoveDirectory DEBUG:', {
-      directoryId,
-      sourceParentDirectoryId,
-      targetParentDirectoryId,
-      sourceCacheKey,
-      targetCacheKey,
-    });
+      const sourceCacheKey = CACHE_KEYS.directories.withParent(sourceParentDirectoryId);
+      const targetCacheKey = CACHE_KEYS.directories.withParent(
+        targetParentDirectoryId ?? undefined
+      );
+      let movedDirectory: Directory | null = null;
 
-    // Check if target cache exists
-    const targetCacheExists = cacheExists(targetCacheKey);
-    console.log('🔧 Target cache exists:', targetCacheExists);
-
-    // Log current target cache content
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const currentTargetCache = cache.get(targetCacheKey as any);
-    console.log('🔧 Current target cache content:', currentTargetCache);
-
-    // Log all cache keys to understand the structure
-    const allCacheKeys = Array.from(cache.keys());
-    console.log('🔧 All cache keys:', allCacheKeys);
-
-    // Filter for directory-related keys
-    const directoryCacheKeys = allCacheKeys.filter(
-      key => Array.isArray(key) && key[0] === 'directories'
-    );
-    console.log('🔧 Directory cache keys:', directoryCacheKeys);
-
-    // Find the directory to move first
-    let movedDirectory: Directory | null = null;
-
-    try {
-      // Step 1: Remove from source cache optimistically
       await mutate(
         sourceCacheKey,
         produce((draft?: Directory[]) => {
-          if (!draft) {
-            return draft;
-          }
+          if (!draft) return draft;
 
           const directoryIndex = draft.findIndex(dir => dir.id === directoryId);
           if (directoryIndex !== -1) {
@@ -78,70 +43,45 @@ export const useMoveDirectory = () => {
 
           return draft;
         }),
-        {
-          rollbackOnError: true,
-          populateCache: true,
-          revalidate: false,
-        }
+        { revalidate: false }
       );
 
-      // Step 2: Add to target cache optimistically (only if cache exists)
-      const shouldUpdateTargetCache = movedDirectory && cacheExists(targetCacheKey);
-      console.log('🔧 Should update target cache:', shouldUpdateTargetCache, {
-        hasMovedDirectory: !!movedDirectory,
-        targetCacheExists: cacheExists(targetCacheKey),
-      });
+      const shouldUpdateTargetCache = movedDirectory;
 
       if (shouldUpdateTargetCache) {
-        console.log('🔧 Running target cache update...');
         await mutate(
           targetCacheKey,
           produce((draft?: Directory[]) => {
-            console.log('🔧 Target cache draft before update:', draft);
-            if (!draft || !movedDirectory) {
-              console.log('🔧 Skipping update - no draft or no moved directory');
-
-              return draft;
-            }
+            if (!draft || !movedDirectory) return draft;
 
             const updatedDirectory = {
               ...movedDirectory,
               parent_id: targetParentDirectoryId,
             };
 
-            console.log('🔧 Adding directory to target cache:', updatedDirectory);
-            const newDraft = [updatedDirectory, ...draft];
-            console.log('🔧 Target cache draft after update:', newDraft);
-
-            return newDraft;
+            return [updatedDirectory, ...draft];
           }),
-          {
-            rollbackOnError: true,
-            populateCache: true,
-            revalidate: false,
-          }
+          { revalidate: false }
         );
-        console.log('🔧 Target cache update completed');
-      } else {
-        console.log('🔧 Skipping target cache update');
       }
 
-      // Step 3: Make API call
       await DirectoriesService.moveDirectory(directoryId, {
-        target_parent_id: targetParentDirectoryId,
+        target_parent_id: targetParentDirectoryId ?? null,
       });
 
-      // Step 4: Revalidate both caches to ensure consistency
-      mutate(sourceCacheKey);
-      mutate(targetCacheKey);
-    } catch (error) {
-      console.error('Failed to move directory:', error);
-      // Rollback will happen automatically due to rollbackOnError: true
-      throw error;
-    }
-  };
+      return {
+        directoryId,
+        sourceParentDirectoryId,
+        targetParentDirectoryId,
+        movedDirectory,
+      };
+    },
+    swrMutationConfig
+  );
 
   return {
-    moveDirectory,
+    moveDirectory: moveDirectorySWR.trigger,
+    isMutating: moveDirectorySWR.isMutating,
+    error: moveDirectorySWR.error,
   };
 };

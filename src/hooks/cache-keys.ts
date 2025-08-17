@@ -6,7 +6,7 @@ export const CACHE_KEYS = {
   },
   chats: {
     all: ['chats'],
-    withParent: (parentDirectoryId?: string, parentChatId?: string) => {
+    withParent: (parentDirectoryId?: string | null, parentChatId?: string | null) => {
       if (parentDirectoryId) {
         return ['chats', 'directory', parentDirectoryId];
       }
@@ -21,7 +21,7 @@ export const CACHE_KEYS = {
   },
   directories: {
     all: ['directories'],
-    withParent: (parentId?: string) =>
+    withParent: (parentId?: string | null) =>
       parentId ? ['directories', parentId] : ['directories'],
   },
   messages: {
@@ -39,13 +39,16 @@ export const MUTATION_KEYS = {
   chats: {
     create: 'mutation:createChat',
     updateDetails: 'mutation:updateChatDetails',
+    rename: 'mutation:renameChat',
     delete: 'mutation:deleteChat',
     move: 'mutation:moveChat',
     sendMessage: (chatId: string) => `mutation:sendMessage:${chatId}`,
   },
   directories: {
     create: 'mutation:createDirectory',
+    rename: 'mutation:renameDirectory',
     move: 'mutation:moveDirectory',
+    delete: 'mutation:deleteDirectory',
   },
 } as const;
 
@@ -54,7 +57,7 @@ export const MUTATION_KEYS = {
  * Used with SWR's mutate() to update multiple cache entries at once.
  *
  * @example
- * invalidateCachePattern(['directories']) matches:
+ * findCacheKeysByPattern(['directories']) matches:
  * - ['directories'] ✅
  * - ['directories', 'abc-123'] ✅
  * - ['directories', 'xyz-456'] ✅
@@ -63,7 +66,7 @@ export const MUTATION_KEYS = {
  *
  * The mutation will run on ALL matching caches simultaneously.
  */
-export const invalidateCachePattern = (pattern: string[]) => {
+export const findCacheKeysByPattern = (pattern: string[]) => {
   return (key: unknown) => {
     if (!Array.isArray(key)) {
       return false;

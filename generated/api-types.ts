@@ -4,932 +4,1012 @@
  */
 
 export interface paths {
-  '/api/auth/sign-in': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Log in into the system */
+        post: operations["AuthController_signIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Log in into the system */
-    post: operations['AuthController_signIn'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/sign-up': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Log in into the system */
+        post: operations["AuthController_signUp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Log in into the system */
-    post: operations['AuthController_signUp'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/google': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_signInWithGoogle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations['AuthController_signInWithGoogle'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh access token */
+        post: operations["AuthController_refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Refresh access token */
-    post: operations['AuthController_refresh'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Logout a user from the system */
+        post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Logout a user from the system */
-    post: operations['AuthController_logout'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/current': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/users/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user */
+        get: operations["UserController_getCurrentUser"];
+        /** Update current user */
+        put: operations["UserController_updateCurrentUser"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get current user */
-    get: operations['UserController_getCurrentUser'];
-    /** Update current user */
-    put: operations['UserController_updateCurrentUser'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/directories': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/directories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get root or nested directories by passing or omitting parentId param */
+        get: operations["DirectoryController_getDirectories"];
+        put?: never;
+        /** Create a directory */
+        post: operations["DirectoryController_createDirectory"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get root or nested directories by passing or omitting parentId param */
-    get: operations['DirectoryController_getDirectories'];
-    put?: never;
-    /** Create a directory */
-    post: operations['DirectoryController_createDirectory'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/directories/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/directories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a directory */
+        put: operations["DirectoryController_updateDirectory"];
+        post?: never;
+        /** Delete a directory */
+        delete: operations["DirectoryController_deleteDirectory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    /** Update a directory */
-    put: operations['DirectoryController_updateDirectory'];
-    post?: never;
-    /** Delete a directory */
-    delete: operations['DirectoryController_deleteDirectory'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/directories/{id}/location': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/directories/{id}/location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change directory location */
+        put: operations["DirectoryController_changeDirectoryLocation"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    /** Change directory location */
-    put: operations['DirectoryController_changeDirectoryLocation'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/conversations': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Initiate a new conversation */
+        post: operations["ConversationController_initiateConversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Initiate a new conversation */
-    post: operations['ConversationController_initiateConversation'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/chats/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/chats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all user not deleted chats */
+        get: operations["ChatController_getUserChats"];
+        put?: never;
+        /** Create a chat */
+        post: operations["ChatController_createChat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get chat details */
-    get: operations['ChatController_getChatDetails'];
-    /** Update a chat data */
-    put: operations['ChatController_updateChat'];
-    post?: never;
-    /** Delete the chat */
-    delete: operations['ChatController_deleteChat'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/chats': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/chats/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get chat details */
+        get: operations["ChatController_getChatDetails"];
+        /** Update a chat data */
+        put: operations["ChatController_updateChat"];
+        post?: never;
+        /** Delete the chat */
+        delete: operations["ChatController_deleteChat"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get all user not deleted chats */
-    get: operations['ChatController_getUserChats'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/chats/{id}/messages': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/chats/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get chat messages */
+        get: operations["MessageController_getChatMessages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get chat messages */
-    get: operations['MessageController_getChatMessages'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/messages/{id}/branch-context': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/chats/{id}/branch-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a branch context by child chat id */
+        put: operations["BranchContextController_updateBranchContextByChildChatId"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get a branch context by message id */
-    get: operations['BranchContextController_getBranchContextByMessage'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/chats/{id}/breadcrumbs': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/messages/{id}/branch-context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a branch context by message id */
+        get: operations["BranchContextController_getBranchContextByMessage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get breadcrumbs for a chat */
-    get: operations['BreadcrumbsController_getBreadcrumbsForChat'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/chats/{id}/breadcrumbs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get breadcrumbs for a chat */
+        get: operations["BreadcrumbsController_getBreadcrumbsForChat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    SingInDto: {
-      /** Format: email */
-      email: string;
-      password: string;
+    schemas: {
+        SingInDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        AccessTokenDto: {
+            access_token: string;
+        };
+        SignUpDto: {
+            first_name: string;
+            password: string;
+            confirmation_password: string;
+            last_name: string;
+            /** Format: email */
+            email: string;
+        };
+        SignInWithGoogleDto: {
+            code: string;
+        };
+        MessageDto: {
+            message: string;
+        };
+        UserDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: email */
+            email: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            last_name: string;
+            first_name: string;
+            avatar: string | null;
+        };
+        UpdateUserDto: {
+            first_name?: string;
+            last_name?: string;
+            /** Format: email */
+            email?: string;
+            password: string;
+            confirmation_password: string;
+            avatar?: string;
+            is_online?: boolean;
+            /** Format: date-time */
+            last_seen?: string;
+        };
+        CreateDirectoryDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            parent_directory_id?: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+        };
+        UpdateDirectoryDto: {
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+        };
+        ChangeDirectoryLocationRequestDto: {
+            /** Format: uuid */
+            target_parent_id: string | null;
+        };
+        GetDirectoryDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet";
+            has_children: boolean;
+        };
+        CreateConversationResponseTitleDto: {
+            title: string;
+            chat_id: string;
+            /** @enum {string} */
+            type: "error" | "title" | "content" | "complete";
+        };
+        CreateConversationResponseContentDto: {
+            id: string;
+            body: string;
+            /** @enum {string} */
+            type: "error" | "title" | "content" | "complete";
+        };
+        CreateConversationResponseCompleteDto: {
+            id: string;
+            /** @enum {string} */
+            type: "error" | "title" | "content" | "complete";
+        };
+        CreateConversationResponseErrorDto: {
+            id: string;
+            error: string;
+            /** @enum {string} */
+            type: "error" | "title" | "content" | "complete";
+        };
+        ReplyToDto: {
+            /** Format: uuid */
+            id: string;
+            content: string;
+        };
+        ConversationBranchContextDto: {
+            /** Format: uuid */
+            parent_message_id: string;
+        };
+        CreateConversationDto: {
+            /** Format: uuid */
+            chat_id: string;
+            /** Format: uuid */
+            message_id: string;
+            /** @enum {string} */
+            model: "gemini-2.0-flash-lite" | "gemini-2.0-flash" | "gemini-2.5-flash" | "gemini-2.5-pro";
+            content: string;
+            reply_to?: components["schemas"]["ReplyToDto"];
+            branch_context?: components["schemas"]["ConversationBranchContextDto"];
+        };
+        CreateChatBranchContext: {
+            /** Format: uuid */
+            parent_chat_id: string;
+            /** Format: uuid */
+            parent_message_id: string;
+            selected_text?: string;
+            start_position?: number;
+            end_position?: number;
+            /** @enum {string} */
+            connection_type: "attached" | "detached" | "temporary";
+            /** @enum {string} */
+            context_type: "full_message" | "text_selection";
+        };
+        CreateChatDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: uuid */
+            directory_id?: string;
+            branch_context?: components["schemas"]["CreateChatBranchContext"];
+        };
+        UpdateChatDto: {
+            name?: string;
+            /** Format: uuid */
+            directory_id?: string | null;
+        };
+        ChatDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            parent_directory_id: string | null;
+            has_children: boolean;
+        };
+        ChatDetailsMetadata: {
+            /** Format: uuid */
+            parent_message_id: string;
+            /** Format: uuid */
+            parent_chat_id: string;
+        };
+        GetChatDetailsDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            metadata: components["schemas"]["ChatDetailsMetadata"] | null;
+        };
+        PaginationMetadata: {
+            total: number;
+            lastPage: number;
+            currentPage: number;
+            perPage: number;
+            prev: number | null;
+            next: number | null;
+        };
+        PaginatedResult: {
+            data: unknown[][];
+            meta: components["schemas"]["PaginationMetadata"];
+        };
+        AppMessageBranchDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            child_chat_id: string;
+            connection_type: string;
+            connection_color: string;
+            /** @enum {string} */
+            context_type: "full_message" | "text_selection";
+            end_position: number | null;
+            start_position: number | null;
+        };
+        AppMessageDto: {
+            /** Format: uuid */
+            id: string;
+            content: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @enum {string} */
+            role: "model" | "user";
+            llm_model: string | null;
+            reply_content: string | null;
+            branches: components["schemas"]["AppMessageBranchDto"][];
+        };
+        UpdateBranchContextDto: {
+            /** @enum {string} */
+            connection_type?: "attached" | "detached" | "temporary";
+        };
+        BranchContextByMessageIdDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            child_chat_id: string;
+            connection_type: string;
+            connection_color: string;
+            /** @enum {string} */
+            context_type: "full_message" | "text_selection";
+            end_position: number | null;
+            start_position: number | null;
+        };
+        ChatBreadcrumbsDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "folder" | "mindlet" | "chat" | "branch";
+        };
     };
-    AccessTokenDto: {
-      access_token: string;
-    };
-    SignUpDto: {
-      first_name: string;
-      password: string;
-      confirmation_password: string;
-      last_name: string;
-      /** Format: email */
-      email: string;
-    };
-    SignInWithGoogleDto: {
-      code: string;
-    };
-    MessageDto: {
-      message: string;
-    };
-    UserDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: email */
-      email: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-      last_name: string;
-      first_name: string;
-      avatar: string | null;
-    };
-    UpdateUserDto: {
-      first_name?: string;
-      last_name?: string;
-      /** Format: email */
-      email?: string;
-      password: string;
-      confirmation_password: string;
-      avatar?: string;
-      is_online?: boolean;
-      /** Format: date-time */
-      last_seen?: string;
-    };
-    CreateDirectoryDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      parent_directory_id?: string;
-      name: string;
-      /** @enum {string} */
-      type: 'folder' | 'mindlet';
-    };
-    UpdateDirectoryDto: {
-      name: string;
-      /** @enum {string} */
-      type: 'folder' | 'mindlet';
-    };
-    ChangeDirectoryLocationRequestDto: {
-      /** Format: uuid */
-      target_parent_id?: string | null;
-    };
-    GetDirectoryDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      /** @enum {string} */
-      type: 'folder' | 'mindlet';
-      has_children: boolean;
-    };
-    CreateConversationResponseTitleDto: {
-      title: string;
-      chat_id: string;
-      /** @enum {string} */
-      type: 'error' | 'title' | 'content' | 'complete';
-    };
-    CreateConversationResponseContentDto: {
-      id: string;
-      body: string;
-      /** @enum {string} */
-      type: 'error' | 'title' | 'content' | 'complete';
-    };
-    CreateConversationResponseCompleteDto: {
-      id: string;
-      /** @enum {string} */
-      type: 'error' | 'title' | 'content' | 'complete';
-    };
-    CreateConversationResponseErrorDto: {
-      id: string;
-      error: string;
-      /** @enum {string} */
-      type: 'error' | 'title' | 'content' | 'complete';
-    };
-    ReplyToDto: {
-      /** Format: uuid */
-      id: string;
-      content: string;
-    };
-    ConversationBranchContextDto: {
-      /** Format: uuid */
-      parent_chat_id: string;
-      /** Format: uuid */
-      parent_message_id: string;
-      selected_text?: string;
-      start_position?: number;
-      end_position?: number;
-      /** @enum {string} */
-      connection_type: 'attached' | 'detached' | 'temporary';
-      /** @enum {string} */
-      context_type: 'full_message' | 'text_selection';
-    };
-    CreateConversationDto: {
-      /** Format: uuid */
-      chat_id: string;
-      /** Format: uuid */
-      message_id: string;
-      /** Format: uuid */
-      directory_id?: string;
-      /** @enum {string} */
-      model:
-        | 'gemini-2.0-flash-lite'
-        | 'gemini-2.0-flash'
-        | 'gemini-2.5-flash'
-        | 'gemini-2.5-pro';
-      content: string;
-      reply_to?: components['schemas']['ReplyToDto'];
-      branch_context?: components['schemas']['ConversationBranchContextDto'];
-    };
-    UpdateChatDto: {
-      name?: string;
-      directory_id?: string;
-    };
-    ChatDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      parent_directory_id: string | null;
-      has_children: boolean;
-    };
-    GetChatDetailsDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-    };
-    PaginationMetadata: {
-      total: number;
-      lastPage: number;
-      currentPage: number;
-      perPage: number;
-      prev: number | null;
-      next: number | null;
-    };
-    PaginatedResult: {
-      data: unknown[][];
-      meta: components['schemas']['PaginationMetadata'];
-    };
-    AppMessageBranchDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      child_chat_id: string;
-      connection_type: string;
-      connection_color: string;
-      /** @enum {string} */
-      context_type: 'full_message' | 'text_selection';
-      end_position: number | null;
-      start_position: number | null;
-    };
-    AppMessageDto: {
-      /** Format: uuid */
-      id: string;
-      content: string;
-      /** Format: date-time */
-      created_at: string;
-      /** @enum {string} */
-      role: 'model' | 'user';
-      llm_model: string | null;
-      reply_content: string | null;
-      branches: components['schemas']['AppMessageBranchDto'][];
-    };
-    BranchContextByMessageIdDto: {
-      /** Format: uuid */
-      id: string;
-      /** Format: uuid */
-      child_chat_id: string;
-      connection_type: string;
-      connection_color: string;
-      /** @enum {string} */
-      context_type: 'full_message' | 'text_selection';
-      end_position: number | null;
-      start_position: number | null;
-    };
-    ChatBreadcrumbsDto: {
-      /** Format: uuid */
-      id: string;
-      name: string;
-      /** @enum {string} */
-      type: 'folder' | 'mindlet' | 'chat' | 'branch';
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  AuthController_signIn: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SingInDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+    AuthController_signIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SingInDto"];
+            };
         };
-      };
-    };
-  };
-  AuthController_signUp: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SignUpDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+    };
+    AuthController_signUp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  AuthController_signInWithGoogle: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SignInWithGoogleDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignUpDto"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
         };
-      };
     };
-  };
-  AuthController_refresh: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+    AuthController_signInWithGoogle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInWithGoogleDto"];
+            };
         };
-      };
-    };
-  };
-  AuthController_logout: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+    };
+    AuthController_refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  UserController_getCurrentUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['UserDto'];
+    };
+    AuthController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  UserController_updateCurrentUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateUserDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+    };
+    UserController_getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  DirectoryController_getDirectories: {
-    parameters: {
-      query?: {
-        parent_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['GetDirectoryDto'][];
+    };
+    UserController_updateCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  DirectoryController_createDirectory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateDirectoryDto'];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-      };
     };
-  };
-  DirectoryController_updateDirectory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateDirectoryDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    DirectoryController_getDirectories: {
+        parameters: {
+            query?: {
+                parent_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetDirectoryDto"][];
+                };
+            };
         };
-      };
     };
-  };
-  DirectoryController_deleteDirectory: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    DirectoryController_createDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDirectoryDto"];
+            };
         };
-      };
-    };
-  };
-  DirectoryController_changeDirectoryLocation: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ChangeDirectoryLocationRequestDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+    };
+    DirectoryController_updateDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-      };
-    };
-  };
-  ConversationController_initiateConversation: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateConversationDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDirectoryDto"];
+            };
         };
-        content: {
-          'application/json':
-            | components['schemas']['CreateConversationResponseTitleDto']
-            | components['schemas']['CreateConversationResponseErrorDto']
-            | components['schemas']['CreateConversationResponseContentDto']
-            | components['schemas']['CreateConversationResponseCompleteDto'];
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-      };
-      201: {
-        headers: {
-          [name: string]: unknown;
+    };
+    DirectoryController_deleteDirectory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  ChatController_getChatDetails: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['GetChatDetailsDto'];
+    };
+    DirectoryController_changeDirectoryLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-      };
-    };
-  };
-  ChatController_updateChat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateChatDto'];
-      };
-    };
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeDirectoryLocationRequestDto"];
+            };
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-      };
     };
-  };
-  ChatController_deleteChat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ConversationController_initiateConversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConversationDto"];
+            };
         };
-      };
-    };
-  };
-  ChatController_getUserChats: {
-    parameters: {
-      query?: {
-        parent_directory_id?: string;
-        parent_chat_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateConversationResponseTitleDto"] | components["schemas"]["CreateConversationResponseErrorDto"] | components["schemas"]["CreateConversationResponseContentDto"] | components["schemas"]["CreateConversationResponseCompleteDto"];
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          'application/json': components['schemas']['ChatDto'][];
-        };
-      };
     };
-  };
-  MessageController_getChatMessages: {
-    parameters: {
-      query?: {
-        skip?: number;
-        take?: number;
-      };
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ChatController_getUserChats: {
+        parameters: {
+            query?: {
+                parent_directory_id?: string;
+                parent_chat_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['PaginatedResult'] & {
-            data?: components['schemas']['AppMessageDto'][];
-          };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatDto"][];
+                };
+            };
         };
-      };
     };
-  };
-  BranchContextController_getBranchContextByMessage: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ChatController_createChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['BranchContextByMessageIdDto'][];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChatDto"];
+            };
         };
-      };
-    };
-  };
-  BreadcrumbsController_getBreadcrumbsForChat: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['ChatBreadcrumbsDto'][];
-        };
-      };
     };
-  };
+    ChatController_getChatDetails: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GetChatDetailsDto"];
+                };
+            };
+        };
+    };
+    ChatController_updateChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateChatDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    ChatController_deleteChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    MessageController_getChatMessages: {
+        parameters: {
+            query?: {
+                skip?: number;
+                take?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResult"] & {
+                        data?: components["schemas"]["AppMessageDto"][];
+                    };
+                };
+            };
+        };
+    };
+    BranchContextController_updateBranchContextByChildChatId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBranchContextDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
+    };
+    BranchContextController_getBranchContextByMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchContextByMessageIdDto"][];
+                };
+            };
+        };
+    };
+    BreadcrumbsController_getBreadcrumbsForChat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatBreadcrumbsDto"][];
+                };
+            };
+        };
+    };
 }
