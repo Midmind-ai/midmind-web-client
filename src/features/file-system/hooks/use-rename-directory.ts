@@ -1,10 +1,6 @@
-import { produce } from 'immer';
-import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { useSWRConfig } from 'swr';
 
-import { swrMutationConfig } from '@config/swr';
-
-import { MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
+import { findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
@@ -16,49 +12,37 @@ type RenameDirectoryParams = {
 };
 
 export const useRenameDirectory = () => {
-  const renameDirectorySWR = useSWRMutation(
-    MUTATION_KEYS.directories.rename,
-    async (_, { arg }: { arg: RenameDirectoryParams }) => {
-      const { id, name } = arg;
-
-      // Optimistically update all directory caches that might contain this directory
-      await mutate(
-        findCacheKeysByPattern(['directories']),
-        produce((draft?: Directory[]) => {
-          if (!draft) {
-            return draft;
-          }
-
-          const directoryIndex = draft.findIndex(dir => dir.id === id);
-          if (directoryIndex !== -1) {
-            draft[directoryIndex].name = name;
-          }
-
-          return draft;
-        }),
-        {
-          revalidate: false,
-        }
-      );
-
-      // Make API call to update on server
-      await DirectoriesService.updateDirectory(id, {
-        name,
-        type: 'folder', // Assuming all directories are folders for now
-      });
-
-      return { id, name };
-    },
-    swrMutationConfig
-  );
+  const { mutate } = useSWRConfig();
 
   const renameDirectory = async ({ id, name }: RenameDirectoryParams) => {
-    return renameDirectorySWR.trigger({ id, name });
+    // Update all directory caches that might contain this directory
+    await mutate(
+      findCacheKeysByPattern(['directories']),
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        await DirectoriesService.updateDirectory(id, {
+          name,
+          type: 'folder', // Assuming all directories are folders for now
+        });
+
+        // Return updated data
+        if (!current) return [];
+
+        return current.map(dir => (dir.id === id ? { ...dir, name } : dir));
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - update name in UI
+          if (!current) return [];
+
+          return current.map(dir => (dir.id === id ? { ...dir, name } : dir));
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
   };
 
-  return {
-    renameDirectory,
-    isMutating: renameDirectorySWR.isMutating,
-    error: renameDirectorySWR.error,
-  };
+  return { renameDirectory };
 };

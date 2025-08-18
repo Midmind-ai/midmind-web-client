@@ -75,6 +75,31 @@ src/
         └── utils/
 ```
 
+## 🚨 Global Error Handling Architecture
+
+### Centralized Error Handling via Axios Interceptors
+
+All API errors are automatically caught and displayed as toast notifications through a global Axios interceptor:
+
+- **Location**: `src/config/axios.ts` - Response interceptor catches all API errors
+- **Error Handler**: `src/utils/error-handler.tsx` - Formats messages based on HTTP status
+- **UI Component**: Sonner toast notifications - User-friendly error display
+
+### How It Works
+
+1. **Axios Interceptor** catches all API errors globally
+2. **Error Handler** formats messages based on HTTP status codes (400, 401, 403, 404, 500)
+3. **Sonner Toast** displays user-friendly error notifications
+4. **SWR Rollback** automatically reverts optimistic updates via `rollbackOnError: true`
+
+### Benefits
+
+- ✅ **No manual error handling** needed in hooks - clean implementations
+- ✅ **Consistent error messages** across the entire application
+- ✅ **Automatic rollback** of optimistic updates on API failures
+- ✅ **Clean hook implementations** without try-catch blocks
+- ✅ **Centralized error formatting** based on HTTP status codes
+
 ## ⚙️ Configuration Architecture
 
 ### Centralized Configuration Management
@@ -287,72 +312,189 @@ export const useChatActions = () => {
 
 ## 🔄 SWR Mutations Best Practices
 
-### ✅ Preferred Approach: useSWRMutation
+### ✅ Recommended Pattern: Direct Mutate with Global Error Handling
 
-For operations that modify server state (CREATE, UPDATE, DELETE), **always use `useSWRMutation`** instead of manual try/catch with `mutate()`.
+For ALL operations that modify server state (CREATE, UPDATE, DELETE, MOVE), use the direct `mutate()` pattern with optimistic updates. Errors are handled globally via Axios interceptors, eliminating the need for try-catch blocks.
 
-**✅ Correct Implementation:**
+**This is the canonical pattern for all mutations:**
+
+**Example 1: Delete Operation**
 ```typescript
-import useSWRMutation from 'swr/mutation';
-import { swrMutationConfig } from '@config/swr';
-import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
-
-export const useMoveDirectory = () => {
+export const useDeleteDirectory = () => {
   const { mutate } = useSWRConfig();
-  
-  const moveDirectorySWR = useSWRMutation(
-    MUTATION_KEYS.directories.move,
-    async (_, { arg }: { arg: MoveDirectoryParams }) => {
-      const { directoryId, sourceParentDirectoryId, targetParentDirectoryId } = arg;
 
-      // Step 1: Optimistic cache updates
-      await mutate(sourceCacheKey, optimisticRemove, { revalidate: false });
-      await mutate(targetCacheKey, optimisticAdd, { revalidate: false });
+  const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
-      // Step 2: API call - if this fails, SWR automatically rolls back all optimistic updates
-      await DirectoriesService.moveDirectory(directoryId, { 
-        target_parent_id: targetParentDirectoryId 
-      });
-
-      return { directoryId, sourceParentDirectoryId, targetParentDirectoryId };
-    },
-    swrMutationConfig  // Centralized config with rollbackOnError: true
-  );
-
-  return {
-    moveDirectory: moveDirectorySWR.trigger,
-    isMutating: moveDirectorySWR.isMutating,
-    error: moveDirectorySWR.error,
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        await DirectoriesService.deleteDirectory(id);
+        
+        // Clean up related caches after successful deletion
+        await mutate(findCacheKeysByPattern(['directories', id]), undefined);
+        await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
+        
+        // Return updated data (without the deleted item)
+        if (!current) return [];
+        return current.filter(item => item.id !== id);
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - remove from UI
+          if (!current) return [];
+          return current.filter(item => item.id !== id);
+        },
+        rollbackOnError: true, // ✅ Automatic rollback on API error
+        populateCache: true,   // Use the returned data as new cache
+        revalidate: false,     // Don't revalidate since we return the data
+      }
+    );
   };
+
+  return { deleteDirectory };
 };
 ```
 
-**❌ Problematic Manual Approach:**
+**Example 2: Create Operation**
 ```typescript
-// ❌ This does NOT provide proper rollback on API errors
-try {
-  await mutate(cacheKey, optimisticUpdate, { 
-    rollbackOnError: true  // Only watches mutate(), not API calls
-  });
-  
-  await APIService.call();  // If this fails, cache stays in wrong state!
-} catch (error) {
-  // Cache is inconsistent!
-}
+export const useCreateDirectory = () => {
+  const { mutate } = useSWRConfig();
+
+  const createDirectory = async (name: string, parentId?: string) => {
+    const cacheKey = CACHE_KEYS.directories.withParent(parentId);
+    const newId = uuid(); // Generate ID client-side for optimistic update
+
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        const created = await DirectoriesService.createDirectory({ 
+          id: newId, 
+          name, 
+          parent_id: parentId 
+        });
+        
+        // Return updated data with new item
+        if (!current) return [created];
+        return [...current, created];
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - add to UI
+          const optimisticDir = { id: newId, name, parent_id: parentId, created_at: new Date() };
+          if (!current) return [optimisticDir];
+          return [...current, optimisticDir];
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+  };
+
+  return { createDirectory };
+};
 ```
 
-### Why useSWRMutation is Superior
+**Example 3: Update Operation**
+```typescript
+export const useUpdateDirectory = () => {
+  const { mutate } = useSWRConfig();
 
-**1. Automatic Rollback on Any Error**
-- If the API call fails, SWR automatically reverts ALL optimistic cache updates
-- No manual cache state management needed
+  const updateDirectory = async (id: string, updates: Partial<Directory>) => {
+    // Update all caches that contain this directory
+    await mutate(
+      findCacheKeysByPattern(['directories']),
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        await DirectoriesService.updateDirectory(id, updates);
+        
+        // Return updated data
+        if (!current) return [];
+        return current.map(dir => 
+          dir.id === id ? { ...dir, ...updates } : dir
+        );
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - update in UI
+          if (!current) return [];
+          return current.map(dir => 
+            dir.id === id ? { ...dir, ...updates } : dir
+          );
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+  };
 
-**2. Built-in Loading and Error States**
-- `isMutating` for loading indicators
-- `error` for error handling
-- `data` for success results
+  return { updateDirectory };
+};
+```
 
-**3. Centralized Configuration**
+### Key Benefits of This Pattern
+
+1. **Consistent Across All Operations**: Same pattern for CREATE, UPDATE, DELETE, MOVE
+2. **No Try-Catch Needed**: Axios interceptor handles all errors globally
+3. **Automatic Error Toasts**: User-friendly notifications via Sonner
+4. **Optimistic UI Updates**: Immediate feedback to users
+5. **Automatic Rollback**: On API failure, UI reverts to previous state
+6. **Clean Code**: No error handling boilerplate in hooks
+
+### Error Handling Flow
+
+```
+User Action
+    ↓
+Hook Called (e.g., deleteDirectory)
+    ↓
+Optimistic Update Applied (immediate UI feedback)
+    ↓
+API Call via Service
+    ↓
+[Success Path]              [Error Path]
+    ↓                           ↓
+Cache Updated            Axios Interceptor Catches
+    ↓                           ↓
+UI Stays Updated         Error Handler Called
+                               ↓
+                         Sonner Toast Shown
+                               ↓
+                         SWR Rollback Triggered
+                               ↓
+                         UI Reverts to Previous State
+```
+
+### When to Use This Pattern
+
+**Use the Direct Mutate Pattern for:**
+- ✅ **All CRUD operations**: CREATE, UPDATE, DELETE
+- ✅ **Move/reorder operations**: Changing parent relationships  
+- ✅ **Batch operations**: Multiple cache updates
+- ✅ **Any mutation**: Where you want automatic error toasts and rollback
+
+### Why This Pattern is Superior
+
+**1. Automatic Error Handling**
+- Axios interceptor catches all API errors globally
+- No try-catch blocks needed in hooks
+- Consistent error messages based on HTTP status codes
+
+**2. Automatic Rollback**
+- `rollbackOnError: true` works seamlessly with global error handling
+- If API fails, optimistic updates are automatically reverted
+- UI always stays in sync with server state
+
+**3. Clean Implementation**
+- No error handling boilerplate
+- Focus on business logic, not error management
+- Consistent pattern across all mutations
+
+**4. Centralized Configuration**
 ```typescript
 // src/config/swr.ts
 export const swrMutationConfig = {
@@ -361,44 +503,43 @@ export const swrMutationConfig = {
 } as const;
 ```
 
-**4. Clean Component Integration**
+**5. User-Friendly Feedback**
+- Immediate optimistic updates for better UX
+- Automatic error toasts via Sonner
+- Clear error messages for different scenarios
+
+### Implementation Checklist
+
+✅ **Axios Interceptor** configured in `src/config/axios.ts`
+✅ **Error Handler** implemented in `src/utils/error-handler.tsx`
+✅ **Sonner Toaster** added to root provider
+✅ **Direct Mutate Pattern** used consistently across all mutations
+
+### Critical Rules for This Pattern
+
+**✅ CORRECT: No try-catch needed with global error handling**
 ```typescript
-const { moveDirectory, isMutating, error } = useMoveDirectory();
-
-// Simple usage:
-await moveDirectory({ directoryId: "123", targetParentDirectoryId: "456" });
-
-// Built-in states:
-if (isMutating) return <Spinner />;
-if (error) return <ErrorMessage error={error} />;
+await mutate(
+  cacheKey,
+  async (current) => {
+    await APIService.call(); // Errors caught by Axios interceptor
+    return updatedData;
+  },
+  { 
+    optimisticData: optimisticUpdate,
+    rollbackOnError: true  // Works with global error handling
+  }
+);
 ```
 
-### Migration from Manual Approach
-
-Replace manual try/catch mutations with `useSWRMutation`:
-
+**❌ INCORRECT: Manual try-catch is redundant**
 ```typescript
-// Before: Manual approach
-const updateEntity = async (data) => {
-  try {
-    await mutate(key, optimisticUpdate, { rollbackOnError: true });
-    await EntityService.update(data);
-  } catch (error) {
-    // Manual error handling
-  }
-};
-
-// After: useSWRMutation approach  
-const updateEntitySWR = useSWRMutation(
-  'update-entity',
-  async (_, { arg }) => {
-    await mutate(key, optimisticUpdate, { revalidate: false });
-    return await EntityService.update(arg);
-  },
-  swrMutationConfig
-);
-
-return { updateEntity: updateEntitySWR.trigger };
+try {
+  await mutate(/* ... */);
+} catch (error) {
+  // Don't do this - Axios already handles errors globally
+  handleError(error);
+}
 ```
 
 ### ✅ Always Use Centralized Cache Keys

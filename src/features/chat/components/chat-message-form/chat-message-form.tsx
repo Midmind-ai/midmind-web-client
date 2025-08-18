@@ -1,4 +1,9 @@
-import { ChevronDownIcon, CircleStop, PaperclipIcon, SendHorizonal } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  PaperclipIcon,
+  SendHorizonal,
+  SquareStopIcon,
+} from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
 import { Button } from '@components/ui/button';
@@ -115,7 +120,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
             className="size-9 self-end"
             onClick={abortCurrentRequest}
           >
-            <CircleStop className="text-background size-4" />
+            <SquareStopIcon className="text-background size-4" />
           </Button>
         ) : (
           <Button

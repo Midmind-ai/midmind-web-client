@@ -1,55 +1,46 @@
-import { produce } from 'immer';
-import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { useSWRConfig } from 'swr';
 
-import { swrMutationConfig } from '@config/swr';
-
-import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
+import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
 
-type DeleteDirectoryParams = {
-  id: string;
-  parentDirectoryId?: string;
-};
-
 export const useDeleteDirectory = () => {
-  const deleteDirectorySWR = useSWRMutation(
-    MUTATION_KEYS.directories.delete,
-    async (_, { arg }: { arg: DeleteDirectoryParams }) => {
-      const { id, parentDirectoryId } = arg;
-
-      await mutate(
-        CACHE_KEYS.directories.withParent(parentDirectoryId),
-        produce((draft: Directory[]) => {
-          if (!draft) return null;
-
-          return draft.filter(item => item.id !== id);
-        }),
-        {
-          revalidate: false,
-        }
-      );
-
-      await DirectoriesService.deleteDirectory(id);
-
-      await mutate(findCacheKeysByPattern(['directories', id]), undefined);
-      await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
-
-      return { id, parentDirectoryId };
-    },
-    swrMutationConfig
-  );
+  const { mutate } = useSWRConfig();
 
   const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
-    return deleteDirectorySWR.trigger({ id, parentDirectoryId });
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        await DirectoriesService.deleteDirectory(id);
+
+        // Clean up related caches only after successful deletion
+        await mutate(findCacheKeysByPattern(['directories', id]), undefined);
+        await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
+
+        // Return the updated data (without the deleted item)
+        if (!current) return [];
+
+        return current.filter(item => item.id !== id);
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - remove the item from UI
+          if (!current) return [];
+
+          return current.filter(item => item.id !== id);
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
   };
 
   return {
     deleteDirectory,
-    isMutating: deleteDirectorySWR.isMutating,
-    error: deleteDirectorySWR.error,
   };
 };

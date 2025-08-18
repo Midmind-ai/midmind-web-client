@@ -1,13 +1,10 @@
-import { produce } from 'immer';
-import { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { useSWRConfig, unstable_serialize } from 'swr';
 
-import { swrMutationConfig } from '@config/swr';
+import { CACHE_KEYS } from '@hooks/cache-keys';
 
-import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
-
-import type { Directory } from '@services/directories/directories-dtos';
 import { DirectoriesService } from '@services/directories/directories-service';
+
+import type { Directory } from '@shared-types/entities';
 
 type MoveDirectoryParams = {
   directoryId: string;
@@ -16,72 +13,62 @@ type MoveDirectoryParams = {
 };
 
 export const useMoveDirectory = () => {
-  const { mutate } = useSWRConfig();
+  const { mutate, cache } = useSWRConfig();
 
-  const moveDirectorySWR = useSWRMutation(
-    MUTATION_KEYS.directories.move,
-    async (_, { arg }: { arg: MoveDirectoryParams }) => {
-      const { directoryId, sourceParentDirectoryId, targetParentDirectoryId } = arg;
+  const moveDirectory = async ({
+    directoryId,
+    sourceParentDirectoryId,
+    targetParentDirectoryId,
+  }: MoveDirectoryParams) => {
+    const sourceCacheKey = CACHE_KEYS.directories.withParent(sourceParentDirectoryId);
+    const targetCacheKey = CACHE_KEYS.directories.withParent(targetParentDirectoryId);
 
-      const sourceCacheKey = CACHE_KEYS.directories.withParent(sourceParentDirectoryId);
-      const targetCacheKey = CACHE_KEYS.directories.withParent(
-        targetParentDirectoryId ?? undefined
-      );
-      let movedDirectory: Directory | null = null;
+    // Get current cache data for both source and target using unstable_serialize
+    const sourceCacheState = cache.get(unstable_serialize(sourceCacheKey));
+    const targetCacheState = cache.get(unstable_serialize(targetCacheKey));
 
-      await mutate(
-        sourceCacheKey,
-        produce((draft?: Directory[]) => {
-          if (!draft) return draft;
+    const sourceCacheData = sourceCacheState?.data;
+    const targetCacheData = targetCacheState?.data;
 
-          const directoryIndex = draft.findIndex(dir => dir.id === directoryId);
-          if (directoryIndex !== -1) {
-            movedDirectory = { ...draft[directoryIndex] };
+    const movedDirectory = sourceCacheData?.find(
+      (dir: Directory) => dir.id === directoryId
+    );
 
-            return draft.filter(dir => dir.id !== directoryId);
-          }
+    if (!movedDirectory) {
+      throw new Error('Directory not found in cache');
+    }
 
-          return draft;
-        }),
-        { revalidate: false }
-      );
+    // Create updated directory object
+    const updatedDirectory = {
+      ...movedDirectory,
+      parent_id: targetParentDirectoryId,
+    };
 
-      const shouldUpdateTargetCache = movedDirectory;
+    // Manual optimistic updates - immediate cache updates
+    const updatedSourceCache =
+      sourceCacheData?.filter((dir: Directory) => dir.id !== directoryId) || [];
+    const updatedTargetCache = targetCacheData
+      ? [updatedDirectory, ...targetCacheData]
+      : [updatedDirectory];
 
-      if (shouldUpdateTargetCache) {
-        await mutate(
-          targetCacheKey,
-          produce((draft?: Directory[]) => {
-            if (!draft || !movedDirectory) return draft;
+    // Apply optimistic updates immediately
+    await mutate(sourceCacheKey, updatedSourceCache, { revalidate: false });
+    await mutate(targetCacheKey, updatedTargetCache, { revalidate: false });
 
-            const updatedDirectory = {
-              ...movedDirectory,
-              parent_id: targetParentDirectoryId,
-            };
-
-            return [updatedDirectory, ...draft];
-          }),
-          { revalidate: false }
-        );
-      }
-
+    try {
+      // Make API call
       await DirectoriesService.moveDirectory(directoryId, {
         target_parent_id: targetParentDirectoryId ?? null,
       });
+    } catch (error) {
+      // Manual rollback on error - restore original cache state
+      await mutate(sourceCacheKey, sourceCacheData, { revalidate: false });
+      await mutate(targetCacheKey, targetCacheData, { revalidate: false });
 
-      return {
-        directoryId,
-        sourceParentDirectoryId,
-        targetParentDirectoryId,
-        movedDirectory,
-      };
-    },
-    swrMutationConfig
-  );
-
-  return {
-    moveDirectory: moveDirectorySWR.trigger,
-    isMutating: moveDirectorySWR.isMutating,
-    error: moveDirectorySWR.error,
+      // Re-throw error so it gets handled by global error handler
+      throw error;
+    }
   };
+
+  return { moveDirectory };
 };

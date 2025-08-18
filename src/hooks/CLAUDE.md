@@ -9,107 +9,215 @@ All hooks follow a strict two-layer architecture:
 - **Layer 1: Data Hooks** (`/hooks/data/`) - Pure SWR operations, no business logic
 - **Layer 2: Logic Hooks** (`/hooks/logic/`) - Business logic that orchestrates data hooks
 
-### 2. When to Use Each Approach
+### 2. Global Error Handling
 
-#### Use `useSWRMutation` when:
+With Axios interceptors handling all API errors globally:
 
-- Multiple components need to share the same loading/error state
-- You need request deduplication (preventing duplicate API calls)
-- Simple cache updates are sufficient
-- You want standardized error handling across the app
+- **No try-catch blocks needed** in mutation hooks
+- **Automatic error toasts** via Sonner
+- **Automatic rollback** of optimistic updates on API failures
 
-#### Use Direct Service Calls when:
+## The Recommended Mutation Pattern
 
-- Only one component needs the loading state
-- You need complex optimistic updates across multiple cache keys
-- Performance is critical (avoiding extra abstraction layers)
-- You want full control over the execution flow
+### Direct Mutate with Optimistic Updates (For ALL Mutations)
 
-## Mutation Patterns
+This pattern works for CREATE, UPDATE, DELETE, MOVE, and any other mutation operations. Errors are handled globally by Axios interceptors, so no try-catch blocks are needed.
 
-### Pattern 1: Direct Service Call with Optimistic Updates (Preferred for Complex Operations)
+#### Example 1: Delete Operation
 
 ```typescript
-import { produce } from 'immer';
-import { mutate } from 'swr';
-
-export const useRenameDirectory = () => {
-  const renameDirectory = async ({ id, name }: RenameDirectoryParams) => {
-    try {
-      // IMPORTANT: Optimistic update MUST be inside try-catch for rollback to work
-      await mutate(
-        invalidateCachePattern(['directories']),
-        produce((draft?: Directory[]) => {
-          if (!draft) {
-            return draft;
-          }
-
-          const directoryIndex = draft.findIndex(dir => dir.id === id);
-          if (directoryIndex !== -1) {
-            draft[directoryIndex].name = name;
-          }
-
-          return draft;
-        }),
-        {
-          revalidate: false,
-          rollbackOnError: true, // Only works if mutate is inside try-catch
-        }
-      );
-
-      // Make API call to update on server
-      await DirectoriesService.updateDirectory(id, { name });
-    } catch (error) {
-      // If API fails, optimistic update will be rolled back automatically
-      console.error('Failed to rename directory:', error);
-      throw error;
-    }
-  };
-
-  return { renameDirectory };
-};
-```
-
-### Pattern 2: useSWRMutation (For Shared State Scenarios)
-
-```typescript
-import useSWRMutation from 'swr/mutation';
-
-export const useRenameChat = () => {
+export const useDeleteDirectory = () => {
   const { mutate } = useSWRConfig();
 
-  // Multiple components can access this loading state
-  const {
-    trigger,
-    isMutating: isLoading,
-    error,
-  } = useSWRMutation(
-    MUTATION_KEYS.chats.updateDetails,
-    async (_key: string, { arg }: { arg: { id: string; name: string } }) => {
-      return ChatsService.updateChatDetails(arg.id, { name: arg.name });
-    }
-  );
+  const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
-  const renameChat = async (id: string, name: string) => {
-    await trigger(
-      { id, name },
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        await DirectoriesService.deleteDirectory(id);
+
+        // Clean up related caches after successful deletion
+        await mutate(findCacheKeysByPattern(['directories', id]), undefined);
+        await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
+
+        // Return updated data (without the deleted item)
+        if (!current) return [];
+        return current.filter(item => item.id !== id);
+      },
       {
-        onSuccess: () => {
-          // Update cache after success
-          mutate(CACHE_KEYS.chats.details(id), { name, id }, false);
-          mutate(invalidateCachePattern(['chats']));
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - remove from UI
+          if (!current) return [];
+          return current.filter(item => item.id !== id);
         },
+        rollbackOnError: true, // ✅ Automatic rollback on API error
+        populateCache: true, // Use the returned data as new cache
+        revalidate: false, // Don't revalidate since we return the data
       }
     );
   };
 
-  return { renameChat, isLoading, error };
+  return { deleteDirectory };
 };
 ```
 
+#### Example 2: Create Operation
+
+```typescript
+export const useCreateDirectory = () => {
+  const { mutate } = useSWRConfig();
+
+  const createDirectory = async (name: string, parentId?: string) => {
+    const cacheKey = CACHE_KEYS.directories.withParent(parentId);
+    const newId = uuid(); // Generate ID client-side for optimistic update
+
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        const created = await DirectoriesService.createDirectory({
+          id: newId,
+          name,
+          parent_id: parentId,
+        });
+
+        // Return updated data with new item
+        if (!current) return [created];
+        return [...current, created];
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - add to UI
+          const optimisticDir = {
+            id: newId,
+            name,
+            parent_id: parentId,
+            created_at: new Date().toISOString(),
+          };
+          if (!current) return [optimisticDir];
+          return [...current, optimisticDir];
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+  };
+
+  return { createDirectory };
+};
+```
+
+#### Example 3: Update Operation
+
+```typescript
+export const useUpdateDirectory = () => {
+  const { mutate } = useSWRConfig();
+
+  const updateDirectory = async (id: string, updates: Partial<Directory>) => {
+    // Update all caches that contain this directory
+    await mutate(
+      findCacheKeysByPattern(['directories']),
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        await DirectoriesService.updateDirectory(id, updates);
+
+        // Return updated data
+        if (!current) return [];
+        return current.map(dir => (dir.id === id ? { ...dir, ...updates } : dir));
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          // Immediate optimistic update - update in UI
+          if (!current) return [];
+          return current.map(dir => (dir.id === id ? { ...dir, ...updates } : dir));
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+  };
+
+  return { updateDirectory };
+};
+```
+
+#### Example 4: Move Operation
+
+```typescript
+export const useMoveDirectory = () => {
+  const { mutate } = useSWRConfig();
+
+  const moveDirectory = async (
+    id: string,
+    fromParentId?: string,
+    toParentId?: string
+  ) => {
+    const fromCache = CACHE_KEYS.directories.withParent(fromParentId);
+    const toCache = CACHE_KEYS.directories.withParent(toParentId);
+
+    // Remove from source cache
+    await mutate(
+      fromCache,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        if (!current) return [];
+        return current.filter(dir => dir.id !== id);
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          if (!current) return [];
+          return current.filter(dir => dir.id !== id);
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+
+    // Add to destination cache and call API
+    await mutate(
+      toCache,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        // API call - errors handled by Axios interceptor globally
+        const moved = await DirectoriesService.moveDirectory(id, {
+          target_parent_id: toParentId,
+        });
+
+        if (!current) return [moved];
+        return [...current, moved];
+      },
+      {
+        optimisticData: (current?: Directory[]): Directory[] => {
+          const movedDir = { id, parent_id: toParentId /* other fields */ };
+          if (!current) return [movedDir];
+          return [...current, movedDir];
+        },
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
+    );
+  };
+
+  return { moveDirectory };
+};
+```
+
+### Key Benefits of This Pattern
+
+1. **Consistent Across All Operations**: Same pattern for CREATE, UPDATE, DELETE, MOVE
+2. **No Try-Catch Needed**: Axios interceptor handles all errors globally
+3. **Automatic Error Toasts**: User-friendly notifications via Sonner
+4. **Optimistic UI Updates**: Immediate feedback to users
+5. **Automatic Rollback**: On API failure, UI reverts to previous state
+6. **Clean Code**: No error handling boilerplate in hooks
+
 ## Cache Management Patterns
 
-### Pattern 1: Update Multiple Caches with invalidateCachePattern
+### Pattern 1: Update Multiple Caches with findCacheKeysByPattern
 
 ```typescript
 // This updates ALL cache keys that start with ['directories']
@@ -117,18 +225,25 @@ export const useRenameChat = () => {
 // - ['directories', 'folder-id-1'] - directories in folder 1
 // - ['directories', 'folder-id-2'] - directories in folder 2
 await mutate(
-  invalidateCachePattern(['directories']),
-  produce((draft?: Directory[]) => {
+  findCacheKeysByPattern(['directories']),
+  async (current?: Directory[]): Promise<Directory[]> => {
+    // API call here
+    await DirectoriesService.updateDirectory(id, updates);
+
     // This function runs on EVERY matching cache
-    if (!draft) return draft;
+    if (!current) return [];
 
     // Find and update the item in each cache
-    const index = draft.findIndex(dir => dir.id === targetId);
-    if (index !== -1) {
-      draft[index].someProperty = newValue;
-    }
-  }),
-  { revalidate: false }
+    return current.map(dir =>
+      dir.id === targetId ? { ...dir, ...updates } : dir
+    );
+  },
+  {
+    optimisticData: /* same update logic */,
+    rollbackOnError: true,
+    populateCache: true,
+    revalidate: false
+  }
 );
 ```
 
@@ -139,54 +254,107 @@ await mutate(
 const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 await mutate(
   cacheKey,
-  produce((draft?: Directory[]) => {
-    if (!draft) return draft;
+  async (current?: Directory[]): Promise<Directory[]> => {
+    // API call here
+    const newItem = await DirectoriesService.createDirectory(data);
+
     // Modify the specific cache
-    draft.unshift(newDirectory);
-  }),
-  { revalidate: false }
+    if (!current) return [newItem];
+    return [...current, newItem];
+  },
+  {
+    optimisticData: /* same logic */,
+    rollbackOnError: true,
+    populateCache: true,
+    revalidate: false
+  }
 );
 ```
 
-## Critical Rules for Optimistic Updates
+## Critical Rules for Mutations with Global Error Handling
 
-### ✅ CORRECT: Optimistic update inside try-catch
+### ✅ The New Standard: No Try-Catch Needed
+
+With global error handling via Axios interceptors, you DON'T need try-catch blocks:
 
 ```typescript
+// ✅ CORRECT: Let Axios interceptor handle errors
+await mutate(
+  cacheKey,
+  async current => {
+    await APIService.call(); // Errors caught by Axios interceptor
+    return updatedData;
+  },
+  {
+    optimisticData: optimisticUpdate,
+    rollbackOnError: true, // Still works with global error handling
+  }
+);
+```
+
+### ❌ INCORRECT: Manual try-catch is redundant
+
+```typescript
+// ❌ Don't do this - Axios already handles errors globally
 try {
-  await mutate(key, optimisticData, { rollbackOnError: true });
-  await apiCall();
+  await mutate(
+    cacheKey,
+    async current => {
+      await APIService.call();
+      return updatedData;
+    },
+    { rollbackOnError: true }
+  );
 } catch (error) {
-  // Rollback happens automatically
-  throw error;
+  // This is redundant - error is already handled globally
+  handleError(error);
 }
 ```
 
-### ❌ INCORRECT: Optimistic update outside try-catch
+### When This Pattern Works Best
 
-```typescript
-await mutate(key, optimisticData, { rollbackOnError: true });
-try {
-  await apiCall();
-} catch (error) {
-  // Rollback WON'T happen!
-  throw error;
-}
+- ✅ **All CRUD operations**: CREATE, UPDATE, DELETE
+- ✅ **Move/reorder operations**: Changing parent relationships
+- ✅ **Batch operations**: Multiple cache updates
+- ✅ **Any mutation**: Where you want automatic error toasts
+
+## Error Flow Diagram
+
+```
+User Action
+    ↓
+Hook Called (e.g., deleteDirectory)
+    ↓
+Optimistic Update Applied (immediate UI feedback)
+    ↓
+API Call via Service
+    ↓
+[Success Path]              [Error Path]
+    ↓                           ↓
+Cache Updated            Axios Interceptor Catches
+    ↓                           ↓
+UI Stays Updated         Error Handler Called
+                               ↓
+                         Sonner Toast Shown
+                               ↓
+                         SWR Rollback Triggered
+                               ↓
+                         UI Reverts to Previous State
 ```
 
 ## Decision Tree for Hook Implementation
 
-1. **Do multiple components need the same loading state?**
-   - Yes → Use `useSWRMutation`
-   - No → Continue to #2
+1. **Do you need to modify server state?**
+   - Yes → Use the Direct Mutate Pattern
+   - No → Use regular `useSWR` for data fetching
 
-2. **Do you need complex optimistic updates across multiple caches?**
-   - Yes → Use direct service calls
-   - No → Continue to #3
+2. **Do you need optimistic updates?**
+   - Yes → Include `optimisticData` option
+   - No → Skip `optimisticData`, just use the async function
 
-3. **Is this a simple CRUD operation?**
-   - Yes → Use direct service calls (simpler)
-   - No → Use `useSWRMutation` (more features)
+3. **Do you need to update multiple caches?**
+   - Yes → Use `findCacheKeysByPattern`
+   - No → Use specific cache key
 
 ## Common Patterns to Follow
 
@@ -197,11 +365,11 @@ try {
 - Send to server with the pre-generated ID
 - Update parent's `has_children` flag if applicable
 
-### Rename/Update Operations
+### Update Operations
 
-- Always wrap optimistic update and API call in the same try-catch
-- Use `rollbackOnError: true` for automatic rollback
-- Update all relevant caches using `invalidateCachePattern`
+- Update all relevant caches using `findCacheKeysByPattern`
+- Apply optimistic updates immediately
+- Let Axios handle any errors globally
 
 ### Delete Operations
 
@@ -209,18 +377,37 @@ try {
 - Call delete API
 - Clean up any related caches
 
+### Move Operations
+
+- Remove from source cache optimistically
+- Add to destination cache optimistically
+- Call move API
+- Both caches rollback on error
+
 ## Type Safety for Cache Updates
 
 Always check if draft exists before operating on it:
 
 ```typescript
-produce((draft?: SomeType[]) => {
-  if (!draft) {
-    return draft; // Return undefined as-is
+async (current?: SomeType[]): Promise<SomeType[]> => {
+  if (!current) {
+    return []; // or return appropriate default
   }
-  // Now TypeScript knows draft is SomeType[]
+  // Now TypeScript knows current is SomeType[]
   // Safe to use array methods
-});
+  return current.filter(/* ... */);
+};
 ```
 
 This prevents runtime errors when caches haven't been populated yet.
+
+## Summary
+
+The Direct Mutate Pattern with Global Error Handling is the recommended approach for ALL mutation operations in this codebase. It provides:
+
+- **Consistency**: Same pattern everywhere
+- **Simplicity**: No error handling boilerplate
+- **Reliability**: Automatic rollback on failures
+- **User Experience**: Immediate feedback and clear error messages
+
+Always follow this pattern for mutations unless you have a specific requirement that necessitates a different approach.

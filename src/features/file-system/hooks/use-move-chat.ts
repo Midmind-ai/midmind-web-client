@@ -1,10 +1,6 @@
-import { produce } from 'immer';
-import { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { useSWRConfig, unstable_serialize } from 'swr';
 
-import { swrMutationConfig } from '@config/swr';
-
-import { CACHE_KEYS, MUTATION_KEYS } from '@hooks/cache-keys';
+import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
@@ -18,94 +14,65 @@ type MoveChatParams = {
 };
 
 export const useMoveChat = () => {
-  const { mutate } = useSWRConfig();
+  const { mutate, cache } = useSWRConfig();
 
-  const moveChatSWR = useSWRMutation(
-    MUTATION_KEYS.chats.move,
-    async (_, { arg }: { arg: MoveChatParams }) => {
-      const {
-        chatId,
-        sourceParentDirectoryId,
-        sourceParentChatId,
-        targetParentDirectoryId,
-      } = arg;
+  const moveChat = async ({
+    chatId,
+    sourceParentDirectoryId,
+    sourceParentChatId,
+    targetParentDirectoryId,
+  }: MoveChatParams) => {
+    const sourceCacheKey = CACHE_KEYS.chats.withParent(
+      sourceParentDirectoryId,
+      sourceParentChatId
+    );
+    const targetCacheKey = CACHE_KEYS.chats.withParent(targetParentDirectoryId);
 
-      const sourceCacheKey = CACHE_KEYS.chats.withParent(
-        sourceParentDirectoryId,
-        sourceParentChatId
-      );
-      const targetCacheKey = CACHE_KEYS.chats.withParent(targetParentDirectoryId);
+    // Get current cache data for both source and target using unstable_serialize
+    const sourceCacheState = cache.get(unstable_serialize(sourceCacheKey));
+    const targetCacheState = cache.get(unstable_serialize(targetCacheKey));
 
-      let movedChat: Chat | undefined;
-      await mutate(
-        sourceCacheKey,
-        produce((draft?: Chat[]) => {
-          if (!draft) {
-            return draft;
-          }
+    const sourceCacheData = sourceCacheState?.data;
+    const targetCacheData = targetCacheState?.data;
 
-          const chatIndex = draft.findIndex(chat => chat.id === chatId);
-          if (chatIndex !== -1) {
-            movedChat = { ...draft[chatIndex] };
+    const movedChat = sourceCacheData?.find((chat: Chat) => chat.id === chatId);
 
-            return draft.filter(chat => chat.id !== chatId);
-          }
+    if (!movedChat) {
+      throw new Error('Chat not found in cache');
+    }
 
-          return draft;
-        }),
-        {
-          populateCache: true,
-          revalidate: false,
-        }
-      );
+    // Create updated chat object
+    const updatedChat = {
+      ...movedChat,
+      parent_directory_id: targetParentDirectoryId,
+    };
 
-      if (movedChat) {
-        await mutate(
-          targetCacheKey,
-          produce((draft?: Chat[]) => {
-            if (!draft || !movedChat) {
-              return draft;
-            }
+    // Manual optimistic updates - immediate cache updates
+    const updatedSourceCache =
+      sourceCacheData?.filter((chat: Chat) => chat.id !== chatId) || [];
+    const updatedTargetCache = targetCacheData
+      ? [updatedChat, ...targetCacheData]
+      : [updatedChat];
 
-            const updatedChat = {
-              ...movedChat,
-              parent_directory_id: targetParentDirectoryId,
-            };
+    // Apply optimistic updates immediately
+    await mutate(sourceCacheKey, updatedSourceCache, { revalidate: false });
+    await mutate(targetCacheKey, updatedTargetCache, { revalidate: false });
 
-            return [updatedChat, ...draft];
-          }),
-          {
-            populateCache: true,
-            revalidate: false,
-          }
-        );
-      }
-
-      if (!movedChat) {
-        throw new Error('Chat not found in cache');
-      }
-
-      const chatToUpdate: Chat = movedChat;
+    try {
+      // Make API call
       await ChatsService.updateChatDetails(chatId, {
-        name: chatToUpdate.name,
+        name: movedChat.name,
         directory_id: targetParentDirectoryId,
       });
-      mutate(sourceCacheKey);
-      mutate(targetCacheKey);
+    } catch (error) {
+      // Manual rollback on error - restore original cache state
+      await mutate(sourceCacheKey, sourceCacheData, { revalidate: false });
+      await mutate(targetCacheKey, targetCacheData, { revalidate: false });
 
-      return {
-        chatId,
-        sourceParentDirectoryId,
-        sourceParentChatId,
-        targetParentDirectoryId,
-      };
-    },
-    swrMutationConfig
-  );
-
-  return {
-    moveChat: moveChatSWR.trigger,
-    isMutating: moveChatSWR.isMutating,
-    error: moveChatSWR.error,
+      // Re-throw error so it gets handled by global error handler
+      throw error;
+    }
   };
+
+  return { moveChat };
 };

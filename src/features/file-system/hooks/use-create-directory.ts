@@ -1,23 +1,15 @@
-import { produce } from 'immer';
-import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { useSWRConfig } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
-import { swrMutationConfig } from '@config/swr';
-
-import { CACHE_KEYS, MUTATION_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
+import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
 
-type FinalizeDirectoryParams = {
-  id: string;
-  name: string;
-  parentDirectoryId?: string;
-};
-
 export const useCreateDirectory = () => {
+  const { mutate } = useSWRConfig();
+
   const createTemporaryDirectory = async (parentDirectoryId?: string) => {
     // Generate a unique ID for the new directory
     const newDirectoryId = uuidv4();
@@ -33,43 +25,39 @@ export const useCreateDirectory = () => {
     // Add to cache immediately at the top of the list
     const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
-    await mutate(
+    mutate(
       cacheKey,
-      produce((draft?: Directory[]) => {
-        if (!draft) {
-          return [newDirectory];
-        }
-        draft.unshift(newDirectory); // Add to top
-      }),
-      { revalidate: false }
+      (current?: Directory[]): Directory[] => {
+        if (!current) return [newDirectory];
+
+        return [newDirectory, ...current]; // Add to top
+      },
+      {
+        revalidate: false,
+      }
     );
 
     return newDirectoryId;
   };
 
-  const finalizeDirectorySWR = useSWRMutation(
-    MUTATION_KEYS.directories.create,
-    async (_, { arg }: { arg: FinalizeDirectoryParams }) => {
-      const { id, name, parentDirectoryId } = arg;
+  const finalizeDirectoryCreation = async (
+    id: string,
+    name: string,
+    parentDirectoryId?: string
+  ) => {
+    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
 
-      // Update the cache with the final name
-      const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+    await mutate(
+      cacheKey,
+      async (current?: Directory[]): Promise<Directory[]> => {
+        if (!current) return [];
 
-      await mutate(
-        cacheKey,
-        produce((draft?: Directory[]) => {
-          if (!draft) {
-            return draft;
-          }
+        return current.map(dir => (dir.id === id ? { ...dir, name } : dir));
+      },
+      { revalidate: false }
+    );
 
-          const directoryIndex = draft.findIndex(dir => dir.id === id);
-          if (directoryIndex !== -1) {
-            draft[directoryIndex].name = name;
-          }
-        }),
-        { revalidate: false }
-      );
-
+    try {
       await DirectoriesService.createDirectory({
         id,
         name,
@@ -77,38 +65,34 @@ export const useCreateDirectory = () => {
         parent_directory_id: parentDirectoryId,
       });
 
+      // Create child caches for the new directory chats and folders
       await mutate(CACHE_KEYS.directories.withParent(id), [], { revalidate: false });
+      await mutate(CACHE_KEYS.chats.withParent(id, undefined), [], {
+        revalidate: false,
+      });
 
-      await mutate(CACHE_KEYS.chats.withParent(id, undefined), [], { revalidate: false });
-
+      // Update parent directory's has_children flag if needed
       if (parentDirectoryId) {
         await mutate(
           findCacheKeysByPattern(['directories']),
-          produce((draft?: Directory[]) => {
-            if (!draft) {
-              return draft;
-            }
+          (parentCurrent?: Directory[]): Directory[] => {
+            if (!parentCurrent) return [];
 
-            const parentIndex = draft.findIndex(dir => dir.id === parentDirectoryId);
-            if (parentIndex !== -1) {
-              draft[parentIndex].has_children = true;
-            }
-          }),
-          { revalidate: false }
+            return parentCurrent.map(dir =>
+              dir.id === parentDirectoryId ? { ...dir, has_children: true } : dir
+            );
+          },
+          {
+            rollbackOnError: true,
+            populateCache: true,
+            revalidate: false,
+          }
         );
       }
-
-      return { id, name, parentDirectoryId };
-    },
-    swrMutationConfig
-  );
-
-  const finalizeDirectoryCreation = async (
-    id: string,
-    name: string,
-    parentDirectoryId?: string
-  ) => {
-    return finalizeDirectorySWR.trigger({ id, name, parentDirectoryId });
+    } catch (e) {
+      removeTemporaryDirectory(id, parentDirectoryId);
+      throw e;
+    }
   };
 
   const removeTemporaryDirectory = async (id: string, parentDirectoryId?: string) => {
@@ -116,14 +100,16 @@ export const useCreateDirectory = () => {
 
     await mutate(
       cacheKey,
-      produce((draft?: Directory[]) => {
-        if (!draft) {
-          return draft;
-        }
+      async (current?: Directory[]): Promise<Directory[]> => {
+        if (!current) return [];
 
-        return draft.filter(dir => dir.id !== id);
-      }),
-      { revalidate: false }
+        return current.filter(dir => dir.id !== id);
+      },
+      {
+        rollbackOnError: true,
+        populateCache: true,
+        revalidate: false,
+      }
     );
   };
 
@@ -131,7 +117,5 @@ export const useCreateDirectory = () => {
     createTemporaryDirectory,
     finalizeDirectoryCreation,
     removeTemporaryDirectory,
-    isMutating: finalizeDirectorySWR.isMutating,
-    error: finalizeDirectorySWR.error,
   };
 };
