@@ -13,6 +13,7 @@ import { AppRoutes } from '@constants/paths';
 
 import type { TokenResponse } from '@services/auth/auth-dtos';
 
+import { handleSWRError } from '@utils/error-handler';
 import { getFromStorage, removeFromStorage, setToStorage } from '@utils/local-storage';
 
 type RefreshQueueItem = {
@@ -114,6 +115,9 @@ baseAxiosInstance.interceptors.response.use(
         isRefreshing = false;
       }
     }
+
+    // Handle all other errors with global error handler
+    handleSWRError(error);
 
     return Promise.reject(error);
   }

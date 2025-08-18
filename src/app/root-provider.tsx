@@ -7,6 +7,7 @@ import { SWRProvider } from '@app/providers/swr-provider';
 import { ThemeProvider } from '@app/providers/theme-provider';
 import router from '@app/router';
 
+import { Toaster } from '@components/ui/sonner';
 import { TooltipProvider } from '@components/ui/tooltip';
 
 import { LocalStorageKeys } from '@constants/local-storage';
@@ -25,6 +26,7 @@ const RootProvider = () => {
             <RouterProvider router={router} />
             <ModalsRenderer />
             {import.meta.env.DEV && <DevTools />}
+            <Toaster position="top-right" />
           </TooltipProvider>
         </SWRProvider>
       </ThemeProvider>
