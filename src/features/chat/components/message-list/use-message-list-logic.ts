@@ -1,4 +1,4 @@
-import { useRef, type UIEvent, useEffect } from 'react';
+import { useRef, type UIEvent, useEffect, useCallback } from 'react';
 
 import { useChatActions } from '@features/chat/hooks/use-chat-actions';
 import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
@@ -22,20 +22,18 @@ export const useMessageListLogic = (chatId: string) => {
   const chatActions = useChatActions(chatId);
   const messageActions = useMessageActions(chatId);
 
-  const scrollToTarget = (withAnimation = false) => {
+  const scrollToTarget = useCallback((withAnimation = false) => {
     if (!scrollTargetRef.current) {
       return;
     }
 
-    if (scrollTargetRef.current) {
-      scrollTargetRef.current.scrollIntoView({
-        behavior: withAnimation ? 'smooth' : 'auto',
-        block: 'start',
-      });
-    }
-  };
+    scrollTargetRef.current.scrollIntoView({
+      behavior: withAnimation ? 'smooth' : 'auto',
+      block: 'start',
+    });
+  }, []);
 
-  const scrollToBottom = (withAnimation = false) => {
+  const scrollToBottom = useCallback((withAnimation = false) => {
     if (!scrollAreaRef.current) {
       return;
     }
@@ -50,7 +48,7 @@ export const useMessageListLogic = (chatId: string) => {
         behavior: withAnimation ? 'smooth' : 'auto',
       });
     }
-  };
+  }, []);
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -72,13 +70,13 @@ export const useMessageListLogic = (chatId: string) => {
     previousScrollTopPositionRef.current = scrollTop;
   };
 
-  const handleAutoScroll = () => {
+  const handleAutoScroll = useCallback(() => {
     scrollToTarget(true);
-  };
+  }, [scrollToTarget]);
 
   useEffect(() => {
     scrollToTarget();
-  }, [chatId, isMessagesLoading]);
+  }, [chatId, isMessagesLoading, scrollToTarget]);
 
   return {
     messages,
