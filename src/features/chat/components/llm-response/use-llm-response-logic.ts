@@ -16,7 +16,6 @@ import type { ChatMessage } from '@shared-types/entities';
 type UseLLMResponseLogicArgs = {
   id: string;
   content: string;
-  isLastMessage: boolean;
   branches: ChatMessage['branches'];
   onOpenInSidePanel: (branchChatId: string) => void;
 };
@@ -24,12 +23,9 @@ type UseLLMResponseLogicArgs = {
 export const useLLMResponseLogic = ({
   id,
   content,
-  isLastMessage,
   branches,
   onOpenInSidePanel,
 }: UseLLMResponseLogicArgs) => {
-  const isNewMessage = isLastMessage && content.length < 10;
-
   const { id: chatId } = useParams();
 
   const { messageRef } = useTextHighlight({
@@ -37,7 +33,7 @@ export const useLLMResponseLogic = ({
     onOpenInSidePanel,
   });
 
-  const [isStreaming, setIsStreaming] = useState(isNewMessage);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState(content);
 
   const getCurrentSelectionContext = () => {

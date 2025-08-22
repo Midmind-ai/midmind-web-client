@@ -51,7 +51,6 @@ const LLMResponse = ({
       id,
       content,
       branches,
-      isLastMessage,
       onOpenInSidePanel,
     });
 
