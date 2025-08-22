@@ -18,8 +18,6 @@ type UseLLMResponseLogicArgs = {
   content: string;
   isLastMessage: boolean;
   branches: ChatMessage['branches'];
-  onStreamingEnd: VoidFunction;
-  onStreamingStart: VoidFunction;
   onOpenInSidePanel: (branchChatId: string) => void;
 };
 
@@ -29,8 +27,6 @@ export const useLLMResponseLogic = ({
   isLastMessage,
   branches,
   onOpenInSidePanel,
-  onStreamingStart,
-  onStreamingEnd,
 }: UseLLMResponseLogicArgs) => {
   const isNewMessage = isLastMessage && content.length < 10;
 
@@ -55,12 +51,10 @@ export const useLLMResponseLogic = ({
       if (id === chunk.id && chunk.body && chunk.type === 'content') {
         setIsStreaming(true);
         setStreamingContent(prev => prev + chunk.body);
-        onStreamingStart();
       }
 
       if (id === chunk.id && chunk.type === 'complete') {
         setIsStreaming(false);
-        onStreamingEnd();
       }
     };
 
@@ -69,7 +63,7 @@ export const useLLMResponseLogic = ({
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [id, chatId, onStreamingStart, onStreamingEnd]);
+  }, [id, chatId]);
 
   return {
     messageRef,

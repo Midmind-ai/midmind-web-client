@@ -22,8 +22,6 @@ type Props = {
   onCopyText: VoidFunction;
   onOpenBranch: VoidFunction;
   onOpenInNewTab: VoidFunction;
-  onStreamingEnd: VoidFunction;
-  onStreamingStart: VoidFunction;
   onNewSetOfBranches: VoidFunction;
   onNewTemporaryBranch: VoidFunction;
   onOpenInSidePanel: (branchChatId: string) => void;
@@ -42,8 +40,6 @@ const LLMResponse = ({
   onCopyText,
   onOpenBranch,
   onOpenInNewTab,
-  onStreamingEnd,
-  onStreamingStart,
   onOpenInSidePanel,
   onNewSetOfBranches,
   onNewAttachedBranch,
@@ -56,8 +52,6 @@ const LLMResponse = ({
       content,
       branches,
       isLastMessage,
-      onStreamingEnd,
-      onStreamingStart,
       onOpenInSidePanel,
     });
 

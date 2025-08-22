@@ -15,7 +15,6 @@ const MessageList = ({ chatId }: Props) => {
     scrollAreaRef,
     messageActions,
     handleScroll,
-    scrollToBottom,
     handleAutoScroll,
   } = useMessageListLogic(chatId);
 
@@ -58,8 +57,6 @@ const MessageList = ({ chatId }: Props) => {
               key={id}
               {...message}
               isLastMessage={isLastMessage}
-              onStreamingStart={scrollToBottom}
-              onStreamingEnd={scrollToBottom}
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id, content)}
               onOpenBranch={() => {}}
