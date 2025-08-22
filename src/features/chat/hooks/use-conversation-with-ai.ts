@@ -3,6 +3,7 @@ import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { v4 as uuidv4 } from 'uuid';
 
+import { emitMessageSent } from '@features/chat/utils/message-send-emitter';
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
 
 import { MUTATION_KEYS } from '@hooks/cache-keys';
@@ -98,6 +99,8 @@ export const useConversationWithAI = (chatId: string) => {
         populateCache: true,
       }
     );
+
+    emitMessageSent();
 
     await trigger(body, {
       rollbackOnError: true,

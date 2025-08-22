@@ -22,7 +22,7 @@ export const useMessageListLogic = (chatId: string) => {
   const chatActions = useChatActions(chatId);
   const messageActions = useMessageActions(chatId);
 
-  const scrollTrigger = (withAnimation = false) => {
+  const scrollToTarget = (withAnimation = false) => {
     if (!scrollTargetRef.current) {
       return;
     }
@@ -73,11 +73,11 @@ export const useMessageListLogic = (chatId: string) => {
   };
 
   const handleAutoScroll = () => {
-    scrollTrigger(true);
+    scrollToTarget(true);
   };
 
   useEffect(() => {
-    scrollTrigger();
+    scrollToTarget();
   }, [chatId, isMessagesLoading]);
 
   return {

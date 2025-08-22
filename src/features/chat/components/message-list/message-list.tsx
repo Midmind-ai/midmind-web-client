@@ -1,6 +1,3 @@
-import { ArrowDown } from 'lucide-react';
-
-import { Button } from '@components/ui/button';
 import { ScrollArea } from '@components/ui/scroll-area';
 
 import LLMResponse from '@features/chat/components/llm-response/llm-response';
@@ -19,7 +16,6 @@ const MessageList = ({ chatId }: Props) => {
     messageActions,
     scrollTargetRef,
     handleScroll,
-    scrollToBottom,
     handleAutoScroll,
   } = useMessageListLogic(chatId);
 
@@ -33,12 +29,7 @@ const MessageList = ({ chatId }: Props) => {
         {messages?.map((message, index) => {
           const { id, content, role } = message;
 
-          const isLastUserMessage =
-            role === 'user' &&
-            (index === messages.length - 1 ||
-              (index < messages.length - 1 && messages[index + 1]?.role === 'model'));
-
-          const isLastLLMMessage = role === 'model' && index === messages.length - 1;
+          const isLastMessage = index === messages.length - 1;
 
           if (role === 'user') {
             return (
@@ -48,7 +39,6 @@ const MessageList = ({ chatId }: Props) => {
               >
                 <UserMessage
                   {...message}
-                  isLastMessage={isLastUserMessage}
                   onAutoScroll={handleAutoScroll}
                   onCopyText={() => messageActions.copyText(content)}
                   onReply={() => messageActions.replyToMessage(id, content)}
@@ -71,7 +61,7 @@ const MessageList = ({ chatId }: Props) => {
             <LLMResponse
               key={id}
               {...message}
-              isLastMessage={isLastLLMMessage}
+              isLastMessage={isLastMessage}
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id, content)}
               onOpenBranch={() => {}}
@@ -91,15 +81,6 @@ const MessageList = ({ chatId }: Props) => {
             />
           );
         })}
-        <Button
-          className="fixed right-6 bottom-[calc(64px+16px)] z-50 h-11 w-11 rounded-full
-            shadow-lg hover:shadow-xl"
-          size="icon"
-          aria-label="Scroll to bottom"
-          onClick={() => scrollToBottom(true)}
-        >
-          <ArrowDown className="h-4 w-4" />
-        </Button>
       </div>
     </ScrollArea>
   );
