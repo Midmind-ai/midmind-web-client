@@ -11,6 +11,8 @@ import type { ChatBranchContext } from '@features/chat/types/chat-types';
 
 import type { ChatMessage } from '@shared-types/entities';
 
+import { cn } from '@utils/cn';
+
 type Props = {
   id: string;
   content: string;
@@ -61,8 +63,11 @@ const LLMResponse = ({
         asChild
       >
         <div
-          className="group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent
-            p-2.5 transition-colors duration-100"
+          className={cn(
+            `group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent p-2.5
+            transition-colors duration-100`,
+            isLastMessage && 'min-h-[800px]'
+          )}
         >
           <h6
             className="text-muted-foreground mb-4 text-xs font-light uppercase opacity-0

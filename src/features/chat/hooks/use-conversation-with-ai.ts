@@ -1,6 +1,7 @@
 import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { v4 as uuidv4 } from 'uuid';
 
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
 
@@ -63,17 +64,34 @@ export const useConversationWithAI = (chatId: string) => {
       reply_content: body.reply_to?.content || null,
     };
 
+    const llmMessage: ChatMessage = {
+      id: uuidv4(),
+      created_at: new Date().toISOString(),
+      content: '',
+      role: 'model',
+      branches: [],
+      llm_model: body.model,
+      reply_content: null,
+    };
+
     await mutate(
       getInfiniteKey(chatId),
       produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {
         const allMessages = draft?.flatMap(page => page.data || []);
-        const messageExists = allMessages?.some(message => message.id === userMessage.id);
+        const userMessageExists = allMessages?.some(
+          message => message.id === userMessage.id
+        );
+        const llmMessageExists = allMessages?.some(
+          message => message.id === llmMessage.id
+        );
 
-        if (messageExists) {
-          return;
+        if (!userMessageExists) {
+          draft?.[0].data.unshift(userMessage);
         }
 
-        draft?.[0].data.unshift(userMessage);
+        if (!llmMessageExists) {
+          draft?.[0].data.unshift(llmMessage);
+        }
       }),
       {
         revalidate: false,

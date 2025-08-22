@@ -1,3 +1,6 @@
+import { ArrowDown } from 'lucide-react';
+
+import { Button } from '@components/ui/button';
 import { ScrollArea } from '@components/ui/scroll-area';
 
 import LLMResponse from '@features/chat/components/llm-response/llm-response';
@@ -14,7 +17,9 @@ const MessageList = ({ chatId }: Props) => {
     chatActions,
     scrollAreaRef,
     messageActions,
+    scrollTargetRef,
     handleScroll,
+    scrollToBottom,
     handleAutoScroll,
   } = useMessageListLogic(chatId);
 
@@ -24,31 +29,41 @@ const MessageList = ({ chatId }: Props) => {
       className="h-full"
       onScroll={handleScroll}
     >
-      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-9">
+      <div className="relative mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-9">
         {messages?.map((message, index) => {
-          const { id, content } = message;
-          const isLastMessage = index === messages.length - 1;
+          const { id, content, role } = message;
 
-          if (message.role === 'user') {
+          const isLastUserMessage =
+            role === 'user' &&
+            (index === messages.length - 1 ||
+              (index < messages.length - 1 && messages[index + 1]?.role === 'model'));
+
+          const isLastLLMMessage = role === 'model' && index === messages.length - 1;
+
+          if (role === 'user') {
             return (
-              <UserMessage
+              <div
                 key={id}
-                {...message}
-                isLastMessage={isLastMessage}
-                onAutoScroll={handleAutoScroll}
-                onCopyText={() => messageActions.copyText(content)}
-                onReply={() => messageActions.replyToMessage(id, content)}
-                onNewAttachedBranch={selectionContext =>
-                  chatActions.createAttachedBranch(id, content, selectionContext)
-                }
-                onNewDetachedBranch={selectionContext =>
-                  chatActions.createDetachedBranch(id, content, selectionContext)
-                }
-                onNewTemporaryBranch={() => {
-                  chatActions.createTemporaryBranch(id, content);
-                }}
-                onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
-              />
+                ref={scrollTargetRef}
+              >
+                <UserMessage
+                  {...message}
+                  isLastMessage={isLastUserMessage}
+                  onAutoScroll={handleAutoScroll}
+                  onCopyText={() => messageActions.copyText(content)}
+                  onReply={() => messageActions.replyToMessage(id, content)}
+                  onNewAttachedBranch={selectionContext =>
+                    chatActions.createAttachedBranch(id, content, selectionContext)
+                  }
+                  onNewDetachedBranch={selectionContext =>
+                    chatActions.createDetachedBranch(id, content, selectionContext)
+                  }
+                  onNewTemporaryBranch={() => {
+                    chatActions.createTemporaryBranch(id, content);
+                  }}
+                  onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
+                />
+              </div>
             );
           }
 
@@ -56,7 +71,7 @@ const MessageList = ({ chatId }: Props) => {
             <LLMResponse
               key={id}
               {...message}
-              isLastMessage={isLastMessage}
+              isLastMessage={isLastLLMMessage}
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id, content)}
               onOpenBranch={() => {}}
@@ -76,6 +91,15 @@ const MessageList = ({ chatId }: Props) => {
             />
           );
         })}
+        <Button
+          className="fixed right-6 bottom-[calc(64px+16px)] z-50 h-11 w-11 rounded-full
+            shadow-lg hover:shadow-xl"
+          size="icon"
+          aria-label="Scroll to bottom"
+          onClick={() => scrollToBottom(true)}
+        >
+          <ArrowDown className="h-4 w-4" />
+        </Button>
       </div>
     </ScrollArea>
   );

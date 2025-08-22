@@ -15,11 +15,25 @@ export const useMessageListLogic = (chatId: string) => {
     isValidating,
   } = useGetChatMessages(chatId);
 
+  const scrollTargetRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousScrollTopPositionRef = useRef(0);
 
   const chatActions = useChatActions(chatId);
   const messageActions = useMessageActions(chatId);
+
+  const scrollTrigger = (withAnimation = false) => {
+    if (!scrollTargetRef.current) {
+      return;
+    }
+
+    if (scrollTargetRef.current) {
+      scrollTargetRef.current.scrollIntoView({
+        behavior: withAnimation ? 'smooth' : 'auto',
+        block: 'start',
+      });
+    }
+  };
 
   const scrollToBottom = (withAnimation = false) => {
     if (!scrollAreaRef.current) {
@@ -59,20 +73,22 @@ export const useMessageListLogic = (chatId: string) => {
   };
 
   const handleAutoScroll = () => {
-    scrollToBottom(true);
+    scrollTrigger(true);
   };
 
   useEffect(() => {
-    scrollToBottom();
+    scrollTrigger();
   }, [chatId, isMessagesLoading]);
 
   return {
     messages,
     chatActions,
     scrollAreaRef,
-    isMessagesLoading,
     messageActions,
+    scrollTargetRef,
+    isMessagesLoading,
     handleScroll,
+    scrollToBottom,
     handleAutoScroll,
   };
 };
