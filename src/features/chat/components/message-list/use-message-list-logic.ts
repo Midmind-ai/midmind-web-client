@@ -1,5 +1,7 @@
 import { useRef, type UIEvent, useEffect, useCallback } from 'react';
 
+import { useLocation } from 'react-router';
+
 import { useChatActions } from '@features/chat/hooks/use-chat-actions';
 import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
 import { useMessageActions } from '@features/chat/hooks/use-message-actions';
@@ -14,6 +16,8 @@ export const useMessageListLogic = (chatId: string) => {
     loadMore,
     isValidating,
   } = useGetChatMessages(chatId);
+
+  const location = useLocation();
 
   const scrollTargetRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -75,8 +79,10 @@ export const useMessageListLogic = (chatId: string) => {
   }, [scrollToTarget]);
 
   useEffect(() => {
+    if (location.state?.fromHomePage) return;
+
     scrollToBottom();
-  }, [chatId, isMessagesLoading, scrollToBottom]);
+  }, [chatId, location.state?.fromHomePage, isMessagesLoading, scrollToBottom]);
 
   return {
     messages,

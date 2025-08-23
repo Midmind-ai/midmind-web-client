@@ -19,7 +19,11 @@ const HomePage = () => {
       sendMessage: true,
     });
 
-    navigate(AppRoutes.Chat(chatId));
+    navigate(AppRoutes.Chat(chatId), {
+      state: {
+        fromHomePage: true,
+      },
+    });
   };
 
   return (
