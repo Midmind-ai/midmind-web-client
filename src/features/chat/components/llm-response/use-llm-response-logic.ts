@@ -16,6 +16,7 @@ import type { ChatMessage } from '@shared-types/entities';
 type UseLLMResponseLogicArgs = {
   id: string;
   content: string;
+  isLastMessage: boolean;
   branches: ChatMessage['branches'];
   onOpenInSidePanel: (branchChatId: string) => void;
 };
@@ -24,6 +25,7 @@ export const useLLMResponseLogic = ({
   id,
   content,
   branches,
+  isLastMessage,
   onOpenInSidePanel,
 }: UseLLMResponseLogicArgs) => {
   const { id: chatId } = useParams();
@@ -34,7 +36,10 @@ export const useLLMResponseLogic = ({
   });
 
   const [isWaiting, setIsWaiting] = useState(false);
+  const [hasStartedStreaming, setHasStartedStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState(content);
+
+  const shouldApplyMinHeight = isLastMessage && hasStartedStreaming;
 
   const getCurrentSelectionContext = () => {
     if (messageRef.current) {
@@ -55,6 +60,7 @@ export const useLLMResponseLogic = ({
 
     if (content === '' && !streamingContent) {
       setIsWaiting(true);
+      setHasStartedStreaming(true);
     }
 
     subscribeToResponseChunk(handleResponseChunk);
@@ -65,9 +71,10 @@ export const useLLMResponseLogic = ({
   }, [id, chatId, content, streamingContent]);
 
   return {
+    isWaiting,
     messageRef,
     streamingContent,
-    isWaiting,
+    shouldApplyMinHeight,
     getCurrentSelectionContext,
   };
 };

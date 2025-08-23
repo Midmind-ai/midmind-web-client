@@ -49,13 +49,19 @@ const LLMResponse = ({
   onNewDetachedBranch,
   onNewTemporaryBranch,
 }: Props) => {
-  const { streamingContent, isWaiting, messageRef, getCurrentSelectionContext } =
-    useLLMResponseLogic({
-      id,
-      content,
-      branches,
-      onOpenInSidePanel,
-    });
+  const {
+    isWaiting,
+    messageRef,
+    streamingContent,
+    shouldApplyMinHeight,
+    getCurrentSelectionContext,
+  } = useLLMResponseLogic({
+    id,
+    content,
+    branches,
+    isLastMessage,
+    onOpenInSidePanel,
+  });
 
   return (
     <ContextMenu>
@@ -67,7 +73,7 @@ const LLMResponse = ({
           className={cn(
             `group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent p-2.5
             transition-colors duration-100`,
-            isLastMessage &&
+            shouldApplyMinHeight &&
               'min-h-[calc(100vh-var(--navigation-header-height)-var(--chat-form-with-padding-height))]'
           )}
         >

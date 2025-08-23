@@ -75,8 +75,8 @@ export const useMessageListLogic = (chatId: string) => {
   }, [scrollToTarget]);
 
   useEffect(() => {
-    scrollToTarget();
-  }, [chatId, isMessagesLoading, scrollToTarget]);
+    scrollToBottom();
+  }, [chatId, isMessagesLoading, scrollToBottom]);
 
   return {
     messages,
