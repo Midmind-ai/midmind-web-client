@@ -16,24 +16,16 @@ import type { ChatMessage } from '@shared-types/entities';
 type UseLLMResponseLogicArgs = {
   id: string;
   content: string;
-  isLastMessage: boolean;
   branches: ChatMessage['branches'];
-  onStreamingEnd: VoidFunction;
-  onStreamingStart: VoidFunction;
   onOpenInSidePanel: (branchChatId: string) => void;
 };
 
 export const useLLMResponseLogic = ({
   id,
   content,
-  isLastMessage,
   branches,
   onOpenInSidePanel,
-  onStreamingStart,
-  onStreamingEnd,
 }: UseLLMResponseLogicArgs) => {
-  const isNewMessage = isLastMessage && content.length < 10;
-
   const { id: chatId } = useParams();
 
   const { messageRef } = useTextHighlight({
@@ -41,7 +33,7 @@ export const useLLMResponseLogic = ({
     onOpenInSidePanel,
   });
 
-  const [isStreaming, setIsStreaming] = useState(isNewMessage);
+  const [isWaiting, setIsWaiting] = useState(false);
   const [streamingContent, setStreamingContent] = useState(content);
 
   const getCurrentSelectionContext = () => {
@@ -52,29 +44,30 @@ export const useLLMResponseLogic = ({
 
   useEffect(() => {
     const handleResponseChunk = (chunk: ConversationWithAIResponseDto) => {
-      if (id === chunk.id && chunk.body && chunk.type === 'content') {
-        setIsStreaming(true);
-        setStreamingContent(prev => prev + chunk.body);
-        onStreamingStart();
-      }
+      if (id === chunk.id) {
+        setIsWaiting(false);
 
-      if (id === chunk.id && chunk.type === 'complete') {
-        setIsStreaming(false);
-        onStreamingEnd();
+        if (chunk.body && chunk.type === 'content') {
+          setStreamingContent(prev => prev + chunk.body);
+        }
       }
     };
+
+    if (content === '' && !streamingContent) {
+      setIsWaiting(true);
+    }
 
     subscribeToResponseChunk(handleResponseChunk);
 
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [id, chatId, onStreamingStart, onStreamingEnd]);
+  }, [id, chatId, content, streamingContent]);
 
   return {
     messageRef,
     streamingContent,
-    isStreaming,
+    isWaiting,
     getCurrentSelectionContext,
   };
 };

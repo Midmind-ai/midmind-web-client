@@ -8,7 +8,6 @@ import type { UseMessageSelectionContextT } from '@features/chat/types/chat-type
 
 type Props = {
   content: string;
-  isLastMessage: boolean;
   reply_content: string | null;
   onReply: VoidFunction;
   onCopyText: VoidFunction;
@@ -21,7 +20,6 @@ type Props = {
 
 const UserMessage = ({
   content,
-  isLastMessage,
   reply_content,
   onReply,
   onCopyText,
@@ -32,7 +30,6 @@ const UserMessage = ({
   onNewSetOfBranches,
 }: Props) => {
   const { messageRef, getCurrentSelectionContext } = useUserMessageLogic({
-    isLastMessage,
     onAutoScroll,
   });
 

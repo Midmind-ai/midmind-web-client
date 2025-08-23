@@ -68,10 +68,9 @@ export const handleLLMResponse = async (
 };
 
 const messageChunks = new Map<string, string[]>();
-const createdMessages = new Set<string>();
 
 const handleContentChunk = (params: ChunkHandlerParams): void => {
-  const { chatId, model, chunk } = params;
+  const { chunk } = params;
 
   if (!chunk.id || chunk.type !== 'content' || !chunk.body) {
     return;
@@ -82,26 +81,6 @@ const handleContentChunk = (params: ChunkHandlerParams): void => {
   }
 
   messageChunks.get(chunk.id)?.push(chunk.body);
-
-  if (!createdMessages.has(chunk.id)) {
-    createdMessages.add(chunk.id);
-
-    mutate(
-      getInfiniteKey(chatId),
-      produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {
-        draft?.[0].data.unshift({
-          id: chunk.id,
-          content: chunk.body,
-          role: 'model',
-          created_at: new Date().toISOString(),
-          branches: [],
-          llm_model: model,
-          reply_content: null,
-        });
-      }),
-      { revalidate: false, populateCache: true }
-    );
-  }
 };
 
 const handleTitleChunk = (params: ChunkHandlerParams): void => {
@@ -199,7 +178,6 @@ const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> =>
   }
 
   messageChunks.delete(chunk.id);
-  createdMessages.delete(chunk.id);
 
   if (parentChatId && parentMessageId) {
     const branchContext = await BranchContextService.getBranchContext(parentMessageId);

@@ -97,6 +97,7 @@ export const useChatMessageFormLogic = ({
       conversationWithAI({
         chat_id: actualChatId,
         message_id: uuidv4(),
+        future_llm_message_id: uuidv4(),
         content: data.content,
         model: data.model,
         ...(data.replyInfo && { reply_to: data.replyInfo }),
