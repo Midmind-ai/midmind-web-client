@@ -1,7 +1,6 @@
 import { produce } from 'immer';
 import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { v4 as uuidv4 } from 'uuid';
 
 import { emitMessageSent } from '@features/chat/utils/message-send-emitter';
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
@@ -66,7 +65,7 @@ export const useConversationWithAI = (chatId: string) => {
     };
 
     const llmMessage: ChatMessage = {
-      id: uuidv4(),
+      id: body.future_llm_message_id,
       created_at: new Date().toISOString(),
       content: '',
       role: 'model',

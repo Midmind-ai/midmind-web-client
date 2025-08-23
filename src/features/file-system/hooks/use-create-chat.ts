@@ -142,10 +142,22 @@ export const useCreateChat = () => {
       }
 
       if (sendMessage) {
+        const futureLLMMessageId = uuidv4();
+
         const userMessage: ChatMessage = {
           id: messageId,
           content: content,
           role: 'user',
+          branches: [],
+          llm_model: model,
+          created_at: new Date().toISOString(),
+          reply_content: null,
+        };
+
+        const llmMessage: ChatMessage = {
+          id: futureLLMMessageId,
+          content: '',
+          role: 'model',
           branches: [],
           llm_model: model,
           created_at: new Date().toISOString(),
@@ -161,9 +173,9 @@ export const useCreateChat = () => {
           infiniteKey,
           [
             {
-              data: [userMessage],
+              data: [llmMessage, userMessage],
               meta: {
-                total: 1,
+                total: 2,
                 lastPage: 1,
                 currentPage: 1,
                 perPage: 20,
@@ -182,9 +194,9 @@ export const useCreateChat = () => {
         await mutate(
           messagesKey,
           {
-            data: [userMessage],
+            data: [llmMessage, userMessage],
             meta: {
-              total: 1,
+              total: 2,
               lastPage: 1,
               currentPage: 1,
               perPage: 20,
@@ -201,6 +213,7 @@ export const useCreateChat = () => {
         const conversationBody: ConversationWithAIRequestDto = {
           chat_id: chatId,
           message_id: messageId,
+          future_llm_message_id: futureLLMMessageId,
           content,
           model,
           ...(branchContext && {
