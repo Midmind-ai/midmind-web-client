@@ -35,11 +35,13 @@ export const useLLMResponseLogic = ({
     onOpenInSidePanel,
   });
 
-  const [isWaiting, setIsWaiting] = useState(false);
-  const [hasStartedStreaming, setHasStartedStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState(content);
+  const [isStreamingStarted, setIsStreamingStarted] = useState(false);
 
-  const shouldApplyMinHeight = isLastMessage && hasStartedStreaming;
+  const isContentEmpty = content === '';
+  const isStreaming = isStreamingStarted && streamingContent !== content;
+  const isWaiting = isContentEmpty && !streamingContent;
+  const shouldApplyMinHeight = isLastMessage && isStreamingStarted;
 
   const getCurrentSelectionContext = () => {
     if (messageRef.current) {
@@ -50,17 +52,14 @@ export const useLLMResponseLogic = ({
   useEffect(() => {
     const handleResponseChunk = (chunk: ConversationWithAIResponseDto) => {
       if (id === chunk.id) {
-        setIsWaiting(false);
-
         if (chunk.body && chunk.type === 'content') {
           setStreamingContent(prev => prev + chunk.body);
         }
       }
     };
 
-    if (content === '' && !streamingContent) {
-      setIsWaiting(true);
-      setHasStartedStreaming(true);
+    if (isContentEmpty && !streamingContent && !isStreamingStarted) {
+      setIsStreamingStarted(true);
     }
 
     subscribeToResponseChunk(handleResponseChunk);
@@ -68,11 +67,12 @@ export const useLLMResponseLogic = ({
     return () => {
       unsubscribeFromResponseChunk(handleResponseChunk);
     };
-  }, [id, chatId, content, streamingContent]);
+  }, [id, chatId, content, streamingContent, isStreamingStarted, isContentEmpty]);
 
   return {
     isWaiting,
     messageRef,
+    isStreaming,
     streamingContent,
     shouldApplyMinHeight,
     getCurrentSelectionContext,

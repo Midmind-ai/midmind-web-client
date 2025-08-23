@@ -52,6 +52,7 @@ const LLMResponse = ({
   const {
     isWaiting,
     messageRef,
+    isStreaming,
     streamingContent,
     shouldApplyMinHeight,
     getCurrentSelectionContext,
@@ -114,7 +115,7 @@ const LLMResponse = ({
               </div>
             </>
           )}
-          {!isWaiting && isLastMessage && (
+          {!isWaiting && !isStreaming && isLastMessage && (
             <div className="mb-12 flex flex-wrap gap-2.5">
               <QuickActionButton
                 icon={<GitBranchPlus className="text-foreground size-6" />}
