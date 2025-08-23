@@ -7,9 +7,12 @@ import { useLLMResponseLogic } from '@features/chat/components/llm-response/use-
 import MessageContextMenu from '@features/chat/components/message-context-menu/message-context-menu';
 import QuickActionButton from '@features/chat/components/quick-action-button/quick-action-button';
 import ReactMarkdown from '@features/chat/components/react-markdown/react-markdown';
+import TypingDots from '@features/chat/components/typing-dots/typing-dots';
 import type { ChatBranchContext } from '@features/chat/types/chat-types';
 
 import type { ChatMessage } from '@shared-types/entities';
+
+import { cn } from '@utils/cn';
 
 type Props = {
   id: string;
@@ -46,7 +49,7 @@ const LLMResponse = ({
   onNewDetachedBranch,
   onNewTemporaryBranch,
 }: Props) => {
-  const { streamingContent, isStreaming, messageRef, getCurrentSelectionContext } =
+  const { streamingContent, isWaiting, messageRef, getCurrentSelectionContext } =
     useLLMResponseLogic({
       id,
       content,
@@ -57,12 +60,16 @@ const LLMResponse = ({
   return (
     <ContextMenu>
       <ContextMenuTrigger
-        disabled={isStreaming}
+        disabled={isWaiting}
         asChild
       >
         <div
-          className="group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent
-            p-2.5 transition-colors duration-100"
+          className={cn(
+            `group data-[state=open]:bg-muted/50 w-full rounded-md bg-transparent p-2.5
+            transition-colors duration-100`,
+            isLastMessage &&
+              'min-h-[calc(100vh-var(--navigation-header-height)-var(--chat-form-with-padding-height))]'
+          )}
         >
           <h6
             className="text-muted-foreground mb-4 text-xs font-light uppercase opacity-0
@@ -70,30 +77,38 @@ const LLMResponse = ({
           >
             {llm_model}
           </h6>
-          <div
-            ref={messageRef}
-            className="text-base leading-relaxed font-light"
-            onClick={getCurrentSelectionContext}
-          >
-            <ReactMarkdown content={streamingContent} />
-          </div>
-          <div className="mb-4 flex items-center gap-2.5">
-            {branches.map(({ id, connection_color, connection_type, child_chat_id }) => {
-              if (connection_type === 'temporary') {
-                return null;
-              }
+          {isWaiting && isLastMessage ? (
+            <TypingDots />
+          ) : (
+            <>
+              <div
+                ref={messageRef}
+                className="text-base leading-relaxed font-light"
+                onClick={getCurrentSelectionContext}
+              >
+                <ReactMarkdown content={streamingContent} />
+              </div>
+              <div className="mb-4 flex items-center gap-2.5">
+                {branches.map(
+                  ({ id, connection_color, connection_type, child_chat_id }) => {
+                    if (connection_type === 'temporary') {
+                      return null;
+                    }
 
-              return (
-                <ConnectionTypeBadge
-                  key={id}
-                  bgColor={connection_color}
-                  branchChatId={child_chat_id}
-                  connectionType={connection_type}
-                />
-              );
-            })}
-          </div>
-          {!isStreaming && isLastMessage && (
+                    return (
+                      <ConnectionTypeBadge
+                        key={id}
+                        bgColor={connection_color}
+                        branchChatId={child_chat_id}
+                        connectionType={connection_type}
+                      />
+                    );
+                  }
+                )}
+              </div>
+            </>
+          )}
+          {!isWaiting && isLastMessage && (
             <div className="mb-12 flex flex-wrap gap-2.5">
               <QuickActionButton
                 icon={<GitBranchPlus className="text-foreground size-6" />}

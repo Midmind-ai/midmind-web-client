@@ -1,4 +1,4 @@
-import { useRef, type UIEvent, useEffect } from 'react';
+import { useRef, type UIEvent, useEffect, useCallback } from 'react';
 
 import { useChatActions } from '@features/chat/hooks/use-chat-actions';
 import { useGetChatMessages } from '@features/chat/hooks/use-get-chat-messages';
@@ -15,13 +15,25 @@ export const useMessageListLogic = (chatId: string) => {
     isValidating,
   } = useGetChatMessages(chatId);
 
+  const scrollTargetRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const previousScrollTopPositionRef = useRef(0);
 
   const chatActions = useChatActions(chatId);
   const messageActions = useMessageActions(chatId);
 
-  const scrollToBottom = (withAnimation = false) => {
+  const scrollToTarget = useCallback((withAnimation = false) => {
+    if (!scrollTargetRef.current) {
+      return;
+    }
+
+    scrollTargetRef.current.scrollIntoView({
+      behavior: withAnimation ? 'smooth' : 'auto',
+      block: 'start',
+    });
+  }, []);
+
+  const scrollToBottom = useCallback((withAnimation = false) => {
     if (!scrollAreaRef.current) {
       return;
     }
@@ -36,7 +48,7 @@ export const useMessageListLogic = (chatId: string) => {
         behavior: withAnimation ? 'smooth' : 'auto',
       });
     }
-  };
+  }, []);
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -58,21 +70,23 @@ export const useMessageListLogic = (chatId: string) => {
     previousScrollTopPositionRef.current = scrollTop;
   };
 
-  const handleAutoScroll = () => {
-    scrollToBottom(true);
-  };
+  const handleAutoScroll = useCallback(() => {
+    scrollToTarget(true);
+  }, [scrollToTarget]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [chatId, isMessagesLoading]);
+    scrollToTarget();
+  }, [chatId, isMessagesLoading, scrollToTarget]);
 
   return {
     messages,
     chatActions,
     scrollAreaRef,
-    isMessagesLoading,
     messageActions,
+    scrollTargetRef,
+    isMessagesLoading,
     handleScroll,
     handleAutoScroll,
+    scrollToBottom,
   };
 };

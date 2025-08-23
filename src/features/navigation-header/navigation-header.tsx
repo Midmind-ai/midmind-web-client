@@ -22,7 +22,10 @@ const NavigationHeader = ({
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="flex items-center justify-between border-b py-3 pr-2.5 pl-4">
+    <header
+      className="flex min-h-(--navigation-header-height) items-center justify-between
+        border-b pr-2.5 pl-4"
+    >
       <div className="flex items-center gap-2">
         {showSidebarToggle && (
           <>

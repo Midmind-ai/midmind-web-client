@@ -395,6 +395,8 @@ export interface components {
       chat_id: string;
       /** Format: uuid */
       message_id: string;
+      /** Format: uuid */
+      future_llm_message_id: string;
       /** @enum {string} */
       model:
         | 'gemini-2.0-flash-lite'

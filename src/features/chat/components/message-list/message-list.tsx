@@ -14,6 +14,7 @@ const MessageList = ({ chatId }: Props) => {
     chatActions,
     scrollAreaRef,
     messageActions,
+    scrollTargetRef,
     handleScroll,
     handleAutoScroll,
   } = useMessageListLogic(chatId);
@@ -24,31 +25,35 @@ const MessageList = ({ chatId }: Props) => {
       className="h-full"
       onScroll={handleScroll}
     >
-      <div className="mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-9">
+      <div className="relative mx-auto flex w-full max-w-[768px] flex-col gap-2.5 pt-9">
         {messages?.map((message, index) => {
-          const { id, content } = message;
+          const { id, content, role } = message;
+
           const isLastMessage = index === messages.length - 1;
 
-          if (message.role === 'user') {
+          if (role === 'user') {
             return (
-              <UserMessage
+              <div
                 key={id}
-                {...message}
-                isLastMessage={isLastMessage}
-                onAutoScroll={handleAutoScroll}
-                onCopyText={() => messageActions.copyText(content)}
-                onReply={() => messageActions.replyToMessage(id, content)}
-                onNewAttachedBranch={selectionContext =>
-                  chatActions.createAttachedBranch(id, content, selectionContext)
-                }
-                onNewDetachedBranch={selectionContext =>
-                  chatActions.createDetachedBranch(id, content, selectionContext)
-                }
-                onNewTemporaryBranch={() => {
-                  chatActions.createTemporaryBranch(id, content);
-                }}
-                onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
-              />
+                ref={scrollTargetRef}
+              >
+                <UserMessage
+                  {...message}
+                  onAutoScroll={handleAutoScroll}
+                  onCopyText={() => messageActions.copyText(content)}
+                  onReply={() => messageActions.replyToMessage(id, content)}
+                  onNewAttachedBranch={selectionContext =>
+                    chatActions.createAttachedBranch(id, content, selectionContext)
+                  }
+                  onNewDetachedBranch={selectionContext =>
+                    chatActions.createDetachedBranch(id, content, selectionContext)
+                  }
+                  onNewTemporaryBranch={() => {
+                    chatActions.createTemporaryBranch(id, content);
+                  }}
+                  onNewSetOfBranches={() => chatActions.createNewBranchSet(id)}
+                />
+              </div>
             );
           }
 

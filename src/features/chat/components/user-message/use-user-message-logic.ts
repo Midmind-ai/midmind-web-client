@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
 
+import {
+  subscribeToMessageSent,
+  unsubscribeFromMessageSent,
+} from '@features/chat/utils/message-send-emitter';
 import { captureSelection } from '@features/chat/utils/text-selection';
 
 type UseUserMessageLogicArgs = {
-  isLastMessage: boolean;
   onAutoScroll: VoidFunction;
 };
 
-export const useUserMessageLogic = ({
-  isLastMessage,
-  onAutoScroll,
-}: UseUserMessageLogicArgs) => {
+export const useUserMessageLogic = ({ onAutoScroll }: UseUserMessageLogicArgs) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
   const getCurrentSelectionContext = () => {
@@ -20,10 +20,16 @@ export const useUserMessageLogic = ({
   };
 
   useEffect(() => {
-    if (isLastMessage) {
+    const handleMessageSent = () => {
       onAutoScroll();
-    }
-  }, [onAutoScroll, isLastMessage]);
+    };
+
+    subscribeToMessageSent(handleMessageSent);
+
+    return () => {
+      unsubscribeFromMessageSent(handleMessageSent);
+    };
+  }, [onAutoScroll]);
 
   return {
     messageRef,
