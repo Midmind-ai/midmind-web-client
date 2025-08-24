@@ -1,6 +1,6 @@
-import { useNavigate, useParams, useLocation } from 'react-router';
+import { useParams } from 'react-router';
 
-import { AppRoutes, SearchParams } from '@constants/paths';
+import { AppRoutes } from '@constants/paths';
 
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import type {
@@ -13,29 +13,15 @@ import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
 
 import type { ConversationBranchContext } from '@shared-types/entities';
 
+import { useSplitScreenActions } from './use-split-screen-actions';
+
 export const useChatActions = (actualChatId?: string) => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { id: urlChatId = '' } = useParams();
-
-  const { createChat } = useCreateChat();
-
   const chatId = actualChatId || urlChatId;
 
-  const openChatInSplitView = (newChatId: string) => {
-    const currentUrl = new URL(window.location.href);
-    const currentSplitChatId = currentUrl.searchParams.get(SearchParams.Split);
+  const { openChatInSplitView } = useSplitScreenActions(chatId);
 
-    if (actualChatId && currentSplitChatId && currentSplitChatId === actualChatId) {
-      currentUrl.searchParams.set(SearchParams.Split, newChatId);
-
-      navigate(`${AppRoutes.Chat(actualChatId)}${currentUrl.search}`);
-    } else {
-      currentUrl.searchParams.set(SearchParams.Split, newChatId);
-
-      navigate(`${location.pathname}${currentUrl.search}`);
-    }
-  };
+  const { createChat } = useCreateChat();
 
   const createBranch = async ({
     content,
@@ -53,6 +39,7 @@ export const useChatActions = (actualChatId?: string) => {
       content: textToUse,
       model: DEFAULT_AI_MODEL,
       parentChatId: chatId,
+      openInSplitScreen: true,
       branchContext: {
         parent_chat_id: chatId,
         parent_message_id: messageId,
@@ -65,8 +52,6 @@ export const useChatActions = (actualChatId?: string) => {
     });
 
     emitBranchCreated({ branchContext });
-
-    openChatInSplitView(newChatId);
 
     if (selectionContext) {
       // setTimeout is used to ensure the component has time to render and subscribe

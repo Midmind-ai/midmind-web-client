@@ -19,7 +19,7 @@ With Axios interceptors handling all API errors globally:
 
 ## The Recommended Mutation Pattern
 
-### Direct Mutate with Optimistic Updates (For ALL Mutations)
+### Direct Mutate with Optimistic Updates (For Single Cache Entry Mutations)
 
 This pattern works for CREATE, UPDATE, DELETE, MOVE, and any other mutation operations. Errors are handled globally by Axios interceptors, so no try-catch blocks are needed.
 
@@ -145,67 +145,6 @@ export const useUpdateDirectory = () => {
 };
 ```
 
-#### Example 4: Move Operation
-
-```typescript
-export const useMoveDirectory = () => {
-  const { mutate } = useSWRConfig();
-
-  const moveDirectory = async (
-    id: string,
-    fromParentId?: string,
-    toParentId?: string
-  ) => {
-    const fromCache = CACHE_KEYS.directories.withParent(fromParentId);
-    const toCache = CACHE_KEYS.directories.withParent(toParentId);
-
-    // Remove from source cache
-    await mutate(
-      fromCache,
-      async (current?: Directory[]): Promise<Directory[]> => {
-        if (!current) return [];
-        return current.filter(dir => dir.id !== id);
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          if (!current) return [];
-          return current.filter(dir => dir.id !== id);
-        },
-        rollbackOnError: true,
-        populateCache: true,
-        revalidate: false,
-      }
-    );
-
-    // Add to destination cache and call API
-    await mutate(
-      toCache,
-      async (current?: Directory[]): Promise<Directory[]> => {
-        // API call - errors handled by Axios interceptor globally
-        const moved = await DirectoriesService.moveDirectory(id, {
-          target_parent_id: toParentId,
-        });
-
-        if (!current) return [moved];
-        return [...current, moved];
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          const movedDir = { id, parent_id: toParentId /* other fields */ };
-          if (!current) return [movedDir];
-          return [...current, movedDir];
-        },
-        rollbackOnError: true,
-        populateCache: true,
-        revalidate: false,
-      }
-    );
-  };
-
-  return { moveDirectory };
-};
-```
-
 ### Key Benefits of This Pattern
 
 1. **Consistent Across All Operations**: Same pattern for CREATE, UPDATE, DELETE, MOVE
@@ -214,6 +153,116 @@ export const useMoveDirectory = () => {
 4. **Optimistic UI Updates**: Immediate feedback to users
 5. **Automatic Rollback**: On API failure, UI reverts to previous state
 6. **Clean Code**: No error handling boilerplate in hooks
+
+### Manual Optimistic Updates (For Multi-Cache Entry Mutations)
+
+When a mutation affects **multiple cache entries simultaneously** (like moving items between containers), the built-in `optimisticData` approach becomes complex and error-prone. In these cases, we use **manual optimistic updates** with explicit rollback handling.
+
+**Use this approach when:**
+
+- Moving items between different parent containers
+- Operations that affect both source and destination caches
+- Complex mutations that require coordinated updates across multiple cache keys
+
+#### Example: Move Chat Between Directories
+
+```typescript
+export const useMoveChat = () => {
+  const { mutate, cache } = useSWRConfig();
+
+  const moveChat = async ({
+    chatId,
+    sourceParentDirectoryId,
+    sourceParentChatId,
+    targetParentDirectoryId,
+  }: MoveChatParams) => {
+    // Get cache keys for both source and destination
+    const sourceCacheKey = CACHE_KEYS.chats.byParentId(
+      sourceParentDirectoryId,
+      sourceParentChatId
+    );
+    const targetCacheKey = CACHE_KEYS.chats.byParentId(targetParentDirectoryId);
+
+    // Get current cache data for both locations
+    const sourceCacheState = cache.get(unstable_serialize(sourceCacheKey));
+    const targetCacheState = cache.get(unstable_serialize(targetCacheKey));
+
+    const sourceCacheData = sourceCacheState?.data;
+    const targetCacheData = targetCacheState?.data;
+
+    const movedChat = sourceCacheData?.find((chat: Chat) => chat.id === chatId);
+
+    if (!movedChat) {
+      throw new Error('Chat not found in cache');
+    }
+
+    // Create updated chat object with new parent
+    const updatedChat = {
+      ...movedChat,
+      parent_directory_id: targetParentDirectoryId,
+    };
+
+    // STEP 1: Apply optimistic updates immediately to both caches
+    const updatedSourceCache =
+      sourceCacheData?.filter((chat: Chat) => chat.id !== chatId) || [];
+    const updatedTargetCache = targetCacheData
+      ? [updatedChat, ...targetCacheData]
+      : [updatedChat];
+
+    // Update both caches optimistically (no revalidation)
+    await mutate(sourceCacheKey, updatedSourceCache, { revalidate: false });
+    await mutate(targetCacheKey, updatedTargetCache, { revalidate: false });
+
+    try {
+      // STEP 2: Make API call
+      await ChatsService.updateChatDetails(chatId, {
+        name: movedChat.name,
+        directory_id: targetParentDirectoryId,
+      });
+    } catch (error) {
+      // STEP 3: Manual rollback on error - restore original cache states
+      await mutate(sourceCacheKey, sourceCacheData, { revalidate: false });
+      await mutate(targetCacheKey, targetCacheData, { revalidate: false });
+
+      // Re-throw error so it gets handled by global error handler
+      throw error;
+    }
+  };
+
+  return { moveChat };
+};
+```
+
+#### Key Differences from Single-Cache Pattern
+
+1. **Manual Cache Management**: Use `cache.get()` to retrieve current state before mutations
+2. **Explicit Optimistic Updates**: Apply changes to multiple caches using separate `mutate()` calls
+3. **Manual Rollback**: Restore original cache states in try-catch block
+4. **No `optimisticData` Prop**: Avoid SWR's built-in optimistic updates for complex scenarios
+5. **Coordinated Updates**: Ensure all related caches are updated atomically
+
+#### When to Use Manual vs Automatic Optimistic Updates
+
+**Use Automatic (`optimisticData` prop):**
+
+- ✅ Single cache entry affected
+- ✅ Simple ADD/REMOVE/UPDATE operations
+- ✅ Standard CRUD operations
+
+**Use Manual Optimistic Updates:**
+
+- ✅ Multiple cache entries affected simultaneously
+- ✅ Move operations between containers
+- ✅ Complex state transitions requiring coordination
+- ✅ When `optimisticData` callback becomes too complex
+
+#### Benefits of Manual Approach
+
+1. **Full Control**: Complete control over cache updates and rollback logic
+2. **Atomic Operations**: Ensure multiple caches are updated together
+3. **Clear Rollback**: Explicit error handling with original state restoration
+4. **Performance**: Immediate UI updates without waiting for server response
+5. **Consistency**: Maintain data integrity across related cache entries
 
 ## Cache Management Patterns
 
