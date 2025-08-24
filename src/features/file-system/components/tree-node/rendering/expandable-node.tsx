@@ -30,7 +30,7 @@ type Props = {
   isActive: boolean;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  childNodes?: TreeNodeType[];
+  childNodes: TreeNodeType[] | undefined;
   isLoadingChildren: boolean;
   onClick: VoidFunction;
   TreeNodeComponent: React.ComponentType<{

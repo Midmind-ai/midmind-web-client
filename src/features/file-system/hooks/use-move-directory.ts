@@ -8,7 +8,7 @@ import type { Directory } from '@shared-types/entities';
 
 type MoveDirectoryParams = {
   directoryId: string;
-  sourceParentDirectoryId?: string;
+  sourceParentDirectoryId?: string | null;
   targetParentDirectoryId?: string | null;
 };
 
@@ -17,9 +17,11 @@ export const useMoveDirectory = () => {
 
   const moveDirectory = async ({
     directoryId,
-    sourceParentDirectoryId,
+    sourceParentDirectoryId = null,
     targetParentDirectoryId,
   }: MoveDirectoryParams) => {
+    if (sourceParentDirectoryId === targetParentDirectoryId) return;
+
     const sourceCacheKey = CACHE_KEYS.directories.byParentId(sourceParentDirectoryId);
     const targetCacheKey = CACHE_KEYS.directories.byParentId(targetParentDirectoryId);
 

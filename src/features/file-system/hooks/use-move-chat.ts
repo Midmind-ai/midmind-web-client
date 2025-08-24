@@ -8,8 +8,8 @@ import type { Chat } from '@shared-types/entities';
 
 type MoveChatParams = {
   chatId: string;
-  sourceParentDirectoryId?: string;
-  sourceParentChatId?: string;
+  sourceParentDirectoryId?: string | null;
+  sourceParentChatId?: string | null;
   targetParentDirectoryId?: string | null;
 };
 
@@ -18,10 +18,12 @@ export const useMoveChat = () => {
 
   const moveChat = async ({
     chatId,
-    sourceParentDirectoryId,
+    sourceParentDirectoryId = null,
     sourceParentChatId,
     targetParentDirectoryId,
   }: MoveChatParams) => {
+    if (sourceParentDirectoryId === targetParentDirectoryId) return;
+
     const sourceCacheKey = CACHE_KEYS.chats.byParentId(
       sourceParentDirectoryId,
       sourceParentChatId

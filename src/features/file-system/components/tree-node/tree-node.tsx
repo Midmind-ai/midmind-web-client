@@ -2,6 +2,7 @@ import { useTreeNodeLogic } from '@features/file-system/components/tree-node/log
 import ExpandableNode from '@features/file-system/components/tree-node/rendering/expandable-node';
 import LeafNode from '@features/file-system/components/tree-node/rendering/leaf-node';
 import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
+import { useTreeData } from '@features/file-system/hooks/use-tree-data';
 import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes-store';
 
 type Props = {
@@ -12,9 +13,13 @@ const TreeNode = ({ node }: Props) => {
   const { isExpanded, setExpanded } = useExpandedNodesStore();
   const isOpen = isExpanded(node.id);
 
-  const { isActive, handleClick, childNodes, isLoadingChildren } = useTreeNodeLogic(
-    node,
-    isOpen
+  const { isActive, handleClick } = useTreeNodeLogic(node);
+
+  // Fetch children only when expanded
+  const shouldFetchChildren = isOpen && (node.type === 'directory' || node.hasChildren);
+  const { treeNodes: childNodes, isLoading: isLoadingChildren } = useTreeData(
+    shouldFetchChildren ? node.id : null,
+    shouldFetchChildren ? (node.type === 'chats' ? 'chat' : node.type) : undefined
   );
 
   const setIsOpen = (open: boolean) => {

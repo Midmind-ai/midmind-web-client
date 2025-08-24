@@ -86,30 +86,16 @@ export const useCreateChat = () => {
     const mainCacheState = cache.get(unstable_serialize(cacheKey));
     const mainCacheData = mainCacheState?.data;
 
-    // For branch chats, we also need parent cache states
-    let parentCacheStates: Array<{
-      key: string;
-      serializedKey: string;
-      data: Chat[] | undefined;
-    }> = [];
+    // For branch chats, we need to update the parent chat's has_children flag
+    // The parent chat is located in the same directory as this new chat
+    let parentCacheKey: ReturnType<typeof CACHE_KEYS.chats.byParentId> | null = null;
+    let parentCacheData: Chat[] | undefined = undefined;
 
     if (parentChatId) {
-      // Get all cache keys that might contain the parent chat
-      const parentCacheKeys = [
-        CACHE_KEYS.chats.byParentId(undefined, undefined), // Root chats
-        CACHE_KEYS.chats.byParentId(parentDirectoryId, undefined), // Directory chats
-      ];
-
-      parentCacheStates = parentCacheKeys.map(key => {
-        const serializedKey = unstable_serialize(key);
-        const state = cache.get(serializedKey);
-
-        return {
-          key: JSON.stringify(key),
-          serializedKey,
-          data: state?.data,
-        };
-      });
+      // Parent chat is in the same directory as the new chat we're creating
+      parentCacheKey = CACHE_KEYS.chats.byParentId(parentDirectoryId, undefined);
+      const parentCacheState = cache.get(unstable_serialize(parentCacheKey));
+      parentCacheData = parentCacheState?.data;
     }
 
     // STEP 2: Create optimistic chat object
@@ -117,6 +103,7 @@ export const useCreateChat = () => {
       id: chatId,
       name: 'New chat',
       parent_directory_id: parentDirectoryId || null,
+      parent_chat_id: parentChatId || null,
       has_children: false,
     };
 
@@ -129,21 +116,15 @@ export const useCreateChat = () => {
     await mutate(cacheKey, updatedMainCache, { revalidate: false });
 
     // If this is a branch chat, update parent chat's has_children flag
-    if (parentChatId) {
+    if (parentChatId && parentCacheKey && parentCacheData) {
       // Expand the parent chat node in the UI tree to show the new branch chat
       expandNode(parentChatId);
 
-      // Update all parent caches that contain the parent chat
-      for (const parentCacheState of parentCacheStates) {
-        if (parentCacheState.data) {
-          const updatedParentCache = parentCacheState.data.map(chat =>
-            chat.id === parentChatId ? { ...chat, has_children: true } : chat
-          );
-          await mutate(JSON.parse(parentCacheState.key), updatedParentCache, {
-            revalidate: false,
-          });
-        }
-      }
+      // Update parent chat's has_children flag in the specific cache where it exists
+      const updatedParentCache = parentCacheData.map((chat: Chat) =>
+        chat.id === parentChatId ? { ...chat, has_children: true } : chat
+      );
+      await mutate(parentCacheKey, updatedParentCache, { revalidate: false });
     }
 
     if (openInSplitScreen) {
@@ -270,13 +251,9 @@ export const useCreateChat = () => {
       // Restore main chat cache
       await mutate(cacheKey, mainCacheData, { revalidate: false });
 
-      // Restore parent caches if this was a branch chat
-      if (parentChatId) {
-        for (const parentCacheState of parentCacheStates) {
-          await mutate(JSON.parse(parentCacheState.key), parentCacheState.data, {
-            revalidate: false,
-          });
-        }
+      // Restore parent cache if this was a branch chat
+      if (parentChatId && parentCacheKey && parentCacheData) {
+        await mutate(parentCacheKey, parentCacheData, { revalidate: false });
       }
 
       // Re-throw error so it gets handled by global error handler
