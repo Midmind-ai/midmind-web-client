@@ -13,25 +13,18 @@ import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
-import ChildrenList from '@features/file-system/components/tree-node/rendering/children-list';
-import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
-import { useCreateDirectory } from '@features/file-system/hooks/use-create-directory';
-import { useRenameChat } from '@features/file-system/hooks/use-rename-chat';
-import { useRenameDirectory } from '@features/file-system/hooks/use-rename-directory';
-import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
-
-import { useInlineEditStore } from '@stores/use-inline-edit-store';
-import { useMenuStateStore } from '@stores/use-menu-state-store';
-
-import { useFolderListLogic } from '../../folder-list/use-folder-list-logic';
+import ChildrenList from '@features/file-system/components/tree-node/components/children-list';
+import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
+import {
+  useFileSystemActions,
+  type TreeNode as TreeNodeType,
+} from '@features/file-system/use-file-system.actions';
 
 type Props = {
   node: TreeNodeType;
   isActive: boolean;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  childNodes: TreeNodeType[] | undefined;
-  isLoadingChildren: boolean;
   onClick: VoidFunction;
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
@@ -43,20 +36,24 @@ const ExpandableNode = ({
   isActive,
   isOpen,
   setIsOpen,
-  childNodes,
-  isLoadingChildren,
   onClick,
   TreeNodeComponent,
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const { deleteChat, deleteDirectory, openChatInNewTab, openChatInSidePanel } =
-    useFolderListLogic();
-  const { renameDirectory } = useRenameDirectory();
-  const { renameChat } = useRenameChat();
-  const { finalizeDirectoryCreation, removeTemporaryDirectory } = useCreateDirectory();
-  const { isEditing, startEditing } = useInlineEditStore();
-  const { isMenuOpen } = useMenuStateStore();
+  const {
+    deleteChat,
+    deleteDirectory,
+    openChatInNewTab,
+    openChatInSidePanel,
+    renameDirectory,
+    renameChat,
+    finalizeDirectoryCreation,
+    removeTemporaryDirectory,
+    startEditing,
+  } = useFileSystemActions().actions;
+  const { isEditing, isMenuOpen } = useFileSystemActions().helpers;
+
   const isCurrentlyEditing = isEditing(node.id);
   const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
 
@@ -247,8 +244,8 @@ const ExpandableNode = ({
           </div>
           <CollapsibleContent>
             <ChildrenList
-              isLoadingChildren={isLoadingChildren}
-              childNodes={childNodes}
+              parentNodeId={node.id}
+              parentNodeType={node.type as 'directory' | 'chat'}
               TreeNodeComponent={TreeNodeComponent}
             />
           </CollapsibleContent>

@@ -3,8 +3,8 @@ import { useDraggable } from '@dnd-kit/core';
 import type {
   DraggableData,
   DroppableData,
-} from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
-import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
+  TreeNode,
+} from '@features/file-system/use-file-system.actions';
 
 type UseDraggableConfigProps = {
   node: TreeNode;

@@ -6,11 +6,12 @@ import { AppRoutes } from '@constants/paths';
 
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
-import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
+import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const { createChat } = useCreateChat();
+  const controller = useFileSystemActions();
+  const { createChat } = controller.actions;
 
   const handleSubmit = async (data: OnSubmitArgs) => {
     const chatId = await createChat({

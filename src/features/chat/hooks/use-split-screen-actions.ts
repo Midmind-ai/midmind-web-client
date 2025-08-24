@@ -24,7 +24,26 @@ export const useSplitScreenActions = (actualChatId?: string) => {
     }
   };
 
+  // Shared navigation functions to break circular dependencies
+  const openChatInNewTab = (chatId: string) => {
+    window.open(AppRoutes.Chat(chatId), '_blank');
+  };
+
+  const openChatInSidePanel = (chatId: string) => {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set(SearchParams.Split, chatId);
+    navigate(`${location.pathname}${currentUrl.search}`);
+  };
+
+  const navigateToChat = (chatId: string) => {
+    const currentSearch = window.location.search;
+    navigate(`${AppRoutes.Chat(chatId)}${currentSearch}`);
+  };
+
   return {
     openChatInSplitView,
+    openChatInNewTab,
+    openChatInSidePanel,
+    navigateToChat,
   };
 };

@@ -1,7 +1,5 @@
 import { useParams } from 'react-router';
 
-import { AppRoutes } from '@constants/paths';
-
 import { DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import type {
   CreateBranchArgs,
@@ -9,7 +7,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
-import { useCreateChat } from '@features/file-system/hooks/use-create-chat';
+import { useCreateChat } from '@features/file-system/actions/use-create-chat';
 
 import type { ConversationBranchContext } from '@shared-types/entities';
 
@@ -19,8 +17,7 @@ export const useChatActions = (actualChatId?: string) => {
   const { id: urlChatId = '' } = useParams();
   const chatId = actualChatId || urlChatId;
 
-  const { openChatInSplitView } = useSplitScreenActions(chatId);
-
+  const { openChatInNewTab, openChatInSidePanel } = useSplitScreenActions(chatId);
   const { createChat } = useCreateChat();
 
   const createBranch = async ({
@@ -104,14 +101,6 @@ export const useChatActions = (actualChatId?: string) => {
   const createNewBranchSet = (_messageId: string) => {
     // eslint-disable-next-line no-alert
     alert('Coming soon');
-  };
-
-  const openChatInSidePanel = (chatId: string) => {
-    openChatInSplitView(chatId);
-  };
-
-  const openChatInNewTab = (chatId: string) => {
-    window.open(AppRoutes.Chat(chatId), '_blank', 'noopener,noreferrer');
   };
 
   return {

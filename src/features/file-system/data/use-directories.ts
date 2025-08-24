@@ -4,7 +4,7 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
-export const useSwrGetDirectories = (parentId?: string | null) => {
+export const useDirectories = (parentId?: string | null) => {
   const {
     data: directories,
     isLoading,

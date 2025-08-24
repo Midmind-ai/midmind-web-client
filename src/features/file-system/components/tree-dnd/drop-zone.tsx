@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 
-import type { DroppableData } from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
+import type { DroppableData } from '@features/file-system/use-file-system.actions';
 
 import { cn } from '@utils/cn';
 

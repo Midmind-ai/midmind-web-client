@@ -1,26 +1,20 @@
-import { useTreeNodeLogic } from '@features/file-system/components/tree-node/logic/use-tree-node-logic';
-import ExpandableNode from '@features/file-system/components/tree-node/rendering/expandable-node';
-import LeafNode from '@features/file-system/components/tree-node/rendering/leaf-node';
-import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
-import { useTreeData } from '@features/file-system/hooks/use-tree-data';
-import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes-store';
+import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
+import LeafNode from '@features/file-system/components/tree-node/components/leaf-node';
+import {
+  useFileSystemActions,
+  type TreeNode as TreeNodeType,
+} from '@features/file-system/use-file-system.actions';
 
 type Props = {
   node: TreeNodeType;
 };
 
 const TreeNode = ({ node }: Props) => {
-  const { isExpanded, setExpanded } = useExpandedNodesStore();
+  const { isExpanded, isNodeActive, handleNodeClick } = useFileSystemActions().helpers;
+  const { setExpanded } = useFileSystemActions().actions;
   const isOpen = isExpanded(node.id);
-
-  const { isActive, handleClick } = useTreeNodeLogic(node);
-
-  // Fetch children only when expanded
-  const shouldFetchChildren = isOpen && (node.type === 'directory' || node.hasChildren);
-  const { treeNodes: childNodes, isLoading: isLoadingChildren } = useTreeData(
-    shouldFetchChildren ? node.id : null,
-    shouldFetchChildren ? (node.type === 'chats' ? 'chat' : node.type) : undefined
-  );
+  const isActive = isNodeActive(node);
+  const handleClick = () => handleNodeClick(node);
 
   const setIsOpen = (open: boolean) => {
     setExpanded(node.id, open);
@@ -44,8 +38,6 @@ const TreeNode = ({ node }: Props) => {
       isActive={isActive}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      childNodes={childNodes}
-      isLoadingChildren={isLoadingChildren}
       onClick={handleClick}
       TreeNodeComponent={TreeNode}
     />

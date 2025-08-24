@@ -1,8 +1,8 @@
 import {
-  useSwrGetChatsByParentDirectory,
-  useSwrGetChatsByParentChat,
-} from '@hooks/swr/use-swr-get-chats';
-import { useSwrGetDirectories } from '@hooks/swr/use-swr-get-directories';
+  useChatsByParentDirectory,
+  useChatsByParentChat,
+} from '@features/file-system/data/use-chats';
+import { useDirectories } from '@features/file-system/data/use-directories';
 
 import type { Chat, Directory } from '@shared-types/entities';
 
@@ -16,10 +16,17 @@ export type TreeNode = {
   originalData: Directory | Chat;
 };
 
-export const useTreeData = (
+// Data-only type for pure data fetching
+export type FileSystemData = {
+  treeNodes: TreeNode[];
+  isLoading: boolean;
+  error: unknown;
+};
+
+export const useFileSystemData = (
   parentId?: string | null,
   parentType?: 'directory' | 'chat'
-) => {
+): FileSystemData => {
   // Determine if we're fetching children of a chat or a directory
   const isParentChat = parentType === 'chat';
 
@@ -28,21 +35,21 @@ export const useTreeData = (
     directories,
     isLoading: isLoadingDirectories,
     error: directoriesError,
-  } = useSwrGetDirectories(isParentChat ? null : parentId);
+  } = useDirectories(isParentChat ? null : parentId);
 
   // Fetch chats by parent directory (only if parent is not a chat)
   const {
     chats: chatsByDirectory,
     isLoading: isLoadingChatsByDirectory,
     error: chatsByDirectoryError,
-  } = useSwrGetChatsByParentDirectory(isParentChat ? null : parentId);
+  } = useChatsByParentDirectory(isParentChat ? null : parentId);
 
   // Fetch chats by parent chat (only if parent is a chat)
   const {
     chats: chatsByParentChat,
     isLoading: isLoadingChatsByParentChat,
     error: chatsByParentChatError,
-  } = useSwrGetChatsByParentChat(isParentChat ? parentId : null);
+  } = useChatsByParentChat(isParentChat ? parentId : null);
 
   // Select the appropriate chats based on parent type
   const chats = isParentChat ? chatsByParentChat : chatsByDirectory;

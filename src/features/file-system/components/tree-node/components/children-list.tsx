@@ -1,18 +1,27 @@
 import { SidebarMenuSub } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
 
-import { SKELETON_COUNT } from '@features/file-system/components/tree-node/logic/constants';
-import type { TreeNode as TreeNodeType } from '@features/file-system/hooks/use-tree-data';
+import { SKELETON_COUNT } from '@features/file-system/components/tree-node/constants';
+import {
+  useFileSystemData,
+  type TreeNode as TreeNodeType,
+} from '@features/file-system/use-file-system.data';
 
 type Props = {
-  isLoadingChildren: boolean;
-  childNodes?: TreeNodeType[];
+  parentNodeId: string;
+  parentNodeType: 'directory' | 'chat';
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
   }>;
 };
 
-const ChildrenList = ({ isLoadingChildren, childNodes, TreeNodeComponent }: Props) => {
+const ChildrenList = ({ parentNodeId, parentNodeType, TreeNodeComponent }: Props) => {
+  // Fetch children data for this parent node using data-only hook
+  const { treeNodes: childNodes, isLoading: isLoadingChildren } = useFileSystemData(
+    parentNodeId,
+    parentNodeType
+  );
+
   return (
     <SidebarMenuSub className="ml-3.5 pb-0 pl-3.5">
       {isLoadingChildren && (

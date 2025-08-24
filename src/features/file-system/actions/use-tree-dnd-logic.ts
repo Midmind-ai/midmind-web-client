@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
-import { useMoveChat } from '@features/file-system/hooks/use-move-chat';
-import { useMoveDirectory } from '@features/file-system/hooks/use-move-directory';
-import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
+import { useMoveChat } from './use-move-chat';
+import { useMoveDirectory } from './use-move-directory';
 
+import type { TreeNode } from '../use-file-system.actions';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
 export type DraggableData = {

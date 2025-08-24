@@ -1,8 +1,8 @@
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 import { ThemedSpan } from '@components/ui/themed-span';
 
-import NodeIcon from '@features/file-system/components/tree-node/ui/node-icon';
-import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
+import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
+import type { TreeNode } from '@features/file-system/use-file-system.actions';
 
 type Props = {
   node: TreeNode;

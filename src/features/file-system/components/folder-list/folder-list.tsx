@@ -1,14 +1,14 @@
 import { SidebarGroup, SidebarGroupContent, SidebarMenu } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
 
-import { useFolderListLogic } from '@features/file-system/components/folder-list/use-folder-list-logic';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-provider';
-import type { DroppableData } from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
+import { type DroppableData } from '@features/file-system/use-file-system.actions';
+import { useFileSystemData } from '@features/file-system/use-file-system.data';
 
 const FolderList = () => {
-  const { treeNodes, isLoading } = useFolderListLogic();
+  const { treeNodes, isLoading } = useFileSystemData();
 
   // Root drop zone configuration - accepts items to move to root level (null parent)
   const rootDroppableData: DroppableData = {

@@ -5,15 +5,13 @@ import { SidebarMenuButton } from '@components/ui/sidebar';
 
 import { AppRoutes } from '@constants/paths';
 
-import { useCreateDirectory } from '@features/file-system/hooks/use-create-directory';
-
-import { useInlineEditStore } from '@stores/use-inline-edit-store';
+import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
 
 const FolderActions = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { startEditing } = useInlineEditStore();
-  const { createTemporaryDirectory } = useCreateDirectory();
+  const controller = useFileSystemActions();
+  const { createTemporaryDirectory, startEditing } = controller.actions;
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -39,13 +37,7 @@ const FolderActions = () => {
 
   return (
     <div className="flex justify-end border-b-1 p-1">
-      {/* <SidebarMenuButton className={buttonClassNames}>
-        <FileSearch2 className="size-5.5! stroke-[1px]" />
-      </SidebarMenuButton> */}
       <div className="flex gap-1">
-        {/* <SidebarMenuButton className={buttonClassNames}>
-          <FilePlus2 className="size-5.5! stroke-1" />
-        </SidebarMenuButton> */}
         <SidebarMenuButton
           className={buttonClassNames}
           onClick={handleCreateDirectory}
@@ -58,12 +50,6 @@ const FolderActions = () => {
         >
           <MessageSquarePlus className="size-5.5! stroke-1" />
         </SidebarMenuButton>
-        {/* <SidebarMenuButton className={buttonClassNames}>
-          <PackagePlus
-            className="size-5.5! stroke-1"
-            color="oklch(62.7% 0.194 149.214)"
-          />
-        </SidebarMenuButton> */}
       </div>
     </div>
   );

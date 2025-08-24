@@ -13,15 +13,16 @@ import {
 import { SidebarMenu } from '@components/ui/sidebar';
 
 import DragOverlayNode from '@features/file-system/components/tree-dnd/drag-overlay-node';
-import { useTreeDndLogic } from '@features/file-system/components/tree-dnd/use-tree-dnd-logic';
+import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
 
 type Props = {
   children: React.ReactNode;
 };
 
 const TreeDndProvider = ({ children }: Props) => {
-  const { activeItem, handleDragStart, handleDragEnd, handleDragCancel } =
-    useTreeDndLogic();
+  const controller = useFileSystemActions();
+  const { handleDragStart, handleDragEnd, handleDragCancel } = controller.actions;
+  const { draggedNode } = controller.ui;
 
   // Configure sensors for different input methods
   const sensors = useSensors(
@@ -61,7 +62,7 @@ const TreeDndProvider = ({ children }: Props) => {
           transformOrigin: '0 0',
         }}
       >
-        {activeItem ? (
+        {draggedNode ? (
           <div
             className="scale-90 transform-gpu cursor-grabbing transition-transform
               duration-200 ease-out"
@@ -73,7 +74,7 @@ const TreeDndProvider = ({ children }: Props) => {
             <SidebarMenu
               className="bg-sidebar border-border/50 gap-[2px] rounded-md border"
             >
-              <DragOverlayNode node={activeItem.node} />
+              <DragOverlayNode node={draggedNode.node} />
             </SidebarMenu>
           </div>
         ) : null}

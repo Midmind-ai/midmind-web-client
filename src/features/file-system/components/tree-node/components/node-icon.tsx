@@ -1,6 +1,6 @@
 import { Folder, MessageCircle, MessagesSquare } from 'lucide-react';
 
-import type { TreeNode } from '@features/file-system/hooks/use-tree-data';
+import type { TreeNode } from '@features/file-system/use-file-system.actions';
 
 type Props = {
   nodeType: TreeNode['type'];
