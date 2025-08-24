@@ -7,10 +7,14 @@ import {
 import { captureSelection } from '@features/chat/utils/text-selection';
 
 type UseUserMessageLogicArgs = {
+  chatId: string;
   onAutoScroll: VoidFunction;
 };
 
-export const useUserMessageLogic = ({ onAutoScroll }: UseUserMessageLogicArgs) => {
+export const useUserMessageLogic = ({
+  chatId,
+  onAutoScroll,
+}: UseUserMessageLogicArgs) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
   const getCurrentSelectionContext = () => {
@@ -20,8 +24,10 @@ export const useUserMessageLogic = ({ onAutoScroll }: UseUserMessageLogicArgs) =
   };
 
   useEffect(() => {
-    const handleMessageSent = () => {
-      onAutoScroll();
+    const handleMessageSent = (messageChatId: string) => {
+      if (messageChatId === chatId) {
+        onAutoScroll();
+      }
     };
 
     subscribeToMessageSent(handleMessageSent);
@@ -29,7 +35,7 @@ export const useUserMessageLogic = ({ onAutoScroll }: UseUserMessageLogicArgs) =
     return () => {
       unsubscribeFromMessageSent(handleMessageSent);
     };
-  }, [onAutoScroll]);
+  }, [chatId, onAutoScroll]);
 
   return {
     messageRef,

@@ -99,7 +99,7 @@ export const useConversationWithAI = (chatId: string) => {
       }
     );
 
-    emitMessageSent();
+    emitMessageSent(chatId);
 
     await trigger(body, {
       rollbackOnError: true,

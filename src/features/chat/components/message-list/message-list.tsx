@@ -38,6 +38,7 @@ const MessageList = ({ chatId }: Props) => {
                 ref={scrollTargetRef}
               >
                 <UserMessage
+                  chatId={chatId}
                   {...message}
                   onAutoScroll={handleAutoScroll}
                   onCopyText={() => messageActions.copyText(content)}

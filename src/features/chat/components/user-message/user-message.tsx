@@ -7,6 +7,7 @@ import { useUserMessageLogic } from '@features/chat/components/user-message/use-
 import type { UseMessageSelectionContextT } from '@features/chat/types/chat-types';
 
 type Props = {
+  chatId: string;
   content: string;
   reply_content: string | null;
   onReply: VoidFunction;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 const UserMessage = ({
+  chatId,
   content,
   reply_content,
   onReply,
@@ -30,6 +32,7 @@ const UserMessage = ({
   onNewSetOfBranches,
 }: Props) => {
   const { messageRef, getCurrentSelectionContext } = useUserMessageLogic({
+    chatId,
     onAutoScroll,
   });
 
