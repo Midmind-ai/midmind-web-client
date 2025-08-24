@@ -60,7 +60,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
     directories?.forEach((dir: Directory) => {
       // Initialize empty directories cache for this directory
       mutate(
-        CACHE_KEYS.directories.withParent(dir.id),
+        CACHE_KEYS.directories.byParentId(dir.id),
         (currentData: Directory[] | undefined) => {
           // Only initialize if cache doesn't exist (undefined)
           // If it already exists (even as empty array), keep it
@@ -71,7 +71,7 @@ export const useTreeNodeLogic = (node: TreeNode, isOpen: boolean) => {
 
       // Also initialize empty chats cache for this directory
       mutate(
-        CACHE_KEYS.chats.withParent(dir.id, undefined),
+        CACHE_KEYS.chats.byParentId(dir.id, undefined),
         (currentData: Chat[] | undefined) => {
           return currentData ?? [];
         },

@@ -11,7 +11,7 @@ export const useSwrGetDirectories = (parentId?: string | null) => {
     error,
     mutate,
   } = useSWR(
-    parentId !== null ? CACHE_KEYS.directories.withParent(parentId || undefined) : null,
+    parentId !== null ? CACHE_KEYS.directories.byParentId(parentId || undefined) : null,
     parentId !== null
       ? () => DirectoriesService.getDirectories(parentId || undefined)
       : null

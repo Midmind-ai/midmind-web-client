@@ -22,11 +22,11 @@ export const useMoveChat = () => {
     sourceParentChatId,
     targetParentDirectoryId,
   }: MoveChatParams) => {
-    const sourceCacheKey = CACHE_KEYS.chats.withParent(
+    const sourceCacheKey = CACHE_KEYS.chats.byParentId(
       sourceParentDirectoryId,
       sourceParentChatId
     );
-    const targetCacheKey = CACHE_KEYS.chats.withParent(targetParentDirectoryId);
+    const targetCacheKey = CACHE_KEYS.chats.byParentId(targetParentDirectoryId);
 
     // Get current cache data for both source and target using unstable_serialize
     const sourceCacheState = cache.get(unstable_serialize(sourceCacheKey));

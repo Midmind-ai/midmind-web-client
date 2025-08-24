@@ -28,7 +28,7 @@ export const getInfiniteKey = (chatId: string) => {
 
       const skip = pageIndex * ITEMS_PER_PAGE;
 
-      return `${CACHE_KEYS.messages.chat(chatId)}?page=${pageIndex}&skip=${skip}&take=${ITEMS_PER_PAGE}`;
+      return `${CACHE_KEYS.messages.byChatId(chatId)}?page=${pageIndex}&skip=${skip}&take=${ITEMS_PER_PAGE}`;
     }
   );
 };

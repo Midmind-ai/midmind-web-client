@@ -23,7 +23,7 @@ export const useCreateDirectory = () => {
     };
 
     // Add to cache immediately at the top of the list
-    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.byParentId(parentDirectoryId);
 
     mutate(
       cacheKey,
@@ -45,7 +45,7 @@ export const useCreateDirectory = () => {
     name: string,
     parentDirectoryId?: string
   ) => {
-    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.byParentId(parentDirectoryId);
 
     await mutate(
       cacheKey,
@@ -66,8 +66,8 @@ export const useCreateDirectory = () => {
       });
 
       // Create child caches for the new directory chats and folders
-      await mutate(CACHE_KEYS.directories.withParent(id), [], { revalidate: false });
-      await mutate(CACHE_KEYS.chats.withParent(id, undefined), [], {
+      await mutate(CACHE_KEYS.directories.byParentId(id), [], { revalidate: false });
+      await mutate(CACHE_KEYS.chats.byParentId(id, undefined), [], {
         revalidate: false,
       });
 
@@ -96,7 +96,7 @@ export const useCreateDirectory = () => {
   };
 
   const removeTemporaryDirectory = async (id: string, parentDirectoryId?: string) => {
-    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.byParentId(parentDirectoryId);
 
     await mutate(
       cacheKey,

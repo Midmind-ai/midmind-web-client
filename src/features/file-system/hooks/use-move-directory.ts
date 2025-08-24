@@ -20,8 +20,8 @@ export const useMoveDirectory = () => {
     sourceParentDirectoryId,
     targetParentDirectoryId,
   }: MoveDirectoryParams) => {
-    const sourceCacheKey = CACHE_KEYS.directories.withParent(sourceParentDirectoryId);
-    const targetCacheKey = CACHE_KEYS.directories.withParent(targetParentDirectoryId);
+    const sourceCacheKey = CACHE_KEYS.directories.byParentId(sourceParentDirectoryId);
+    const targetCacheKey = CACHE_KEYS.directories.byParentId(targetParentDirectoryId);
 
     // Get current cache data for both source and target using unstable_serialize
     const sourceCacheState = cache.get(unstable_serialize(sourceCacheKey));

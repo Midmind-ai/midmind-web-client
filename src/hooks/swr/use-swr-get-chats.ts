@@ -13,7 +13,7 @@ export const useSwrGetChatsByParentDirectory = (parentDirectoryId?: string | nul
     mutate,
   } = useSWR(
     parentDirectoryId !== null
-      ? CACHE_KEYS.chats.withParent(parentDirectoryId, undefined)
+      ? CACHE_KEYS.chats.byParentId(parentDirectoryId, undefined)
       : null,
     parentDirectoryId !== null ? () => ChatsService.getChats({ parentDirectoryId }) : null
   );
@@ -34,7 +34,7 @@ export const useSwrGetChatsByParentChat = (parentChatId?: string | null) => {
     error,
     mutate,
   } = useSWR(
-    parentChatId !== null ? CACHE_KEYS.chats.withParent(undefined, parentChatId) : null,
+    parentChatId !== null ? CACHE_KEYS.chats.byParentId(undefined, parentChatId) : null,
     parentChatId !== null ? () => ChatsService.getChats({ parentChatId }) : null
   );
 

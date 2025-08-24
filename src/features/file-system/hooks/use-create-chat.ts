@@ -110,7 +110,7 @@ export const useCreateChat = () => {
         expandNode(parentChatId);
 
         // Determine the cache key for child chats
-        const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
+        const cacheKey = CACHE_KEYS.chats.byParentId(parentDirectoryId, parentChatId);
 
         // Load existing chats from server to ensure they appear in expanded area
         const existingChats = await ChatsService.getChats({ parentChatId });
@@ -126,7 +126,7 @@ export const useCreateChat = () => {
         );
       } else {
         // For non-branch chats, determine cache key and add directly
-        const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
+        const cacheKey = CACHE_KEYS.chats.byParentId(parentDirectoryId, parentChatId);
 
         await mutate(
           cacheKey,
@@ -166,7 +166,7 @@ export const useCreateChat = () => {
 
         // Populate both the infinite key cache and direct string key cache
         const infiniteKey = getInfiniteKey(chatId);
-        const messagesKey = `${CACHE_KEYS.messages.chat(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+        const messagesKey = `${CACHE_KEYS.messages.byChatId(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
 
         // Populate infinite key cache (used by handleContentChunk)
         await mutate(

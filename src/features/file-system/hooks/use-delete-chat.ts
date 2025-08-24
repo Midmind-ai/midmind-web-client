@@ -20,7 +20,7 @@ export const useDeleteChat = () => {
     parentDirectoryId,
     parentChatId,
   }: DeleteChatParams) => {
-    const cacheKey = CACHE_KEYS.chats.withParent(parentDirectoryId, parentChatId);
+    const cacheKey = CACHE_KEYS.chats.byParentId(parentDirectoryId, parentChatId);
 
     await mutate(
       cacheKey,

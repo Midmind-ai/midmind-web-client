@@ -10,7 +10,7 @@ export const useDeleteDirectory = () => {
   const { mutate } = useSWRConfig();
 
   const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
-    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+    const cacheKey = CACHE_KEYS.directories.byParentId(parentDirectoryId);
 
     await mutate(
       cacheKey,

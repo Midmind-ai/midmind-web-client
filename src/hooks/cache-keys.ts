@@ -5,8 +5,8 @@ export const CACHE_KEYS = {
     signIn: ['auth', 'signIn'],
   },
   chats: {
-    all: ['chats'],
-    withParent: (parentDirectoryId?: string | null, parentChatId?: string | null) => {
+    root: ['chats'],
+    byParentId: (parentDirectoryId?: string | null, parentChatId?: string | null) => {
       if (parentDirectoryId) {
         return ['chats', 'directory', parentDirectoryId];
       }
@@ -20,13 +20,17 @@ export const CACHE_KEYS = {
     breadcrumbs: (id: string) => ['breadcrumbs', id],
   },
   directories: {
-    all: ['directories'],
-    withParent: (parentId?: string | null) =>
+    root: ['directories'],
+    byParentId: (parentId?: string | null) =>
       parentId ? ['directories', parentId] : ['directories'],
   },
   messages: {
-    chat: (chatId: string) => ['messages', chatId],
-    paginated: (chatId: string, pageIndex: number) => ['messages', chatId, pageIndex],
+    byChatId: (chatId: string) => ['messages', chatId],
+    byChatIdPaginated: (chatId: string, pageIndex: number) => [
+      'messages',
+      chatId,
+      pageIndex,
+    ],
   },
 } as const;
 
