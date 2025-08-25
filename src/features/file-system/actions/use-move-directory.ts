@@ -1,10 +1,10 @@
-import { useSWRConfig, unstable_serialize } from 'swr';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
+
+import { useSWRConfig, unstable_serialize } from '@lib/swr';
 
 type MoveDirectoryParams = {
   directoryId: string;

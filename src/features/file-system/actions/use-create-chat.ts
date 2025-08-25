@@ -1,4 +1,3 @@
-import { useSWRConfig, unstable_serialize } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
@@ -20,6 +19,8 @@ import { ConversationsService } from '@services/conversations/conversations-serv
 import { useAbortControllerStore } from '@stores/use-abort-controller-store';
 
 import type { ChatBranchContext, Chat, ChatMessage } from '@shared-types/entities';
+
+import { useSWRConfig, unstable_serialize } from '@lib/swr';
 
 type CreateChatArgs = {
   content: string;

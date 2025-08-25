@@ -1,10 +1,10 @@
-import { useSWRConfig, unstable_serialize } from 'swr';
-
 import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
 import type { Chat } from '@shared-types/entities';
+
+import { useSWRConfig, unstable_serialize } from '@lib/swr';
 
 type DeleteChatParams = {
   id: string;

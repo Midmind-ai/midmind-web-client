@@ -1,6 +1,6 @@
 import { apiConfig } from '@config/api';
 
-import type { SWRConfiguration } from 'swr';
+import type { SWRConfiguration } from '@lib/swr';
 
 /**
  * Global SWR configuration

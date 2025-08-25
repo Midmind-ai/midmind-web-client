@@ -1,11 +1,11 @@
-import useSWRInfinite from 'swr/infinite';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { MessagesService } from '@services/messages/messages-service';
 
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
+
+import { useSWRInfinite } from '@lib/swr';
 
 export const ITEMS_PER_PAGE = 20;
 
@@ -32,7 +32,7 @@ export const useGetChatMessages = (chatId: string) => {
     isValidating,
   } = useSWRInfinite(
     getKey,
-    key => {
+    (key: string) => {
       const pageIndex = parseInt(key.split('page=')[1]?.split('&')[0] || '0');
       const skip = pageIndex * ITEMS_PER_PAGE;
 

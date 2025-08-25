@@ -1,10 +1,10 @@
-import { useSWRConfig } from 'swr';
-
 import { findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
+
+import { useSWRConfig } from '@lib/swr';
 
 type RenameDirectoryParams = {
   id: string;

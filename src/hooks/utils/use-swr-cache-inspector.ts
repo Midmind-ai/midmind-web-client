@@ -1,4 +1,4 @@
-import { useSWRConfig } from 'swr';
+import { useSWRConfig } from '@lib/swr';
 
 /**
  * Simple hook to inspect SWR cache programmatically.

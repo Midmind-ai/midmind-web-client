@@ -1,8 +1,8 @@
-import useSWR from 'swr';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
+
+import { useSWR } from '@lib/swr';
 
 // Hook for getting chats by parent directory
 export const useChatsByParentDirectory = (parentDirectoryId?: string | null) => {

@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
-import { useSWRConfig } from 'swr';
 import { z } from 'zod';
 
 import { LocalStorageKeys } from '@constants/local-storage';
@@ -16,6 +15,8 @@ import type { SignInRequest } from '@services/auth/auth-dtos';
 import { AuthService } from '@services/auth/auth-service';
 
 import { setToStorage } from '@utils/local-storage';
+
+import { useSWRConfig } from '@lib/swr';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),

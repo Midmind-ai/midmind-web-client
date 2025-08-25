@@ -1,8 +1,8 @@
-import useSWR from 'swr';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
+
+import { useSWR } from '@lib/swr';
 
 export const useDirectories = (parentId?: string | null) => {
   const {

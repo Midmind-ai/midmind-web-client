@@ -1,4 +1,3 @@
-import { useSWRConfig } from 'swr';
 import { v4 as uuidv4 } from 'uuid';
 
 import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
@@ -6,6 +5,8 @@ import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
+
+import { useSWRConfig } from '@lib/swr';
 
 export const useCreateDirectory = () => {
   const { mutate } = useSWRConfig();

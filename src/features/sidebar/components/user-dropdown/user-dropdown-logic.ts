@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router';
-import { useSWRConfig } from 'swr';
 
 import { useTheme } from '@app/providers/theme-provider';
 
@@ -12,6 +11,8 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 import { useCurrentUser, useLogout } from '@hooks/logic/use-auth-operations';
 
 import { removeFromStorage } from '@utils/local-storage';
+
+import { useSWRConfig } from '@lib/swr';
 
 export const useUserDropdownLogic = () => {
   const navigate = useNavigate();

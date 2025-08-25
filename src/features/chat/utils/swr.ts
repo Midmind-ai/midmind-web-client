@@ -1,6 +1,4 @@
 import { produce } from 'immer';
-import { mutate } from 'swr';
-import { unstable_serialize } from 'swr/infinite';
 
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type {
@@ -18,6 +16,8 @@ import type { ConversationWithAIResponseDto } from '@services/conversations/conv
 
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
+
+import { mutate, unstable_serialize } from '@lib/swr';
 
 export const getInfiniteKey = (chatId: string) => {
   return unstable_serialize(

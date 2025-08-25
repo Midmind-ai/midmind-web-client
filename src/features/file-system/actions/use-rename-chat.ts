@@ -1,10 +1,10 @@
-import { useSWRConfig } from 'swr';
-
 import { findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
 import type { Chat } from '@shared-types/entities';
+
+import { useSWRConfig } from '@lib/swr';
 
 export const useRenameChat = () => {
   const { mutate } = useSWRConfig();

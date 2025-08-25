@@ -17,7 +17,8 @@
       "@services/*": ["./src/services/*"],
       "@stores/*": ["./src/stores/*"],
       "@shared-types/*": ["./src/types/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@lib/*": ["./src/lib/*"]
     }
   }
 }

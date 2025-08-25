@@ -1,6 +1,4 @@
 import { produce } from 'immer';
-import { useSWRConfig } from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 import { emitMessageSent } from '@features/chat/utils/message-send-emitter';
 import { getInfiniteKey, handleLLMResponse } from '@features/chat/utils/swr';
@@ -18,6 +16,8 @@ import { useAbortControllerStore } from '@stores/use-abort-controller-store';
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
 
+import { useSWRConfig, useSWRMutation } from '@lib/swr';
+
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();
   const {
@@ -26,7 +26,7 @@ export const useConversationWithAI = (chatId: string) => {
     error,
   } = useSWRMutation(
     MUTATION_KEYS.chats.sendMessage(chatId),
-    async (_, { arg }: { arg: ConversationWithAIRequestDto }) => {
+    async (_: unknown, { arg }: { arg: ConversationWithAIRequestDto }) => {
       const abortController = createAbortController(chatId);
 
       ConversationsService.conversationWithAI(

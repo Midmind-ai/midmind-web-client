@@ -1,10 +1,10 @@
-import { useSWRConfig } from 'swr';
-
 import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
+
+import { useSWRConfig } from '@lib/swr';
 
 export const useDeleteDirectory = () => {
   const { mutate } = useSWRConfig();

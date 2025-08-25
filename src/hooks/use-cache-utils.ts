@@ -1,4 +1,4 @@
-import { useSWRConfig } from 'swr';
+import { useSWRConfig } from '@lib/swr';
 
 /**
  * Hook that provides utilities for searching and manipulating SWR cache

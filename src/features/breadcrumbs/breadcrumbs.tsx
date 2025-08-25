@@ -9,6 +9,8 @@ import { AppRoutes } from '@constants/paths';
 import BreadcrumbItem from '@features/breadcrumbs/components/breadcrumb-item/breadcrumb-item';
 import { useGetChatBreadcrumbs } from '@features/breadcrumbs/hooks/use-get-chat-breadcrumbs';
 
+import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
+
 type Props = {
   id: string;
 };
@@ -19,7 +21,7 @@ const Breadcrumbs = ({ id }: Props) => {
   return (
     <Breadcrumb>
       <BreadcrumbList className="gap-1 sm:gap-1">
-        {data?.map(({ id, name, type }, index) => (
+        {data?.map(({ id, name, type }: GetChatBreadcrumbsResponse[0], index: number) => (
           <div
             className="flex items-center"
             key={id}
