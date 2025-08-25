@@ -37,24 +37,27 @@ const SplitLayout = () => {
       >
         <Outlet />
       </ResizablePanel>
-      <ResizableHandle />
+
       {chatId && (
-        <ResizablePanel
-          id="side-panel"
-          order={2}
-          minSize={35}
-          onResize={handleResize}
-          defaultSize={sidePanelWidth}
-          className="w-1/2"
-        >
-          <Chat
-            chatId={chatId}
-            showCloseButton
-            showSidebarToggle={false}
-            onClose={removeValue}
-            branchContext={branchContext}
-          />
-        </ResizablePanel>
+        <>
+          <ResizableHandle />
+          <ResizablePanel
+            id="side-panel"
+            order={2}
+            minSize={35}
+            onResize={handleResize}
+            defaultSize={sidePanelWidth}
+            className="w-1/2"
+          >
+            <Chat
+              chatId={chatId}
+              showCloseButton
+              showSidebarToggle={false}
+              onClose={removeValue}
+              branchContext={branchContext}
+            />
+          </ResizablePanel>
+        </>
       )}
     </ResizablePanelGroup>
   );

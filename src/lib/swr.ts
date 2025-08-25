@@ -16,40 +16,90 @@ import { default as useOriginalSWRMutation } from 'swr/mutation';
 // Re-export everything from SWR first (except what we're wrapping)
 export * from 'swr';
 
-// Check if mutation logging is enabled
-const getDebugStatus = () =>
-  typeof window !== 'undefined' &&
-  process.env.NODE_ENV !== 'production' &&
-  localStorage.getItem('debug:mutations');
+// Verbosity levels
+type VerbosityLevel = 'off' | 'compact' | 'detailed';
+
+// Check current verbosity level
+const getVerbosityLevel = (): VerbosityLevel => {
+  if (typeof window === 'undefined' || process.env.NODE_ENV === 'production') {
+    return 'off';
+  }
+  const stored = localStorage.getItem('debug:swr-verbosity');
+
+  return (stored as VerbosityLevel) || 'off';
+};
+
+// Check if any logging is enabled
+const getDebugStatus = () => getVerbosityLevel() !== 'off';
 
 const logMutationStart = (key: any, currentData?: any, optimisticData?: any) => {
-  if (!getDebugStatus()) return;
+  const verbosity = getVerbosityLevel();
+  if (verbosity === 'off') return;
 
-  console.group(
-    `%c🔄 SWR Mutate: ${JSON.stringify(key)}`,
-    'color: #0EA5E9; font-weight: bold'
-  );
-  console.log('📊 Previous:', currentData);
+  const serializedKey = JSON.stringify(key);
 
-  if (optimisticData !== undefined) {
-    console.log('✨ Optimistic:', optimisticData);
+  if (verbosity === 'compact') {
+    // Just show the start of the mutation - end will be logged separately
+    console.log(
+      `%c🔄 MUTATE %c${serializedKey} %c📊 Previous: %c${summarizeData(currentData)}`,
+      'color: #0EA5E9; font-weight: bold',
+      'color: #6B7280',
+      'color: #0EA5E9',
+      'color: #6B7280'
+    );
+
+    if (optimisticData !== undefined) {
+      console.log(
+        `%c   %c✨ Optimistic: %c${summarizeData(optimisticData)}`,
+        'color: transparent',
+        'color: #0EA5E9',
+        'color: #F59E0B'
+      );
+    }
+  } else if (verbosity === 'detailed') {
+    console.groupCollapsed(
+      `%c🔄 SWR Mutate: %c${serializedKey}`,
+      'color: #0EA5E9; font-weight: bold',
+      'color: #6B7280; font-weight: normal'
+    );
+    console.log('📊 Previous:', currentData);
+
+    if (optimisticData !== undefined) {
+      console.log('✨ Optimistic:', optimisticData);
+    }
   }
 };
 
 const logMutationEnd = (result: any, error?: any, duration?: number) => {
-  if (!getDebugStatus()) return;
+  const verbosity = getVerbosityLevel();
+  if (verbosity === 'off') return;
 
-  if (error) {
-    console.error('❌ Error:', error);
-  } else {
-    console.log('✅ Final:', result);
+  if (verbosity === 'compact') {
+    const timing = duration ? ` (${duration}ms)` : '';
+
+    if (error) {
+      console.error(`%c   %c❌ Error:${timing}`, 'color: transparent', 'color: #EF4444');
+    } else {
+      console.log(
+        `%c   %c✅ Final: %c${summarizeData(result)}${timing}`,
+        'color: transparent',
+        'color: #0EA5E9',
+        'color: #10B981'
+      );
+    }
+  } else if (verbosity === 'detailed') {
+    if (error) {
+      console.error('❌ Error:', error);
+    } else {
+      console.log('✅ Final:', result);
+    }
+
+    if (duration) {
+      console.log(`⏱️ Duration: ${duration}ms`);
+    }
+
+    console.groupEnd();
   }
-
-  if (duration) {
-    console.log(`⏱️ Duration: ${duration}ms`);
-  }
-
-  console.groupEnd();
 };
 
 // Create wrapped mutate function for useSWRConfig
@@ -118,44 +168,118 @@ export const useSWRConfig = () => {
   };
 };
 
-// Enhanced useSWR with fetch logging and grouping
-export const useSWR = (key: any, fetcher?: any, options?: any) => {
-  const startTime = useRef<number | null>(null);
+// Smart data summarization
+const summarizeData = (data: any): string => {
+  if (data === null) return 'null';
+  if (data === undefined) return 'undefined';
 
+  if (Array.isArray(data)) {
+    if (data.length === 0) return '[]';
+    if (data.length === 1) return '[1 item]';
+
+    return `[${data.length} items]`;
+  }
+
+  if (typeof data === 'object') {
+    const keys = Object.keys(data);
+    if (keys.length === 0) return '{}';
+
+    // Show key fields for common objects
+    const keyFields = ['id', 'name', 'email', 'title', 'type'];
+    const relevantKeys = keys.filter(key => keyFields.includes(key));
+
+    if (relevantKeys.length > 0) {
+      const preview = relevantKeys
+        .slice(0, 2)
+        .map(key => `${key}: ${JSON.stringify(data[key])}`)
+        .join(', ');
+
+      return `{${preview}${relevantKeys.length > 2 ? ', ...' : ''}}`;
+    }
+
+    return `{${keys.length} fields}`;
+  }
+
+  if (typeof data === 'string') {
+    return data.length > 50 ? `"${data.slice(0, 47)}..."` : JSON.stringify(data);
+  }
+
+  return String(data);
+};
+
+// Enhanced useSWR with improved logging
+export const useSWR = (key: any, fetcher?: any, options?: any) => {
   const result = useOriginalSWR(
     key,
     fetcher
       ? async (...args: any[]) => {
-          if (!getDebugStatus()) {
+          const verbosity = getVerbosityLevel();
+          if (verbosity === 'off') {
             return fetcher(...args);
           }
 
           const fetchStartTime = performance.now();
-          startTime.current = fetchStartTime;
-
           const serializedKey = JSON.stringify(key);
-          console.group(
-            `%c📡 SWR Fetch: ${serializedKey}`,
-            'color: #8B5CF6; font-weight: bold'
-          );
-          console.log('🔑 Key:', key);
-          console.log('⏰ Started:', new Date().toLocaleTimeString());
 
           try {
             const data = await fetcher(...args);
             const duration = Math.round(performance.now() - fetchStartTime);
 
-            console.log('✅ Success:', data);
-            console.log(`⏱️ Duration: ${duration}ms`);
-            console.groupEnd();
+            if (verbosity === 'compact') {
+              // Single line with timing
+              console.log(
+                `%c📡 GET %c${serializedKey} %c→ %c${summarizeData(data)} %c(${duration}ms)`,
+                'color: #8B5CF6; font-weight: bold',
+                'color: #6B7280',
+                'color: #8B5CF6',
+                'color: #10B981',
+                'color: #6B7280; font-size: 11px'
+              );
+            } else if (verbosity === 'detailed') {
+              // Collapsed group with clean summary line
+              console.groupCollapsed(
+                `%c📡 GET %c${serializedKey} %c→ %c${summarizeData(data)} %c(${duration}ms)`,
+                'color: #8B5CF6',
+                'color: #6B7280; font-weight: normal',
+                'color: #8B5CF6; font-weight: normal',
+                'color: #10B981; font-weight: normal',
+                'color: #6B7280; font-weight: normal; font-size: 11px'
+              );
+              console.log('🔑 Full Key:', key);
+              console.log('⏰ Started:', new Date().toLocaleTimeString());
+              console.log('✅ Full Data:', data);
+              console.log(`⏱️ Duration: ${duration}ms`);
+              console.groupEnd();
+            }
 
             return data;
           } catch (error) {
             const duration = Math.round(performance.now() - fetchStartTime);
 
-            console.error('❌ Error:', error);
-            console.log(`⏱️ Duration: ${duration}ms`);
-            console.groupEnd();
+            if (verbosity === 'compact') {
+              console.error(
+                `%c📡 GET %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+                'color: #8B5CF6; font-weight: bold',
+                'color: #6B7280',
+                'color: #8B5CF6',
+                'color: #EF4444',
+                'color: #6B7280; font-size: 11px'
+              );
+            } else if (verbosity === 'detailed') {
+              console.groupCollapsed(
+                `%c📡 GET %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+                'color: #8B5CF6; font-weight: normal',
+                'color: #6B7280; font-weight: normal',
+                'color: #8B5CF6; font-weight: normal',
+                'color: #EF4444; font-weight: normal',
+                'color: #6B7280; font-weight: normal; font-size: 11px'
+              );
+              console.log('🔑 Full Key:', key);
+              console.log('⏰ Started:', new Date().toLocaleTimeString());
+              console.error('❌ Full Error:', error);
+              console.log(`⏱️ Duration: ${duration}ms`);
+              console.groupEnd();
+            }
 
             throw error;
           }
@@ -167,41 +291,78 @@ export const useSWR = (key: any, fetcher?: any, options?: any) => {
   return result;
 };
 
-// Enhanced useSWRMutation with mutation logging
+// Enhanced useSWRMutation with improved logging
 export const useSWRMutation = (key: any, fetcher: any, options?: any) => {
   const result = useOriginalSWRMutation(
     key,
     async (url: any, { arg }: { arg: any }) => {
-      if (!getDebugStatus()) {
+      const verbosity = getVerbosityLevel();
+      if (verbosity === 'off') {
         return fetcher(url, { arg });
       }
 
       const startTime = performance.now();
       const serializedKey = JSON.stringify(key);
 
-      console.group(
-        `%c🚀 SWR Mutation: ${serializedKey}`,
-        'color: #F59E0B; font-weight: bold'
-      );
-      console.log('🔑 Key:', key);
-      console.log('📦 Args:', arg);
-      console.log('⏰ Started:', new Date().toLocaleTimeString());
-
       try {
         const result = await fetcher(url, { arg });
         const duration = Math.round(performance.now() - startTime);
 
-        console.log('✅ Success:', result);
-        console.log(`⏱️ Duration: ${duration}ms`);
-        console.groupEnd();
+        if (verbosity === 'compact') {
+          console.log(
+            `%c🚀 MUTATION %c${serializedKey} %c→ %c${summarizeData(result)} %c(${duration}ms)`,
+            'color: #F59E0B; font-weight: bold',
+            'color: #6B7280',
+            'color: #F59E0B',
+            'color: #10B981',
+            'color: #6B7280; font-size: 11px'
+          );
+        } else if (verbosity === 'detailed') {
+          console.groupCollapsed(
+            `%c🚀 MUTATION %c${serializedKey} %c→ %c${summarizeData(result)} %c(${duration}ms)`,
+            'color: #F59E0B; font-weight: normal',
+            'color: #6B7280',
+            'color: #F59E0B',
+            'color: #10B981',
+            'color: #6B7280; font-size: 11px'
+          );
+          console.log('🔑 Full Key:', key);
+          console.log('📦 Full Args:', arg);
+          console.log('⏰ Started:', new Date().toLocaleTimeString());
+          console.log('✅ Full Result:', result);
+          console.log(`⏱️ Duration: ${duration}ms`);
+          console.groupEnd();
+        }
 
         return result;
       } catch (error) {
         const duration = Math.round(performance.now() - startTime);
 
-        console.error('❌ Error:', error);
-        console.log(`⏱️ Duration: ${duration}ms`);
-        console.groupEnd();
+        if (verbosity === 'compact') {
+          console.error(
+            `%c🚀 MUTATION %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+            'color: #F59E0B; font-weight: bold',
+            'color: #6B7280',
+            'color: #F59E0B',
+            'color: #EF4444',
+            'color: #6B7280; font-size: 11px'
+          );
+        } else if (verbosity === 'detailed') {
+          console.groupCollapsed(
+            `%c🚀 MUTATION %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+            'color: #F59E0B; font-weight: normal',
+            'color: #6B7280; font-weight: normal',
+            'color: #F59E0B; font-weight: normal',
+            'color: #EF4444; font-weight: normal',
+            'color: #6B7280; font-weight: normal; font-size: 11px'
+          );
+          console.log('🔑 Full Key:', key);
+          console.log('📦 Full Args:', arg);
+          console.log('⏰ Started:', new Date().toLocaleTimeString());
+          console.error('❌ Full Error:', error);
+          console.log(`⏱️ Duration: ${duration}ms`);
+          console.groupEnd();
+        }
 
         throw error;
       }
@@ -212,41 +373,78 @@ export const useSWRMutation = (key: any, fetcher: any, options?: any) => {
   return result;
 };
 
-// Enhanced useSWRInfinite with infinite scroll logging
+// Enhanced useSWRInfinite with improved logging
 export const useSWRInfinite = (getKey: any, fetcher?: any, options?: any) => {
   const result = useOriginalSWRInfinite(
     getKey,
     fetcher
       ? async (...args: any[]) => {
-          if (!getDebugStatus()) {
+          const verbosity = getVerbosityLevel();
+          if (verbosity === 'off') {
             return fetcher(...args);
           }
 
           const startTime = performance.now();
           const pageKey = args[0]; // First arg is the page key
-
-          console.group(
-            `%c📜 SWR Infinite: ${JSON.stringify(pageKey)}`,
-            'color: #10B981; font-weight: bold'
-          );
-          console.log('🔑 Page Key:', pageKey);
-          console.log('⏰ Started:', new Date().toLocaleTimeString());
+          const serializedKey = JSON.stringify(pageKey);
 
           try {
             const data = await fetcher(...args);
             const duration = Math.round(performance.now() - startTime);
 
-            console.log('✅ Success:', data);
-            console.log(`⏱️ Duration: ${duration}ms`);
-            console.groupEnd();
+            if (verbosity === 'compact') {
+              console.log(
+                `%c📜 INFINITE %c${serializedKey} %c→ %c${summarizeData(data)} %c(${duration}ms)`,
+                'color: #10B981; font-weight: normal',
+                'color: #6B7280',
+                'color: #10B981',
+                'color: #059669',
+                'color: #6B7280; font-size: 11px'
+              );
+            } else if (verbosity === 'detailed') {
+              console.groupCollapsed(
+                `%c📜 INFINITE %c${serializedKey} %c→ %c${summarizeData(data)} %c(${duration}ms)`,
+                'color: #10B981; font-weight: normal',
+                'color: #6B7280; font-weight: normal',
+                'color: #10B981; font-weight: normal',
+                'color: #059669; font-weight: normal',
+                'color: #6B7280; font-weight: normal; font-size: 11px'
+              );
+              console.log('🔑 Full Page Key:', pageKey);
+              console.log('⏰ Started:', new Date().toLocaleTimeString());
+              console.log('✅ Full Data:', data);
+              console.log(`⏱️ Duration: ${duration}ms`);
+              console.groupEnd();
+            }
 
             return data;
           } catch (error) {
             const duration = Math.round(performance.now() - startTime);
 
-            console.error('❌ Error:', error);
-            console.log(`⏱️ Duration: ${duration}ms`);
-            console.groupEnd();
+            if (verbosity === 'compact') {
+              console.error(
+                `%c📜 INFINITE %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+                'color: #10B981; font-weight: bold',
+                'color: #6B7280',
+                'color: #10B981',
+                'color: #EF4444',
+                'color: #6B7280; font-size: 11px'
+              );
+            } else if (verbosity === 'detailed') {
+              console.groupCollapsed(
+                `%c📜 INFINITE %c${serializedKey} %c→ %c❌ Error %c(${duration}ms)`,
+                'color: #10B981; font-weight: normal',
+                'color: #6B7280',
+                'color: #10B981',
+                'color: #EF4444',
+                'color: #6B7280; font-size: 11px'
+              );
+              console.log('🔑 Full Page Key:', pageKey);
+              console.log('⏰ Started:', new Date().toLocaleTimeString());
+              console.error('❌ Full Error:', error);
+              console.log(`⏱️ Duration: ${duration}ms`);
+              console.groupEnd();
+            }
 
             throw error;
           }
@@ -260,17 +458,68 @@ export const useSWRInfinite = (getKey: any, fetcher?: any, options?: any) => {
 
 // Enhanced global mutate with logging
 export const mutate = (...args: Parameters<typeof originalMutate>) => {
-  if (!getDebugStatus()) {
+  const verbosity = getVerbosityLevel();
+  if (verbosity === 'off') {
     return originalMutate(...args);
   }
 
   const [key] = args;
-  console.log(
-    `%c⚡ Global Mutate: ${JSON.stringify(key)}`,
-    'color: #EF4444; font-weight: bold'
-  );
+  const serializedKey = JSON.stringify(key);
+
+  if (verbosity === 'compact') {
+    console.log(
+      `%c⚡ GLOBAL MUTATE %c${serializedKey}`,
+      'color: #EF4444; font-weight: bold',
+      'color: #6B7280'
+    );
+  } else if (verbosity === 'detailed') {
+    console.log(`%c⚡ Global Mutate: ${serializedKey}`, 'color: #EF4444');
+  }
 
   return originalMutate(...args);
+};
+
+// Cycle through verbosity levels
+const cycleVerbosity = () => {
+  const current = getVerbosityLevel();
+  let next: VerbosityLevel;
+
+  switch (current) {
+    case 'off':
+      next = 'compact';
+      break;
+    case 'compact':
+      next = 'detailed';
+      break;
+    case 'detailed':
+      next = 'off';
+      break;
+    default:
+      next = 'compact';
+  }
+
+  if (next === 'off') {
+    localStorage.removeItem('debug:swr-verbosity');
+  } else {
+    localStorage.setItem('debug:swr-verbosity', next);
+  }
+
+  const colors = {
+    off: '#6B7280',
+    compact: '#10B981',
+    detailed: '#8B5CF6',
+  };
+
+  const descriptions = {
+    off: 'DISABLED',
+    compact: 'COMPACT (with timing)',
+    detailed: 'DETAILED (collapsed groups with details)',
+  };
+
+  console.log(
+    `%c🔄 SWR Logging: ${descriptions[next]}`,
+    `color: ${colors[next]}; font-weight: bold`
+  );
 };
 
 // Setup keyboard shortcuts and console helpers
@@ -285,17 +534,7 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
         if (modifierKey && event.shiftKey && (event.key === 'L' || event.key === 'l')) {
           event.preventDefault();
           event.stopPropagation();
-
-          const current = localStorage.getItem('debug:mutations');
-          if (!current) {
-            localStorage.setItem('debug:mutations', '1');
-            console.log('%c✅ SWR Logging ENABLED. Refreshing...', 'color: #10B981');
-          } else {
-            localStorage.removeItem('debug:mutations');
-            console.log('%c❌ SWR Logging DISABLED. Refreshing...', 'color: #EF4444');
-          }
-
-          setTimeout(() => window.location.reload(), 100);
+          cycleVerbosity();
         }
       },
       true
@@ -309,32 +548,50 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
   }
 
   // Console helpers
-  (window as any).enableSWRLogging = () => {
-    localStorage.setItem('debug:mutations', '1');
-    console.log('%c✅ SWR logging enabled. Refreshing...', 'color: #10B981');
-    setTimeout(() => window.location.reload(), 100);
-  };
-
-  (window as any).disableSWRLogging = () => {
-    localStorage.removeItem('debug:mutations');
-    console.log('%c❌ SWR logging disabled. Refreshing...', 'color: #EF4444');
-    setTimeout(() => window.location.reload(), 100);
-  };
-
-  // Show status
-  if (getDebugStatus()) {
+  (window as any).setSWRVerbosity = (level: VerbosityLevel) => {
+    if (level === 'off') {
+      localStorage.removeItem('debug:swr-verbosity');
+    } else {
+      localStorage.setItem('debug:swr-verbosity', level);
+    }
     console.log(
-      '%c🔍 Enhanced SWR Logging is ACTIVE',
+      `%c🔄 SWR Verbosity set to: ${level.toUpperCase()}`,
       'color: #0EA5E9; font-weight: bold'
+    );
+  };
+
+  (window as any).cycleSWRVerbosity = cycleVerbosity;
+
+  // Legacy helpers for compatibility
+  (window as any).enableSWRLogging = () => (window as any).setSWRVerbosity('compact');
+  (window as any).disableSWRLogging = () => (window as any).setSWRVerbosity('off');
+
+  // Show current verbosity status
+  const currentLevel = getVerbosityLevel();
+
+  if (currentLevel !== 'off') {
+    const colors = {
+      compact: '#10B981',
+      detailed: '#8B5CF6',
+    };
+
+    const descriptions = {
+      compact: 'COMPACT - Single-line logs with timing',
+      detailed: 'DETAILED - Collapsed groups with all details',
+    };
+
+    console.log(
+      `%c🔍 SWR Logging: ${descriptions[currentLevel as keyof typeof descriptions]}`,
+      `color: ${colors[currentLevel as keyof typeof colors]}; font-weight: bold`
     );
     console.log('%c   📡 Data fetching: useSWR calls', 'color: #8B5CF6');
     console.log('%c   🔄 Cache mutations: useSWRConfig().mutate calls', 'color: #0EA5E9');
     console.log('%c   🚀 Mutations: useSWRMutation triggers', 'color: #F59E0B');
     console.log('%c   ⚡ Global mutate: Direct mutate() calls', 'color: #EF4444');
-    console.log('%c   Press Cmd+Shift+L to toggle', 'color: #6B7280');
+    console.log('%c   Press Cmd+Shift+L to cycle verbosity', 'color: #6B7280');
   } else {
     console.log(
-      '%c💡 Press Cmd+Shift+L to enable comprehensive SWR logging',
+      '%c💡 Press Cmd+Shift+L to cycle SWR logging verbosity (Off → Compact → Detailed)',
       'color: #6B7280; font-size: 11px'
     );
   }
