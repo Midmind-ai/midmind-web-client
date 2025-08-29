@@ -32,19 +32,19 @@ The logger is already included in this project. Simply import from `@/lib/swr` i
 
 ```typescript
 // ❌ Old way - direct SWR import
-import { useSWR, mutate } from 'swr'
+import { useSWR, mutate } from 'swr';
 
 // ✅ New way - with logging
-import { useSWR, mutate } from '@/lib/swr'
+import { useSWR, mutate } from '@/lib/swr';
 ```
 
 ### 2. Basic Usage
 
 ```typescript
-import { useSWR, mutate } from '@/lib/swr'
+import { useSWR, mutate } from '@/lib/swr';
 
 // Use SWR as normal - no console output by default
-const { data, error } = useSWR('/api/users', fetcher)
+const { data, error } = useSWR('/api/users', fetcher);
 
 // Press Cmd+Shift+L to activate logging!
 // The keyboard shortcut cycles through:
@@ -54,14 +54,14 @@ const { data, error } = useSWR('/api/users', fetcher)
 ### 3. Optional Configuration
 
 ```typescript
-import { configureSWRLogger } from '@/lib/swr'
+import { configureSWRLogger } from '@/lib/swr';
 
 // Override defaults if needed
 configureSWRLogger({
   verbosity: 'detailed', // Start with detailed logging
   showTimestamp: true, // Add timestamps to logs
   keyFilters: [/^api\//], // Only log API calls
-})
+});
 ```
 
 ## Configuration
@@ -79,7 +79,7 @@ SWR_LOG_LEVEL=detailed  # Options: 'off', 'basic', 'detailed'
 ### Runtime Configuration
 
 ```typescript
-import { configureSWRLogger } from '@/lib/swr'
+import { configureSWRLogger } from '@/lib/swr';
 
 configureSWRLogger({
   enabled: true,
@@ -88,10 +88,10 @@ configureSWRLogger({
   keyFilters: [/^messages:/], // Only log keys matching these patterns
   excludeKeys: [/^internal:/], // Exclude keys matching these patterns
   formatters: {
-    user: (user) => `User(${user.id}, ${user.name})`,
-    message: (msg) => `Message: ${msg.content.slice(0, 50)}...`,
+    user: user => `User(${user.id}, ${user.name})`,
+    message: msg => `Message: ${msg.content.slice(0, 50)}...`,
   },
-})
+});
 ```
 
 ## Verbosity Levels
@@ -99,7 +99,7 @@ configureSWRLogger({
 ### Off
 
 ```typescript
-configureSWRLogger({ verbosity: 'off' })
+configureSWRLogger({ verbosity: 'off' });
 ```
 
 No logging output.
@@ -107,7 +107,7 @@ No logging output.
 ### Basic (Default)
 
 ```typescript
-configureSWRLogger({ verbosity: 'basic' })
+configureSWRLogger({ verbosity: 'basic' });
 ```
 
 Single-line logs for each operation:
@@ -121,7 +121,7 @@ Single-line logs for each operation:
 ### Detailed
 
 ```typescript
-configureSWRLogger({ verbosity: 'detailed' })
+configureSWRLogger({ verbosity: 'detailed' });
 ```
 
 Collapsed groups with complete information:
@@ -155,14 +155,14 @@ configureSWRLogger({
     incident: (incident: any) =>
       `Incident #${incident.id} [${incident.status}] ${incident.title}`,
   },
-})
+});
 
 // Usage in your data structures
 interface User {
-  id: string
-  name: string
+  id: string;
+  name: string;
   // Add formatter hint (optional, for documentation)
-  _logFormatter?: 'user'
+  _logFormatter?: 'user';
 }
 ```
 
@@ -176,7 +176,7 @@ configureSWRLogger({
     /^incidents:/, // All incident-related keys
     /users:current/, // Specific user key
   ],
-})
+});
 
 // Exclude specific keys from logging
 configureSWRLogger({
@@ -185,13 +185,13 @@ configureSWRLogger({
     /^temp:/, // Temporary keys
     /_metadata$/, // Metadata keys
   ],
-})
+});
 ```
 
 ### Custom Logger Integration
 
 ```typescript
-import { configureSWRLogger, LogEntry } from '@/lib/swr'
+import { configureSWRLogger, LogEntry } from '@/lib/swr';
 
 // Send logs to external service
 configureSWRLogger({
@@ -203,14 +203,14 @@ configureSWRLogger({
       key: logEntry.key,
       timestamp: logEntry.timestamp,
       hasError: !!logEntry.metadata?.error,
-    })
+    });
 
     // Also log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('[SWR Analytics]', logEntry)
+      console.log('[SWR Analytics]', logEntry);
     }
   },
-})
+});
 ```
 
 ## Migration Guide
@@ -243,11 +243,11 @@ replace: from '@/lib/swr'
 
 ```typescript
 // In your app initialization
-import { configureSWRLogger } from '@/lib/swr'
+import { configureSWRLogger } from '@/lib/swr';
 
 configureSWRLogger({
   verbosity: process.env.NODE_ENV === 'development' ? 'detailed' : 'off',
-})
+});
 ```
 
 ### From Other Logging Solutions
@@ -289,31 +289,31 @@ logger.logMutate(key: string, data: unknown, options: unknown, result: unknown):
 
 ```typescript
 interface SWRLoggerConfig {
-  enabled: boolean
-  verbosity: 'off' | 'basic' | 'detailed'
-  loggerType: 'console' | 'custom'
-  customLogger?: (logEntry: LogEntry) => void
-  keyFilters?: RegExp[]
-  excludeKeys?: RegExp[]
-  formatters?: Record<string, DataFormatter>
-  showTimestamp?: boolean
-  showStackTrace?: boolean
+  enabled: boolean;
+  verbosity: 'off' | 'basic' | 'detailed';
+  loggerType: 'console' | 'custom';
+  customLogger?: (logEntry: LogEntry) => void;
+  keyFilters?: RegExp[];
+  excludeKeys?: RegExp[];
+  formatters?: Record<string, DataFormatter>;
+  showTimestamp?: boolean;
+  showStackTrace?: boolean;
 }
 
 interface LogEntry {
-  operation: 'useSWR' | 'useSWRInfinite' | 'mutate'
-  key: string | 'filter-function'
-  timestamp: Date
-  before?: unknown
-  after?: unknown
-  data?: unknown
-  options?: unknown
-  result?: unknown
+  operation: 'useSWR' | 'useSWRInfinite' | 'mutate';
+  key: string | 'filter-function';
+  timestamp: Date;
+  before?: unknown;
+  after?: unknown;
+  data?: unknown;
+  options?: unknown;
+  result?: unknown;
   metadata?: {
-    pages?: number
-    matchedKeys?: number
-    isFilterFunction?: boolean
-  }
+    pages?: number;
+    matchedKeys?: number;
+    isFilterFunction?: boolean;
+  };
 }
 ```
 
@@ -327,7 +327,7 @@ configureSWRLogger({
   enabled: process.env.NODE_ENV !== 'production',
   verbosity: process.env.NODE_ENV === 'development' ? 'detailed' : 'off',
   showTimestamp: true,
-})
+});
 ```
 
 ### Performance Considerations
@@ -383,7 +383,7 @@ configureSWRLogger({
 
 ```typescript
 // app/layout.tsx or similar
-import { configureSWRLogger } from '@/lib/swr'
+import { configureSWRLogger } from '@/lib/swr';
 
 // Configure logging on app startup
 if (typeof window !== 'undefined') {
@@ -402,10 +402,9 @@ if (typeof window !== 'undefined') {
     ],
     formatters: {
       user: (user: any) => `${user.name} (${user.role})`,
-      message: (msg: any) =>
-        `"${msg.content.slice(0, 30)}..." from ${msg.sender}`,
+      message: (msg: any) => `"${msg.content.slice(0, 30)}..." from ${msg.sender}`,
     },
-  })
+  });
 }
 ```
 
@@ -413,19 +412,19 @@ if (typeof window !== 'undefined') {
 
 ```typescript
 // components/UserList.tsx
-import { useSWR, mutate } from '@/lib/swr'
+import { useSWR, mutate } from '@/lib/swr';
 
 export const UserList = () => {
   // Logged automatically
-  const { data: users, error } = useSWR<User[]>('/api/users', fetcher)
+  const { data: users, error } = useSWR<User[]>('/api/users', fetcher);
 
   const handleAddUser = async (newUser: User) => {
     // This mutation will be logged with before/after state
-    await mutate('/api/users', [...(users || []), newUser])
-  }
+    await mutate('/api/users', [...(users || []), newUser]);
+  };
 
   // ... rest of component
-}
+};
 ```
 
 This logging solution provides complete transparency into your SWR operations while being highly configurable and performance-conscious.
