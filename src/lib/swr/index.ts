@@ -2,13 +2,14 @@
 export * from 'swr';
 export type { SWRInfiniteResponse } from 'swr/infinite';
 export type { SWRMutationResponse } from 'swr/mutation';
-export { SWRConfig, useSWRConfig } from 'swr';
+export { SWRConfig } from 'swr';
 export type { KeyedMutator, SWRConfiguration, SWRResponse } from 'swr';
 
 // Export wrapped functions with logging
 export { useSWR } from './wrappers/use-swr';
 export { useSWRInfinite } from './wrappers/use-swr-infinite';
 export { useSWRMutation } from './wrappers/use-swr-mutation';
+export { useSWRConfig } from './wrappers/use-swr-config';
 export { mutate } from './wrappers/mutate';
 
 // Export logger configuration
