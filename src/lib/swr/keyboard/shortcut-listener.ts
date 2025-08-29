@@ -64,6 +64,18 @@ const handleKeyPress = (event: KeyboardEvent): void => {
         '%cDetailed logging enabled. Expanded output with full details.',
         'color: #10b981'
       );
+      // Show color legend when switching to detailed mode
+      console.log(
+        `%c🎨 Colors: %cuseSWR %c• %cuseSWRInfinite %c• %cuseSWRMutation %c• %cmutate`,
+        'color: #6b7280; font-weight: normal;',
+        'color: #10b981; font-weight: normal;',
+        'color: #6b7280;',
+        'color: #3b82f6; font-weight: normal;',
+        'color: #6b7280;',
+        'color: #8b5cf6; font-weight: normal;',
+        'color: #6b7280;',
+        'color: #f59e0b; font-weight: normal;'
+      );
     }
   }
 };
@@ -105,6 +117,21 @@ export const initializeKeyboardShortcut = (): void => {
     'background: #1f2937; color: white; padding: 2px 4px; border-radius: 3px',
     'color: inherit'
   );
+
+  // Show color legend when detailed mode is enabled
+  if (config.verbosity === 'detailed') {
+    console.log(
+      `%c🎨 Colors: %cuseSWR %c• %cuseSWRInfinite %c• %cuseSWRMutation %c• %cmutate`,
+      'color: #6b7280; font-weight: normal;',
+      'color: #10b981; font-weight: normal;',
+      'color: #6b7280;',
+      'color: #3b82f6; font-weight: normal;',
+      'color: #6b7280;',
+      'color: #8b5cf6; font-weight: normal;',
+      'color: #6b7280;',
+      'color: #f59e0b; font-weight: normal;'
+    );
+  }
 };
 
 // Cleanup function for testing or unmounting

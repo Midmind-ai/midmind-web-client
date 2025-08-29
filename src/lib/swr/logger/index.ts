@@ -44,16 +44,32 @@ export class SWRLogger {
 
     if (logEntry.operation === 'useSWR') {
       console.log(
-        `${timestamp}[SWR] useSWR('${logEntry.key}') ${this.formatData(logEntry.before)} → ${this.formatData(logEntry.after)}`
+        `%c${timestamp}%c[SWR]%c useSWR('${logEntry.key}') ${this.formatData(logEntry.before)} → ${this.formatData(logEntry.after)}`,
+        'color: inherit; font-weight: normal;', // Timestamp
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #10b981; font-weight: normal;' // useSWR - Green
       );
     } else if (logEntry.operation === 'useSWRInfinite') {
       console.log(
-        `${timestamp}[SWR] useSWRInfinite('${logEntry.key}') ${logEntry.metadata?.pages || 0} pages`
+        `%c${timestamp}%c[SWR]%c useSWRInfinite('${logEntry.key}') ${logEntry.metadata?.pages || 0} pages`,
+        'color: inherit; font-weight: normal;', // Timestamp
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #3b82f6; font-weight: normal;' // useSWRInfinite - Blue
+      );
+    } else if (logEntry.operation === 'useSWRMutation') {
+      console.log(
+        `%c${timestamp}%c[SWR]%c useSWRMutation('${logEntry.key}') triggered`,
+        'color: inherit; font-weight: normal;', // Timestamp
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #8b5cf6; font-weight: normal;' // useSWRMutation - Purple
       );
     } else if (logEntry.operation === 'mutate') {
       if (logEntry.key === 'filter-function') {
         console.log(
-          `${timestamp}[SWR] mutate(filter) → ${logEntry.metadata?.matchedKeys || 0} keys`
+          `%c${timestamp}%c[SWR]%c mutate(filter) → ${logEntry.metadata?.matchedKeys || 0} keys`,
+          'color: inherit; font-weight: normal;', // Timestamp
+          'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+          'color: #f59e0b; font-weight: normal;' // mutate - Orange
         );
       } else {
         const beforeText =
@@ -61,7 +77,10 @@ export class SWRLogger {
         const afterText =
           logEntry.after !== undefined ? this.formatData(logEntry.after) : '(no result)';
         console.log(
-          `${timestamp}[SWR] mutate('${logEntry.key}') ${beforeText} → ${afterText}`
+          `%c${timestamp}%c[SWR]%c mutate('${logEntry.key}') ${beforeText} → ${afterText}`,
+          'color: inherit; font-weight: normal;', // Timestamp
+          'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+          'color: #f59e0b; font-weight: normal;' // mutate - Orange
         );
       }
     }
@@ -74,23 +93,48 @@ export class SWRLogger {
       : '';
 
     if (logEntry.operation === 'useSWR') {
-      console.groupCollapsed(`[SWR] useSWR('${logEntry.key}')${timestamp}`);
-      console.log('BEFORE:');
+      console.groupCollapsed(
+        `%c[SWR]%c useSWR('${logEntry.key}')${timestamp}`,
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #10b981; font-weight: normal;' // useSWR - Green
+      );
+      console.log('%cBEFORE:', 'color: #cccccc');
       console.dir(logEntry.before, { depth: null, colors: true });
-      console.log('AFTER:');
+      console.log('%cAFTER:', 'color: #cccccc');
       console.dir(logEntry.after, { depth: null, colors: true });
       console.groupEnd();
     } else if (logEntry.operation === 'useSWRInfinite') {
-      console.groupCollapsed(`[SWR] useSWRInfinite('${logEntry.key}')${timestamp}`);
-      console.log('BEFORE:');
+      console.groupCollapsed(
+        `%c[SWR]%c useSWRInfinite('${logEntry.key}')${timestamp}`,
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #3b82f6; font-weight: normal;' // useSWRInfinite - Blue
+      );
+      console.log('%cBEFORE:', 'color: #cccccc');
       console.dir(logEntry.before, { depth: null, colors: true });
-      console.log('PAGES:', logEntry.metadata?.pages || 0);
-      console.log('AFTER:');
+      console.log('%cPAGES:', 'color: #cccccc', logEntry.metadata?.pages || 0);
+      console.log('%cAFTER:', 'color: #cccccc');
       console.dir(logEntry.after, { depth: null, colors: true });
+      console.groupEnd();
+    } else if (logEntry.operation === 'useSWRMutation') {
+      console.groupCollapsed(
+        `%c[SWR]%c useSWRMutation('${logEntry.key}')${timestamp}`,
+        'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+        'color: #8b5cf6; font-weight: normal;' // useSWRMutation - Purple
+      );
+      console.log('%cDATA:', 'color: #cccccc');
+      console.dir(logEntry.data, { depth: null, colors: true });
+      console.log('%cOPTIONS:', 'color: #cccccc');
+      console.dir(logEntry.options, { depth: null, colors: true });
+      console.log('%cRESULT:', 'color: #cccccc');
+      console.dir(logEntry.result, { depth: null, colors: true });
       console.groupEnd();
     } else if (logEntry.operation === 'mutate') {
       if (logEntry.key === 'filter-function') {
-        console.groupCollapsed(`[SWR] mutate(filter function)${timestamp}`);
+        console.groupCollapsed(
+          `%c[SWR]%c mutate(filter function)${timestamp}`,
+          'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+          'color: #f59e0b; font-weight: normal;' // mutate - Orange
+        );
 
         // Show before/after cache states for filter functions
         if (logEntry.before && Array.isArray(logEntry.before)) {
@@ -111,41 +155,42 @@ export class SWRLogger {
           console.groupEnd();
         }
 
-        console.log('DATA:', this.formatData(logEntry.data));
-        console.log('OPTIONS:', this.formatData(logEntry.options));
-        console.log('MATCHED KEYS:', logEntry.metadata?.matchedKeys || 0);
-
-        if (Array.isArray(logEntry.result)) {
-          logEntry.result.forEach((value, index) => {
-            console.groupCollapsed(`Result ${index + 1}`);
-            console.log('VALUE:', this.formatData(value));
-            console.groupEnd();
-          });
-        }
+        console.log('%cDATA/MUTATOR:', 'color: #cccccc');
+        console.dir(logEntry.data, { depth: null, colors: true });
+        console.log('%cOPTIONS:', 'color: #cccccc');
+        console.dir(logEntry.options, { depth: null, colors: true });
+        console.log(
+          '%cMATCHED KEYS:',
+          'color: #cccccc',
+          logEntry.metadata?.matchedKeys || 0
+        );
         console.groupEnd();
       } else {
-        console.groupCollapsed(`[SWR] mutate('${logEntry.key}')${timestamp}`);
+        console.groupCollapsed(
+          `%c[SWR]%c mutate('${logEntry.key}')${timestamp}`,
+          'color: #6b7280; font-weight: normal;', // [SWR] - Grey
+          'color: #f59e0b; font-weight: normal;' // mutate - Orange
+        );
 
-        // Show before/after data if available
-        if (logEntry.before !== undefined || logEntry.after !== undefined) {
-          console.log('BEFORE:');
-          if (logEntry.before !== undefined) {
-            console.dir(logEntry.before, { depth: null, colors: true });
-          } else {
-            console.log('(no cache)');
-          }
-
-          console.log('AFTER:');
-          if (logEntry.after !== undefined) {
-            console.dir(logEntry.after, { depth: null, colors: true });
-          } else {
-            console.log('(no result)');
-          }
+        // Show cache state changes
+        console.log('%cBEFORE:', 'color: #cccccc');
+        if (logEntry.before !== undefined) {
+          console.dir(logEntry.before, { depth: null, colors: true });
+        } else {
+          console.log('(no cache)');
         }
 
-        console.log('DATA:', this.formatData(logEntry.data));
-        console.log('OPTIONS:', this.formatData(logEntry.options));
-        console.log('RESULT:', this.formatData(logEntry.result));
+        console.log('%cAFTER:', 'color: #cccccc');
+        if (logEntry.after !== undefined) {
+          console.dir(logEntry.after, { depth: null, colors: true });
+        } else {
+          console.log('(no result)');
+        }
+
+        console.log('%cDATA/MUTATOR:', 'color: #cccccc');
+        console.dir(logEntry.data, { depth: null, colors: true });
+        console.log('%cOPTIONS:', 'color: #cccccc');
+        console.dir(logEntry.options, { depth: null, colors: true });
         console.groupEnd();
       }
     }
@@ -193,6 +238,23 @@ export class SWRLogger {
       before,
       after,
       metadata: { pages },
+    });
+  }
+
+  public logUseSWRMutation(
+    key: string,
+    data: unknown,
+    options: unknown,
+    result: unknown
+  ): void {
+    this.log({
+      operation: 'useSWRMutation',
+      key,
+      timestamp: new Date(),
+      data,
+      options,
+      result,
+      metadata: { isMutation: true },
     });
   }
 

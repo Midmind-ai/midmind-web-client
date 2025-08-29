@@ -17,12 +17,12 @@ export const useSWRMutation = (key: any, fetcher: any, config?: any): any => {
       const result = await fetcher(key, options);
 
       // Log successful mutation
-      logger.logMutate(keyStr, options.arg, config, result);
+      logger.logUseSWRMutation(keyStr, options.arg, config, result);
 
       return result;
     } catch (error) {
       // Log failed mutation
-      logger.logMutate(keyStr, options.arg, config, error);
+      logger.logUseSWRMutation(keyStr, options.arg, config, error);
       throw error;
     }
   };

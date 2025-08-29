@@ -3,7 +3,7 @@ export type LogVerbosity = 'off' | 'basic' | 'detailed';
 export type LoggerType = 'console' | 'custom';
 
 export interface LogEntry {
-  operation: 'useSWR' | 'useSWRInfinite' | 'mutate';
+  operation: 'useSWR' | 'useSWRInfinite' | 'useSWRMutation' | 'mutate';
   key: string | 'filter-function';
   timestamp: Date;
   before?: unknown;
@@ -15,6 +15,7 @@ export interface LogEntry {
     pages?: number;
     matchedKeys?: number;
     isFilterFunction?: boolean;
+    isMutation?: boolean;
   };
 }
 

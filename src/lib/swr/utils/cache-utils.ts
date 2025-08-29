@@ -1,12 +1,11 @@
+import { unstable_serialize } from 'swr';
+
 import type { Key, Cache } from 'swr';
 
 // Helper to get cache value for any key type
 export const getCacheValue = (cache: Cache<unknown>, key: Key): unknown => {
-  if (typeof key === 'string') {
-    return cache.get(key);
-  }
-  // For complex keys, SWR serializes them internally
-  const serializedKey = JSON.stringify(key);
+  // Use SWR's internal serialization to match how keys are stored
+  const serializedKey = unstable_serialize(key);
 
   return cache.get(serializedKey);
 };
