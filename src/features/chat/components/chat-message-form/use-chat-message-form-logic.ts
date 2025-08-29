@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef, useEffect } from 'react';
+import { type KeyboardEvent, useRef, useEffect, type ClipboardEvent } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -56,7 +56,7 @@ export const useChatMessageFormLogic = ({
   } = useForm<ChatMessageFormData>({
     resolver: zodResolver(
       z.object({
-        content: z.string().min(1, 'Message cannot be empty'),
+        content: z.string().min(1),
         model: z.enum([
           AI_MODELS.GEMINI_2_0_FLASH_LITE,
           AI_MODELS.GEMINI_2_0_FLASH,
@@ -89,7 +89,7 @@ export const useChatMessageFormLogic = ({
   const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
     useConversationWithAI(actualChatId);
 
-  const handleFormSubmit = (data: ChatMessageFormData) => {
+  const handleSubmitForm = (data: ChatMessageFormData) => {
     if (onSubmit) {
       // For new chat
       onSubmit({
@@ -125,10 +125,8 @@ export const useChatMessageFormLogic = ({
     });
   };
 
-  const handleCloseReply = () => {
-    reset({
-      replyInfo: undefined,
-    });
+  const handleReplyClose = () => {
+    setValue('replyInfo', undefined);
   };
 
   const handleImageButtonClick = () => {
@@ -137,7 +135,7 @@ export const useChatMessageFormLogic = ({
     }
   };
 
-  const openFileViewModal = (file: File) => {
+  const handleOpenFileViewModal = (file: File) => {
     openModal('FileViewModal', {
       file,
     });
@@ -158,7 +156,36 @@ export const useChatMessageFormLogic = ({
     }
   };
 
-  const handleRemoveImage = (index: number) => {
+  const handleImagePaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = event.clipboardData?.items;
+
+    if (!items) return;
+
+    const imageFiles: File[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+
+        if (file) {
+          imageFiles.push(file);
+        }
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      event.preventDefault();
+
+      const dataTransfer = new DataTransfer();
+      imageFiles.forEach(file => dataTransfer.items.add(file));
+
+      handleImageUpload(dataTransfer.files);
+    }
+  };
+
+  const handleImageRemove = (index: number) => {
     const currentImages = watch('files') || [];
     const updatedImages = currentImages.filter((_, i) => i !== index);
     setValue('files', updatedImages);
@@ -172,11 +199,11 @@ export const useChatMessageFormLogic = ({
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
 
-      handleSubmit(handleFormSubmit)();
+      handleSubmit(handleSubmitForm)();
     }
 
     if (event.key === 'Escape') {
-      handleCloseReply();
+      handleReplyClose();
     }
   };
 
@@ -215,13 +242,14 @@ export const useChatMessageFormLogic = ({
     fileInputRef,
     register,
     handleSubmit,
-    handleFormSubmit,
+    handleSubmitForm,
     abortCurrentRequest,
     handleKeyDown,
-    openFileViewModal,
-    handleCloseReply,
+    handleOpenFileViewModal,
+    handleReplyClose,
     handleImageUpload,
-    handleRemoveImage,
+    handleImageRemove,
     handleImageButtonClick,
+    handleImagePaste,
   };
 };
