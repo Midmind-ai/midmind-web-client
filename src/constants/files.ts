@@ -1,4 +1,3 @@
-// Supported image formats for file uploads
 export const SUPPORTED_FORMATS = [
   'image/jpeg',
   'image/png',

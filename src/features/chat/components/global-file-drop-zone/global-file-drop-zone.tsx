@@ -12,11 +12,11 @@ type Props = {
   children?: React.ReactNode;
   acceptedTypes?: string;
   maxFiles?: number;
-  onImagesSelected?: (files: FileList | null) => void;
+  onFilesSelected?: (files: FileList | null) => void;
 };
 
 const GlobalFileDropZone = ({
-  onImagesSelected,
+  onFilesSelected,
   className,
   disabled,
   children,
@@ -103,11 +103,11 @@ const GlobalFileDropZone = ({
       if (files && files.length > 0) {
         const filteredFiles = filterFiles(files);
         if (filteredFiles.length > 0) {
-          onImagesSelected?.(filteredFiles);
+          onFilesSelected?.(filteredFiles);
         }
       }
     },
-    [onImagesSelected, filterFiles]
+    [onFilesSelected, filterFiles]
   );
 
   const handleFileInputChange = useCallback(
@@ -116,12 +116,12 @@ const GlobalFileDropZone = ({
       if (files && files.length > 0) {
         const filteredFiles = filterFiles(files);
         if (filteredFiles.length > 0) {
-          onImagesSelected?.(filteredFiles);
+          onFilesSelected?.(filteredFiles);
         }
       }
       e.target.value = '';
     },
-    [onImagesSelected, filterFiles]
+    [onFilesSelected, filterFiles]
   );
 
   useEffect(() => {

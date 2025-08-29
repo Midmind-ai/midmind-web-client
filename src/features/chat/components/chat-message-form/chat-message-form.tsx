@@ -66,7 +66,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
         />
       )}
       <GlobalFileDropZone
-        onImagesSelected={handleImageUpload}
+        onFilesSelected={handleImageUpload}
         disabled={hasActiveRequest}
       >
         <form
