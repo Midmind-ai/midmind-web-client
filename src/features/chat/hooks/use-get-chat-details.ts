@@ -2,6 +2,8 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
+import type { Chat } from '@shared-types/entities';
+
 import { useSWR } from '@lib/swr';
 
 export const useGetChatDetails = (id: string) => {
@@ -9,7 +11,7 @@ export const useGetChatDetails = (id: string) => {
     data: chatDetails,
     isLoading: isLoading,
     error,
-  } = useSWR(CACHE_KEYS.chats.details(id), () => ChatsService.getChatDetails(id));
+  } = useSWR<Chat>(CACHE_KEYS.chats.details(id), () => ChatsService.getChatDetails(id));
 
   return {
     chatDetails,

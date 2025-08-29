@@ -4,6 +4,8 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { UsersService } from '@services/users/users-service';
 
+import type { User } from '@shared-types/entities';
+
 import { getFromStorage } from '@utils/local-storage';
 
 import { useSWR } from '@lib/swr';
@@ -11,7 +13,7 @@ import { useSWR } from '@lib/swr';
 export function useSwrCurrentUser() {
   const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
 
-  return useSWR(
+  return useSWR<User>(
     accessToken ? CACHE_KEYS.auth.currentUser : null,
     () => UsersService.getCurrentUser(),
     {
