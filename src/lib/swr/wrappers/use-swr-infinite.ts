@@ -1,17 +1,8 @@
-import { type Key, useSWRConfig, type Cache } from 'swr';
+import { type Key, useSWRConfig } from 'swr';
 import originalUseSWRInfinite, { type SWRInfiniteResponse } from 'swr/infinite';
 
 import { getSWRLogger } from '../logger';
-
-// Helper to get cache value
-const getCacheValue = (cache: Cache<unknown>, key: Key): unknown => {
-  if (typeof key === 'string') {
-    return cache.get(key);
-  }
-  const serializedKey = JSON.stringify(key);
-
-  return cache.get(serializedKey);
-};
+import { getCacheValueSafe } from '../utils/cache-utils';
 
 // Wrapped useSWRInfinite with logging
 export const useSWRInfinite = <Data = unknown, Error = unknown>(
@@ -25,7 +16,7 @@ export const useSWRInfinite = <Data = unknown, Error = unknown>(
 
   // Get the first page key to check cache
   const firstKey = getKey(0, null);
-  const beforeData = firstKey ? getCacheValue(cache, firstKey) : undefined;
+  const beforeData = getCacheValueSafe(cache, firstKey);
 
   // Call original useSWRInfinite with enhanced config
   const result = originalUseSWRInfinite(

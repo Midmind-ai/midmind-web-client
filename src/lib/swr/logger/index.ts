@@ -56,8 +56,12 @@ export class SWRLogger {
           `${timestamp}[SWR] mutate(filter) → ${logEntry.metadata?.matchedKeys || 0} keys`
         );
       } else {
+        const beforeText =
+          logEntry.before !== undefined ? this.formatData(logEntry.before) : '(no cache)';
+        const afterText =
+          logEntry.after !== undefined ? this.formatData(logEntry.after) : '(no result)';
         console.log(
-          `${timestamp}[SWR] mutate('${logEntry.key}') → ${this.formatData(logEntry.result)}`
+          `${timestamp}[SWR] mutate('${logEntry.key}') ${beforeText} → ${afterText}`
         );
       }
     }
@@ -70,32 +74,75 @@ export class SWRLogger {
       : '';
 
     if (logEntry.operation === 'useSWR') {
-      console.group(`[SWR] useSWR('${logEntry.key}')${timestamp}`);
-      console.log('BEFORE:', this.formatData(logEntry.before));
-      console.log('AFTER:', this.formatData(logEntry.after));
+      console.groupCollapsed(`[SWR] useSWR('${logEntry.key}')${timestamp}`);
+      console.log('BEFORE:');
+      console.dir(logEntry.before, { depth: null, colors: true });
+      console.log('AFTER:');
+      console.dir(logEntry.after, { depth: null, colors: true });
       console.groupEnd();
     } else if (logEntry.operation === 'useSWRInfinite') {
-      console.group(`[SWR] useSWRInfinite('${logEntry.key}')${timestamp}`);
-      console.log('BEFORE:', this.formatData(logEntry.before));
+      console.groupCollapsed(`[SWR] useSWRInfinite('${logEntry.key}')${timestamp}`);
+      console.log('BEFORE:');
+      console.dir(logEntry.before, { depth: null, colors: true });
       console.log('PAGES:', logEntry.metadata?.pages || 0);
-      console.log('AFTER:', this.formatData(logEntry.after));
+      console.log('AFTER:');
+      console.dir(logEntry.after, { depth: null, colors: true });
       console.groupEnd();
     } else if (logEntry.operation === 'mutate') {
       if (logEntry.key === 'filter-function') {
-        console.group(`[SWR] mutate(filter function)${timestamp}`);
+        console.groupCollapsed(`[SWR] mutate(filter function)${timestamp}`);
+
+        // Show before/after cache states for filter functions
+        if (logEntry.before && Array.isArray(logEntry.before)) {
+          console.groupCollapsed(`BEFORE (${logEntry.before.length} cache entries)`);
+          logEntry.before.forEach((entry: { key: string; value: unknown }) => {
+            console.log(`${entry.key}:`);
+            console.dir(entry.value, { depth: null, colors: true });
+          });
+          console.groupEnd();
+        }
+
+        if (logEntry.after && Array.isArray(logEntry.after)) {
+          console.groupCollapsed(`AFTER (${logEntry.after.length} cache entries)`);
+          logEntry.after.forEach((entry: { key: string; value: unknown }) => {
+            console.log(`${entry.key}:`);
+            console.dir(entry.value, { depth: null, colors: true });
+          });
+          console.groupEnd();
+        }
+
         console.log('DATA:', this.formatData(logEntry.data));
         console.log('OPTIONS:', this.formatData(logEntry.options));
         console.log('MATCHED KEYS:', logEntry.metadata?.matchedKeys || 0);
+
         if (Array.isArray(logEntry.result)) {
           logEntry.result.forEach((value, index) => {
-            console.groupCollapsed(`Key ${index + 1}`);
-            console.log('RESULT:', this.formatData(value));
+            console.groupCollapsed(`Result ${index + 1}`);
+            console.log('VALUE:', this.formatData(value));
             console.groupEnd();
           });
         }
         console.groupEnd();
       } else {
-        console.group(`[SWR] mutate('${logEntry.key}')${timestamp}`);
+        console.groupCollapsed(`[SWR] mutate('${logEntry.key}')${timestamp}`);
+
+        // Show before/after data if available
+        if (logEntry.before !== undefined || logEntry.after !== undefined) {
+          console.log('BEFORE:');
+          if (logEntry.before !== undefined) {
+            console.dir(logEntry.before, { depth: null, colors: true });
+          } else {
+            console.log('(no cache)');
+          }
+
+          console.log('AFTER:');
+          if (logEntry.after !== undefined) {
+            console.dir(logEntry.after, { depth: null, colors: true });
+          } else {
+            console.log('(no result)');
+          }
+        }
+
         console.log('DATA:', this.formatData(logEntry.data));
         console.log('OPTIONS:', this.formatData(logEntry.options));
         console.log('RESULT:', this.formatData(logEntry.result));
@@ -154,7 +201,9 @@ export class SWRLogger {
     data: unknown,
     options: unknown,
     result: unknown,
-    matchedKeys?: number
+    matchedKeys?: number,
+    before?: unknown,
+    after?: unknown
   ): void {
     this.log({
       operation: 'mutate',
@@ -163,6 +212,8 @@ export class SWRLogger {
       data,
       options,
       result,
+      before,
+      after,
       metadata:
         key === 'filter-function' ? { matchedKeys, isFilterFunction: true } : undefined,
     });

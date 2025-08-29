@@ -1,22 +1,7 @@
-import originalUseSWR, {
-  type SWRResponse,
-  type Key,
-  useSWRConfig,
-  type Cache,
-} from 'swr';
+import originalUseSWR, { type SWRResponse, type Key, useSWRConfig } from 'swr';
 
 import { getSWRLogger } from '../logger';
-
-// Helper to get cache value
-const getCacheValue = (cache: Cache<unknown>, key: Key): unknown => {
-  if (typeof key === 'string') {
-    return cache.get(key);
-  }
-  // For complex keys, SWR serializes them internally
-  const serializedKey = JSON.stringify(key);
-
-  return cache.get(serializedKey);
-};
+import { getCacheValueSafe } from '../utils/cache-utils';
 
 // Wrapped useSWR with logging
 export const useSWR = <Data = unknown, Error = unknown>(
@@ -29,7 +14,7 @@ export const useSWR = <Data = unknown, Error = unknown>(
   const logger = getSWRLogger();
 
   // Capture before state
-  const beforeData = key ? getCacheValue(cache, key) : undefined;
+  const beforeData = getCacheValueSafe(cache, key);
 
   // Call original useSWR with enhanced config
   const result = originalUseSWR(
