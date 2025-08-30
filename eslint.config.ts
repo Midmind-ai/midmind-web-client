@@ -178,9 +178,9 @@ export default tseslint.config([
       ],
     },
   },
-  // Allow the lib wrapper to import from 'swr'
+  // Allow the lib wrapper files to import from 'swr'
   {
-    files: ['src/lib/swr.ts'],
+    files: ['src/lib/swr.ts', 'src/lib/swr/**/*.ts'],
     rules: {
       'no-restricted-imports': 'off',
     },

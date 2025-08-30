@@ -56,14 +56,14 @@ export const useSignInFormLogic = () => {
 
   const handleSignIn = (data: SignInRequestDto) => {
     signIn(data, {
-      onSuccess: async response => {
+      onSuccess: async (response: { access_token: string }) => {
         setToStorage(LocalStorageKeys.AccessToken, response.access_token);
 
         await mutate(CACHE_KEYS.auth.currentUser);
 
         navigate(AppRoutes.Home, { replace: true });
       },
-      onError: error => {
+      onError: (error: unknown) => {
         console.error('Sign in error:', error);
         // TODO: Add proper user notification for  errors
       },

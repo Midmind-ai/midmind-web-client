@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { produce } from 'immer';
 
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
@@ -101,7 +102,7 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
       if (draft) {
         draft.name = titleChunk.title;
       }
-    }),
+    }) as any,
     { revalidate: false, populateCache: true }
   );
 
@@ -117,12 +118,11 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
         const chatIndex = draft.findIndex(
           (chat: ChatDetails) => chat.id === titleChunk.chat_id
         );
-
         if (chatIndex !== -1) {
           draft[chatIndex].name = titleChunk.title;
         }
       }
-    }),
+    }) as any,
     { revalidate: false, populateCache: true }
   );
 
@@ -130,13 +130,12 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
     CACHE_KEYS.chats.breadcrumbs(titleChunk.chat_id),
     produce((draft?: Array<{ id: string; name: string; type: string }>) => {
       if (draft) {
-        const chatIndex = draft.findIndex(item => item.id === titleChunk.chat_id);
-
-        if (chatIndex !== -1) {
-          draft[chatIndex].name = titleChunk.title;
+        const itemIndex = draft.findIndex(item => item.id === titleChunk.chat_id);
+        if (itemIndex !== -1) {
+          draft[itemIndex].name = titleChunk.title;
         }
       }
-    }),
+    }) as any,
     { revalidate: false, populateCache: true }
   );
 };
@@ -161,18 +160,15 @@ const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> =>
     mutate(
       getInfiniteKey(chatId),
       produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {
-        if (!draft?.[0]?.data) {
-          return;
+        if (draft?.[0]?.data) {
+          const messageIndex = draft[0].data.findIndex(
+            (msg: ChatMessage) => msg.id === chunk.id
+          );
+          if (messageIndex !== -1) {
+            draft[0].data[messageIndex].content = completeContent;
+          }
         }
-
-        const messageIndex = draft[0].data.findIndex(
-          (msg: ChatMessage) => msg.id === chunk.id
-        );
-
-        if (messageIndex !== -1) {
-          draft[0].data[messageIndex].content = completeContent;
-        }
-      }),
+      }) as any,
       { revalidate: false, populateCache: true }
     );
   }
@@ -185,22 +181,19 @@ const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> =>
     await mutate(
       getInfiniteKey(parentChatId),
       produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {
-        if (!draft || !Array.isArray(draft) || draft.length === 0) {
-          return;
-        }
-
-        draft.forEach(page => {
-          if (page.data) {
-            const messageIndex = page.data.findIndex(
-              message => message.id === parentMessageId
-            );
-
-            if (messageIndex !== -1) {
-              page.data[messageIndex].branches = branchContext;
+        if (draft && Array.isArray(draft) && draft.length > 0) {
+          draft.forEach(page => {
+            if (page.data) {
+              const messageIndex = page.data.findIndex(
+                (message: ChatMessage) => message.id === parentMessageId
+              );
+              if (messageIndex !== -1) {
+                page.data[messageIndex].branches = branchContext;
+              }
             }
-          }
-        });
-      }),
+          });
+        }
+      }) as any,
       {
         revalidate: false,
         populateCache: true,

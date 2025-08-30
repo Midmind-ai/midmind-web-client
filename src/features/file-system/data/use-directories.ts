@@ -2,6 +2,8 @@ import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
+import type { Directory } from '@shared-types/entities';
+
 import { useSWR } from '@lib/swr';
 
 export const useDirectories = (parentId?: string | null) => {
@@ -10,7 +12,7 @@ export const useDirectories = (parentId?: string | null) => {
     isLoading,
     error,
     mutate,
-  } = useSWR(
+  } = useSWR<Directory[]>(
     parentId !== null ? CACHE_KEYS.directories.byParentId(parentId || undefined) : null,
     parentId !== null
       ? () => DirectoriesService.getDirectories(parentId || undefined)
