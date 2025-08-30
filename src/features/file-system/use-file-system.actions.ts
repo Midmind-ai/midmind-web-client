@@ -30,6 +30,7 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 type CreateChatArgs = {
   content: string;
   model: LLModel;
+  attachments?: string[];
   sendMessage?: boolean;
   openInSplitScreen?: boolean;
   parentChatId?: string;

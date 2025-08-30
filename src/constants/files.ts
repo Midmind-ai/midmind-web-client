@@ -1,8 +1,3 @@
-export const SUPPORTED_FORMATS = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-] as const;
+export const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
-export type SupportedImageFormat = (typeof SUPPORTED_FORMATS)[number];
+export type SupportedFileFormat = (typeof SUPPORTED_FORMATS)[number];

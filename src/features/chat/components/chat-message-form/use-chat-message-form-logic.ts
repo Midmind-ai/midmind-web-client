@@ -6,9 +6,15 @@ import { useParams } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
+import type { SupportedFileFormat } from '@constants/files';
+
 import { AI_MODELS, DEFAULT_AI_MODEL } from '@features/chat/constants/ai-models';
 import { useConversationWithAI } from '@features/chat/hooks/use-conversation-with-ai';
-import type { OnSubmitArgs, LLModel } from '@features/chat/types/chat-types';
+import type {
+  OnSubmitArgs,
+  LLModel,
+  AttachmentProgress,
+} from '@features/chat/types/chat-types';
 import {
   subscribeToMessageReply,
   unsubscribeFromMessageReply,
@@ -18,11 +24,12 @@ import {
 import { useModalOperations } from '@hooks/logic/use-modal-operations';
 
 import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
+import { FilesService } from '@services/files/files-service';
 
 type ChatMessageFormData = {
   content: string;
   model: LLModel;
-  files?: File[];
+  attachments?: AttachmentProgress[];
   replyInfo?: {
     id: string;
     content: string;
@@ -63,7 +70,15 @@ export const useChatMessageFormLogic = ({
           AI_MODELS.GEMINI_2_5_FLASH,
           AI_MODELS.GEMINI_2_5_PRO,
         ]),
-        files: z.array(z.instanceof(File)).optional(),
+        attachments: z
+          .array(
+            z.object({
+              id: z.string(),
+              progress: z.number(),
+              file: z.instanceof(File),
+            })
+          )
+          .optional(),
         replyInfo: z
           .object({
             content: z.string(),
@@ -75,16 +90,17 @@ export const useChatMessageFormLogic = ({
     values: {
       content: '',
       model: DEFAULT_AI_MODEL,
-      files: [],
+      attachments: [],
       replyInfo: undefined,
     },
     mode: 'onChange',
   });
+
   const { openModal } = useModalOperations();
 
   const actualChatId = chatId || urlChatId;
   const replyInfo = watch('replyInfo');
-  const selectedImages = watch('files') || [];
+  const attachments = watch('attachments') || [];
 
   const { conversationWithAI, abortCurrentRequest, hasActiveRequest, isLoading, error } =
     useConversationWithAI(actualChatId);
@@ -95,6 +111,7 @@ export const useChatMessageFormLogic = ({
       onSubmit({
         content: data.content,
         model: data.model,
+        attachments: data.attachments?.map(att => att.id).filter(Boolean) || [],
       });
     } else {
       // For existing chat
@@ -102,12 +119,19 @@ export const useChatMessageFormLogic = ({
       const shouldIncludeBranchContext =
         branchContext && currentContext !== lastProcessedContextRef.current;
 
+      const attachmentIds = data.attachments?.map(att => att.id) || [];
+
       conversationWithAI({
         chat_id: actualChatId,
         message_id: uuidv4(),
         future_llm_message_id: uuidv4(),
         content: data.content,
         model: data.model,
+        ...(data.attachments &&
+          data.attachments.length > 0 && {
+            attachments: data.attachments.map(att => att.id),
+          }),
+        ...(attachmentIds.length > 0 && { attachments: attachmentIds }),
         ...(data.replyInfo && { reply_to: data.replyInfo }),
         ...(shouldIncludeBranchContext && { branch_context: branchContext }),
       });
@@ -120,7 +144,7 @@ export const useChatMessageFormLogic = ({
     reset({
       content: '',
       model: data.model,
-      files: [],
+      attachments: [],
       replyInfo: undefined,
     });
   };
@@ -141,15 +165,84 @@ export const useChatMessageFormLogic = ({
     });
   };
 
-  const handleImageUpload = (files: FileList | null) => {
+  const handleImageUpload = async (files: FileList | null) => {
     if (!files) return;
 
-    const newImages = Array.from(files).filter(
-      file => file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024 // 10MB limit
-    );
+    const currentAttachments = watch('attachments') || [];
 
-    const currentImages = watch('files') || [];
-    setValue('files', [...currentImages, ...newImages]);
+    const newAttachments: AttachmentProgress[] = Array.from(files).map(file => ({
+      id: '',
+      progress: 0,
+      file,
+    }));
+
+    setValue('attachments', [...currentAttachments, ...newAttachments]);
+
+    await Promise.all(
+      newAttachments.map(async (attachment, index): Promise<void> => {
+        const actualIndex = currentAttachments.length + index;
+
+        const currentAttachmentsForLocal = watch('attachments') || [];
+        const updatedAttachments = [...currentAttachmentsForLocal];
+
+        if (updatedAttachments[actualIndex]) {
+          updatedAttachments[actualIndex] = {
+            ...updatedAttachments[actualIndex],
+            progress: 0,
+          };
+        }
+
+        setValue('attachments', updatedAttachments);
+
+        const initResponse = await FilesService.initFileUpload(
+          {
+            mime_type: attachment.file.type as SupportedFileFormat,
+            original_filename: attachment.file.name,
+            size_bytes: attachment.file.size,
+            extension: attachment.file.name.split('.').pop() || '',
+          },
+          progressEvent => {
+            const currentProgress = Math.round(
+              (progressEvent.loaded / (progressEvent?.total ?? 0)) * 100
+            );
+
+            const currentAttachmentsForProgress = watch('attachments') || [];
+            const updatedAttachments = [...currentAttachmentsForProgress];
+
+            if (updatedAttachments[actualIndex]) {
+              updatedAttachments[actualIndex] = {
+                ...updatedAttachments[actualIndex],
+                progress: currentProgress,
+              };
+            }
+
+            setValue('attachments', updatedAttachments);
+          }
+        );
+
+        const currentAttachmentsForId = watch('attachments') || [];
+        const updatedAttachmentsWithId = [...currentAttachmentsForId];
+
+        if (updatedAttachmentsWithId[actualIndex]) {
+          updatedAttachmentsWithId[actualIndex] = {
+            ...updatedAttachmentsWithId[actualIndex],
+            id: initResponse.file_id,
+          };
+        }
+
+        setValue('attachments', updatedAttachmentsWithId);
+
+        await fetch(initResponse.upload_url, {
+          method: 'POST',
+          body: attachment.file,
+        });
+
+        await FilesService.finalizeFileUpload(initResponse.file_id, {
+          actual_size_bytes: attachment.file.size,
+          status: 'uploaded',
+        });
+      })
+    );
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -186,9 +279,11 @@ export const useChatMessageFormLogic = ({
   };
 
   const handleImageRemove = (index: number) => {
-    const currentImages = watch('files') || [];
-    const updatedImages = currentImages.filter((_, i) => i !== index);
-    setValue('files', updatedImages);
+    const currentAttachments = watch('attachments') || [];
+
+    const updatedAttachments = currentAttachments.filter((_, i) => i !== index);
+
+    setValue('attachments', updatedAttachments);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -238,7 +333,7 @@ export const useChatMessageFormLogic = ({
     error,
     control,
     replyInfo,
-    selectedImages,
+    attachments,
     fileInputRef,
     register,
     handleSubmit,

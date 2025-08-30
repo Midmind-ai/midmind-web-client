@@ -9,11 +9,19 @@ import type {
 
 import type { MessageResponse } from '@shared-types/common';
 
+import type { AxiosProgressEvent } from 'axios';
+
 export class FilesService {
-  static async initFileUpload(body: InitFileUploadRequestDto) {
+  static async initFileUpload(
+    body: InitFileUploadRequestDto,
+    onUploadProgress: (progressEvent: AxiosProgressEvent) => void
+  ) {
     const { data } = await baseAxiosInstance.post<InitFileUploadResponseDto>(
       '/files',
-      body
+      body,
+      {
+        onUploadProgress,
+      }
     );
 
     return data;

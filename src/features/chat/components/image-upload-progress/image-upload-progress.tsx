@@ -30,16 +30,14 @@ const ImageUploadProgress = ({
           alt={`Preview ${file.name}`}
           className="size-full object-cover"
         />
-
         {isUploading && (
           <div
-            className="absolute inset-0 flex items-center justify-center bg-black/60
+            className="absolute inset-0 flex items-center justify-center bg-black/50
               backdrop-blur-sm"
           >
             <div className="text-xs font-medium text-white">{Math.round(progress)}%</div>
           </div>
         )}
-
         {isUploading && (
           <div className="absolute right-0 bottom-0 left-0 bg-black/40 p-1">
             <Progress

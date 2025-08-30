@@ -17,6 +17,13 @@ export type ChatMessageFormData = {
 export type OnSubmitArgs = {
   content: string;
   model: LLModel;
+  attachments?: string[];
+};
+
+export type AttachmentProgress = {
+  id: string;
+  progress: number;
+  file: File;
 };
 
 export type BranchContext = {

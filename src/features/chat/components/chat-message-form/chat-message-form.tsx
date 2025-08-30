@@ -39,7 +39,7 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
   const {
     isValid,
     replyInfo,
-    selectedImages,
+    attachments,
     control,
     hasActiveRequest,
     fileInputRef,
@@ -74,17 +74,20 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
           className="outline-input bg-background-accent flex flex-col gap-2 rounded-lg p-2
             pl-2.5 shadow-sm outline-1"
         >
-          {selectedImages.length > 0 && (
+          {attachments.length > 0 && (
             <div className="flex flex-wrap gap-2.5">
-              {selectedImages.map((image, index) => (
-                <ImageUploadProgress
-                  key={`${image.name}-${index}`}
-                  file={image}
-                  progress={0}
-                  onRemove={() => handleImageRemove(index)}
-                  onView={() => handleOpenFileViewModal(image)}
-                />
-              ))}
+              {attachments.map((attachment, index) => {
+                return (
+                  <ImageUploadProgress
+                    key={`${attachment.file.name}-${index}`}
+                    file={attachment.file}
+                    progress={attachment.progress}
+                    isUploading={!attachment.id}
+                    onRemove={() => handleImageRemove(index)}
+                    onView={() => handleOpenFileViewModal(attachment.file)}
+                  />
+                );
+              })}
             </div>
           )}
           <div className="flex items-center gap-2">
