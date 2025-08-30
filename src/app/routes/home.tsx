@@ -17,13 +17,12 @@ const HomePage = () => {
     const chatId = await createChat({
       content: data.content,
       model: data.model,
+      attachments: data.attachments,
       sendMessage: true,
     });
 
     navigate(AppRoutes.Chat(chatId), {
-      state: {
-        fromHomePage: true,
-      },
+      state: { fromHomePage: true },
     });
   };
 

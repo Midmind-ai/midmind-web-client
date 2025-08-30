@@ -1,3 +1,3 @@
 import type { components } from 'generated/api-types';
 
-export type GetChatBreadcrumbsResponse = components['schemas']['ChatBreadcrumbsDto'][];
+export type GetChatBreadcrumbsResponseDto = components['schemas']['ChatBreadcrumbsDto'][];

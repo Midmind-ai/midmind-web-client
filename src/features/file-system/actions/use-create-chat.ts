@@ -25,6 +25,7 @@ import { useSWRConfig, unstable_serialize } from '@lib/swr';
 type CreateChatArgs = {
   content: string;
   model: LLModel;
+  attachments?: string[];
   sendMessage?: boolean;
   openInSplitScreen?: boolean;
   parentChatId?: string;
@@ -47,6 +48,7 @@ export const useCreateChat = () => {
   const createChat = async ({
     content,
     model,
+    attachments = [],
     sendMessage = false,
     openInSplitScreen = false,
     parentChatId,
@@ -151,6 +153,11 @@ export const useCreateChat = () => {
           llm_model: model,
           created_at: new Date().toISOString(),
           reply_content: null,
+          attachments: attachments.map((id: string) => ({
+            id,
+            mime_type: '',
+            original_filename: '',
+          })),
         };
 
         // Create an empty AI message placeholder that will be filled by the streaming response
@@ -162,6 +169,7 @@ export const useCreateChat = () => {
           llm_model: model,
           created_at: new Date().toISOString(),
           reply_content: null,
+          attachments: [],
         };
 
         // Set up cache keys for message storage
@@ -218,6 +226,7 @@ export const useCreateChat = () => {
           future_llm_message_id: futureLLMMessageId,
           content,
           model,
+          ...(attachments.length > 0 && { attachments }),
           // Include branch context if this is a branch chat
           ...(branchContext && {
             branch_context: {

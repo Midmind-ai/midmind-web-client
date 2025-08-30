@@ -61,6 +61,7 @@ export const useConversationWithAI = (chatId: string) => {
       role: 'user',
       branches: [],
       llm_model: body.model,
+      attachments: [],
       reply_content: body.reply_to?.content || null,
     };
 
@@ -71,6 +72,7 @@ export const useConversationWithAI = (chatId: string) => {
       role: 'model',
       branches: [],
       llm_model: body.model,
+      attachments: [],
       reply_content: null,
     };
 

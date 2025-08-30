@@ -1,12 +1,12 @@
 import { MUTATION_KEYS } from '@hooks/cache-keys';
 
-import type { SignInRequest } from '@services/auth/auth-dtos';
+import type { SignInRequestDto } from '@services/auth/auth-dtos';
 import { AuthService } from '@services/auth/auth-service';
 
 import { useSWRMutation } from '@lib/swr';
 
 type SignInFetcherArgs = {
-  arg: SignInRequest;
+  arg: SignInRequestDto;
 };
 
 export const useSignIn = () => {
