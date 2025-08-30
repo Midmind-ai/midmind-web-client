@@ -1,7 +1,7 @@
 import type { components } from 'generated/api-types';
 
-export type SignInWithGoogleRequest = components['schemas']['SignInWithGoogleDto'];
+export type SignInWithGoogleRequestDto = components['schemas']['SignInWithGoogleDto'];
 
-export type SignInRequest = components['schemas']['SingInDto'];
+export type SignInRequestDto = components['schemas']['SingInDto'];
 
-export type TokenResponse = components['schemas']['AccessTokenDto'];
+export type TokenResponseDto = components['schemas']['AccessTokenDto'];

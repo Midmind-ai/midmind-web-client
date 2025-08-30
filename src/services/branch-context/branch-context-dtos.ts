@@ -1,4 +1,4 @@
 import type { components } from 'generated/api-types';
 
-export type GetBranchContextResponse =
+export type GetBranchContextResponseDto =
   components['schemas']['BranchContextByMessageIdDto'][];

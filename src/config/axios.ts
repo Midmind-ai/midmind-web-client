@@ -11,7 +11,7 @@ const ApiErrorCodes = {
 import { LocalStorageKeys } from '@constants/local-storage';
 import { AppRoutes } from '@constants/paths';
 
-import type { TokenResponse } from '@services/auth/auth-dtos';
+import type { TokenResponseDto } from '@services/auth/auth-dtos';
 
 import { handleSWRError } from '@utils/error-handler';
 import { getFromStorage, removeFromStorage, setToStorage } from '@utils/local-storage';
@@ -93,7 +93,7 @@ baseAxiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await authAxiosInstance.post<TokenResponse>('/refresh');
+        const { data } = await authAxiosInstance.post<TokenResponseDto>('/refresh');
         const { access_token } = data;
 
         setToStorage(LocalStorageKeys.AccessToken, access_token);

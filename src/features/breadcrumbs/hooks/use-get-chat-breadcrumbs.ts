@@ -1,6 +1,6 @@
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
-import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
+import type { GetChatBreadcrumbsResponseDto } from '@services/breadcrumbs/breadcrumbs-dtos';
 import { BreadcrumbsService } from '@services/breadcrumbs/breadcrumbs-service';
 
 import { useSWR } from '@lib/swr';
@@ -10,5 +10,5 @@ export const useGetChatBreadcrumbs = (chatId: string) => {
     BreadcrumbsService.getChatBreadcrumbs(chatId)
   );
 
-  return { data: data as GetChatBreadcrumbsResponse | undefined, isLoading, error };
+  return { data: data as GetChatBreadcrumbsResponseDto | undefined, isLoading, error };
 };

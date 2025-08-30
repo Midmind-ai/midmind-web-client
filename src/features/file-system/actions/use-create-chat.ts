@@ -151,6 +151,7 @@ export const useCreateChat = () => {
           llm_model: model,
           created_at: new Date().toISOString(),
           reply_content: null,
+          attachments: [],
         };
 
         // Create an empty AI message placeholder that will be filled by the streaming response
@@ -162,6 +163,7 @@ export const useCreateChat = () => {
           llm_model: model,
           created_at: new Date().toISOString(),
           reply_content: null,
+          attachments: [],
         };
 
         // Set up cache keys for message storage

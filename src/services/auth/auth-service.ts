@@ -1,22 +1,28 @@
 import { authAxiosInstance, baseAxiosInstance } from '@config/axios';
 
 import type {
-  SignInRequest,
-  SignInWithGoogleRequest,
-  TokenResponse,
+  SignInRequestDto,
+  SignInWithGoogleRequestDto,
+  TokenResponseDto,
 } from '@services/auth/auth-dtos';
 
 import type { MessageResponse } from '@shared-types/common';
 
 export class AuthService {
-  static async signIn(requestBody: SignInRequest) {
-    const { data } = await authAxiosInstance.post<TokenResponse>('/sign-in', requestBody);
+  static async signIn(requestBody: SignInRequestDto) {
+    const { data } = await authAxiosInstance.post<TokenResponseDto>(
+      '/sign-in',
+      requestBody
+    );
 
     return data;
   }
 
-  static async signInWithGoogle(requestBody: SignInWithGoogleRequest) {
-    const { data } = await authAxiosInstance.post<TokenResponse>('/google', requestBody);
+  static async signInWithGoogle(requestBody: SignInWithGoogleRequestDto) {
+    const { data } = await authAxiosInstance.post<TokenResponseDto>(
+      '/google',
+      requestBody
+    );
 
     return data;
   }
@@ -28,7 +34,7 @@ export class AuthService {
   }
 
   static async refreshToken() {
-    const { data } = await authAxiosInstance.post<TokenResponse>('/refresh');
+    const { data } = await authAxiosInstance.post<TokenResponseDto>('/refresh');
 
     return data;
   }

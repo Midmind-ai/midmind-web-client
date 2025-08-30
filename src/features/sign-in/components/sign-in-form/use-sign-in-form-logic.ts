@@ -11,7 +11,7 @@ import { useSignIn } from '@features/sign-in/hooks/use-sign-in';
 
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
-import type { SignInRequest } from '@services/auth/auth-dtos';
+import type { SignInRequestDto } from '@services/auth/auth-dtos';
 import { AuthService } from '@services/auth/auth-service';
 
 import { setToStorage } from '@utils/local-storage';
@@ -31,7 +31,7 @@ export const useSignInFormLogic = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignInRequest>({
+  } = useForm<SignInRequestDto>({
     resolver: zodResolver(signInValidationSchema),
   });
 
@@ -54,7 +54,7 @@ export const useSignInFormLogic = () => {
     },
   });
 
-  const handleSignIn = (data: SignInRequest) => {
+  const handleSignIn = (data: SignInRequestDto) => {
     signIn(data, {
       onSuccess: async response => {
         setToStorage(LocalStorageKeys.AccessToken, response.access_token);

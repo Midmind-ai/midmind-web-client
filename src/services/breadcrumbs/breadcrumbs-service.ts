@@ -1,10 +1,10 @@
 import { baseAxiosInstance } from '@config/axios';
 
-import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
+import type { GetChatBreadcrumbsResponseDto } from '@services/breadcrumbs/breadcrumbs-dtos';
 
 export class BreadcrumbsService {
   static async getChatBreadcrumbs(chatId: string) {
-    const { data } = await baseAxiosInstance.get<GetChatBreadcrumbsResponse>(
+    const { data } = await baseAxiosInstance.get<GetChatBreadcrumbsResponseDto>(
       `/chats/${chatId}/breadcrumbs`
     );
 
