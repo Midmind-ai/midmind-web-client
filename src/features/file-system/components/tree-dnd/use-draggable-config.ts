@@ -6,6 +6,8 @@ import type {
   TreeNode,
 } from '@features/file-system/use-file-system.actions';
 
+import { EntityEnum } from '@shared-types/entities';
+
 type UseDraggableConfigProps = {
   node: TreeNode;
   isDisabled?: boolean;
@@ -33,9 +35,9 @@ export const useDraggableConfig = ({
 }: UseDraggableConfigProps): UseDraggableConfigReturn => {
   // Prepare draggable data for when this node is being dragged
   const draggableData: DraggableData = {
-    type: node.type as 'chat' | 'directory',
+    type: node.type,
     id: node.id,
-    parentDirectoryId: node.parentDirectoryId ?? undefined,
+    parentFolderId: node.parentDirectoryId ?? undefined,
     parentChatId: node.parentChatId ?? undefined,
     node: node, // Pass the complete node for the overlay
   };
@@ -44,8 +46,8 @@ export const useDraggableConfig = ({
   const droppableData: DroppableData = {
     type: 'expandable-node',
     id: node.id,
-    nodeType: node.type as 'chat' | 'directory',
-    accepts: ['chat', 'directory'], // ExpandableNodes can accept both chats and directories
+    nodeType: node.type,
+    accepts: [EntityEnum.Chat, EntityEnum.Folder], // ExpandableNodes can accept both chats and directories
     targetName: node.name, // Include the target directory name for logging
   };
 

@@ -1,17 +1,19 @@
 import { FolderPlus, MessageSquarePlus } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { SidebarMenuButton } from '@components/ui/sidebar';
 
 import { AppRoutes } from '@constants/paths';
 
-import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
+import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+
+import { navigate } from '@hooks/use-navigation';
 
 const FolderActions = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const controller = useFileSystemActions();
-  const { createTemporaryDirectory, startEditing } = controller.actions;
+
+  // Store actions (inline editing handled inside store)
+  const createTemporaryFolder = useFileSystemStore(state => state.createTemporaryFolder);
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -23,16 +25,10 @@ const FolderActions = () => {
     navigate(url);
   };
 
-  const handleCreateDirectory = async () => {
+  const handleCreateDirectory = () => {
     // Create new directory inline (no parent - root level)
-    const newDirectoryId = await createTemporaryDirectory();
-
-    if (newDirectoryId) {
-      // Add small delay to ensure component renders before focusing
-      setTimeout(() => {
-        startEditing(newDirectoryId);
-      }, 50);
-    }
+    // Store automatically starts inline editing
+    createTemporaryFolder();
   };
 
   return (

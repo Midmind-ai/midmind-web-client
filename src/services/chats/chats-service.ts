@@ -12,11 +12,11 @@ export class ChatsService {
   static async getChats(options?: { parentDirectoryId?: string; parentChatId?: string }) {
     const params: Record<string, string> = {};
 
-    if (options?.parentDirectoryId) {
+    if (options?.parentDirectoryId && options.parentDirectoryId !== 'root') {
       params.parent_directory_id = options.parentDirectoryId;
     }
 
-    if (options?.parentChatId) {
+    if (options?.parentChatId && options.parentChatId !== 'root') {
       params.parent_chat_id = options.parentChatId;
     }
 

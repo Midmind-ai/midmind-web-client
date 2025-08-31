@@ -23,3 +23,10 @@ export type TreeItem = {
   id: string;
   name: string;
 };
+
+export enum EntityEnum {
+  Folder = 'folder',
+  Chat = 'chat',
+  Mindlet = 'mindlet',
+  Note = 'note',
+}

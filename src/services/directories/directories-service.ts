@@ -9,7 +9,7 @@ import type {
 
 export class DirectoriesService {
   static async getDirectories(parentId?: string) {
-    const params = parentId ? { parent_id: parentId } : {};
+    const params = parentId && parentId !== 'root' ? { parent_id: parentId } : {};
 
     const { data } = await baseAxiosInstance.get<Directory[]>('/directories', {
       params,

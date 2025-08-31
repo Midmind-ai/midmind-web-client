@@ -7,18 +7,17 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
-import { useCreateChat } from '@features/file-system/actions/use-create-chat';
+import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
 
 import type { ConversationBranchContext } from '@shared-types/entities';
 
-import { useSplitScreenActions } from './use-split-screen-actions';
+import { openChatInNewTab, openChatInSidePanel } from './use-split-screen-actions';
 
 export const useChatActions = (actualChatId?: string) => {
   const { id: urlChatId = '' } = useParams();
   const chatId = actualChatId || urlChatId;
 
-  const { openChatInNewTab, openChatInSidePanel } = useSplitScreenActions(chatId);
-  const { createChat } = useCreateChat();
+  const createChat = useFileSystemStore(state => state.createChat);
 
   const createBranch = async ({
     content,

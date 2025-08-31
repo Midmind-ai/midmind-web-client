@@ -74,6 +74,8 @@ export const useConversationWithAI = (chatId: string) => {
       reply_content: null,
     };
 
+    // debugger;
+
     await mutate(
       getInfiniteKey(chatId),
       produce((draft?: PaginatedResponse<ChatMessage[]>[]) => {

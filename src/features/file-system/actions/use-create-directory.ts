@@ -5,6 +5,7 @@ import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
 import { DirectoriesService } from '@services/directories/directories-service';
 
 import type { Directory } from '@shared-types/entities';
+import { EntityEnum } from '@shared-types/entities';
 
 import { useSWRConfig } from '@lib/swr';
 
@@ -19,7 +20,7 @@ export const useCreateDirectory = () => {
     const newDirectory: Directory = {
       id: newDirectoryId,
       name: '', // Empty name - user will fill this in
-      type: 'folder',
+      type: EntityEnum.Folder,
       has_children: false,
     };
 
@@ -62,7 +63,7 @@ export const useCreateDirectory = () => {
       await DirectoriesService.createDirectory({
         id,
         name,
-        type: 'folder',
+        type: EntityEnum.Folder,
         parent_directory_id: parentDirectoryId,
       });
 

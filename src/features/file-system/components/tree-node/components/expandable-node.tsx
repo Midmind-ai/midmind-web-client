@@ -15,10 +15,16 @@ import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import ChildrenList from '@features/file-system/components/tree-node/components/children-list';
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
+import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
 import {
   useFileSystemActions,
   type TreeNode as TreeNodeType,
 } from '@features/file-system/use-file-system.actions';
+
+import { useMenuStateStore } from '@stores/use-menu-state-store';
+
+import { EntityEnum } from '@shared-types/entities';
 
 type Props = {
   node: TreeNodeType;
@@ -41,18 +47,20 @@ const ExpandableNode = ({
 }: Props) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const {
-    deleteChat,
-    deleteDirectory,
-    openChatInNewTab,
-    openChatInSidePanel,
-    renameDirectory,
-    renameChat,
-    finalizeDirectoryCreation,
-    removeTemporaryDirectory,
-    startEditing,
-  } = useFileSystemActions().actions;
-  const { isEditing, isMenuOpen } = useFileSystemActions().helpers;
+  // Store actions (cache revalidation handled inside store)
+  const renameChat = useFileSystemStore(state => state.renameChat);
+  const renameFolder = useFileSystemStore(state => state.renameFolder);
+  const deleteChat = useFileSystemStore(state => state.deleteChat);
+  const deleteFolder = useFileSystemStore(state => state.deleteFolder);
+  const finalizeFolderCreation = useFileSystemStore(
+    state => state.finalizeFolderCreation
+  );
+  const removeTemporaryFolder = useFileSystemStore(state => state.removeTemporaryFolder);
+
+  // Still need actions for other operations
+  const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
+  const { isEditing, startEditing } = useInlineEditStore();
+  const { isMenuOpen } = useMenuStateStore();
 
   const isCurrentlyEditing = isEditing(node.id);
   const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
@@ -77,26 +85,29 @@ const ExpandableNode = ({
   }, [isCurrentlyEditing]);
 
   const handleRename = async (newName: string) => {
-    if (node.type === 'directory') {
+    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
       // Check if this is a new directory (empty name means it was just created)
       if (node.name === '') {
         // This is a new directory being named for the first time
-        await finalizeDirectoryCreation(node.id, newName);
+        await finalizeFolderCreation(node.id, newName);
       } else {
         // This is an existing directory being renamed
-        await renameDirectory({ id: node.id, name: newName });
+        await renameFolder(node.id, newName);
       }
-    } else if (node.type === 'chat') {
+    } else if (node.type === EntityEnum.Chat) {
       // Handle chat renaming
       await renameChat(node.id, newName);
     }
   };
 
   const handleCancel = async () => {
-    if (node.type === 'directory' && node.name === '') {
-      // This is a new directory being canceled - remove from cache
-      const parentDirectoryId = node.parentDirectoryId || undefined;
-      await removeTemporaryDirectory(node.id, parentDirectoryId);
+    if (
+      (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) &&
+      node.name === ''
+    ) {
+      // This is a new directory being canceled - remove from store
+      const parentFolderId = node.parentDirectoryId || undefined;
+      removeTemporaryFolder(node.id, parentFolderId);
     }
     // For chats, no special cancel logic needed - just cancel the edit
   };
@@ -114,10 +125,10 @@ const ExpandableNode = ({
 
   // Map tree node types to entity types
   const getEntityType = () => {
-    if (node.type === 'directory') {
+    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
       return 'folder' as const;
     }
-    if (node.type === 'chat') {
+    if (node.type === EntityEnum.Chat) {
       return 'chat' as const;
     }
 
@@ -210,7 +221,9 @@ const ExpandableNode = ({
                 onCancel={handleCancel}
                 className="text-primary block truncate"
                 placeholder={
-                  node.type === 'directory' ? 'Directory name...' : 'Chat name...'
+                  node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet
+                    ? 'Folder name...'
+                    : 'Chat name...'
                 }
               />
               {!isCurrentlyEditing && (
@@ -218,17 +231,17 @@ const ExpandableNode = ({
                   entityType={getEntityType()}
                   handlers={{
                     onDelete: async () => {
-                      if (node.type === 'chat') {
-                        await deleteChat({
-                          id: node.id,
-                          parentChatId: node.parentChatId ?? undefined,
-                          parentDirectoryId: node.parentDirectoryId ?? undefined,
-                        });
-                      } else if (node.type === 'directory') {
-                        await deleteDirectory(
+                      if (node.type === EntityEnum.Chat) {
+                        await deleteChat(
                           node.id,
-                          node.parentDirectoryId ?? undefined
+                          node.parentDirectoryId ?? undefined,
+                          node.parentChatId ?? undefined
                         );
+                      } else if (
+                        node.type === EntityEnum.Folder ||
+                        node.type === EntityEnum.Mindlet
+                      ) {
+                        await deleteFolder(node.id, node.parentDirectoryId ?? undefined);
                       }
                     },
                     onRename: handleRenameAction,
@@ -245,7 +258,9 @@ const ExpandableNode = ({
           <CollapsibleContent>
             <ChildrenList
               parentNodeId={node.id}
-              parentNodeType={node.type as 'directory' | 'chat'}
+              parentNodeType={
+                node.type === EntityEnum.Chat ? EntityEnum.Chat : EntityEnum.Folder
+              }
               TreeNodeComponent={TreeNodeComponent}
             />
           </CollapsibleContent>

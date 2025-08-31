@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ThemedSpan } from '@components/ui/themed-span';
 
-import { useInlineEditStore } from '@stores/use-inline-edit-store';
+import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
 
 type Props = {
   entityId: string;
@@ -27,8 +27,9 @@ const EditableText = ({
   const [inputValue, setInputValue] = useState(currentValue);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { isEditing, stopEditing } = useInlineEditStore();
-  const isCurrentlyEditing = isEditing(entityId);
+  const editingEntityId = useInlineEditStore(state => state.editingEntityId);
+  const stopEditing = useInlineEditStore(state => state.stopEditing);
+  const isCurrentlyEditing = useInlineEditStore(state => state.isEditing(entityId));
 
   // Auto-focus when entering edit mode
   useEffect(() => {
@@ -55,7 +56,7 @@ const EditableText = ({
       focusInput();
       requestAnimationFrame(focusInput);
     }
-  }, [isCurrentlyEditing, autoFocus]);
+  }, [isCurrentlyEditing, autoFocus, editingEntityId]);
 
   // Reset input value when switching to edit mode
   useEffect(() => {
@@ -160,7 +161,7 @@ const EditableText = ({
         className={`w-full border-0 bg-transparent outline-none ${className} ${
           isSubmitting ? 'cursor-wait opacity-50' : ''
         }`}
-        // autoFocus={autoFocus} // Try native autoFocus as backup
+        autoFocus={autoFocus} // Try native autoFocus as backup
       />
     );
   }

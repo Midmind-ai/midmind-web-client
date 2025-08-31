@@ -1,19 +1,19 @@
 import { useParams } from 'react-router';
 
-import { useSplitScreenActions } from '@features/chat/hooks/use-split-screen-actions';
+import {
+  openChatInNewTab,
+  openChatInSidePanel,
+  navigateToChat,
+} from '@features/chat/hooks/use-split-screen-actions';
 import type { LLModel } from '@features/chat/types/chat-types';
+import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
 
-import { useInlineEditStore } from '@stores/use-inline-edit-store';
 import { useMenuStateStore } from '@stores/use-menu-state-store';
 
-import type { ChatBranchContext } from '@shared-types/entities';
+import { EntityEnum, type ChatBranchContext } from '@shared-types/entities';
 
-import { useCreateChat } from './actions/use-create-chat';
-import { useCreateDirectory } from './actions/use-create-directory';
 import { useDeleteChat } from './actions/use-delete-chat';
 import { useDeleteDirectory } from './actions/use-delete-directory';
-import { useMoveChat } from './actions/use-move-chat';
-import { useMoveDirectory } from './actions/use-move-directory';
 import { useRenameChat } from './actions/use-rename-chat';
 import { useRenameDirectory } from './actions/use-rename-directory';
 import {
@@ -21,8 +21,9 @@ import {
   type DraggableData,
   type DroppableData,
 } from './actions/use-tree-dnd-logic';
-import { useExpandedNodesStore } from './stores/use-expanded-nodes-store';
-import { type TreeNode, type FileSystemData } from './use-file-system.data';
+import { type TreeNode, type FileSystemData } from './data/use-file-system.data';
+import { useExpandedNodesStore } from './stores/use-expanded-nodes.store';
+import { useFileSystemStore } from './stores/use-file-system.store';
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
@@ -33,27 +34,14 @@ type CreateChatArgs = {
   sendMessage?: boolean;
   openInSplitScreen?: boolean;
   parentChatId?: string;
-  parentDirectoryId?: string;
+  parentFolderId?: string;
   branchContext?: ChatBranchContext;
 };
 
 type DeleteChatParams = {
   id: string;
-  parentDirectoryId?: string;
+  parentFolderId?: string;
   parentChatId?: string;
-};
-
-type MoveChatParams = {
-  chatId: string;
-  sourceParentDirectoryId?: string | null;
-  sourceParentChatId?: string | null;
-  targetParentDirectoryId?: string | null;
-};
-
-type MoveDirectoryParams = {
-  directoryId: string;
-  sourceParentDirectoryId?: string | null;
-  targetParentDirectoryId?: string | null;
 };
 
 // Actions and UI state type for components that need interactivity
@@ -64,19 +52,10 @@ type FileSystemActions = {
     createChat: (args: CreateChatArgs) => Promise<string>;
     deleteChat: (params: DeleteChatParams) => Promise<void>;
     renameChat: (id: string, name: string) => Promise<void>;
-    moveChat: (params: MoveChatParams) => Promise<void>;
 
-    // Directory operations
-    createTemporaryDirectory: (parentId?: string) => Promise<string>;
-    finalizeDirectoryCreation: (
-      id: string,
-      name: string,
-      parentId?: string
-    ) => Promise<void>;
-    removeTemporaryDirectory: (id: string, parentId?: string) => Promise<void>;
-    deleteDirectory: (id: string, parentId?: string) => Promise<void>;
-    renameDirectory: (params: { id: string; name: string }) => Promise<void>;
-    moveDirectory: (params: MoveDirectoryParams) => Promise<void>;
+    // Folder operations
+    deleteFolder: (id: string, parentId?: string) => Promise<void>;
+    renameFolder: (params: { id: string; name: string }) => Promise<void>;
 
     // Navigation actions
     openChatInNewTab: (chatId: string) => void;
@@ -120,20 +99,13 @@ export const useFileSystemActions = (): FileSystemActions => {
   const { id: chatId = '' } = useParams();
 
   // CRUD hooks for chats
-  const { createChat } = useCreateChat();
+  const createChat = useFileSystemStore(state => state.createChat);
   const { deleteChat } = useDeleteChat();
   const { renameChat } = useRenameChat();
-  const { moveChat } = useMoveChat();
 
   // CRUD hooks for directories
-  const {
-    createTemporaryDirectory,
-    finalizeDirectoryCreation,
-    removeTemporaryDirectory,
-  } = useCreateDirectory();
-  const { deleteDirectory } = useDeleteDirectory();
-  const { renameDirectory } = useRenameDirectory();
-  const { moveDirectory } = useMoveDirectory();
+  const { deleteDirectory: deleteFolder } = useDeleteDirectory();
+  const { renameDirectory: renameFolder } = useRenameDirectory();
 
   // DND logic
   const {
@@ -153,9 +125,7 @@ export const useFileSystemActions = (): FileSystemActions => {
   const openMenu = useMenuStateStore(state => state.openMenu);
   const closeMenu = useMenuStateStore(state => state.closeMenu);
 
-  // Chat actions
-  const { openChatInNewTab, openChatInSidePanel, navigateToChat } =
-    useSplitScreenActions();
+  // Chat actions are now imported directly
 
   // Helper functions (no data dependencies)
   const isExpanded = (nodeId: string): boolean => expandedNodes.has(nodeId);
@@ -163,7 +133,7 @@ export const useFileSystemActions = (): FileSystemActions => {
   const isMenuOpen = (menuId: string): boolean => activeMenuId === menuId;
 
   const isNodeActive = (node: TreeNode): boolean => {
-    if (node.type === 'chat') {
+    if (node.type === EntityEnum.Chat) {
       return chatId === node.id;
     }
 
@@ -171,7 +141,7 @@ export const useFileSystemActions = (): FileSystemActions => {
   };
 
   const handleNodeClick = (node: TreeNode): void => {
-    if (node.type === 'chat') {
+    if (node.type === EntityEnum.Chat) {
       navigateToChat(node.id);
     }
   };
@@ -183,15 +153,10 @@ export const useFileSystemActions = (): FileSystemActions => {
       createChat,
       deleteChat,
       renameChat,
-      moveChat,
 
-      // Directory actions
-      createTemporaryDirectory,
-      finalizeDirectoryCreation,
-      removeTemporaryDirectory,
-      deleteDirectory,
-      renameDirectory,
-      moveDirectory,
+      // Folder actions
+      deleteFolder,
+      renameFolder,
 
       // Navigation actions
       openChatInNewTab,

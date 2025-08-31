@@ -18,7 +18,7 @@ const DropZone = ({ children, data, className }: Props) => {
 
   // Determine if the current dragged item can be dropped here
   const canAcceptDrop = active?.data.current
-    ? data.accepts.includes(active.data.current.type as 'chat' | 'directory')
+    ? data.accepts.includes(active.data.current.type)
     : false;
 
   // Only show drop feedback if the item can actually be dropped

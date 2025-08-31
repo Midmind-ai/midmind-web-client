@@ -1,5 +1,4 @@
 import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
-import LeafNode from '@features/file-system/components/tree-node/components/leaf-node';
 import {
   useFileSystemActions,
   type TreeNode as TreeNodeType,
@@ -20,16 +19,16 @@ const TreeNode = ({ node }: Props) => {
     setExpanded(node.id, open);
   };
 
-  // For leaf nodes (only for future entity types - directories and chats are always expandable)
-  if (!node.hasChildren && node.type !== 'directory' && node.type !== 'chat') {
-    return (
-      <LeafNode
-        node={node}
-        isActive={isActive}
-        onClick={handleClick}
-      />
-    );
-  }
+  // // For leaf nodes (only for future entity types - directories and chats are always expandable)
+  // if () {
+  //   return (
+  //     <LeafNode
+  //       node={node}
+  //       isActive={isActive}
+  //       onClick={handleClick}
+  //     />
+  //   );
+  // }
 
   // For expandable nodes (directories and chats are always expandable)
   return (

@@ -5,18 +5,19 @@ import { SKELETON_COUNT } from '@features/file-system/components/tree-node/const
 import {
   useFileSystemData,
   type TreeNode as TreeNodeType,
-} from '@features/file-system/use-file-system.data';
+} from '@features/file-system/data/use-file-system.data';
+
+import type { EntityEnum } from '@shared-types/entities';
 
 type Props = {
   parentNodeId: string;
-  parentNodeType: 'directory' | 'chat';
+  parentNodeType: EntityEnum;
   TreeNodeComponent: React.ComponentType<{
     node: TreeNodeType;
   }>;
 };
 
 const ChildrenList = ({ parentNodeId, parentNodeType, TreeNodeComponent }: Props) => {
-  // Fetch children data for this parent node using data-only hook
   const { treeNodes: childNodes, isLoading: isLoadingChildren } = useFileSystemData(
     parentNodeId,
     parentNodeType

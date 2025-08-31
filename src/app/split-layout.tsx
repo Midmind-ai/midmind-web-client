@@ -12,12 +12,15 @@ import { SearchParams } from '@constants/paths';
 import Chat from '@features/chat/chat';
 import { useBranchContext } from '@features/chat/hooks/use-branch-context';
 
+import { useInitializeNavigation } from '@hooks/use-navigation';
 import { useUrlParams } from '@hooks/utils/use-url-params';
 
 import { cn } from '@utils/cn';
 import { getFromStorage, setToStorage } from '@utils/local-storage';
 
 const SplitLayout = () => {
+  useInitializeNavigation();
+
   const { value: chatId = '', removeValue } = useUrlParams(SearchParams.Split);
   const { branchContext } = useBranchContext(chatId);
 

@@ -1,10 +1,4 @@
-import { findCacheKeysByPattern } from '@hooks/cache-keys';
-
-import { DirectoriesService } from '@services/directories/directories-service';
-
-import type { Directory } from '@shared-types/entities';
-
-import { useSWRConfig } from '@lib/swr';
+import { useFileSystemStore } from '../stores/use-file-system.store';
 
 type RenameDirectoryParams = {
   id: string;
@@ -12,36 +6,10 @@ type RenameDirectoryParams = {
 };
 
 export const useRenameDirectory = () => {
-  const { mutate } = useSWRConfig();
+  const renameFolderStore = useFileSystemStore(state => state.renameFolder);
 
   const renameDirectory = async ({ id, name }: RenameDirectoryParams) => {
-    // Update all directory caches that might contain this directory
-    await mutate(
-      findCacheKeysByPattern(['directories']),
-      async (current?: Directory[]): Promise<Directory[]> => {
-        // API call - errors handled by Axios interceptor globally
-        await DirectoriesService.updateDirectory(id, {
-          name,
-          type: 'folder', // Assuming all directories are folders for now
-        });
-
-        // Return updated data
-        if (!current) return [];
-
-        return current.map(dir => (dir.id === id ? { ...dir, name } : dir));
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          // Immediate optimistic update - update name in UI
-          if (!current) return [];
-
-          return current.map(dir => (dir.id === id ? { ...dir, name } : dir));
-        },
-        rollbackOnError: true,
-        populateCache: true,
-        revalidate: false,
-      }
-    );
+    await renameFolderStore(id, name);
   };
 
   return { renameDirectory };

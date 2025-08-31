@@ -1,28 +1,27 @@
-import { useNavigate } from 'react-router';
-
 import { ThemedH1 } from '@components/ui/themed-h1';
 
 import { AppRoutes } from '@constants/paths';
 
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
-import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
+import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+
+import { navigate } from '@hooks/use-navigation';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const controller = useFileSystemActions();
-  const { createChat } = controller.actions;
+  const createChat = useFileSystemStore(state => state.createChat);
 
-  const handleSubmit = async (data: OnSubmitArgs) => {
-    const chatId = await createChat({
+  const handleSubmit = (data: OnSubmitArgs) => {
+    createChat({
       content: data.content,
       model: data.model,
       sendMessage: true,
-    });
-
-    navigate(AppRoutes.Chat(chatId), {
-      state: {
-        fromHomePage: true,
+      navigate: id => {
+        navigate(AppRoutes.Chat(id), {
+          state: {
+            fromHomePage: true,
+          },
+        });
       },
     });
   };

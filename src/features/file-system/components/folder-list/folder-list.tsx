@@ -4,8 +4,10 @@ import { Skeleton } from '@components/ui/skeleton';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-provider';
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
+import { useFileSystemData } from '@features/file-system/data/use-file-system.data';
 import { type DroppableData } from '@features/file-system/use-file-system.actions';
-import { useFileSystemData } from '@features/file-system/use-file-system.data';
+
+import { EntityEnum } from '@shared-types/entities';
 
 const FolderList = () => {
   const { treeNodes, isLoading } = useFileSystemData();
@@ -14,8 +16,8 @@ const FolderList = () => {
   const rootDroppableData: DroppableData = {
     type: 'root',
     id: 'root-drop-zone',
-    nodeType: 'directory',
-    accepts: ['chat', 'directory'], // Root can accept both chats and directories
+    nodeType: EntityEnum.Folder,
+    accepts: [EntityEnum.Chat, EntityEnum.Folder], // Root can accept both chats and directories
   };
 
   return (

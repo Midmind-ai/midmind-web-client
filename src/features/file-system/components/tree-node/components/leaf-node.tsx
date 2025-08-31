@@ -4,10 +4,13 @@ import { ThemedSpan } from '@components/ui/themed-span';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
+import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
 import {
   useFileSystemActions,
   type TreeNode,
 } from '@features/file-system/use-file-system.actions';
+
+import { EntityEnum } from '@shared-types/entities';
 
 type Props = {
   node: TreeNode;
@@ -16,13 +19,13 @@ type Props = {
 };
 
 const LeafNode = ({ node, isActive, onClick }: Props) => {
-  const {
-    deleteChat,
-    deleteDirectory,
-    openChatInSidePanel,
-    openChatInNewTab,
-    startEditing,
-  } = useFileSystemActions().actions;
+  // Store actions (cache revalidation handled inside store)
+  const deleteChat = useFileSystemStore(state => state.deleteChat);
+  const deleteFolder = useFileSystemStore(state => state.deleteFolder);
+
+  // Still need actions for other operations
+  const { openChatInSidePanel, openChatInNewTab, startEditing } =
+    useFileSystemActions().actions;
 
   // Drag and drop configuration (draggable only, not droppable for leaf nodes)
   const { attributes, listeners, setNodeRef, dragStyle } = useDraggableConfig({
@@ -32,10 +35,10 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
 
   // Map tree node types to entity types
   const getEntityType = () => {
-    if (node.type === 'directory') {
+    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
       return 'folder' as const;
     }
-    if (node.type === 'chat') {
+    if (node.type === EntityEnum.Chat) {
       return 'chat' as const;
     }
 
@@ -73,14 +76,17 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
         entityType={getEntityType()}
         handlers={{
           onDelete: async () => {
-            if (node.type === 'chat') {
-              await deleteChat({
-                id: node.id,
-                parentChatId: node.parentChatId ?? undefined,
-                parentDirectoryId: node.parentDirectoryId ?? undefined,
-              });
-            } else if (node.type === 'directory') {
-              await deleteDirectory(node.id, node.parentDirectoryId ?? undefined);
+            if (node.type === EntityEnum.Chat) {
+              await deleteChat(
+                node.id,
+                node.parentDirectoryId ?? undefined,
+                node.parentChatId ?? undefined
+              );
+            } else if (
+              node.type === EntityEnum.Folder ||
+              node.type === EntityEnum.Mindlet
+            ) {
+              await deleteFolder(node.id, node.parentDirectoryId ?? undefined);
             }
           },
           onRename: handleRenameAction,

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { produce } from 'immer';
+import { toast } from 'sonner';
 
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type {
@@ -62,6 +63,9 @@ export const handleLLMResponse = async (
       break;
     case 'complete':
       await handleCompleteChunk(params);
+      break;
+    case 'error':
+      handleErrorChunk(params);
       break;
     default:
       break;
@@ -138,6 +142,64 @@ const handleTitleChunk = (params: ChunkHandlerParams): void => {
     }) as any,
     { revalidate: false, populateCache: true }
   );
+};
+
+const handleErrorChunk = (params: ChunkHandlerParams): void => {
+  const { clearAbortController, chatId, chunk } = params;
+
+  if (chunk.type !== 'error' || !('error' in chunk)) {
+    return;
+  }
+
+  // Clear the abort controller since the conversation has failed
+  clearAbortController(chatId);
+
+  let errorMessage = 'An unexpected error occurred';
+  let errorTitle = 'Error';
+
+  try {
+    // Parse the nested JSON error structure
+    const errorData = JSON.parse(chunk.error as string);
+
+    if (errorData?.error) {
+      const { code, message, status } = errorData.error;
+
+      // Handle specific error codes with user-friendly messages
+      switch (code) {
+        case 429:
+          errorTitle = 'Rate Limit Exceeded';
+          errorMessage =
+            'AI service is currently busy. Please wait a moment before trying again.';
+          break;
+        case 500:
+          errorTitle = 'Service Error';
+          errorMessage = 'AI service is temporarily unavailable. Please try again later.';
+          break;
+        case 503:
+          errorTitle = 'Service Unavailable';
+          errorMessage = 'AI service is temporarily unavailable. Please try again later.';
+          break;
+        default:
+          errorTitle = status
+            ? status
+                .replace(/_/g, ' ')
+                .toLowerCase()
+                .replace(/\b\w/g, (l: string) => l.toUpperCase())
+            : 'Service Error';
+          errorMessage =
+            message || 'Something went wrong with the AI service. Please try again.';
+      }
+    }
+  } catch {
+    // Fallback for malformed error chunks
+    errorMessage = 'AI service encountered an error. Please try again.';
+  }
+
+  // Show error toast with Sonner
+  toast.error(errorMessage, {
+    description: errorTitle !== 'Error' ? errorTitle : undefined,
+    duration: 5000,
+  });
 };
 
 const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> => {

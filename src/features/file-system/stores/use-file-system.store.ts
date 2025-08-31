@@ -1,0 +1,861 @@
+import { v4 as uuidv4 } from 'uuid';
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+
+import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
+import type { LLModel } from '@features/chat/types/chat-types';
+import { handleLLMResponse } from '@features/chat/utils/swr';
+import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes.store';
+import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
+
+import { findCacheKeysByPattern, CACHE_KEYS } from '@hooks/cache-keys';
+
+import type { CreateNewChatRequestDto } from '@services/chats/chats-dtos';
+import { ChatsService } from '@services/chats/chats-service';
+import type {
+  ConversationWithAIRequestDto,
+  ConversationWithAIResponseDto,
+} from '@services/conversations/conversations-dtos';
+import { ConversationsService } from '@services/conversations/conversations-service';
+import { DirectoriesService } from '@services/directories/directories-service';
+
+import { useAbortControllerStore } from '@stores/use-abort-controller-store';
+import { useEntityCreationStore } from '@stores/use-entity-creation.store';
+
+import { EntityEnum } from '@shared-types/entities';
+import type {
+  Directory,
+  Chat,
+  ChatMessage,
+  ChatBranchContext,
+} from '@shared-types/entities';
+
+import { mutate } from '@lib/swr';
+
+type Node = (Directory | Chat) & {
+  type: EntityEnum;
+};
+
+type FileSystemStoreType = {
+  nodes: Array<Node>;
+  childrenOf: Record<string | 'root', string[]>;
+  parentOf: Record<string, string | 'root'>;
+
+  setNodes: (nodes: Array<Directory | Chat>, parentId: string | 'root') => void;
+  createChat: (args: {
+    content: string;
+    model: LLModel;
+    sendMessage?: boolean;
+    openInSplitScreen?: boolean;
+    parentChatId?: string;
+    parentFolderId?: string;
+    branchContext?: ChatBranchContext;
+    navigate?: (chatId: string) => void;
+  }) => Promise<string>;
+  renameChat: (nodeId: string, newName: string) => Promise<void>;
+  renameFolder: (nodeId: string, newName: string) => Promise<void>;
+  deleteChat: (
+    id: string,
+    parentFolderId?: string,
+    parentChatId?: string
+  ) => Promise<void>;
+  deleteFolder: (id: string, parentFolderId?: string) => Promise<void>;
+  moveChat: (
+    chatId: string,
+    sourceParentFolderId?: string | 'root',
+    sourceParentChatId?: string | 'root',
+    targetParentFolderId?: string | 'root'
+  ) => Promise<void>;
+  moveFolder: (
+    folderId: string,
+    sourceParentFolderId?: string | 'root',
+    targetParentFolderId?: string | 'root'
+  ) => Promise<void>;
+  createTemporaryFolder: (parentFolderId?: string) => string;
+  finalizeFolderCreation: (
+    id: string,
+    name: string,
+    parentFolderId?: string
+  ) => Promise<void>;
+  removeTemporaryFolder: (id: string, parentFolderId?: string) => void;
+};
+
+export const useFileSystemStore = create<FileSystemStoreType>()(
+  devtools(
+    (set, get) => ({
+      nodes: [],
+      childrenOf: {},
+      parentOf: {},
+
+      setNodes: (nodes, parentId = 'root') => {
+        set(state => {
+          // Find existing nodes that don't belong to this parent
+          const existingNodes = state.nodes.filter(
+            node => state.parentOf[node.id] !== parentId
+          );
+
+          const newNodes = nodes.map(node => ({
+            ...node,
+            type:
+              node.type ||
+              ('entity_type' in node
+                ? (node as unknown as { entity_type: EntityEnum }).entity_type
+                : EntityEnum.Folder),
+          }));
+
+          // Combine existing nodes from other parents + new API nodes
+          const allNodes = [...existingNodes, ...newNodes];
+
+          // Build new children mapping, preserving temporary directories
+          const newChildrenIds = [...nodes.map(item => item.id)];
+
+          return {
+            ...state,
+            nodes: allNodes,
+            childrenOf: {
+              ...state.childrenOf,
+              [parentId]: newChildrenIds,
+            },
+            parentOf: {
+              ...state.parentOf,
+              ...nodes.reduce(
+                (acc, node) => {
+                  acc[node.id] = parentId;
+
+                  return acc;
+                },
+                {} as Record<string, string>
+              ),
+            },
+          };
+        });
+      },
+
+      createChat: async ({
+        content,
+        model,
+        sendMessage = false,
+        openInSplitScreen = false,
+        parentChatId,
+        parentFolderId,
+        branchContext,
+        navigate,
+      }) => {
+        const chatId = uuidv4();
+        const messageId = uuidv4();
+        const futureLLMMessageId = uuidv4();
+        const chatDetailsCacheKey = CACHE_KEYS.chats.details(chatId);
+        const messagesCacheKey = `${CACHE_KEYS.messages.byChatId(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+
+        const state = get();
+        const originalNodes = [...state.nodes];
+        const originalChildrenOf = { ...state.childrenOf };
+        const originalParentOf = { ...state.parentOf };
+
+        const parentId = parentChatId || 'root';
+
+        // Create optimistic chat object
+        const optimisticChat: Node = {
+          id: chatId,
+          name: 'New chat',
+          type: EntityEnum.Chat,
+          parent_directory_id: parentFolderId || null,
+          parent_chat_id: parentChatId || null,
+          has_children: false,
+        };
+
+        // Mark chat as being created to prevent API calls
+        const { startCreating } = useEntityCreationStore.getState();
+        startCreating(chatId);
+
+        // Optimistic update to store
+        set(state => {
+          const updatedNodes = [optimisticChat, ...state.nodes];
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Add to parent's children list
+          if (updatedChildrenOf[parentId]) {
+            updatedChildrenOf[parentId] = [chatId, ...updatedChildrenOf[parentId]];
+          } else {
+            updatedChildrenOf[parentId] = [chatId];
+          }
+
+          // Set parent relationship
+          updatedParentOf[chatId] = parentId;
+
+          // Update parent chat's has_children flag if this is a branch chat
+          const finalNodes = parentChatId
+            ? updatedNodes.map(node =>
+                node.id === parentChatId ? { ...node, has_children: true } : node
+              )
+            : updatedNodes;
+
+          return {
+            ...state,
+            nodes: finalNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        // Expand parent chat node if this is a branch
+        if (parentChatId) {
+          const { expandNode } = useExpandedNodesStore.getState();
+          expandNode(parentChatId);
+        }
+
+        // Add optimistic chat data into cache
+        await mutate(chatDetailsCacheKey, optimisticChat);
+
+        // Handle message sending if needed
+        if (sendMessage) {
+          // Create the user's initial message
+          const userMessage: ChatMessage = {
+            id: messageId,
+            content: content,
+            role: 'user',
+            branches: [],
+            llm_model: model,
+            created_at: new Date().toISOString(),
+            reply_content: null,
+          };
+
+          // Create an empty AI message placeholder
+          const llmMessage: ChatMessage = {
+            id: futureLLMMessageId,
+            content: '',
+            role: 'model',
+            branches: [],
+            llm_model: model,
+            created_at: new Date().toISOString(),
+            reply_content: null,
+          };
+
+          // Add messages in cache optimistically
+          await mutate(
+            messagesCacheKey,
+            {
+              data: [llmMessage, userMessage],
+              meta: {
+                total: 2,
+                lastPage: 1,
+                currentPage: 1,
+                perPage: 20,
+                prev: null,
+                next: null,
+              },
+            },
+            { revalidate: false, populateCache: true }
+          );
+        }
+
+        // Handle split screen opening
+        if (openInSplitScreen) {
+          const { openChatInSplitView } = await import(
+            '@features/chat/hooks/use-split-screen-actions'
+          );
+          openChatInSplitView(chatId, parentChatId);
+        }
+
+        if (navigate) navigate(chatId);
+
+        try {
+          // Prepare the chat creation payload
+          const newChatDto: CreateNewChatRequestDto = {
+            id: chatId,
+            name: 'New chat',
+            directory_id: parentFolderId,
+            ...(branchContext &&
+              parentChatId && {
+                branch_context: {
+                  parent_chat_id: parentChatId,
+                  parent_message_id: branchContext.parent_message_id,
+                  selected_text: branchContext.selected_text,
+                  start_position: branchContext.start_position,
+                  end_position: branchContext.end_position,
+                  connection_type: branchContext.connection_type,
+                  context_type: branchContext.context_type,
+                },
+              }),
+          };
+
+          // Create the chat on the server
+          await ChatsService.createNewChat(newChatDto);
+
+          if (sendMessage) {
+            // Prepare conversation request
+            const conversationBody: ConversationWithAIRequestDto = {
+              chat_id: chatId,
+              message_id: messageId,
+              future_llm_message_id: futureLLMMessageId,
+              content,
+              model,
+              ...(branchContext && {
+                branch_context: {
+                  parent_message_id: branchContext.parent_message_id,
+                },
+              }),
+            };
+
+            // Create abort controller and start AI conversation
+            const { createAbortController, clearAbortController } =
+              useAbortControllerStore.getState();
+            const newAbortController = createAbortController(chatId);
+
+            ConversationsService.conversationWithAI(
+              conversationBody,
+              (chunk: ConversationWithAIResponseDto) => {
+                // console.log(chunk);
+                handleLLMResponse(
+                  clearAbortController,
+                  chatId,
+                  model,
+                  chunk,
+                  messageId,
+                  parentChatId
+                );
+              },
+              newAbortController.signal
+            );
+          }
+
+          return chatId;
+        } catch (error) {
+          set({
+            nodes: originalNodes,
+            childrenOf: originalChildrenOf,
+            parentOf: originalParentOf,
+          });
+          await mutate(chatDetailsCacheKey, undefined);
+          await mutate(messagesCacheKey, undefined);
+
+          throw error;
+        } finally {
+          // Mark chat creation as finished
+          const { finishCreating } = useEntityCreationStore.getState();
+          finishCreating(chatId);
+        }
+      },
+
+      renameChat: async (nodeId, newName) => {
+        const state = get();
+        const originalNode = state.nodes.find(node => node.id === nodeId);
+        if (!originalNode) {
+          throw new Error('Chat not found');
+        }
+
+        // Optimistic update
+        set(state => ({
+          ...state,
+          nodes: state.nodes.map(node =>
+            node.id === nodeId ? { ...node, name: newName } : node
+          ),
+        }));
+
+        try {
+          await ChatsService.updateChatDetails(nodeId, { name: newName });
+          // Revalidate breadcrumb caches after successful rename
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set(state => ({
+            ...state,
+            nodes: state.nodes.map(node =>
+              node.id === nodeId ? { ...node, name: originalNode.name } : node
+            ),
+          }));
+          throw error;
+        }
+      },
+
+      renameFolder: async (nodeId, newName) => {
+        const state = get();
+        const originalNode = state.nodes.find(node => node.id === nodeId);
+        if (
+          !originalNode ||
+          (originalNode.type !== EntityEnum.Folder &&
+            originalNode.type !== EntityEnum.Mindlet)
+        ) {
+          throw new Error('Folder not found');
+        }
+
+        // Optimistic update
+        set(state => ({
+          ...state,
+          nodes: state.nodes.map(node =>
+            node.id === nodeId ? { ...node, name: newName } : node
+          ),
+        }));
+
+        try {
+          const folderType =
+            originalNode.type === EntityEnum.Folder ? 'folder' : 'mindlet';
+          await DirectoriesService.updateDirectory(nodeId, {
+            name: newName,
+            type: folderType,
+          });
+          // Revalidate breadcrumb caches after successful rename
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set(state => ({
+            ...state,
+            nodes: state.nodes.map(node =>
+              node.id === nodeId ? { ...node, name: originalNode.name } : node
+            ),
+          }));
+          throw error;
+        }
+      },
+
+      deleteChat: async (id, parentFolderId, parentChatId) => {
+        const state = get();
+        const parentId = parentChatId || parentFolderId || 'root';
+
+        // Store original state for rollback
+        const originalNodes = [...state.nodes];
+        const originalChildrenOf = { ...state.childrenOf };
+        const originalParentOf = { ...state.parentOf };
+
+        // Check if this is the last child of the parent
+        const siblings = state.childrenOf[parentId] || [];
+        const isLastChild = siblings.length === 1 && siblings[0] === id;
+
+        // Optimistic update - remove the chat immediately
+        set(state => {
+          const updatedNodes = state.nodes.filter(node => node.id !== id);
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove from parent's children list
+          if (updatedChildrenOf[parentId]) {
+            updatedChildrenOf[parentId] = updatedChildrenOf[parentId].filter(
+              childId => childId !== id
+            );
+          }
+
+          // Remove from parentOf mapping
+          delete updatedParentOf[id];
+
+          // Remove any children entries for this chat
+          delete updatedChildrenOf[id];
+
+          // Update parent's has_children if this was the last child
+          const finalNodes =
+            isLastChild && parentChatId
+              ? updatedNodes.map(node =>
+                  node.id === parentChatId ? { ...node, has_children: false } : node
+                )
+              : updatedNodes;
+
+          return {
+            ...state,
+            nodes: finalNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        try {
+          // Make API call
+          await ChatsService.deleteChat(id);
+
+          // Clear related caches after successful deletion
+          await mutate(['chat', id], undefined, { revalidate: false });
+          await mutate(findCacheKeysByPattern(['messages', id]), undefined, {
+            revalidate: false,
+          });
+
+          // Revalidate breadcrumb caches
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set({
+            nodes: originalNodes,
+            childrenOf: originalChildrenOf,
+            parentOf: originalParentOf,
+          });
+          throw error;
+        }
+      },
+
+      deleteFolder: async (id, parentFolderId) => {
+        const state = get();
+        const parentId = parentFolderId || 'root';
+
+        // Store original state for rollback
+        const originalNodes = [...state.nodes];
+        const originalChildrenOf = { ...state.childrenOf };
+        const originalParentOf = { ...state.parentOf };
+
+        // Optimistic update - remove the directory immediately
+        set(state => {
+          const updatedNodes = state.nodes.filter(node => node.id !== id);
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove from parent's children list
+          if (updatedChildrenOf[parentId]) {
+            updatedChildrenOf[parentId] = updatedChildrenOf[parentId].filter(
+              childId => childId !== id
+            );
+          }
+
+          // Remove from parentOf mapping
+          delete updatedParentOf[id];
+
+          // Remove any children entries for this directory
+          delete updatedChildrenOf[id];
+
+          return {
+            ...state,
+            nodes: updatedNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        try {
+          // Make API call
+          await DirectoriesService.deleteDirectory(id);
+
+          // Clear related caches after successful deletion
+          await mutate(findCacheKeysByPattern(['directories', id]), undefined, {
+            revalidate: false,
+          });
+          await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined, {
+            revalidate: false,
+          });
+
+          // Revalidate breadcrumb caches
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set({
+            nodes: originalNodes,
+            childrenOf: originalChildrenOf,
+            parentOf: originalParentOf,
+          });
+          throw error;
+        }
+      },
+
+      moveChat: async (
+        chatId,
+        sourceParentFolderId = 'root',
+        _sourceParentChatId = 'root',
+        targetParentFolderId = 'root'
+      ) => {
+        if (sourceParentFolderId === targetParentFolderId) return;
+
+        const state = get();
+
+        // Find the chat to move
+        const chatToMove = state.nodes.find(node => node.id === chatId);
+        if (!chatToMove || chatToMove.type !== EntityEnum.Chat) {
+          throw new Error('Chat not found');
+        }
+
+        // Store original state for rollback
+        const originalNodes = [...state.nodes];
+        const originalChildrenOf = { ...state.childrenOf };
+        const originalParentOf = { ...state.parentOf };
+
+        // Get the actual current parent from the store state
+        const actualSourceParentId = state.parentOf[chatId] || 'root';
+        const targetParentId = targetParentFolderId || 'root';
+
+        // Don't move if already in the target location
+        if (actualSourceParentId === targetParentId) return;
+
+        // Optimistic update
+        set(state => {
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove from actual source parent's children
+          if (updatedChildrenOf[actualSourceParentId]) {
+            updatedChildrenOf[actualSourceParentId] = updatedChildrenOf[
+              actualSourceParentId
+            ].filter(id => id !== chatId);
+          }
+
+          // Add to target parent's children
+          if (updatedChildrenOf[targetParentId]) {
+            updatedChildrenOf[targetParentId] = [
+              chatId,
+              ...updatedChildrenOf[targetParentId],
+            ];
+          } else {
+            updatedChildrenOf[targetParentId] = [chatId];
+          }
+
+          // Update parent relationship
+          updatedParentOf[chatId] = targetParentId;
+
+          // Update the node's parent_directory_id
+          const updatedNodes = state.nodes.map(node =>
+            node.id === chatId
+              ? { ...node, parent_directory_id: targetParentFolderId }
+              : node
+          );
+
+          return {
+            ...state,
+            nodes: updatedNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        try {
+          // Make API call
+          await ChatsService.updateChatDetails(chatId, {
+            name: chatToMove.name,
+            directory_id: targetParentFolderId,
+          });
+
+          // TODO: make cache invalidation not visible to the user. Right now revalidation make isLoading flag to be true and ui is flickering.
+          // Invalidate caches
+          // await mutate(findCacheKeysByPattern(['chats']));
+          // await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set({
+            nodes: originalNodes,
+            childrenOf: originalChildrenOf,
+            parentOf: originalParentOf,
+          });
+          throw error;
+        }
+      },
+
+      moveFolder: async (folderId, sourceParentFolderId, targetParentFolderId) => {
+        if (sourceParentFolderId === targetParentFolderId) return;
+
+        const state = get();
+
+        // Find the folder to move
+        const folderToMove = state.nodes.find(node => node.id === folderId);
+        if (!folderToMove) {
+          throw new Error('Folder not found');
+        }
+
+        // Store original state for rollback
+        const originalNodes = [...state.nodes];
+        const originalChildrenOf = { ...state.childrenOf };
+        const originalParentOf = { ...state.parentOf };
+
+        // Get the actual current parent from the store state
+        const actualSourceParentId = state.parentOf[folderId] || 'root';
+        const targetParentId = targetParentFolderId || 'root';
+
+        // Don't move if already in the target location
+        if (actualSourceParentId === targetParentId) return;
+
+        // Optimistic update
+        set(state => {
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove from actual source parent's children
+          if (updatedChildrenOf[actualSourceParentId]) {
+            updatedChildrenOf[actualSourceParentId] = updatedChildrenOf[
+              actualSourceParentId
+            ].filter(id => id !== folderId);
+          }
+
+          // Add to target parent's children
+          if (updatedChildrenOf[targetParentId]) {
+            updatedChildrenOf[targetParentId] = [
+              folderId,
+              ...updatedChildrenOf[targetParentId],
+            ];
+          } else {
+            updatedChildrenOf[targetParentId] = [folderId];
+          }
+
+          // Update parent relationship
+          updatedParentOf[folderId] = targetParentId;
+
+          // Update the node's parent_id
+          const updatedNodes = state.nodes.map(node =>
+            node.id === folderId ? { ...node, parent_id: targetParentFolderId } : node
+          );
+
+          return {
+            ...state,
+            nodes: updatedNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        try {
+          // Make API call
+          await DirectoriesService.moveDirectory(folderId, {
+            target_parent_id: targetParentFolderId ?? null,
+          });
+
+          // TODO: make cache invalidation not visible to the user. Right now revalidation make isLoading flag to be true and ui is flickering.
+          // Invalidate caches
+          // await mutate(findCacheKeysByPattern(['directories']));
+          // await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set({
+            nodes: originalNodes,
+            childrenOf: originalChildrenOf,
+            parentOf: originalParentOf,
+          });
+          throw error;
+        }
+      },
+
+      createTemporaryFolder: parentFolderId => {
+        const newId = uuidv4();
+        const parentId = parentFolderId || 'root';
+
+        // Create temporary directory node with empty name
+        const newDirectory: Node = {
+          id: newId,
+          name: '', // Empty name for inline editing
+          type: EntityEnum.Folder,
+          has_children: false,
+        };
+
+        // Add to state immediately (optimistic)
+        set(state => {
+          const updatedNodes = [newDirectory, ...state.nodes];
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Add to parent's children list at the beginning
+          if (updatedChildrenOf[parentId]) {
+            updatedChildrenOf[parentId] = [newId, ...updatedChildrenOf[parentId]];
+          } else {
+            updatedChildrenOf[parentId] = [newId];
+          }
+
+          // Set parent relationship
+          updatedParentOf[newId] = parentId;
+
+          return {
+            ...state,
+            nodes: updatedNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+
+        useInlineEditStore.getState().startEditing(newId);
+
+        return newId;
+      },
+
+      finalizeFolderCreation: async (id, name, parentFolderId) => {
+        const parentId = parentFolderId || 'root';
+
+        // Update the directory name
+        set(state => ({
+          ...state,
+          nodes: state.nodes.map(node => (node.id === id ? { ...node, name } : node)),
+        }));
+
+        try {
+          // Create directory on server
+          await DirectoriesService.createDirectory({
+            id,
+            name,
+            type: 'folder',
+            parent_directory_id: parentFolderId,
+          });
+
+          // Initialize empty child caches for the new directory
+          await mutate(['directories', id], [], { revalidate: false });
+          await mutate(['chats', 'directories', id], [], { revalidate: false });
+
+          // Update parent's has_children flag if needed
+          if (parentFolderId) {
+            set(state => ({
+              ...state,
+              nodes: state.nodes.map(node =>
+                node.id === parentFolderId ? { ...node, has_children: true } : node
+              ),
+            }));
+          }
+
+          // Revalidate breadcrumb caches
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+
+          // Stop inline editing after successful creation
+          useInlineEditStore.getState().stopEditing();
+        } catch (error) {
+          // Remove temporary directory on error
+          set(state => {
+            const updatedNodes = state.nodes.filter(node => node.id !== id);
+            const updatedChildrenOf = { ...state.childrenOf };
+            const updatedParentOf = { ...state.parentOf };
+
+            // Remove from parent's children list
+            if (updatedChildrenOf[parentId]) {
+              updatedChildrenOf[parentId] = updatedChildrenOf[parentId].filter(
+                childId => childId !== id
+              );
+            }
+
+            // Remove from parentOf mapping
+            delete updatedParentOf[id];
+
+            return {
+              ...state,
+              nodes: updatedNodes,
+              childrenOf: updatedChildrenOf,
+              parentOf: updatedParentOf,
+            };
+          });
+
+          throw error;
+        }
+      },
+
+      removeTemporaryFolder: (id, parentFolderId) => {
+        const parentId = parentFolderId || 'root';
+
+        // Stop inline editing if this directory is being edited
+        const inlineEditStore = useInlineEditStore.getState();
+        if (inlineEditStore.isEditing(id)) {
+          inlineEditStore.stopEditing();
+        }
+
+        // Remove temporary directory from state
+        set(state => {
+          const updatedNodes = state.nodes.filter(node => node.id !== id);
+          const updatedChildrenOf = { ...state.childrenOf };
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove from parent's children list
+          if (updatedChildrenOf[parentId]) {
+            updatedChildrenOf[parentId] = updatedChildrenOf[parentId].filter(
+              childId => childId !== id
+            );
+          }
+
+          // Remove from parentOf mapping
+          delete updatedParentOf[id];
+
+          return {
+            ...state,
+            nodes: updatedNodes,
+            childrenOf: updatedChildrenOf,
+            parentOf: updatedParentOf,
+          };
+        });
+      },
+    }),
+    {
+      name: 'file-system-store',
+    }
+  )
+);

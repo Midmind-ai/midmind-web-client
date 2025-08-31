@@ -1,14 +1,12 @@
-import { useNavigate } from 'react-router';
-
 import { Button } from '@components/ui/button';
 import { ThemedH1 } from '@components/ui/themed-h1';
 import { ThemedP } from '@components/ui/themed-p';
 
 import { AppRoutes } from '@constants/paths';
 
-const NotFoundPage = () => {
-  const navigate = useNavigate();
+import { navigate } from '@hooks/use-navigation';
 
+const NotFoundPage = () => {
   const handleGoHome = () => {
     navigate(AppRoutes.Home, { replace: true });
   };
