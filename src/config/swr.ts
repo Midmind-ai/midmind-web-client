@@ -1,5 +1,3 @@
-import { apiConfig } from '@config/api';
-
 import type { SWRConfiguration } from '@lib/swr';
 
 /**
@@ -15,7 +13,7 @@ export const swrConfig: SWRConfiguration = {
   revalidateOnReconnect: false,
 
   // Deduplication
-  dedupingInterval: apiConfig.timeout,
+  dedupingInterval: 0,
 };
 
 /**

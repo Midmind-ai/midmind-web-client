@@ -33,13 +33,12 @@ export const useFileSystemData = (
 ): FileSystemData => {
   const { isLoading, error } = useLoadData(parentId, parentType);
 
-  const { nodes, childrenOf } = useFileSystemStore();
+  const nodes = useFileSystemStore(state => state.nodes);
+  const childrenIds = useFileSystemStore(state => state.childrenOf[parentId] || []);
 
   // Combine directories and chats into tree nodes
   const treeNodes: TreeNode[] = useMemo(() => {
-    const childrenNodes = nodes.filter(item =>
-      (childrenOf[parentId] || []).some(el => el === item.id)
-    );
+    const childrenNodes = nodes.filter(item => childrenIds.some(el => el === item.id));
 
     const folders = childrenNodes.filter(item => item.type === EntityEnum.Folder);
     const chats = childrenNodes.filter(item => item.type === EntityEnum.Chat) as Chat[];
@@ -70,7 +69,7 @@ export const useFileSystemData = (
         })
       ),
     ];
-  }, [nodes, childrenOf, parentId]);
+  }, [nodes, childrenIds, parentId]);
 
   return {
     treeNodes,

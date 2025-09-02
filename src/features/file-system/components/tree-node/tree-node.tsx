@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
 import {
   useFileSystemActions,
@@ -13,11 +15,14 @@ const TreeNode = ({ node }: Props) => {
   const { setExpanded } = useFileSystemActions().actions;
   const isOpen = isExpanded(node.id);
   const isActive = isNodeActive(node);
-  const handleClick = () => handleNodeClick(node);
+  const handleClick = useCallback(() => handleNodeClick(node), [node, handleNodeClick]);
 
-  const setIsOpen = (open: boolean) => {
-    setExpanded(node.id, open);
-  };
+  const setIsOpen = useCallback(
+    (open: boolean) => {
+      setExpanded(node.id, open);
+    },
+    [setExpanded, node.id]
+  );
 
   // // For leaf nodes (only for future entity types - directories and chats are always expandable)
   // if () {

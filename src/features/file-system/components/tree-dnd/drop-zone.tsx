@@ -29,12 +29,12 @@ const DropZone = ({ children, data, className }: Props) => {
     <div
       ref={setNodeRef}
       className={cn(
-        'rounded-sm transition-all duration-150',
+        'rounded-sm',
         {
           // Valid drop target - more prominent highlighting
-          'bg-blue-500/20 ring-2 ring-blue-500/50': showDropFeedback,
+          'bg-blue-500/10': showDropFeedback,
           // Invalid drop target
-          'bg-red-500/10 ring-1 ring-red-500/30': showInvalidFeedback,
+          'bg-red-500/10': showInvalidFeedback,
         },
         className
       )}

@@ -5,13 +5,14 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
   MeasuringStrategy,
   type DragOverEvent,
 } from '@dnd-kit/core';
+import { createPortal } from 'react-dom';
 
 import { SidebarMenu } from '@components/ui/sidebar';
 
+import { intersectionRatioCollision } from '@features/file-system/components/tree-dnd/collision-detection';
 import DragOverlayNode from '@features/file-system/components/tree-dnd/drag-overlay-node';
 import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
 
@@ -44,7 +45,7 @@ const TreeDndProvider = ({ children }: Props) => {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={intersectionRatioCollision}
       measuring={{
         droppable: {
           strategy: MeasuringStrategy.Always,
@@ -56,29 +57,28 @@ const TreeDndProvider = ({ children }: Props) => {
       onDragCancel={handleDragCancel}
     >
       {children}
-      <DragOverlay
-        adjustScale={false}
-        style={{
-          transformOrigin: '0 0',
-        }}
-      >
-        {draggedNode ? (
-          <div
-            className="scale-90 transform-gpu cursor-grabbing transition-transform
-              duration-200 ease-out"
-            style={{
-              transform: 'rotate(2deg)',
-              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <SidebarMenu
-              className="bg-sidebar border-border/50 gap-[2px] rounded-md border"
+      {createPortal(
+        <DragOverlay>
+          {draggedNode ? (
+            <div
+              className="scale-90 transform-gpu cursor-grabbing transition-transform
+                duration-200 ease-out"
+              style={{
+                transform: 'rotate(2deg)',
+                boxShadow:
+                  '0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)',
+              }}
             >
-              <DragOverlayNode node={draggedNode.node} />
-            </SidebarMenu>
-          </div>
-        ) : null}
-      </DragOverlay>
+              <SidebarMenu
+                className="bg-sidebar border-border/50 gap-[2px] rounded-md border"
+              >
+                <DragOverlayNode node={draggedNode.node} />
+              </SidebarMenu>
+            </div>
+          ) : null}
+        </DragOverlay>,
+        document.body
+      )}
     </DndContext>
   );
 };

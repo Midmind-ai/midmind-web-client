@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Collapsible,
@@ -32,240 +32,239 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   onClick: VoidFunction;
-  TreeNodeComponent: React.ComponentType<{
-    node: TreeNodeType;
-  }>;
+  TreeNodeComponent: React.ComponentType<{ node: TreeNodeType }>;
 };
 
-const ExpandableNode = ({
-  node,
-  isActive,
-  isOpen,
-  setIsOpen,
-  onClick,
-  TreeNodeComponent,
-}: Props) => {
-  const [isHovered, setIsHovered] = useState(false);
+const ExpandableNode = React.memo(
+  ({ node, isActive, isOpen, setIsOpen, onClick, TreeNodeComponent }: Props) => {
+    const [isHovered, setIsHovered] = useState(false);
 
-  // Store actions (cache revalidation handled inside store)
-  const renameChat = useFileSystemStore(state => state.renameChat);
-  const renameFolder = useFileSystemStore(state => state.renameFolder);
-  const deleteChat = useFileSystemStore(state => state.deleteChat);
-  const deleteFolder = useFileSystemStore(state => state.deleteFolder);
-  const finalizeFolderCreation = useFileSystemStore(
-    state => state.finalizeFolderCreation
-  );
-  const removeTemporaryFolder = useFileSystemStore(state => state.removeTemporaryFolder);
+    // Store actions (cache revalidation handled inside store)
+    const renameChat = useFileSystemStore(state => state.renameChat);
+    const renameFolder = useFileSystemStore(state => state.renameFolder);
+    const deleteChat = useFileSystemStore(state => state.deleteChat);
+    const deleteFolder = useFileSystemStore(state => state.deleteFolder);
+    const finalizeFolderCreation = useFileSystemStore(
+      state => state.finalizeFolderCreation
+    );
+    const removeTemporaryFolder = useFileSystemStore(
+      state => state.removeTemporaryFolder
+    );
 
-  // Still need actions for other operations
-  const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
-  const { isEditing, startEditing } = useInlineEditStore();
-  const { isMenuOpen } = useMenuStateStore();
+    // Still need actions for other operations
+    const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
+    const { isEditing, startEditing } = useInlineEditStore();
+    const { isMenuOpen } = useMenuStateStore();
 
-  const isCurrentlyEditing = isEditing(node.id);
-  const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
+    const isCurrentlyEditing = isEditing(node.id);
+    const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
 
-  // Drag and drop configuration
-  const {
-    droppableData,
-    attributes,
-    listeners,
-    setNodeRef: setDraggableNodeRef,
-    dragStyle,
-  } = useDraggableConfig({
-    node,
-    isDisabled: isCurrentlyEditing,
-  });
+    // Drag and drop configuration
+    const {
+      droppableData,
+      attributes,
+      listeners,
+      setNodeRef: setDraggableNodeRef,
+      dragStyle,
+    } = useDraggableConfig({
+      node,
+      isDisabled: isCurrentlyEditing,
+    });
 
-  // Reset hover state when entering edit mode
-  useEffect(() => {
-    if (isCurrentlyEditing) {
-      setIsHovered(false);
-    }
-  }, [isCurrentlyEditing]);
-
-  const handleRename = async (newName: string) => {
-    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
-      // Check if this is a new directory (empty name means it was just created)
-      if (node.name === '') {
-        // This is a new directory being named for the first time
-        await finalizeFolderCreation(node.id, newName);
-      } else {
-        // This is an existing directory being renamed
-        await renameFolder(node.id, newName);
+    // Reset hover state when entering edit mode
+    useEffect(() => {
+      if (isCurrentlyEditing) {
+        setIsHovered(false);
       }
-    } else if (node.type === EntityEnum.Chat) {
-      // Handle chat renaming
-      await renameChat(node.id, newName);
-    }
-  };
+    }, [isCurrentlyEditing]);
 
-  const handleCancel = async () => {
-    if (
-      (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) &&
-      node.name === ''
-    ) {
-      // This is a new directory being canceled - remove from store
-      const parentFolderId = node.parentDirectoryId || undefined;
-      removeTemporaryFolder(node.id, parentFolderId);
-    }
-    // For chats, no special cancel logic needed - just cancel the edit
-  };
+    const handleRename = async (newName: string) => {
+      if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
+        // Check if this is a new directory (empty name means it was just created)
+        if (node.name === '') {
+          // This is a new directory being named for the first time
+          await finalizeFolderCreation(node.id, newName);
+        } else {
+          // This is an existing directory being renamed
+          await renameFolder(node.id, newName);
+        }
+      } else if (node.type === EntityEnum.Chat) {
+        // Handle chat renaming
+        await renameChat(node.id, newName);
+      }
+    };
 
-  const handleChevronClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    const handleCancel = async () => {
+      if (
+        (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) &&
+        node.name === ''
+      ) {
+        // This is a new directory being canceled - remove from store
+        const parentFolderId = node.parentDirectoryId || undefined;
+        removeTemporaryFolder(node.id, parentFolderId);
+      }
+      // For chats, no special cancel logic needed - just cancel the edit
+    };
 
-    // Prevent expand/collapse when in edit mode
-    if (isCurrentlyEditing) {
-      return;
-    }
+    const handleChevronClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
 
-    setIsOpen(!isOpen);
-  };
+      // Prevent expand/collapse when in edit mode
+      if (isCurrentlyEditing) {
+        return;
+      }
 
-  // Map tree node types to entity types
-  const getEntityType = () => {
-    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
-      return 'folder' as const;
-    }
-    if (node.type === EntityEnum.Chat) {
-      return 'chat' as const;
-    }
+      setIsOpen(!isOpen);
+    };
 
-    // Add mappings for other types as needed
-    return 'folder' as const; // fallback
-  };
+    // Map tree node types to entity types
+    const getEntityType = () => {
+      if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
+        return 'folder' as const;
+      }
+      if (node.type === EntityEnum.Chat) {
+        return 'chat' as const;
+      }
 
-  // Handle rename action for this specific node
-  const handleRenameAction = () => {
-    startEditing(node.id);
-  };
+      // Add mappings for other types as needed
+      return 'folder' as const; // fallback
+    };
 
-  return (
-    <SidebarMenuItem
-      ref={setDraggableNodeRef}
-      style={dragStyle}
-    >
-      <DropZone data={droppableData}>
-        <Collapsible
-          className="group/collapsible [&[data-state=open]>div>svg:first-child]:rotate-90"
-          open={isOpen}
-          onOpenChange={isCurrentlyEditing ? undefined : setIsOpen}
-          disabled={isCurrentlyEditing}
-        >
-          <div className="flex items-center gap-[3px]">
-            <SidebarMenuButton
-              isActive={isActive}
-              className={`${isCurrentlyEditing ? '[&:active]:bg-transparent [&:active]:text-current' : 'group/item'}
-                relative cursor-pointer gap-1.5 rounded-sm p-1 pr-8
-                data-[active=true]:font-normal`}
-              onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onKeyDown={
-                isCurrentlyEditing
-                  ? e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }
-                  : undefined
-              }
-              onKeyUp={
-                isCurrentlyEditing
-                  ? e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }
-                  : undefined
-              }
-              onKeyPress={
-                isCurrentlyEditing
-                  ? e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }
-                  : undefined
-              }
-              {...attributes}
-              {...(isCurrentlyEditing ? {} : listeners)}
-            >
-              <CollapsibleTrigger asChild>
-                <div
-                  onClick={handleChevronClick}
-                  className={`relative flex size-6 flex-shrink-0 items-center
-                    justify-center rounded-[4px] transition-colors ${
-                      isCurrentlyEditing
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'hover:bg-sidebar cursor-pointer'
-                    }`}
-                >
-                  <ChevronRight
-                    className={`absolute size-5 stroke-[1.5px] transition-transform
-                      ${isOpen ? 'rotate-90' : ''}
-                      ${isHovered && !isCurrentlyEditing ? 'opacity-100' : 'opacity-0'}`}
-                  />
-                  <div
-                    className={`${isHovered && !isCurrentlyEditing ? 'opacity-0' : 'opacity-100'}`}
-                  >
-                    <NodeIcon
-                      nodeType={node.type}
-                      hasChildren={node.hasChildren}
-                    />
-                  </div>
-                </div>
-              </CollapsibleTrigger>
-              <EditableText
-                entityId={node.id}
-                currentValue={node.name}
-                onSave={handleRename}
-                onCancel={handleCancel}
-                className="text-primary block truncate"
-                placeholder={
-                  node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet
-                    ? 'Folder name...'
-                    : 'Chat name...'
-                }
-              />
-              {!isCurrentlyEditing && (
-                <EntityActionsMenu
-                  entityType={getEntityType()}
-                  handlers={{
-                    onDelete: async () => {
-                      if (node.type === EntityEnum.Chat) {
-                        await deleteChat(
-                          node.id,
-                          node.parentDirectoryId ?? undefined,
-                          node.parentChatId ?? undefined
-                        );
-                      } else if (
-                        node.type === EntityEnum.Folder ||
-                        node.type === EntityEnum.Mindlet
-                      ) {
-                        await deleteFolder(node.id, node.parentDirectoryId ?? undefined);
+    // Handle rename action for this specific node
+    const handleRenameAction = () => {
+      startEditing(node.id);
+    };
+
+    return (
+      <SidebarMenuItem
+        ref={setDraggableNodeRef}
+        style={dragStyle}
+      >
+        <DropZone data={droppableData}>
+          <Collapsible
+            className="group/collapsible
+              [&[data-state=open]>div>svg:first-child]:rotate-90"
+            open={isOpen}
+            onOpenChange={isCurrentlyEditing ? undefined : setIsOpen}
+            disabled={isCurrentlyEditing}
+          >
+            <div className="flex items-center gap-[3px]">
+              <SidebarMenuButton
+                isActive={isActive}
+                className={`${isCurrentlyEditing ? '[&:active]:bg-transparent [&:active]:text-current' : 'group/item'}
+                  relative cursor-pointer gap-1.5 rounded-sm p-1 pr-8
+                  data-[active=true]:font-normal`}
+                onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onKeyDown={
+                  isCurrentlyEditing
+                    ? e => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }
-                    },
-                    onRename: handleRenameAction,
-                    onOpenInNewTab: () => openChatInNewTab(node.id),
-                    onOpenInSidePanel: () => openChatInSidePanel(node.id),
-                  }}
-                  isDeleting={false}
-                  triggerClassName="opacity-0 group-hover/item:opacity-100"
-                  menuId={`expandable-node-${node.id}`}
+                    : undefined
+                }
+                onKeyUp={
+                  isCurrentlyEditing
+                    ? e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    : undefined
+                }
+                onKeyPress={
+                  isCurrentlyEditing
+                    ? e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }
+                    : undefined
+                }
+                {...attributes}
+                {...(isCurrentlyEditing ? {} : listeners)}
+              >
+                <CollapsibleTrigger asChild>
+                  <div
+                    onClick={handleChevronClick}
+                    className={`relative flex size-6 flex-shrink-0 items-center
+                      justify-center rounded-[4px] transition-colors ${
+                        isCurrentlyEditing
+                          ? 'cursor-not-allowed opacity-50'
+                          : 'hover:bg-sidebar cursor-pointer'
+                      }`}
+                  >
+                    <ChevronRight
+                      className={`absolute size-5 stroke-[1.5px] transition-transform
+                        ${isOpen ? 'rotate-90' : ''}
+                        ${isHovered && !isCurrentlyEditing ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                    <div
+                      className={`${isHovered && !isCurrentlyEditing ? 'opacity-0' : 'opacity-100'}`}
+                    >
+                      <NodeIcon
+                        nodeType={node.type}
+                        hasChildren={node.hasChildren}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleTrigger>
+                <EditableText
+                  entityId={node.id}
+                  currentValue={node.name}
+                  onSave={handleRename}
+                  onCancel={handleCancel}
+                  className="text-primary block truncate"
+                  placeholder={
+                    node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet
+                      ? 'Folder name...'
+                      : 'Chat name...'
+                  }
                 />
-              )}
-            </SidebarMenuButton>
-          </div>
-          <CollapsibleContent>
-            <ChildrenList
-              parentNodeId={node.id}
-              parentNodeType={node.type}
-              TreeNodeComponent={TreeNodeComponent}
-            />
-          </CollapsibleContent>
-        </Collapsible>
-      </DropZone>
-    </SidebarMenuItem>
-  );
-};
+                {!isCurrentlyEditing && (
+                  <EntityActionsMenu
+                    entityType={getEntityType()}
+                    handlers={{
+                      onDelete: async () => {
+                        if (node.type === EntityEnum.Chat) {
+                          await deleteChat(
+                            node.id,
+                            node.parentDirectoryId ?? undefined,
+                            node.parentChatId ?? undefined
+                          );
+                        } else if (
+                          node.type === EntityEnum.Folder ||
+                          node.type === EntityEnum.Mindlet
+                        ) {
+                          await deleteFolder(
+                            node.id,
+                            node.parentDirectoryId ?? undefined
+                          );
+                        }
+                      },
+                      onRename: handleRenameAction,
+                      onOpenInNewTab: () => openChatInNewTab(node.id),
+                      onOpenInSidePanel: () => openChatInSidePanel(node.id),
+                    }}
+                    isDeleting={false}
+                    triggerClassName="opacity-0 group-hover/item:opacity-100"
+                    menuId={`expandable-node-${node.id}`}
+                  />
+                )}
+              </SidebarMenuButton>
+            </div>
+            <CollapsibleContent>
+              <ChildrenList
+                parentNodeId={node.id}
+                parentNodeType={node.type}
+                TreeNodeComponent={TreeNodeComponent}
+              />
+            </CollapsibleContent>
+          </Collapsible>
+        </DropZone>
+      </SidebarMenuItem>
+    );
+  }
+);
 
 export default ExpandableNode;
