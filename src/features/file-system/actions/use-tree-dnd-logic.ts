@@ -85,7 +85,7 @@ export const useTreeDndLogic = () => {
         draggableData.id,
         draggableData.parentFolderId,
         draggableData.parentChatId,
-        targetParentFolderId ?? undefined
+        targetParentFolderId
       );
     } else if (
       draggableData.type === EntityEnum.Folder ||
@@ -94,7 +94,7 @@ export const useTreeDndLogic = () => {
       await moveFolder(
         draggableData.id,
         draggableData.parentFolderId,
-        targetParentFolderId ?? undefined
+        targetParentFolderId
       );
     }
   };

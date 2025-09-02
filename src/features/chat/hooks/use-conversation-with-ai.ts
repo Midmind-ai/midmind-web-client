@@ -37,7 +37,7 @@ export const useConversationWithAI = (chatId: string) => {
             chatId,
             arg.model,
             chunk,
-            arg.branch_context?.parent_message_id,
+            arg.chat_metadata?.parent_message_id,
             undefined
           );
         },
@@ -59,9 +59,10 @@ export const useConversationWithAI = (chatId: string) => {
       created_at: new Date().toISOString(),
       content: body.content,
       role: 'user',
-      branches: [],
+      nested_chats: [],
       llm_model: body.model,
       reply_content: body.reply_to?.content || null,
+      attachments: [],
     };
 
     const llmMessage: ChatMessage = {
@@ -69,9 +70,10 @@ export const useConversationWithAI = (chatId: string) => {
       created_at: new Date().toISOString(),
       content: '',
       role: 'model',
-      branches: [],
+      nested_chats: [],
       llm_model: body.model,
       reply_content: null,
+      attachments: [],
     };
 
     // debugger;

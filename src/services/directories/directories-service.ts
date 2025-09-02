@@ -11,7 +11,7 @@ export class DirectoriesService {
   static async getDirectories(parentId?: string) {
     const params = parentId && parentId !== 'root' ? { parent_id: parentId } : {};
 
-    const { data } = await baseAxiosInstance.get<Directory[]>('/directories', {
+    const { data } = await baseAxiosInstance.get<Directory[]>('/folders', {
       params,
     });
 
@@ -19,17 +19,14 @@ export class DirectoriesService {
   }
 
   static async createDirectory(body: CreateDirectoryDto) {
-    const { data } = await baseAxiosInstance.post<CreateDirectoryDto>(
-      '/directories',
-      body
-    );
+    const { data } = await baseAxiosInstance.post<CreateDirectoryDto>('/folders', body);
 
     return data;
   }
 
   static async updateDirectory(id: string, body: UpdateDirectoryDto) {
     const { data } = await baseAxiosInstance.put<UpdateDirectoryDto>(
-      `/directories/${id}`,
+      `/folders/${id}`,
       body
     );
 
@@ -37,16 +34,14 @@ export class DirectoriesService {
   }
 
   static async deleteDirectory(id: string) {
-    const { data } = await baseAxiosInstance.delete<UpdateDirectoryDto>(
-      `/directories/${id}`
-    );
+    const { data } = await baseAxiosInstance.delete<UpdateDirectoryDto>(`/folders/${id}`);
 
     return data;
   }
 
   static async moveDirectory(id: string, body: MoveDirectoryDto) {
     const { data } = await baseAxiosInstance.put<UpdateDirectoryDto>(
-      `/directories/${id}/location`,
+      `/folders/${id}/location`,
       body
     );
 

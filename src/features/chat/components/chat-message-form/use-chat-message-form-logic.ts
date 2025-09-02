@@ -28,7 +28,7 @@ type ChatMessageFormData = {
 
 type UseChatMessageFormLogicProps = {
   chatId?: string;
-  branchContext?: ConversationWithAIRequestDto['branch_context'];
+  branchContext?: ConversationWithAIRequestDto['chat_metadata'];
   onSubmit?: (data: OnSubmitArgs) => void;
 };
 
@@ -101,7 +101,7 @@ export const useChatMessageFormLogic = ({
         content: data.content,
         model: data.model,
         ...(data.replyInfo && { reply_to: data.replyInfo }),
-        ...(shouldIncludeBranchContext && { branch_context: branchContext }),
+        ...(shouldIncludeBranchContext && { chat_metadata: branchContext }),
       });
 
       if (shouldIncludeBranchContext) {

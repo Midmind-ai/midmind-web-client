@@ -5,7 +5,7 @@ import {
   // CodeXml,
   // CommandIcon,
   FolderIcon,
-  GitMergeIcon,
+  GitBranchIcon,
   MessageSquare,
   // Text,
   type LucideProps,
@@ -50,14 +50,14 @@ export const renderEntityIcon = (
     //     {...iconProps}
     //   />
     // ),
-    branch: (
-      <GitMergeIcon
+    chat: (
+      <MessageSquare
         className={size}
         {...iconProps}
       />
     ),
-    chat: (
-      <MessageSquare
+    nested_chat: (
+      <GitBranchIcon
         className={size}
         {...iconProps}
       />

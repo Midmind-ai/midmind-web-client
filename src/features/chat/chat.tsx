@@ -12,7 +12,7 @@ type Props = {
   showCloseButton?: boolean;
   showSidebarToggle?: boolean;
   onClose?: VoidFunction;
-  branchContext?: ConversationWithAIRequestDto['branch_context'];
+  branchContext?: ConversationWithAIRequestDto['chat_metadata'];
 };
 
 const Chat = ({

@@ -13,7 +13,7 @@ export class ChatsService {
     const params: Record<string, string> = {};
 
     if (options?.parentDirectoryId && options.parentDirectoryId !== 'root') {
-      params.parent_directory_id = options.parentDirectoryId;
+      params.parent_folder_id = options.parentDirectoryId;
     }
 
     if (options?.parentChatId && options.parentChatId !== 'root') {

@@ -56,7 +56,7 @@ export const useEntityActions = ({
       );
     }
 
-    if (entityType === 'branch') {
+    if (entityType === 'nested_chat') {
       if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
         return [];
       }

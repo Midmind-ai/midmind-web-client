@@ -41,9 +41,7 @@ export const useFileSystemData = (
       (childrenOf[parentId] || []).some(el => el === item.id)
     );
 
-    const folders = childrenNodes.filter(
-      item => item.type === EntityEnum.Folder || item.type === EntityEnum.Mindlet
-    );
+    const folders = childrenNodes.filter(item => item.type === EntityEnum.Folder);
     const chats = childrenNodes.filter(item => item.type === EntityEnum.Chat) as Chat[];
 
     return [
@@ -66,7 +64,7 @@ export const useFileSystemData = (
           name: chat.name,
           hasChildren: chat.has_children,
           parentId: parentId,
-          parentDirectoryId: chat.parent_directory_id,
+          parentDirectoryId: chat.parent_folder_id,
           parentChatId: chat.parent_chat_id,
           originalData: chat,
         })

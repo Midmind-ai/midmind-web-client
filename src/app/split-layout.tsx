@@ -57,7 +57,9 @@ const SplitLayout = () => {
               showCloseButton
               showSidebarToggle={false}
               onClose={removeValue}
-              branchContext={branchContext}
+              branchContext={
+                branchContext ? { parent_message_id: branchContext.id } : undefined
+              }
             />
           </ResizablePanel>
         </>

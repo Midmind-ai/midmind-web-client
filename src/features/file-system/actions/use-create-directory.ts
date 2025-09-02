@@ -63,8 +63,7 @@ export const useCreateDirectory = () => {
       await DirectoriesService.createDirectory({
         id,
         name,
-        type: EntityEnum.Folder,
-        parent_directory_id: parentDirectoryId,
+        parent_folder_id: parentDirectoryId,
       });
 
       // Create child caches for the new directory chats and folders

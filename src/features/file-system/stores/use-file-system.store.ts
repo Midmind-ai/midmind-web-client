@@ -62,14 +62,14 @@ type FileSystemStoreType = {
   deleteFolder: (id: string, parentFolderId?: string) => Promise<void>;
   moveChat: (
     chatId: string,
-    sourceParentFolderId?: string | 'root',
-    sourceParentChatId?: string | 'root',
-    targetParentFolderId?: string | 'root'
+    sourceParentFolderId?: string | null,
+    sourceParentChatId?: string | null,
+    targetParentFolderId?: string | null
   ) => Promise<void>;
   moveFolder: (
     folderId: string,
-    sourceParentFolderId?: string | 'root',
-    targetParentFolderId?: string | 'root'
+    sourceParentFolderId?: string | null,
+    targetParentFolderId?: string | null
   ) => Promise<void>;
   createTemporaryFolder: (parentFolderId?: string) => string;
   finalizeFolderCreation: (
@@ -87,14 +87,18 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
       childrenOf: {},
       parentOf: {},
 
-      setNodes: (nodes, parentId = 'root') => {
+      setNodes: (newNodes, parentId = 'root') => {
         set(state => {
-          // Find existing nodes that don't belong to this parent
-          const existingNodes = state.nodes.filter(
-            node => state.parentOf[node.id] !== parentId
+          // Get IDs of new nodes
+          const newNodeIds = new Set(newNodes.map(node => node.id));
+
+          // Remove any existing nodes with the same IDs (to prevent duplicates)
+          const existingNodesWithoutDuplicates = state.nodes.filter(
+            node => !newNodeIds.has(node.id)
           );
 
-          const newNodes = nodes.map(node => ({
+          // Add type property to new nodes if missing
+          const typedNewNodes = newNodes.map(node => ({
             ...node,
             type:
               node.type ||
@@ -103,11 +107,31 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
                 : EntityEnum.Folder),
           }));
 
-          // Combine existing nodes from other parents + new API nodes
-          const allNodes = [...existingNodes, ...newNodes];
+          // Combine existing nodes + new nodes
+          const allNodes = [...existingNodesWithoutDuplicates, ...typedNewNodes];
 
-          // Build new children mapping, preserving temporary directories
-          const newChildrenIds = [...nodes.map(item => item.id)];
+          // Update children mapping for this parent
+          const newChildrenIds = newNodes.map(item => item.id);
+
+          // Clean up parentOf for nodes that are no longer children of this parent
+          const oldChildrenIds = state.childrenOf[parentId] || [];
+          const removedChildrenIds = oldChildrenIds.filter(
+            id => !newChildrenIds.includes(id)
+          );
+
+          const updatedParentOf = { ...state.parentOf };
+
+          // Remove parent mapping for removed children
+          removedChildrenIds.forEach(id => {
+            if (updatedParentOf[id] === parentId) {
+              delete updatedParentOf[id];
+            }
+          });
+
+          // Add parent mapping for new children
+          newNodes.forEach(node => {
+            updatedParentOf[node.id] = parentId;
+          });
 
           return {
             ...state,
@@ -116,17 +140,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
               ...state.childrenOf,
               [parentId]: newChildrenIds,
             },
-            parentOf: {
-              ...state.parentOf,
-              ...nodes.reduce(
-                (acc, node) => {
-                  acc[node.id] = parentId;
-
-                  return acc;
-                },
-                {} as Record<string, string>
-              ),
-            },
+            parentOf: updatedParentOf,
           };
         });
       },
@@ -159,7 +173,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           id: chatId,
           name: 'New chat',
           type: EntityEnum.Chat,
-          parent_directory_id: parentFolderId || null,
+          parent_folder_id: parentFolderId || null,
           parent_chat_id: parentChatId || null,
           has_children: false,
         };
@@ -215,10 +229,11 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             id: messageId,
             content: content,
             role: 'user',
-            branches: [],
+            nested_chats: [],
             llm_model: model,
             created_at: new Date().toISOString(),
             reply_content: null,
+            attachments: [],
           };
 
           // Create an empty AI message placeholder
@@ -226,10 +241,11 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             id: futureLLMMessageId,
             content: '',
             role: 'model',
-            branches: [],
+            nested_chats: [],
             llm_model: model,
             created_at: new Date().toISOString(),
             reply_content: null,
+            attachments: [],
           };
 
           // Add messages in cache optimistically
@@ -265,10 +281,10 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           const newChatDto: CreateNewChatRequestDto = {
             id: chatId,
             name: 'New chat',
-            directory_id: parentFolderId,
+            folder_id: parentFolderId,
             ...(branchContext &&
               parentChatId && {
-                branch_context: {
+                chat_metadata: {
                   parent_chat_id: parentChatId,
                   parent_message_id: branchContext.parent_message_id,
                   selected_text: branchContext.selected_text,
@@ -292,7 +308,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
               content,
               model,
               ...(branchContext && {
-                branch_context: {
+                chat_metadata: {
                   parent_message_id: branchContext.parent_message_id,
                 },
               }),
@@ -389,11 +405,8 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
         }));
 
         try {
-          const folderType =
-            originalNode.type === EntityEnum.Folder ? 'folder' : 'mindlet';
           await DirectoriesService.updateDirectory(nodeId, {
             name: newName,
-            type: folderType,
           });
           // Revalidate breadcrumb caches after successful rename
           await mutate(findCacheKeysByPattern(['breadcrumbs']));
@@ -613,7 +626,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           // Make API call
           await ChatsService.updateChatDetails(chatId, {
             name: chatToMove.name,
-            directory_id: targetParentFolderId,
+            folder_id: targetParentFolderId,
           });
 
           // TODO: make cache invalidation not visible to the user. Right now revalidation make isLoading flag to be true and ui is flickering.
@@ -768,8 +781,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           await DirectoriesService.createDirectory({
             id,
             name,
-            type: 'folder',
-            parent_directory_id: parentFolderId,
+            parent_folder_id: parentFolderId,
           });
 
           // Initialize empty child caches for the new directory

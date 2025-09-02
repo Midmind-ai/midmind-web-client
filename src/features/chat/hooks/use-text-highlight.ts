@@ -6,14 +6,14 @@ import { clearHighlights, highlightSelection } from '@features/chat/utils/text-s
 import type { ChatMessage } from '@shared-types/entities';
 
 type Args = {
-  branches: ChatMessage['branches'];
+  nested_chats: ChatMessage['nested_chats'];
   onOpenInSidePanel: (branchChatId: string) => void;
 };
 
-export const useTextHighlight = ({ branches, onOpenInSidePanel }: Args) => {
+export const useTextHighlight = ({ nested_chats, onOpenInSidePanel }: Args) => {
   const messageRef = useRef<HTMLDivElement>(null);
 
-  const textSelections = branches
+  const textSelections = nested_chats
     .filter(
       (branch): branch is DefiniteBranches => branch.context_type === 'text_selection'
     )

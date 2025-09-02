@@ -250,7 +250,7 @@ const handleCompleteChunk = async (params: ChunkHandlerParams): Promise<void> =>
                 (message: ChatMessage) => message.id === parentMessageId
               );
               if (messageIndex !== -1) {
-                page.data[messageIndex].branches = branchContext;
+                page.data[messageIndex].nested_chats = branchContext;
               }
             }
           });

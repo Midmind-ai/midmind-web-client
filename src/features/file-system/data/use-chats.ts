@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { ChatsService } from '@services/chats/chats-service';
 
-import type { Chat } from '@shared-types/entities';
+import { EntityEnum, type Chat } from '@shared-types/entities';
 
 import { useSWR } from '@lib/swr';
 
@@ -20,8 +22,13 @@ export const useChatsByParentDirectory = (parentDirectoryId?: string | null) => 
     parentDirectoryId !== null ? () => ChatsService.getChats({ parentDirectoryId }) : null
   );
 
+  const chatsWithType = useMemo(
+    () => chats?.map(item => ({ ...item, type: EntityEnum.Chat })),
+    [chats]
+  );
+
   return {
-    chats,
+    chats: chatsWithType,
     isLoading,
     error,
     mutate,
@@ -40,8 +47,13 @@ export const useChatsByParentChat = (parentChatId?: string | null) => {
     parentChatId !== null ? () => ChatsService.getChats({ parentChatId }) : null
   );
 
+  const chatsWithType = useMemo(
+    () => chats?.map(item => ({ ...item, type: EntityEnum.Chat })),
+    [chats]
+  );
+
   return {
-    chats,
+    chats: chatsWithType,
     isLoading,
     error,
     mutate,

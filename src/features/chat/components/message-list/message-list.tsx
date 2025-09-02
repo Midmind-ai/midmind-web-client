@@ -61,7 +61,10 @@ const MessageList = ({ chatId }: Props) => {
           return (
             <LLMResponse
               key={id}
-              {...message}
+              id={id}
+              content={content}
+              llm_model={message.llm_model}
+              branches={message.nested_chats}
               isLastMessage={isLastMessage}
               onCopyText={() => messageActions.copyText(content)}
               onReply={() => messageActions.replyToMessage(id, content)}

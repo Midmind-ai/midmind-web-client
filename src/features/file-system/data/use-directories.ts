@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
 import { CACHE_KEYS } from '@hooks/cache-keys';
 
 import { DirectoriesService } from '@services/directories/directories-service';
 
-import type { Directory } from '@shared-types/entities';
+import { EntityEnum, type Directory } from '@shared-types/entities';
 
 import { useSWR } from '@lib/swr';
 
@@ -19,8 +21,13 @@ export const useDirectories = (parentId?: string | null) => {
       : null
   );
 
+  const directoriesWithType = useMemo(
+    () => directories?.map(item => ({ ...item, type: EntityEnum.Folder })),
+    [directories]
+  );
+
   return {
-    directories,
+    directories: directoriesWithType,
     isLoading,
     error,
     mutate,

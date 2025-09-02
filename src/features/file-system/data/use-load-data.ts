@@ -8,19 +8,21 @@ import { useChatsByParentChat, useChatsByParentDirectory } from './use-chats';
 import { useDirectories } from './use-directories';
 
 export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
-  const { setNodes } = useFileSystemStore();
+  const setNodes = useFileSystemStore(state => state.setNodes);
 
   const {
     directories,
     isLoading: isLoadingDirectories,
     error: directoriesError,
-  } = useDirectories(parentType === EntityEnum.Chat ? null : parentId);
+  } = useDirectories(parentType === EntityEnum.Chat ? null : (parentId ?? null));
 
   const {
     chats: chatsByDirectory,
     isLoading: isLoadingChatsByDirectory,
     error: chatsByDirectoryError,
-  } = useChatsByParentDirectory(parentType === EntityEnum.Chat ? null : parentId);
+  } = useChatsByParentDirectory(
+    parentType === EntityEnum.Chat ? null : (parentId ?? null)
+  );
 
   const {
     chats: chatsByParentChat,
@@ -29,14 +31,15 @@ export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
   } = useChatsByParentChat(parentType === EntityEnum.Chat ? parentId : null);
 
   useEffect(() => {
-    const chats = [...(chatsByDirectory || []), ...(chatsByParentChat || [])].map(
-      item => ({ ...item, type: EntityEnum.Chat })
-    );
-
-    const treeNodes = [...(directories || []), ...(chats || [])];
+    const treeNodes = [
+      ...(directories || []),
+      ...(chatsByDirectory || []),
+      ...(chatsByParentChat || []),
+    ];
 
     setNodes(treeNodes, parentId || 'root');
-  }, [directories, chatsByDirectory, chatsByParentChat, setNodes, parentId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [directories, chatsByDirectory, chatsByParentChat, parentId]);
 
   return {
     isLoading:

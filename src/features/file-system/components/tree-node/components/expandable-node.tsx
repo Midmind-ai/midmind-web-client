@@ -258,9 +258,7 @@ const ExpandableNode = ({
           <CollapsibleContent>
             <ChildrenList
               parentNodeId={node.id}
-              parentNodeType={
-                node.type === EntityEnum.Chat ? EntityEnum.Chat : EntityEnum.Folder
-              }
+              parentNodeType={node.type}
               TreeNodeComponent={TreeNodeComponent}
             />
           </CollapsibleContent>

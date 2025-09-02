@@ -19,7 +19,7 @@ type Props = {
   content: string;
   isLastMessage: boolean;
   llm_model: string | null;
-  branches: ChatMessage['branches'];
+  branches: ChatMessage['nested_chats'];
   onReply: VoidFunction;
   onNewNote: VoidFunction;
   onCopyText: VoidFunction;

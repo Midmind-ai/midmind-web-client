@@ -17,7 +17,7 @@ type UseLLMResponseLogicArgs = {
   id: string;
   content: string;
   isLastMessage: boolean;
-  branches: ChatMessage['branches'];
+  branches: ChatMessage['nested_chats'];
   onOpenInSidePanel: (branchChatId: string) => void;
 };
 
@@ -31,7 +31,7 @@ export const useLLMResponseLogic = ({
   const { id: chatId } = useParams();
 
   const { messageRef } = useTextHighlight({
-    branches,
+    nested_chats: branches,
     onOpenInSidePanel,
   });
 

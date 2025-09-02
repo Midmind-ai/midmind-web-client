@@ -27,10 +27,6 @@ export const useChatActions = (actualChatId?: string) => {
   }: CreateBranchArgs) => {
     const textToUse = selectionContext?.selectedText || content;
 
-    const branchContext: ConversationBranchContext = {
-      parent_message_id: messageId,
-    };
-
     const newChatId = await createChat({
       content: textToUse,
       model: DEFAULT_AI_MODEL,
@@ -46,6 +42,16 @@ export const useChatActions = (actualChatId?: string) => {
         context_type: selectionContext ? 'text_selection' : 'full_message',
       },
     });
+
+    const branchContext: ConversationBranchContext = {
+      id: messageId,
+      child_chat_id: newChatId,
+      connection_type: connectionType,
+      connection_color: '', // Default color
+      context_type: selectionContext ? 'text_selection' : 'full_message',
+      start_position: selectionContext?.startPosition || null,
+      end_position: selectionContext?.endPosition || null,
+    };
 
     emitBranchCreated({ branchContext });
 
