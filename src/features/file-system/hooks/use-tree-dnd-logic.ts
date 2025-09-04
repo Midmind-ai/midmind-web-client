@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { EntityEnum } from '@shared-types/entities';
 
-import { useFileSystemStore } from '../stores/use-file-system.store';
+import { useFileSystemStore } from '../stores/file-system.store';
 
 import type { TreeNode } from '../use-file-system.actions';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';

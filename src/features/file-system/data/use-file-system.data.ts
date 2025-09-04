@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { EntityEnum, type Chat, type Directory } from '@shared-types/entities';
 
-import { useFileSystemStore } from '../stores/use-file-system.store';
+import { useFileSystemStore } from '../stores/file-system.store';
 
 import { useLoadData } from './use-load-data';
 
@@ -27,6 +27,9 @@ export type FileSystemData = {
   error: unknown[];
 };
 
+// Empty array constant to avoid creating new references
+const EMPTY_ARRAY: string[] = [];
+
 export const useFileSystemData = (
   parentId: string | 'root' = 'root',
   parentType?: EntityEnum
@@ -34,7 +37,9 @@ export const useFileSystemData = (
   const { isLoading, error } = useLoadData(parentId, parentType);
 
   const nodes = useFileSystemStore(state => state.nodes);
-  const childrenIds = useFileSystemStore(state => state.childrenOf[parentId] || []);
+  const childrenIds = useFileSystemStore(
+    state => state.childrenOf[parentId] || EMPTY_ARRAY
+  );
 
   // Combine directories and chats into tree nodes
   const treeNodes: TreeNode[] = useMemo(() => {

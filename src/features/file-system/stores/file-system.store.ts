@@ -5,8 +5,8 @@ import { devtools } from 'zustand/middleware';
 import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
 import type { LLModel } from '@features/chat/types/chat-types';
 import { handleLLMResponse } from '@features/chat/utils/swr';
-import { useExpandedNodesStore } from '@features/file-system/stores/use-expanded-nodes.store';
-import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
+import { useExpandedNodesStore } from '@features/file-system/stores/expanded-nodes.store';
+import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 
 import { findCacheKeysByPattern, CACHE_KEYS } from '@hooks/cache-keys';
 
@@ -40,8 +40,16 @@ type FileSystemStoreType = {
   nodes: Array<Node>;
   childrenOf: Record<string | 'root', string[]>;
   parentOf: Record<string, string | 'root'>;
+  isLoadingParentIds: string[]; // Track which parents are currently loading
 
   setNodes: (nodes: Array<Directory | Chat>, parentId: string | 'root') => void;
+
+  // Data loading methods (replacing SWR)
+  loadDirectories: (parentId?: string | 'root') => Promise<void>;
+  loadChatsByDirectory: (parentDirectoryId?: string | 'root') => Promise<void>;
+  loadChatsByParentChat: (parentChatId?: string | 'root') => Promise<void>;
+  loadData: (parentId?: string | 'root', parentType?: EntityEnum) => Promise<void>;
+
   createChat: (args: {
     content: string;
     model: LLModel;
@@ -78,6 +86,9 @@ type FileSystemStoreType = {
     parentFolderId?: string
   ) => Promise<void>;
   removeTemporaryFolder: (id: string, parentFolderId?: string) => void;
+
+  // Loading state helpers
+  isParentLoading: (parentId: string | 'root') => boolean;
 };
 
 export const useFileSystemStore = create<FileSystemStoreType>()(
@@ -86,6 +97,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
       nodes: [],
       childrenOf: {},
       parentOf: {},
+      isLoadingParentIds: [],
 
       setNodes: (newNodes, parentId = 'root') => {
         set(state => {
@@ -143,6 +155,206 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             parentOf: updatedParentOf,
           };
         });
+      },
+
+      // Data loading methods (replacing SWR)
+      loadDirectories: async (parentId = 'root') => {
+        try {
+          // Convert 'root' to undefined for service call
+          const serviceParentId = parentId === 'root' ? undefined : parentId;
+
+          const directories = await DirectoriesService.getDirectories(serviceParentId);
+
+          // Add type to directories (same as SWR hook did)
+          const directoriesWithType = directories.map(item => ({
+            ...item,
+            type: EntityEnum.Folder,
+          }));
+
+          // Update store with loaded directories
+          const state = get();
+          const existingNodes = state.nodes.filter(
+            node =>
+              // Keep nodes that are not directories from this parent
+              state.parentOf[node.id] !== parentId || node.type !== EntityEnum.Folder
+          );
+
+          set(state => ({
+            ...state,
+            nodes: [...existingNodes, ...directoriesWithType],
+            childrenOf: {
+              ...state.childrenOf,
+              [parentId]: [
+                ...directoriesWithType.map(d => d.id),
+                ...(state.childrenOf[parentId]?.filter(id => {
+                  const node = state.nodes.find(n => n.id === id);
+
+                  return node?.type !== EntityEnum.Folder;
+                }) || []),
+              ],
+            },
+
+            parentOf: {
+              ...state.parentOf,
+              ...directoriesWithType.reduce(
+                (acc, d) => ({ ...acc, [d.id]: parentId }),
+                {}
+              ),
+            },
+          }));
+        } catch (error) {
+          console.error('Error loading directories:', error);
+          throw error;
+        }
+      },
+
+      loadChatsByDirectory: async (parentDirectoryId = 'root') => {
+        try {
+          // Convert 'root' to undefined for service call
+          const serviceParentId =
+            parentDirectoryId === 'root' ? undefined : parentDirectoryId;
+
+          const chats = await ChatsService.getChats({
+            parentDirectoryId: serviceParentId,
+          });
+
+          // Add type to chats (same as SWR hook did)
+          const chatsWithType = chats.map(item => ({
+            ...item,
+            type: EntityEnum.Chat,
+          }));
+
+          // Update store with loaded chats
+          const state = get();
+          const existingNodes = state.nodes.filter(
+            node =>
+              // Keep nodes that are not chats from this parent directory
+              !(
+                state.parentOf[node.id] === parentDirectoryId &&
+                node.type === EntityEnum.Chat &&
+                !(node as Chat).parent_chat_id
+              )
+          );
+
+          set(state => ({
+            ...state,
+            nodes: [...existingNodes, ...chatsWithType],
+            childrenOf: {
+              ...state.childrenOf,
+              [parentDirectoryId]: [
+                ...(state.childrenOf[parentDirectoryId]?.filter(id => {
+                  const node = state.nodes.find(n => n.id === id);
+
+                  return (
+                    node?.type === EntityEnum.Folder || (node as Chat)?.parent_chat_id
+                  );
+                }) || []),
+                ...chatsWithType.map(c => c.id),
+              ],
+            },
+
+            parentOf: {
+              ...state.parentOf,
+              ...chatsWithType.reduce(
+                (acc, c) => ({ ...acc, [c.id]: parentDirectoryId }),
+                {}
+              ),
+            },
+          }));
+        } catch (error) {
+          console.error('Error loading chats by directory:', error);
+          throw error;
+        }
+      },
+
+      loadChatsByParentChat: async (parentChatId = 'root') => {
+        try {
+          // Convert 'root' to undefined for service call
+          const serviceParentId = parentChatId === 'root' ? undefined : parentChatId;
+
+          const chats = await ChatsService.getChats({ parentChatId: serviceParentId });
+
+          // Add type to chats (same as SWR hook did)
+          const chatsWithType = chats.map(item => ({
+            ...item,
+            type: EntityEnum.Chat,
+          }));
+
+          // Update store with loaded chats
+          const state = get();
+          const existingNodes = state.nodes.filter(
+            node =>
+              // Keep nodes that are not sub-chats of this parent chat
+              !(
+                state.parentOf[node.id] === parentChatId &&
+                node.type === EntityEnum.Chat &&
+                (node as Chat).parent_chat_id
+              )
+          );
+
+          set(state => ({
+            ...state,
+            nodes: [...existingNodes, ...chatsWithType],
+            childrenOf: {
+              ...state.childrenOf,
+              [parentChatId]: [
+                ...(state.childrenOf[parentChatId] || []).filter(id => {
+                  const node = state.nodes.find(n => n.id === id);
+
+                  return !(
+                    node?.type === EntityEnum.Chat && (node as Chat)?.parent_chat_id
+                  );
+                }),
+                ...chatsWithType.map(c => c.id),
+              ],
+            },
+
+            parentOf: {
+              ...state.parentOf,
+              ...chatsWithType.reduce((acc, c) => ({ ...acc, [c.id]: parentChatId }), {}),
+            },
+          }));
+        } catch (error) {
+          console.error('Error loading chats by parent chat:', error);
+          throw error;
+        }
+      },
+
+      loadData: async (parentId = 'root', parentType?: EntityEnum) => {
+        // Add to loading state at the start
+        set(state => ({
+          ...state,
+          isLoadingParentIds: [...new Set([...state.isLoadingParentIds, parentId])],
+        }));
+
+        try {
+          const loadingPromises: Promise<void>[] = [];
+
+          // Load directories and chats by directory in parallel (unless parent is a chat)
+          if (parentType !== EntityEnum.Chat) {
+            loadingPromises.push(get().loadDirectories(parentId));
+            loadingPromises.push(get().loadChatsByDirectory(parentId));
+          }
+
+          // Load chats by parent chat (if parent is a chat)
+          if (parentType === EntityEnum.Chat) {
+            loadingPromises.push(get().loadChatsByParentChat(parentId));
+          }
+
+          // Execute all loading operations in parallel
+          await Promise.allSettled(loadingPromises);
+        } catch (error) {
+          console.error('Error loading data:', error);
+          throw error;
+        } finally {
+          // Remove from loading state when done (success or error)
+          set(state => ({
+            ...state,
+            isLoadingParentIds: [
+              ...state.isLoadingParentIds.filter(id => id !== parentId),
+            ],
+          }));
+        }
       },
 
       createChat: async ({
@@ -343,8 +555,8 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             childrenOf: originalChildrenOf,
             parentOf: originalParentOf,
           });
-          await mutate(chatDetailsCacheKey, undefined);
-          await mutate(messagesCacheKey, undefined);
+          await mutate(chatDetailsCacheKey, undefined, { revalidate: true });
+          await mutate(messagesCacheKey, undefined, { revalidate: true });
 
           throw error;
         } finally {
@@ -629,10 +841,20 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             folder_id: targetParentFolderId,
           });
 
-          // TODO: make cache invalidation not visible to the user. Right now revalidation make isLoading flag to be true and ui is flickering.
           // Invalidate caches
-          // await mutate(findCacheKeysByPattern(['chats']));
-          // await mutate(findCacheKeysByPattern(['breadcrumbs']));
+          await mutate(
+            CACHE_KEYS.chats.byParentId(sourceParentFolderId, _sourceParentChatId),
+            undefined,
+            {
+              revalidate: true,
+            }
+          );
+          await mutate(CACHE_KEYS.chats.byParentId(targetParentFolderId), undefined, {
+            revalidate: true,
+          });
+          await mutate(CACHE_KEYS.chats.breadcrumbs(chatId), undefined, {
+            revalidate: true,
+          });
         } catch (error) {
           // Rollback on error
           set({
@@ -711,10 +933,24 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             target_parent_id: targetParentFolderId ?? null,
           });
 
-          // TODO: make cache invalidation not visible to the user. Right now revalidation make isLoading flag to be true and ui is flickering.
           // Invalidate caches
-          // await mutate(findCacheKeysByPattern(['directories']));
-          // await mutate(findCacheKeysByPattern(['breadcrumbs']));
+          await mutate(
+            CACHE_KEYS.directories.byParentId(sourceParentFolderId),
+            undefined,
+            {
+              revalidate: true,
+            }
+          );
+          await mutate(
+            CACHE_KEYS.directories.byParentId(targetParentFolderId),
+            undefined,
+            {
+              revalidate: true,
+            }
+          );
+          await mutate(findCacheKeysByPattern(['breadcrambs', '*']), undefined, {
+            revalidate: true,
+          });
         } catch (error) {
           // Rollback on error
           set({
@@ -864,6 +1100,11 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             parentOf: updatedParentOf,
           };
         });
+      },
+
+      // Loading state helpers
+      isParentLoading: (parentId: string | 'root') => {
+        return get().isLoadingParentIds.includes(parentId);
       },
     }),
     {

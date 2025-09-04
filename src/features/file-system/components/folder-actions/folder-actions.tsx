@@ -5,7 +5,7 @@ import { SidebarMenuButton } from '@components/ui/sidebar';
 
 import { AppRoutes } from '@constants/paths';
 
-import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 
 import { navigate } from '@hooks/use-navigation';
 

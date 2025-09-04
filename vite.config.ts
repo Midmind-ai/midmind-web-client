@@ -23,19 +23,29 @@ export default defineConfig({
             return {
               visitor: {
                 JSXOpeningElement(path: NodePath<JSXOpeningElement>, state: PluginPass) {
-                  // Extract component name from file path
-                  const file = state.file?.opts?.filename;
-                  const match = file?.match(/([^/\\]+)\.(jsx?|tsx?)$/);
-                  const componentName = match?.[1] ?? 'Unknown';
+                  // Check if data-component attribute already exists
+                  const hasDataComponent = path.node.attributes.some(attr => 
+                    attr.type === 'JSXAttribute' && 
+                    attr.name?.type === 'JSXIdentifier' && 
+                    attr.name.name === 'data-component'
+                  );
 
-                  path.node.attributes.unshift({
-                    type: 'JSXAttribute',
-                    name: { type: 'JSXIdentifier', name: 'data-component' },
-                    value: {
-                      type: 'StringLiteral',
-                      value: `[!] ${componentName}`,
-                    },
-                  });
+                  // Only add if it doesn't already exist
+                  if (!hasDataComponent) {
+                    // Extract component name from file path
+                    const file = state.file?.opts?.filename;
+                    const match = file?.match(/([^/\\]+)\.(jsx?|tsx?)$/);
+                    const componentName = match?.[1] ?? 'Unknown';
+
+                    path.node.attributes.unshift({
+                      type: 'JSXAttribute',
+                      name: { type: 'JSXIdentifier', name: 'data-component' },
+                      value: {
+                        type: 'StringLiteral',
+                        value: `[!] ${componentName}`,
+                      },
+                    });
+                  }
                 },
               },
             };

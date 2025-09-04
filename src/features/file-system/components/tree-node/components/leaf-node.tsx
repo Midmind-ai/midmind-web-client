@@ -4,7 +4,7 @@ import { ThemedSpan } from '@components/ui/themed-span';
 import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
-import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 import {
   useFileSystemActions,
   type TreeNode,

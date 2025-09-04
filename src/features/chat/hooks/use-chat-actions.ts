@@ -7,7 +7,7 @@ import type {
 } from '@features/chat/types/chat-types';
 import { emitBranchCreated } from '@features/chat/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat/utils/message-reply-emitter';
-import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 
 import type { ConversationBranchContext } from '@shared-types/entities';
 

@@ -4,7 +4,7 @@ import { AppRoutes } from '@constants/paths';
 
 import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
 import type { OnSubmitArgs } from '@features/chat/types/chat-types';
-import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
+import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 
 import { navigate } from '@hooks/use-navigation';
 

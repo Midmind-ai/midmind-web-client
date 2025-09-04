@@ -15,8 +15,8 @@ import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import ChildrenList from '@features/file-system/components/tree-node/components/children-list';
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
-import { useFileSystemStore } from '@features/file-system/stores/use-file-system.store';
-import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
+import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
+import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 import {
   useFileSystemActions,
   type TreeNode as TreeNodeType,

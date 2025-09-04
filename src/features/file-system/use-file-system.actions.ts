@@ -6,24 +6,19 @@ import {
   navigateToChat,
 } from '@features/chat/hooks/use-split-screen-actions';
 import type { LLModel } from '@features/chat/types/chat-types';
-import { useInlineEditStore } from '@features/file-system/stores/use-inline-edit.store';
+import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 
 import { useMenuStateStore } from '@stores/use-menu-state-store';
 
 import { EntityEnum, type ChatBranchContext } from '@shared-types/entities';
 
-import { useDeleteChat } from './actions/use-delete-chat';
-import { useDeleteDirectory } from './actions/use-delete-directory';
-import { useRenameChat } from './actions/use-rename-chat';
-import { useRenameDirectory } from './actions/use-rename-directory';
+import { type TreeNode, type FileSystemData } from './data/use-file-system.data';
 import {
   useTreeDndLogic,
   type DraggableData,
   type DroppableData,
-} from './actions/use-tree-dnd-logic';
-import { type TreeNode, type FileSystemData } from './data/use-file-system.data';
-import { useExpandedNodesStore } from './stores/use-expanded-nodes.store';
-import { useFileSystemStore } from './stores/use-file-system.store';
+} from './hooks/use-tree-dnd-logic';
+import { useExpandedNodesStore } from './stores/expanded-nodes.store';
 
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
@@ -48,15 +43,6 @@ type DeleteChatParams = {
 type FileSystemActions = {
   // Actions
   actions: {
-    // Chat operations
-    createChat: (args: CreateChatArgs) => Promise<string>;
-    deleteChat: (params: DeleteChatParams) => Promise<void>;
-    renameChat: (id: string, name: string) => Promise<void>;
-
-    // Folder operations
-    deleteFolder: (id: string, parentId?: string) => Promise<void>;
-    renameFolder: (params: { id: string; name: string }) => Promise<void>;
-
     // Navigation actions
     openChatInNewTab: (chatId: string) => void;
     openChatInSidePanel: (chatId: string) => void;
@@ -97,15 +83,6 @@ type FileSystemActions = {
 // This prevents unnecessary SWR calls and controller data fetching
 export const useFileSystemActions = (): FileSystemActions => {
   const { id: chatId = '' } = useParams();
-
-  // CRUD hooks for chats
-  const createChat = useFileSystemStore(state => state.createChat);
-  const { deleteChat } = useDeleteChat();
-  const { renameChat } = useRenameChat();
-
-  // CRUD hooks for directories
-  const { deleteDirectory: deleteFolder } = useDeleteDirectory();
-  const { renameDirectory: renameFolder } = useRenameDirectory();
 
   // DND logic
   const {
@@ -149,15 +126,6 @@ export const useFileSystemActions = (): FileSystemActions => {
   return {
     // Actions
     actions: {
-      // Chat actions
-      createChat,
-      deleteChat,
-      renameChat,
-
-      // Folder actions
-      deleteFolder,
-      renameFolder,
-
       // Navigation actions
       openChatInNewTab,
       openChatInSidePanel,
