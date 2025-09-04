@@ -32,9 +32,9 @@ const DropZone = ({ children, data, className }: Props) => {
         'rounded-sm',
         {
           // Valid drop target - more prominent highlighting
-          'bg-blue-500/10': showDropFeedback,
+          'bg-neutral-300/20': showDropFeedback,
           // Invalid drop target
-          'bg-red-500/10': showInvalidFeedback,
+          'bg-red-300/20': showInvalidFeedback,
         },
         className
       )}

@@ -62,7 +62,7 @@ const TreeDndProvider = ({ children }: Props) => {
           {draggedNode ? (
             <div
               className="scale-90 transform-gpu cursor-grabbing transition-transform
-                duration-200 ease-out"
+                duration-100 ease-out"
               style={{
                 transform: 'rotate(2deg)',
                 boxShadow:
