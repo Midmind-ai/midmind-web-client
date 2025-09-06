@@ -4,7 +4,7 @@ import ExpandableNode from '@features/file-system/components/tree-node/component
 import {
   useFileSystemActions,
   type TreeNode as TreeNodeType,
-} from '@features/file-system/use-file-system.actions';
+} from '@features/file-system/hooks/use-file-system.actions';
 
 type Props = {
   node: TreeNodeType;

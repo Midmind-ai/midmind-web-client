@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 
-import type { DroppableData } from '@features/file-system/use-file-system.actions';
+import type { DroppableData } from '@features/file-system/hooks/use-file-system.actions';
 
 import { cn } from '@utils/cn';
 

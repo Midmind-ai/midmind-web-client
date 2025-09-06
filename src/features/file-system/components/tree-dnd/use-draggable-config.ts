@@ -4,7 +4,7 @@ import type {
   DraggableData,
   DroppableData,
   TreeNode,
-} from '@features/file-system/use-file-system.actions';
+} from '@features/file-system/hooks/use-file-system.actions';
 
 import { EntityEnum } from '@shared-types/entities';
 

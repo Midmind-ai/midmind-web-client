@@ -155,34 +155,6 @@ export default tseslint.config([
       'no-implied-eval': 'error',
       'no-new-func': 'error',
       'no-useless-concat': 'error',
-
-      // Custom rules to enforce enhanced SWR logging
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'swr',
-              message: 'Use @lib/swr instead to enable comprehensive SWR logging for all operations.',
-            },
-            {
-              name: 'swr/mutation',
-              message: 'Use @lib/swr instead to enable comprehensive SWR logging for all operations.',
-            },
-            {
-              name: 'swr/infinite',
-              message: 'Use @lib/swr instead to enable comprehensive SWR logging for all operations.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  // Allow the lib wrapper files to import from 'swr'
-  {
-    files: ['src/lib/swr.ts', 'src/lib/swr/**/*.ts'],
-    rules: {
-      'no-restricted-imports': 'off',
     },
   },
 ]);

@@ -3,22 +3,27 @@
 ## 🛠️ Technology Stack
 
 ### Core Libraries
+
 - **React / React DOM** - UI rendering and component logic
 - **React Router** - Client-side routing and navigation
 
 ### State Management
+
 - **Zustand** - Lightweight global state management store (prefer over Redux/Context API)
 
 ### API & Data Fetching
+
 - **Axios** - HTTP client for API communication
-- **SWR** - Remote data fetching and caching with revalidation
+- **SWR** - Remote data fetching and caching with revalidation (use only for simple, read-only data that doesn't require complex state management or optimistic updates - most data should be managed through Zustand stores)
 - **Socket.io Client** - Real-time WebSocket communication
 
 ### Styling
+
 - **Tailwind CSS** - Utility-first CSS framework for styling
 - **Shadcn/UI** - Accessible, unstyled UI components built on Radix UI primitives
 
 ### Forms & Validation
+
 - **React Hook Form** - Flexible and performant form management
 - **Zod** - Schema-based form and data validation with TypeScript support
 
@@ -52,26 +57,30 @@ src/
 ├── utils/                         # Utility functions (cn, formatDate)
 │
 └── features/                      # Feature-based modules
-    ├── sign-in/
-    │   ├── components/            # Feature-specific components
-    │   │   └── sign-in-form/
-    │   │       ├── sign-in-form.tsx       # Component implementation
-    │   │       └── use-sign-in-form-logic.ts # Component logic hook
-    │   ├── assets/                # Feature-specific assets
-    │   ├── hooks/                 # Feature-specific hooks
-    │   ├── stores/                # Feature-specific stores
-    │   ├── types/                 # Feature-specific types
-    │   └── utils/                 # Feature-specific utilities
+    ├── file-system/
+    │   ├── components/            # UI components
+    │   │   ├── tree-node/
+    │   │   ├── tree-dnd/
+    │   │   └── folder-list/
+    │   ├── hooks/                 # Action hooks and utilities
+    │   │   ├── use-file-system-actions.ts
+    │   │   └── use-tree-dnd-logic.ts
+    │   ├── stores/                # Zustand stores (handle data loading)
+    │   │   ├── file-system.store.ts
+    │   │   ├── expanded-nodes.store.ts
+    │   │   └── inline-edit.store.ts
+    │   └── data/                  # Data utilities (optional)
+    │       └── use-load-data.ts
     │
     └── chat/
         ├── components/
         │   └── messages/
         │       ├── messages.tsx
         │       └── use-messages-logic.ts
-        ├── assets/
-        ├── hooks/
-        ├── stores/
-        ├── types/
+        ├── hooks/                 # Action and utility hooks
+        │   ├── use-chat-actions.ts
+        │   └── use-get-chat-details.ts
+        ├── stores/                # Feature stores
         └── utils/
 ```
 
@@ -109,7 +118,7 @@ All library configurations and global settings are centralized in the `src/confi
 ```typescript
 src/config/
 ├── api.ts              # API settings (timeout, baseUrl, headers)
-├── axios.ts            # Axios instances with auth interceptors  
+├── axios.ts            # Axios instances with auth interceptors
 ├── swr.ts              # SWR global configuration
 ├── theme-colors.css    # Tailwind color scheme
 └── theme-fonts.css     # Font face definitions
@@ -138,7 +147,7 @@ src/services/
 │   ├── messages-service.ts      # Messages only
 │   └── messages-dtos.ts         # Message types
 ├── chats/
-│   ├── chats-service.ts         # Chats only  
+│   ├── chats-service.ts         # Chats only
 │   └── chats-dtos.ts            # Chat types
 ├── directories/
 │   └── directories-service.ts   # Directories only
@@ -150,22 +159,105 @@ src/services/
 └── combined-service.ts          # Multiple HTTP clients in one service
 ```
 
-## 🔄 Hooks Architecture
+## 🔄 State Management & Data Loading Architecture
 
-### Two-Layer Architecture with Explicit Separation
+### Zustand-Centric Data Management
 
-The hooks system uses a **strict two-layer approach** with clear boundaries:
+The application uses **Zustand stores as the primary data layer**, handling all data fetching, caching, and state management. Components interact with stores directly, not through data fetching hooks.
+
+### Data Loading Pattern
+
+**Core Principle**: Business logic and data management are encapsulated within Zustand stores. Components interact with stores for data and business operations, while hooks handle UI-specific logic.
+
+```typescript
+// Example: file-system.store.ts
+export const useFileSystemStore = create<FileSystemStore>((set, get) => ({
+  // State
+  entities: {},
+  childrenOf: {},
+  isLoadingParentIds: new Set(),
+
+  // Actions
+  loadData: async (parentId: string, parentType?: EntityEnum) => {
+    const { isLoadingParentIds } = get();
+
+    // Prevent duplicate loading
+    if (isLoadingParentIds.has(parentId)) return;
+
+    // Set loading state
+    set(state => ({
+      isLoadingParentIds: new Set([...state.isLoadingParentIds, parentId]),
+    }));
+
+    try {
+      // Fetch data from services
+      const [directories, chats] = await Promise.all([
+        DirectoriesService.getDirectories(parentId),
+        ChatsService.getChats(parentId),
+      ]);
+
+      // Update store state
+      set(state => ({
+        entities: { ...state.entities, ...mapToEntities(directories, chats) },
+        childrenOf: { ...state.childrenOf, [parentId]: [...directories, ...chats] },
+        isLoadingParentIds: removeFromSet(state.isLoadingParentIds, parentId),
+      }));
+    } catch (error) {
+      // Handle error
+      set(state => ({
+        isLoadingParentIds: removeFromSet(state.isLoadingParentIds, parentId),
+      }));
+    }
+  },
+
+  // Selectors
+  isParentLoading: (parentId: string) => {
+    return get().isLoadingParentIds.has(parentId);
+  },
+}));
+```
+
+### Component Integration Pattern
+
+Components call store actions on mount, typically wrapped in a utility hook for reusability:
+
+```typescript
+// Example: use-load-data.ts
+export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
+  const loadData = useFileSystemStore(state => state.loadData);
+  const isParentLoading = useFileSystemStore(state => state.isParentLoading);
+  const childrenOf = useFileSystemStore(state => state.childrenOf);
+
+  const actualParentId = parentId || 'root';
+
+  useEffect(() => {
+    // Check if data already loaded
+    const hasChildren = childrenOf[actualParentId]?.length >= 0;
+
+    // Load only if needed
+    if (!hasChildren && !isParentLoading(actualParentId)) {
+      loadData(actualParentId, parentType);
+    }
+  }, [actualParentId, parentType]);
+
+  return {
+    isLoading: isParentLoading(actualParentId),
+    data: childrenOf[actualParentId] || [],
+  };
+};
+```
+
+## 🪝 Hooks Architecture
+
+### Hook Types and Responsibilities
+
+Hooks are organized by purpose, all residing directly in feature `/hooks` folders:
 
 ```
 src/features/[feature]/hooks/
-├── data/                        # Layer 1: Pure SWR operations
-│   ├── use-get-[entity].ts      # GET operations by cache key
-│   ├── use-create-[entity].ts   # CREATE mutations by cache key
-│   ├── use-update-[entity].ts   # UPDATE mutations by cache key
-│   └── use-delete-[entity].ts   # DELETE mutations by cache key
-└── logic/                       # Layer 2: Business logic operations
-    ├── use-[entity]-actions.ts  # Business operations using data hooks
-    └── use-[feature]-logic.ts   # Feature-specific business logic
+├── use-[feature]-actions.ts     # Orchestrate store actions with navigation
+├── use-[component]-logic.ts     # UI component logic (forms, animations, etc.)
+└── use-[utility].ts             # Utility hooks (DnD, debounce, etc.)
 
 src/hooks/
 ├── use-debounce.ts              # Shared utility hooks
@@ -173,404 +265,154 @@ src/hooks/
 └── cache-keys.ts                # Centralized cache key management
 ```
 
-### Layer 1: Data Hooks (Pure SWR Operations)
+### Hook Types and Responsibilities
 
-**Purpose**: Direct mapping to service calls, no business logic
-**Location**: `src/features/[feature]/hooks/data/`
+**UI Component Logic Hooks**
 
-```typescript
-// src/features/chat/hooks/data/use-get-chats.ts
-import useSWR from 'swr';
-import { ChatsService } from '@/services/chats/chats-service';
-import { SWRCacheKeys } from '@/constants/swr-cache-keys';
+- **Purpose**: Handle UI-specific logic, animations, form state, and user interactions
+- **Pattern**: `use-[component]-logic.ts`
+- **Example**: `use-tree-dnd-logic.ts`, `use-messages-logic.ts`
 
-// ✅ Pure data fetching - no business logic
-export function useGetChats(parentDirectoryId?: string) {
-  return useSWR(
-    SWRCacheKeys.GetChats(parentDirectoryId),
-    () => ChatsService.getChats({ parentDirectoryId }),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 5000,
-    }
-  );
-}
+**Action Coordination Hooks**
 
-export function useGetChatById(id: string | null | undefined) {
-  return useSWR(
-    id ? SWRCacheKeys.GetChatById(id) : null,
-    id ? () => ChatsService.getChatById(id) : null
-  );
-}
-```
+- **Purpose**: Coordinate store actions with navigation and UI side effects
+- **Pattern**: `use-[feature]-actions.ts`
+- **Note**: Business logic should be in stores, these hooks only orchestrate
 
 ```typescript
-// src/features/chat/hooks/data/use-create-chat.ts
-import { useSWRMutation } from 'swr/mutation';
-import { ChatsService } from '@/services/chats/chats-service';
-import { SWRCacheKeys } from '@/constants/swr-cache-keys';
-
-// ✅ Pure mutation - no business logic, just cache invalidation
-export function useCreateChat() {
-  return useSWRMutation(
-    SWRCacheKeys.CreateChat(),
-    async (_, { arg }: { arg: CreateChatDto }) => {
-      const result = await ChatsService.createChat(arg);
-      // Only handle cache invalidation here
-      return result;
-    }
-  );
-}
-```
-
-### Layer 2: Business Logic Hooks
-
-**Purpose**: Add business value, orchestrate data hooks, handle complex workflows
-**Location**: `src/features/[feature]/hooks/logic/`
-
-```typescript
-// src/features/chat/hooks/logic/use-chat-actions.ts
-import { useNavigate } from 'react-router';
-import { AppRoutes, SearchParams } from '@/constants/router';
-import { useUrlParams } from '@/hooks/use-url-params';
-import { useCreateChat } from '../data/use-create-chat';
-import { useDeleteChat } from '../data/use-delete-chat';
-
-// ✅ Business logic that orchestrates data hooks
-export const useChatActions = () => {
+// Example: use-file-system-actions.ts
+// This hook ONLY coordinates store actions with navigation
+// Business logic lives in the store
+export const useFileSystemActions = () => {
   const navigate = useNavigate();
-  const { setValue: setSplitChatId } = useUrlParams(SearchParams.Split);
-  const { trigger: createChat } = useCreateChat();
-  const { trigger: deleteChat } = useDeleteChat();
+  // Get business logic from store
+  const createEntity = useFileSystemStore(state => state.createEntity);
+  const deleteEntity = useFileSystemStore(state => state.deleteEntity);
 
-  const openChatInNewTab = (chatId: string) => {
-    window.open(AppRoutes.Chat(chatId), '_blank');
-  };
-
-  const openChatInSidePanel = (chatId: string) => {
-    setSplitChatId(chatId);
-  };
-
-  const navigateToChat = (chatId: string) => {
-    navigate(AppRoutes.Chat(chatId));
-  };
-
-  // ✅ Complex business workflow using data hooks
-  const createAndNavigateToChat = async (name: string, parentDirectoryId?: string) => {
-    try {
-      const newChat = await createChat({ name, parentDirectoryId });
-      navigateToChat(newChat.id);
-      return newChat;
-    } catch (error) {
-      console.error('Failed to create chat:', error);
-      throw error;
+  // Only coordination - actual business logic is in store
+  const createAndNavigate = async (name: string, type: EntityEnum) => {
+    const entity = await createEntity(name, type); // Business logic in store
+    if (type === EntityEnum.Chat) {
+      navigate(`/chat/${entity.id}`); // Navigation side effect
     }
-  };
-
-  const deleteAndRedirect = async (chatId: string) => {
-    await deleteChat(chatId);
-    navigate(AppRoutes.Home);
+    return entity;
   };
 
   return {
-    // Simple actions
-    openChatInNewTab,
-    openChatInSidePanel,
-    navigateToChat,
-    // Complex business workflows
-    createAndNavigateToChat,
-    deleteAndRedirect,
+    createAndNavigate,
   };
 };
 ```
 
-### Strict Layer Boundaries
+### Store Usage in Components
 
-**❌ Data hooks MUST NOT contain:**
-- Navigation logic
-- Complex business workflows
-- UI state management
-- Feature-specific logic
+**Direct Store Access**: Components can directly use store selectors and actions:
 
-**❌ Business logic hooks MUST NOT contain:**
-- Direct SWR calls
-- Service calls
-- Cache key definitions
-
-**✅ Data hooks SHOULD only:**
-- Call services
-- Handle cache keys
-- Return raw SWR responses
-- Manage loading/error states from SWR
-
-**✅ Business logic hooks SHOULD:**
-- Import and use data hooks
-- Orchestrate multiple operations
-- Handle navigation and routing
-- Manage complex workflows
-- Add business-specific transformations
-
-## 🔄 SWR Mutations Best Practices
-
-### ✅ Recommended Pattern: Direct Mutate with Global Error Handling
-
-For ALL operations that modify server state (CREATE, UPDATE, DELETE, MOVE), use the direct `mutate()` pattern with optimistic updates. Errors are handled globally via Axios interceptors, eliminating the need for try-catch blocks.
-
-**This is the canonical pattern for all mutations:**
-
-**Example 1: Delete Operation**
 ```typescript
-export const useDeleteDirectory = () => {
-  const { mutate } = useSWRConfig();
+import { shallow } from 'zustand/shallow';
 
-  const deleteDirectory = async (id: string, parentDirectoryId?: string) => {
-    const cacheKey = CACHE_KEYS.directories.withParent(parentDirectoryId);
+const FileExplorer = () => {
+  // Single selectors for state
+  const entities = useFileSystemStore(state => state.entities);
+  const isLoading = useFileSystemStore(state => state.isParentLoading('root'));
 
-    await mutate(
-      cacheKey,
-      async (current?: Directory[]): Promise<Directory[]> => {
-        // API call - errors handled by Axios interceptor globally
-        await DirectoriesService.deleteDirectory(id);
-        
-        // Clean up related caches after successful deletion
-        await mutate(findCacheKeysByPattern(['directories', id]), undefined);
-        await mutate(findCacheKeysByPattern(['chats', 'directories', id]), undefined);
-        
-        // Return updated data (without the deleted item)
-        if (!current) return [];
-        return current.filter(item => item.id !== id);
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          // Immediate optimistic update - remove from UI
-          if (!current) return [];
-          return current.filter(item => item.id !== id);
-        },
-        rollbackOnError: true, // ✅ Automatic rollback on API error
-        populateCache: true,   // Use the returned data as new cache
-        revalidate: false,     // Don't revalidate since we return the data
-      }
-    );
+  // Single action selector
+  const loadData = useFileSystemStore(state => state.loadData);
+
+  // Multiple actions with shallow comparison
+  const { createEntity, deleteEntity, moveEntity } = useFileSystemStore(
+    state => ({
+      createEntity: state.createEntity,
+      deleteEntity: state.deleteEntity,
+      moveEntity: state.moveEntity,
+    }),
+    shallow
+  );
+
+  // UI action hook for navigation coordination
+  const createAndNavigate = useFileSystemActions(state => state.createAndNavigate);
+
+  // Load data on mount
+  useEffect(() => {
+    loadData('root');
+  }, [loadData]);
+
+  const handleCreate = async (name: string) => {
+    // Use store action directly for business logic
+    await createEntity(name, EntityEnum.Directory);
+    // Or use action hook for navigation coordination
+    await createAndNavigate(name, EntityEnum.Chat);
   };
 
-  return { deleteDirectory };
+  return <div>{/* Component UI */}</div>;
 };
 ```
 
-**Example 2: Create Operation**
-```typescript
-export const useCreateDirectory = () => {
-  const { mutate } = useSWRConfig();
+### Key Principles
 
-  const createDirectory = async (name: string, parentId?: string) => {
-    const cacheKey = CACHE_KEYS.directories.withParent(parentId);
-    const newId = uuid(); // Generate ID client-side for optimistic update
+**✅ Zustand Stores SHOULD:**
 
-    await mutate(
-      cacheKey,
-      async (current?: Directory[]): Promise<Directory[]> => {
-        // API call - errors handled by Axios interceptor globally
-        const created = await DirectoriesService.createDirectory({ 
-          id: newId, 
-          name, 
-          parent_id: parentId 
-        });
-        
-        // Return updated data with new item
-        if (!current) return [created];
-        return [...current, created];
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          // Immediate optimistic update - add to UI
-          const optimisticDir = { id: newId, name, parent_id: parentId, created_at: new Date() };
-          if (!current) return [optimisticDir];
-          return [...current, optimisticDir];
-        },
-        rollbackOnError: true,
-        populateCache: true,
-        revalidate: false,
-      }
-    );
-  };
+- Handle all data fetching and caching
+- Manage loading and error states
+- Contain ALL business logic and rules
+- Expose actions for CRUD operations
+- Maintain normalized entity state
+- Provide selectors for computed values
+- Handle complex business workflows
 
-  return { createDirectory };
-};
-```
+**✅ UI Hooks SHOULD:**
 
-**Example 3: Update Operation**
-```typescript
-export const useUpdateDirectory = () => {
-  const { mutate } = useSWRConfig();
+- Handle component-specific UI logic
+- Manage form state and validation
+- Handle animations and interactions
+- Coordinate store actions with navigation
+- Bridge store actions with UI side effects
 
-  const updateDirectory = async (id: string, updates: Partial<Directory>) => {
-    // Update all caches that contain this directory
-    await mutate(
-      findCacheKeysByPattern(['directories']),
-      async (current?: Directory[]): Promise<Directory[]> => {
-        // API call - errors handled by Axios interceptor globally
-        await DirectoriesService.updateDirectory(id, updates);
-        
-        // Return updated data
-        if (!current) return [];
-        return current.map(dir => 
-          dir.id === id ? { ...dir, ...updates } : dir
-        );
-      },
-      {
-        optimisticData: (current?: Directory[]): Directory[] => {
-          // Immediate optimistic update - update in UI
-          if (!current) return [];
-          return current.map(dir => 
-            dir.id === id ? { ...dir, ...updates } : dir
-          );
-        },
-        rollbackOnError: true,
-        populateCache: true,
-        revalidate: false,
-      }
-    );
-  };
+**❌ Hooks SHOULD NOT:**
 
-  return { updateDirectory };
-};
-```
+- Contain business logic (this belongs in stores)
+- Call services directly
+- Make decisions about data transformations
 
-### Key Benefits of This Pattern
+**❌ Components SHOULD NOT:**
 
-1. **Consistent Across All Operations**: Same pattern for CREATE, UPDATE, DELETE, MOVE
-2. **No Try-Catch Needed**: Axios interceptor handles all errors globally
-3. **Automatic Error Toasts**: User-friendly notifications via Sonner
-4. **Optimistic UI Updates**: Immediate feedback to users
-5. **Automatic Rollback**: On API failure, UI reverts to previous state
-6. **Clean Code**: No error handling boilerplate in hooks
+- Call services directly
+- Use SWR hooks for data that belongs in stores
+- Manage complex state locally
 
-### Error Handling Flow
-
-```
-User Action
-    ↓
-Hook Called (e.g., deleteDirectory)
-    ↓
-Optimistic Update Applied (immediate UI feedback)
-    ↓
-API Call via Service
-    ↓
-[Success Path]              [Error Path]
-    ↓                           ↓
-Cache Updated            Axios Interceptor Catches
-    ↓                           ↓
-UI Stays Updated         Error Handler Called
-                               ↓
-                         Sonner Toast Shown
-                               ↓
-                         SWR Rollback Triggered
-                               ↓
-                         UI Reverts to Previous State
-```
-
-### When to Use This Pattern
-
-**Use the Direct Mutate Pattern for:**
-- ✅ **All CRUD operations**: CREATE, UPDATE, DELETE
-- ✅ **Move/reorder operations**: Changing parent relationships  
-- ✅ **Batch operations**: Multiple cache updates
-- ✅ **Any mutation**: Where you want automatic error toasts and rollback
-
-### Why This Pattern is Superior
-
-**1. Automatic Error Handling**
-- Axios interceptor catches all API errors globally
-- No try-catch blocks needed in hooks
-- Consistent error messages based on HTTP status codes
-
-**2. Automatic Rollback**
-- `rollbackOnError: true` works seamlessly with global error handling
-- If API fails, optimistic updates are automatically reverted
-- UI always stays in sync with server state
-
-**3. Clean Implementation**
-- No error handling boilerplate
-- Focus on business logic, not error management
-- Consistent pattern across all mutations
-
-**4. Centralized Configuration**
-```typescript
-// src/config/swr.ts
-export const swrMutationConfig = {
-  rollbackOnError: true,    // Auto-rollback on API errors
-  throwOnError: false,      // Errors via .error instead of throwing
-} as const;
-```
-
-**5. User-Friendly Feedback**
-- Immediate optimistic updates for better UX
-- Automatic error toasts via Sonner
-- Clear error messages for different scenarios
-
-### Implementation Checklist
-
-✅ **Axios Interceptor** configured in `src/config/axios.ts`
-✅ **Error Handler** implemented in `src/utils/error-handler.tsx`
-✅ **Sonner Toaster** added to root provider
-✅ **Direct Mutate Pattern** used consistently across all mutations
-
-### Critical Rules for This Pattern
-
-**✅ CORRECT: No try-catch needed with global error handling**
-```typescript
-await mutate(
-  cacheKey,
-  async (current) => {
-    await APIService.call(); // Errors caught by Axios interceptor
-    return updatedData;
-  },
-  { 
-    optimisticData: optimisticUpdate,
-    rollbackOnError: true  // Works with global error handling
-  }
-);
-```
-
-**❌ INCORRECT: Manual try-catch is redundant**
-```typescript
-try {
-  await mutate(/* ... */);
-} catch (error) {
-  // Don't do this - Axios already handles errors globally
-  handleError(error);
-}
-```
+## 🔄 SWR Best Practices
 
 ### ✅ Always Use Centralized Cache Keys
 
 Never use hardcoded strings for mutation keys. Always import from the centralized `cache-keys.ts`:
 
 **✅ Correct:**
+
 ```typescript
 import { MUTATION_KEYS, CACHE_KEYS } from '@hooks/cache-keys';
 
 // Use centralized mutation keys
-useSWRMutation(MUTATION_KEYS.directories.move, mutationFn)
-useSWRMutation(MUTATION_KEYS.chats.create, mutationFn)
+useSWRMutation(MUTATION_KEYS.directories.move, mutationFn);
+useSWRMutation(MUTATION_KEYS.chats.create, mutationFn);
 
 // Use centralized cache keys
-CACHE_KEYS.directories.withParent(parentId)
-CACHE_KEYS.chats.details(chatId)
+CACHE_KEYS.directories.withParent(parentId);
+CACHE_KEYS.chats.details(chatId);
 ```
 
 **❌ Wrong:**
+
 ```typescript
 // ❌ Hardcoded strings - hard to maintain and refactor
-useSWRMutation('move-directory', mutationFn)
-useSWRMutation('create-chat', mutationFn)
-
-// ❌ Inconsistent cache key patterns
-['directories', parentId]
-['chat-details', chatId]
+useSWRMutation('move-directory', mutationFn);
+useSWRMutation('create-chat', mutationFn)[
+  // ❌ Inconsistent cache key patterns
+  ('directories', parentId)
+][('chat-details', chatId)];
 ```
 
 **Benefits of Centralized Keys:**
+
 - **Type Safety**: TypeScript catches typos and missing keys
 - **Consistency**: All mutation keys follow the same pattern
 - **Maintainability**: Easy to update keys across the entire codebase
@@ -590,17 +432,14 @@ type Props = {
 const MyComponent = ({ someProp, onAction }: Props) => {
   const { data, isLoading } = useMyComponentLogic();
 
-  return (
-    <div className="...">
-      {/* Component JSX */}
-    </div>
-  );
+  return <div className="...">{/* Component JSX */}</div>;
 };
 
 export default MyComponent;
 ```
 
 ### Component Logic Separation
+
 - Extract complex logic into custom hooks named `use[ComponentName]Logic.ts`
 - Keep components focused on rendering UI
 - Place business logic and side effects in the custom hook
@@ -608,12 +447,14 @@ export default MyComponent;
 ## 🏷️ Naming Conventions
 
 ### Variables, Functions & Hooks
+
 - **Variables & Functions**: Use `camelCase`
   - Examples: `isPasswordVisible`, `getUserData`, `handleSubmit`
 - **Custom Hooks**: Use `camelCase` starting with `use`
   - Examples: `useSignInLogic`, `useMessages`, `useDebounce`
 
 ### Types & Interfaces
+
 - **Types & Interfaces**: Use `PascalCase`
   - Examples: `User`, `ChatMessage`, `AuthState`
 - **API Types**: Follow `VerbNounRequest/Response` pattern
@@ -621,53 +462,59 @@ export default MyComponent;
 - **Props Types**: Always name component props type as `Props`
 
 ### Files & Folders
-- **Component Folders**: Use `PascalCase`
-  - Examples: `UserCard/`, `ChatHeader/`, `SignInForm/`
-- **General Folders**: Use `kebab-case`
-  - Examples: `api-client/`, `form-utils/`
-- **Utility Files**: Use `camelCase`
-  - Examples: `localStorage.ts`, `timeHelpers.ts`, `formatters.ts`
-- **Component Files**: Use `PascalCase.tsx`
-  - Examples: `SignInForm.tsx`, `ChatMessage.tsx`
-- **Hook Files**: Use `camelCase.ts`
-  - Examples: `useSignInLogic.ts`, `useMessagesLogic.ts`
+
+- **All Folders**: Use `kebab-case`
+  - Examples: `user-card/`, `chat-header/`, `sign-in-form/`, `api-client/`, `form-utils/`
+- **All Files**: Use `kebab-case`
+  - Examples: `local-storage.ts`, `time-helpers.ts`, `formatters.ts`
+- **Component Files**: Use `kebab-case.tsx`
+  - Examples: `sign-in-form.tsx`, `chat-message.tsx`, `user-dropdown.tsx`
+- **Hook Files**: Use `kebab-case.ts`
+  - Examples: `use-sign-in-logic.ts`, `use-messages-logic.ts`, `use-file-system-actions.ts`
 
 ## 📝 Development Guidelines
 
 ### State Management
+
 - Use **Zustand** for global state management
 - Keep stores focused and domain-specific
 - Prefer multiple small stores over one large store
 
 ### API Integration
+
 - Use **Axios** instances with interceptors for consistent API handling
 - Implement API services in `shared/services/`
 - Use **SWR** for server state management and caching
 
 ### Styling
+
 - Use **Tailwind CSS** utilities for all styling
 - Avoid custom CSS files unless absolutely necessary
 - Use `cn()` utility for conditional class names
 - Follow mobile-first responsive design
 
 ### Forms
+
 - Use **React Hook Form** for all forms
 - Validate with **Zod** schemas
 - Keep validation schemas close to where they're used
 
 ### TypeScript
+
 - Always use TypeScript, avoid `any` type
 - Define explicit types for all props, state, and function returns
 - Use type inference where appropriate
 - Export types that might be reused
 
 ### Error Handling
+
 - Implement proper error boundaries
 - Use try-catch blocks in async operations
 - Provide user-friendly error messages
 - Log errors appropriately for debugging
 
 ### Testing
+
 - Write tests for critical business logic
 - Test custom hooks separately
 - Focus on user interactions and outcomes
@@ -687,7 +534,8 @@ export default MyComponent;
 
 ## 📦 Package Manager
 
-This project uses **Yarn** as the package manager. 
+This project uses **Yarn** as the package manager.
+
 - Always use `yarn` commands, never `npm`
 - Commit `yarn.lock` file
 - Never commit `package-lock.json`

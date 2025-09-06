@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import { ITEMS_PER_PAGE } from '@features/chat/hooks/use-get-chat-messages';
-import type { LLModel } from '@features/chat/types/chat-types';
-import { handleLLMResponse } from '@features/chat/utils/swr';
+import { ITEMS_PER_PAGE } from '@features/chat-old/hooks/use-get-chat-messages';
+import type { LLModel } from '@features/chat-old/types/chat-types';
+import { handleLLMResponse } from '@features/chat-old/utils/swr';
 import { useExpandedNodesStore } from '@features/file-system/stores/expanded-nodes.store';
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 
@@ -19,8 +19,8 @@ import type {
 import { ConversationsService } from '@services/conversations/conversations-service';
 import { DirectoriesService } from '@services/directories/directories-service';
 
+import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
 import { useAbortControllerStore } from '@stores/use-abort-controller-store';
-import { useEntityCreationStore } from '@stores/use-entity-creation.store';
 
 import { EntityEnum } from '@shared-types/entities';
 import type {
@@ -391,7 +391,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
         };
 
         // Mark chat as being created to prevent API calls
-        const { startCreating } = useEntityCreationStore.getState();
+        const { startCreating } = useEntityCreationStateStore.getState();
         startCreating(chatId);
 
         // Optimistic update to store
@@ -481,7 +481,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
         // Handle split screen opening
         if (openInSplitScreen) {
           const { openChatInSplitView } = await import(
-            '@features/chat/hooks/use-split-screen-actions'
+            '@features/chat-old/hooks/use-split-screen-actions'
           );
           openChatInSplitView(chatId, parentChatId);
         }
@@ -561,7 +561,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           throw error;
         } finally {
           // Mark chat creation as finished
-          const { finishCreating } = useEntityCreationStore.getState();
+          const { finishCreating } = useEntityCreationStateStore.getState();
           finishCreating(chatId);
         }
       },

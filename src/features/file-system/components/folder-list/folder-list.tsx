@@ -5,7 +5,7 @@ import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-provider';
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
 import { useFileSystemData } from '@features/file-system/data/use-file-system.data';
-import { type DroppableData } from '@features/file-system/use-file-system.actions';
+import { type DroppableData } from '@features/file-system/hooks/use-file-system.actions';
 
 import { EntityEnum } from '@shared-types/entities';
 

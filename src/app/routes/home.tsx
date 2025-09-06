@@ -2,8 +2,8 @@ import { ThemedH1 } from '@components/ui/themed-h1';
 
 import { AppRoutes } from '@constants/paths';
 
-import ChatMessageForm from '@features/chat/components/chat-message-form/chat-message-form';
-import type { OnSubmitArgs } from '@features/chat/types/chat-types';
+import ChatMessageForm from '@features/chat-old/components/chat-message-form/chat-message-form';
+import type { OnSubmitArgs } from '@features/chat-old/types/chat-types';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 
 import { navigate } from '@hooks/use-navigation';

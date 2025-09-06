@@ -9,8 +9,8 @@ import {
 import { LocalStorageKeys } from '@constants/local-storage';
 import { AppRoutes, SearchParams } from '@constants/paths';
 
-import Chat from '@features/chat/chat';
-import { useBranchContext } from '@features/chat/hooks/use-branch-context';
+import Chat from '@features/chat-old/chat';
+import { useBranchContext } from '@features/chat-old/hooks/use-branch-context';
 
 import { navigate, useInitializeNavigation } from '@hooks/use-navigation';
 import { useUrlParams } from '@hooks/utils/use-url-params';

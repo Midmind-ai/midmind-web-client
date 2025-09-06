@@ -14,7 +14,7 @@ import { SidebarMenu } from '@components/ui/sidebar';
 
 import { intersectionRatioCollision } from '@features/file-system/components/tree-dnd/collision-detection';
 import DragOverlayNode from '@features/file-system/components/tree-dnd/drag-overlay-node';
-import { useFileSystemActions } from '@features/file-system/use-file-system.actions';
+import { useFileSystemActions } from '@features/file-system/hooks/use-file-system.actions';
 
 type Props = {
   children: React.ReactNode;

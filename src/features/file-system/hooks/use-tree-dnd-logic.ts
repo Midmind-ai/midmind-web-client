@@ -4,7 +4,7 @@ import { EntityEnum } from '@shared-types/entities';
 
 import { useFileSystemStore } from '../stores/file-system.store';
 
-import type { TreeNode } from '../use-file-system.actions';
+import type { TreeNode } from './use-file-system.actions';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
 export type DraggableData = {
