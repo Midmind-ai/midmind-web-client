@@ -1,5 +1,4 @@
 import EventEmitter from 'eventemitter3';
-
 import type { ConversationBranchContext } from '@shared-types/entities';
 
 export type BranchEvent = {

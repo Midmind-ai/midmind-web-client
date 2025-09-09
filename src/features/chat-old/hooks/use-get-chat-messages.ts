@@ -1,11 +1,8 @@
 import { CACHE_KEYS } from '@hooks/cache-keys';
-
+import { useSWRInfinite } from '@lib/swr';
 import { MessagesService } from '@services/messages/messages-service';
-
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
-
-import { useSWRInfinite } from '@lib/swr';
 
 export const ITEMS_PER_PAGE = 20;
 

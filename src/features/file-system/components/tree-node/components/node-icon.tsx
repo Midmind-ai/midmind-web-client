@@ -1,7 +1,5 @@
 import { Folder, MessageCircle, MessagesSquare } from 'lucide-react';
-
 import type { TreeNode } from '@features/file-system/hooks/use-file-system.actions';
-
 import { EntityEnum } from '@shared-types/entities';
 
 type Props = {

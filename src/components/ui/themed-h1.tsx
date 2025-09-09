@@ -1,5 +1,4 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { cn } from '@utils/cn';
 
 const ThemedH1: FC<HTMLAttributes<HTMLHeadingElement>> = ({

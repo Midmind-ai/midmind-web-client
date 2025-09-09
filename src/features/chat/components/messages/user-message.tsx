@@ -1,8 +1,7 @@
+import { memo } from 'react';
+import MessageReply from '../chat-input/message-reply';
 import { ThemedP } from '@components/ui/themed-p';
-
-import MessageReply from '../form/message-reply';
-
-import type { ChatMessage } from '../../types';
+import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
   message: ChatMessage;
@@ -12,7 +11,7 @@ const UserMessage = ({ message }: Props) => {
   const { content, reply_content } = message;
 
   return (
-    <div className="group w-full rounded-md bg-transparent p-2.5">
+    <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
       <div className="ml-auto w-fit max-w-[465px]">
         {reply_content && (
           <MessageReply
@@ -29,4 +28,4 @@ const UserMessage = ({ message }: Props) => {
   );
 };
 
-export default UserMessage;
+export default memo(UserMessage);

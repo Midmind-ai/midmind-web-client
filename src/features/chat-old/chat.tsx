@@ -1,10 +1,8 @@
+import NavigationHeader from '@components/misc/navigation-header/navigation-header';
 import ChatMessageForm from '@features/chat-old/components/chat-message-form/chat-message-form';
 import MessageList from '@features/chat-old/components/message-list/message-list';
 import { useGetChatDetails } from '@features/chat-old/hooks/use-get-chat-details';
-import NavigationHeader from '@features/navigation-header/navigation-header';
-
 import { usePageTitle } from '@hooks/utils/use-page-title';
-
 import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type Props = {

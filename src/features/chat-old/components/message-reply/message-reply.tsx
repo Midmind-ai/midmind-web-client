@@ -1,8 +1,6 @@
 import { Reply, X } from 'lucide-react';
-
 import { Button } from '@components/ui/button';
 import { ThemedP } from '@components/ui/themed-p';
-
 import { cn } from '@utils/cn';
 
 type Props = {

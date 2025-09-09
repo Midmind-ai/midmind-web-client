@@ -1,12 +1,10 @@
-import { useEffect } from 'react';
-
-import NavigationHeader from '@features/navigation-header/navigation-header';
-
-import { usePageTitle } from '@hooks/utils/use-page-title';
-
-import MessageFormEnhanced from './components/message-form-enhanced';
-import MessageList from './components/message-list';
+import { useEffect, memo } from 'react';
+import ChatInput from './components/chat-input/chat-input';
+import Messages from './components/messages/messages';
+import MessagesSkeleton from './components/messages/messages-skeleton';
 import { useChatsStore } from './stores/chats.store';
+import NavigationHeader from '@components/misc/navigation-header/navigation-header';
+import { usePageTitle } from '@hooks/utils/use-page-title';
 
 type Props = {
   chatId: string;
@@ -29,6 +27,7 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
   const isStreaming = chatState?.isStreaming || false;
   const error = chatState?.error;
 
+  // Set page title based on chat name from store
   usePageTitle(chatDetails?.name || '');
 
   useEffect(() => {
@@ -41,24 +40,8 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
     };
   }, [chatId, addChatToActive, loadChat, loadMessages, removeChatFromActive]);
 
-  if (!chatState || isLoadingChat) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Loading chat...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-red-500">Error: {error}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen flex-col">
+    <div className="@container flex h-screen flex-col">
       <NavigationHeader
         id={chatId}
         showCloseButton={showCloseButton}
@@ -66,18 +49,27 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
         onClose={onClose}
       />
       <div className="flex-1 overflow-hidden">
-        <MessageList
-          messages={messages}
-          chatId={chatId}
-          isLoading={isLoadingMessages}
-          isStreaming={isStreaming}
-        />
+        {error && (
+          <div className="flex h-screen items-center justify-center">
+            <div className="text-red-500">Error: {error}</div>
+          </div>
+        )}
+        {!chatState || isLoadingChat ? (
+          <MessagesSkeleton />
+        ) : (
+          <Messages
+            messages={messages}
+            chatId={chatId}
+            isLoading={isLoadingMessages}
+            isStreaming={isStreaming}
+          />
+        )}
       </div>
-      <div className="mx-auto w-full max-w-[768px] pb-3">
-        <MessageFormEnhanced chatId={chatId} />
+      <div className="mx-auto w-full max-w-[840px] pb-3 @max-[840px]:pb-0">
+        <ChatInput chatId={chatId} />
       </div>
     </div>
   );
 };
 
-export default Chat;
+export default memo(Chat);

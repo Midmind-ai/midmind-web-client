@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
-
 import { useParams } from 'react-router';
-
 import { useTextHighlight } from '@features/chat-old/hooks/use-text-highlight';
 import {
   subscribeToResponseChunk,
   unsubscribeFromResponseChunk,
 } from '@features/chat-old/utils/llm-response-emitter';
 import { captureSelection } from '@features/chat-old/utils/text-selection';
-
 import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
-
 import type { ChatMessage } from '@shared-types/entities';
 
 type UseLLMResponseLogicArgs = {

@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
-
 import type { DefiniteBranches } from '@features/chat-old/types/chat-types';
 import {
   clearHighlights,
   highlightSelection,
 } from '@features/chat-old/utils/text-selection';
-
 import type { ChatMessage } from '@shared-types/entities';
 
 type Args = {

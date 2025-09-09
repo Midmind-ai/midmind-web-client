@@ -1,7 +1,5 @@
 import { memo } from 'react';
-
 import LibReactMarkDown from 'react-markdown';
-
 import { ThemedP } from '@components/ui/themed-p';
 
 type Props = {

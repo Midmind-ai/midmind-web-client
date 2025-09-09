@@ -10,7 +10,6 @@ import {
   // Text,
   type LucideProps,
 } from 'lucide-react';
-
 import type { EntityType } from '@shared-types/entity';
 
 export const renderEntityIcon = (

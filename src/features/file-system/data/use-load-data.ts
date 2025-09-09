@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
-
-import { EntityEnum } from '@shared-types/entities';
-
 import { useFileSystemStore } from '../stores/file-system.store';
+import { EntityEnum } from '@shared-types/entities';
 
 export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
   const loadData = useFileSystemStore(state => state.loadData);

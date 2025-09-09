@@ -1,16 +1,12 @@
 import { Link } from 'react-router';
-
 import {
   BreadcrumbItem as ShadcnBreadcrumbItem,
   BreadcrumbLink,
 } from '@components/ui/breadcrumb';
 import { ThemedSpan } from '@components/ui/themed-span';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
-
 import { useIsTextTruncated } from '@hooks/utils/use-is-text-truncated';
-
 import { type EntityType } from '@shared-types/entity';
-
 import { cn } from '@utils/cn';
 import { renderEntityIcon } from '@utils/entity-icons';
 

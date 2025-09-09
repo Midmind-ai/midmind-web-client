@@ -1,5 +1,4 @@
 import { baseAxiosInstance } from '@config/axios';
-
 import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
 
 export class BreadcrumbsService {

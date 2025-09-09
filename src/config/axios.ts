@@ -1,20 +1,16 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
-
 import { apiConfig } from '@config/api';
+import { LocalStorageKeys } from '@constants/local-storage';
+import { AppRoutes } from '@constants/paths';
+import type { TokenResponse } from '@services/auth/auth-dtos';
+import { handleSWRError } from '@utils/error-handler';
+import { getFromStorage, removeFromStorage, setToStorage } from '@utils/local-storage';
 
 const ApiErrorCodes = {
   Unauthorized: 401,
   Forbidden: 403,
   NotFound: 404,
 } as const;
-
-import { LocalStorageKeys } from '@constants/local-storage';
-import { AppRoutes } from '@constants/paths';
-
-import type { TokenResponse } from '@services/auth/auth-dtos';
-
-import { handleSWRError } from '@utils/error-handler';
-import { getFromStorage, removeFromStorage, setToStorage } from '@utils/local-storage';
 
 type RefreshQueueItem = {
   resolve: (value: string) => void;

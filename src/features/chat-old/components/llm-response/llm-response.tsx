@@ -1,7 +1,5 @@
 import { FilePlus, GitBranchPlus, GitCommitVertical, Glasses } from 'lucide-react';
-
 import { ContextMenu, ContextMenuTrigger } from '@components/ui/context-menu';
-
 import ConnectionTypeBadge from '@features/chat-old/components/connection-type-badge/connection-type-badge';
 import { useLLMResponseLogic } from '@features/chat-old/components/llm-response/use-llm-response-logic';
 import MessageContextMenu from '@features/chat-old/components/message-context-menu/message-context-menu';
@@ -9,9 +7,7 @@ import QuickActionButton from '@features/chat-old/components/quick-action-button
 import ReactMarkdown from '@features/chat-old/components/react-markdown/react-markdown';
 import TypingDots from '@features/chat-old/components/typing-dots/typing-dots';
 import type { ChatBranchContext } from '@features/chat-old/types/chat-types';
-
 import type { ChatMessage } from '@shared-types/entities';
-
 import { cn } from '@utils/cn';
 
 type Props = {

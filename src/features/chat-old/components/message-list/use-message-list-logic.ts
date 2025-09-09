@@ -1,7 +1,5 @@
 import { useRef, type UIEvent, useEffect, useCallback } from 'react';
-
 import { useLocation } from 'react-router';
-
 import { useChatActions } from '@features/chat-old/hooks/use-chat-actions';
 import { useGetChatMessages } from '@features/chat-old/hooks/use-get-chat-messages';
 import { useMessageActions } from '@features/chat-old/hooks/use-message-actions';

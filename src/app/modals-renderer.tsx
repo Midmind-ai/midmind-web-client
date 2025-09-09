@@ -1,8 +1,6 @@
 import { Fragment } from 'react';
-
 import { Modals, type ModalNames } from '@constants/modals';
-
-import { useModalsStore } from '@stores/use-modals-store';
+import { useModalsStore } from '@stores/modals.store';
 
 const ModalsRenderer = () => {
   const { modals, closingModals, finishClosing } = useModalsStore();

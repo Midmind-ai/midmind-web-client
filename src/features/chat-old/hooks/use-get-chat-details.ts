@@ -1,12 +1,8 @@
 import { CACHE_KEYS } from '@hooks/cache-keys';
-
-import { ChatsService } from '@services/chats/chats-service';
-
-import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
-
-import type { Chat } from '@shared-types/entities';
-
 import { useSWR } from '@lib/swr';
+import { ChatsService } from '@services/chats/chats-service';
+import type { Chat } from '@shared-types/entities';
+import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
 
 export const useGetChatDetails = (id: string) => {
   const isCreating = useEntityCreationStateStore(state => state.isCreating(id));

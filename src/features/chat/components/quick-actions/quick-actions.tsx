@@ -1,23 +1,43 @@
 import { FilePlus, GitBranchPlus, GitCommitVertical, Glasses } from 'lucide-react';
+import { memo } from 'react';
+import { createNestedChatAndOpenSplitScreen } from '../../../../actions/chat.actions';
+import QuickActionButton from './quick-action-button';
 
-import QuickActionButton from '../quick-action-button/quick-action-button';
+type Props = {
+  chatId: string;
+  messageId: string;
+};
 
-const QuickActions = () => {
-  // Placeholder implementations - these will be implemented later with actual store actions
-  const handleNewAttachedBranch = () => {
-    // TODO: Implement new attached branch creation for messageId: ${messageId}
+const QuickActions = ({ chatId, messageId }: Props) => {
+  const handleNewAttachedBranch = async () => {
+    createNestedChatAndOpenSplitScreen({
+      parentChatId: chatId,
+      parentMessageId: messageId,
+      connectionType: 'attached',
+      contextType: 'full_message',
+    });
   };
 
-  const handleNewDetachedBranch = () => {
-    // TODO: Implement new detached branch creation for messageId: ${messageId}
+  const handleNewDetachedBranch = async () => {
+    createNestedChatAndOpenSplitScreen({
+      parentChatId: chatId,
+      parentMessageId: messageId,
+      connectionType: 'detached',
+      contextType: 'full_message',
+    });
   };
 
-  const handleNewTemporaryBranch = () => {
-    // TODO: Implement new temporary branch creation for messageId: ${messageId}
+  const handleNewTemporaryBranch = async () => {
+    createNestedChatAndOpenSplitScreen({
+      parentChatId: chatId,
+      parentMessageId: messageId,
+      connectionType: 'temporary',
+      contextType: 'full_message',
+    });
   };
 
   const handleCreateNote = () => {
-    // TODO: Implement note creation for messageId: ${messageId}
+    // TODO: Implement note creation functionality
   };
 
   return (
@@ -46,4 +66,4 @@ const QuickActions = () => {
   );
 };
 
-export default QuickActions;
+export default memo(QuickActions);

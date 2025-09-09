@@ -1,11 +1,8 @@
-import { useState } from 'react';
-
-import { EntityEnum } from '@shared-types/entities';
-
-import { useFileSystemStore } from '../stores/file-system.store';
-
-import type { TreeNode } from './use-file-system.actions';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import { useState } from 'react';
+import { useFileSystemStore } from '../stores/file-system.store';
+import type { TreeNode } from './use-file-system.actions';
+import { EntityEnum } from '@shared-types/entities';
 
 export type DraggableData = {
   type: EntityEnum;

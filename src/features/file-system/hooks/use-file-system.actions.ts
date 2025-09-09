@@ -1,27 +1,21 @@
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useParams } from 'react-router';
-
-import {
-  openChatInNewTab,
-  openChatInSidePanel,
-  navigateToChat,
-} from '@features/chat-old/hooks/use-split-screen-actions';
-import type { LLModel } from '@features/chat-old/types/chat-types';
-import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
-
-import { useMenuStateStore } from '@stores/use-menu-state-store';
-
-import { EntityEnum, type ChatBranchContext } from '@shared-types/entities';
-
 import { type TreeNode, type FileSystemData } from '../data/use-file-system.data';
 import { useExpandedNodesStore } from '../stores/expanded-nodes.store';
-
 import {
   useTreeDndLogic,
   type DraggableData,
   type DroppableData,
 } from './use-tree-dnd-logic';
-
-import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import type { LLModel } from '@features/chat-old/types/chat-types';
+import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
+import {
+  openChatInNewTab,
+  openChatInSidePanel,
+  navigateToChat,
+} from '@hooks/use-split-screen-actions';
+import { EntityEnum, type ChatBranchContext } from '@shared-types/entities';
+import { useMenuStateStore } from '@stores/menu-state.store';
 
 // Type definitions for action parameters
 type CreateChatArgs = {

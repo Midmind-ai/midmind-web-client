@@ -1,14 +1,12 @@
-import { AI_MODELS } from '@features/chat-old/constants/ai-models';
-
+import { AI_MODELS } from '@constants/ai-models';
 import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
-
 import type { components } from 'generated/api-types';
 
 export type ConnectionType = 'attached' | 'detached' | 'temporary';
 
 export type ContextType = 'full_message' | 'text_selection';
 
-export type LLModel = (typeof AI_MODELS)[keyof typeof AI_MODELS];
+export type LLModel = (typeof AI_MODELS)[keyof typeof AI_MODELS]['id'];
 
 export type ChatMessageFormData = {
   content: string;

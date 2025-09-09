@@ -1,11 +1,8 @@
 import { CACHE_KEYS } from '@hooks/cache-keys';
-
+import { useSWR } from '@lib/swr';
 import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
 import { BreadcrumbsService } from '@services/breadcrumbs/breadcrumbs-service';
-
 import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
-
-import { useSWR } from '@lib/swr';
 
 export const useGetChatBreadcrumbs = (chatId: string) => {
   const isCreating = useEntityCreationStateStore(state => state.isCreating(chatId));

@@ -1,8 +1,6 @@
 import SplitLayout from '@app/split-layout';
-
+import Sidebar from '@components/misc/sidebar/sidebar';
 import { SidebarProvider } from '@components/ui/sidebar';
-
-import Sidebar from '@features/sidebar/sidebar';
 
 const RootLayout = () => {
   return (

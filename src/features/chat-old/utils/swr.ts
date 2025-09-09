@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { produce } from 'immer';
 import { toast } from 'sonner';
-
 import { ITEMS_PER_PAGE } from '@features/chat-old/hooks/use-get-chat-messages';
 import type {
   ChunkHandlerParams,
@@ -10,16 +9,12 @@ import type {
   ChatDetails,
 } from '@features/chat-old/types/chat-types';
 import { emitResponseChunk } from '@features/chat-old/utils/llm-response-emitter';
-
 import { CACHE_KEYS, findCacheKeysByPattern } from '@hooks/cache-keys';
-
+import { mutate, unstable_serialize } from '@lib/swr';
 import { BranchContextService } from '@services/branch-context/branch-context-service';
 import type { ConversationWithAIResponseDto } from '@services/conversations/conversations-dtos';
-
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
-
-import { mutate, unstable_serialize } from '@lib/swr';
 
 export const getInfiniteKey = (chatId: string) => {
   return unstable_serialize(

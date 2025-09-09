@@ -1,5 +1,4 @@
 import { ScrollArea } from '@components/ui/scroll-area';
-
 import LLMResponse from '@features/chat-old/components/llm-response/llm-response';
 import { useMessageListLogic } from '@features/chat-old/components/message-list/use-message-list-logic';
 import UserMessage from '@features/chat-old/components/user-message/user-message';

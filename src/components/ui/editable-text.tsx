@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
 import { ThemedSpan } from '@components/ui/themed-span';
-
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 
 type Props = {

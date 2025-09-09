@@ -1,11 +1,9 @@
 import { useDraggable } from '@dnd-kit/core';
-
 import type {
   DraggableData,
   DroppableData,
   TreeNode,
 } from '@features/file-system/hooks/use-file-system.actions';
-
 import { EntityEnum } from '@shared-types/entities';
 
 type UseDraggableConfigProps = {

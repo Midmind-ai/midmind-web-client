@@ -1,7 +1,5 @@
 import { baseAxiosInstance } from '@config/axios';
-
 import type { GetChatMessagesParamsDto } from '@services/messages/messages-dtos';
-
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
 

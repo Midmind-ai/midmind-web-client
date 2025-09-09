@@ -1,5 +1,4 @@
 import { createBrowserRouter } from 'react-router';
-
 import RootLayout from '@app/root-layout';
 import ChatPage from '@app/routes/chat';
 import ChatOldPage from '@app/routes/chat-old';
@@ -8,9 +7,7 @@ import HomePage from '@app/routes/home';
 import NotFoundPage from '@app/routes/not-found';
 import SignInPage from '@app/routes/sign-in';
 import SignUpPage from '@app/routes/sign-up';
-
 import { AppRoutes } from '@constants/paths';
-
 import ProtectedRoute from '@features/sign-in/components/protected-route/protected-route';
 
 const router = createBrowserRouter([

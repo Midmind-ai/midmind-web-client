@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-
 import { debounce } from '@utils/debounce';
 
 // Constants for sidebar width constraints

@@ -1,9 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-
-import { AI_MODELS } from '@features/chat-old/constants/ai-models';
-
+import { AI_MODELS } from '@constants/ai-models';
 import { ChatsService } from '@services/chats/chats-service';
 import type {
   ConversationWithAIRequestDto,
@@ -11,11 +9,22 @@ import type {
 } from '@services/conversations/conversations-dtos';
 import { ConversationsService } from '@services/conversations/conversations-service';
 import { MessagesService } from '@services/messages/messages-service';
-
-import type { ChatState, ChatsStoreState } from '../types';
+import type { AIModel, ChatMessage, Chat } from '@shared-types/entities';
 
 const ITEMS_PER_PAGE = 20;
-const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE;
+const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
+
+// Branch color palette
+const BRANCH_COLORS = [
+  '#FF6B6B', // Red
+  '#4ECDC4', // Teal
+  '#45B7D1', // Blue
+  '#96CEB4', // Green
+  '#FFEAA7', // Yellow
+  '#DDA0DD', // Purple
+  '#98D8C8', // Mint
+  '#F8B195', // Coral
+];
 
 // Initial state for a single chat
 const getInitialChatState = (): ChatState => ({
@@ -31,12 +40,52 @@ const getInitialChatState = (): ChatState => ({
   abortController: null,
 });
 
+// UI State types
+export interface ChatState {
+  chat: Chat | null;
+  messages: ChatMessage[];
+  isLoadingChat: boolean;
+  isLoadingMessages: boolean;
+  isStreaming: boolean;
+  streamingMessageId: string | null;
+  error: string | null;
+  hasMoreMessages: boolean;
+  currentPage: number;
+  abortController: AbortController | null;
+}
+
+export interface ChatsStoreState {
+  // Multiple chats support
+  chats: Record<string, ChatState>;
+  activeChatIds: string[];
+  isCreatingNewChat: boolean;
+
+  // Actions
+  initChat: (chatId: string) => void;
+  loadChat: (chatId: string) => Promise<void>;
+  loadMessages: (chatId: string) => Promise<void>;
+  loadMoreMessages: (chatId: string) => Promise<void>;
+  sendMessage: (chatId: string, content: string, model?: AIModel) => Promise<void>;
+  stopStreaming: (chatId: string) => void;
+  appendNewNestedChat: (args: {
+    newChatId: string;
+    parentChatId: string;
+    parentMessageId: string;
+    connectionType: 'attached' | 'detached' | 'temporary';
+  }) => VoidFunction;
+  clearChat: (chatId: string) => void;
+  setError: (chatId: string, error: string | null) => void;
+  addChatToActive: (chatId: string) => void;
+  removeChatFromActive: (chatId: string) => void;
+}
+
 export const useChatsStore = create<ChatsStoreState>()(
   devtools(
     (set, get) => ({
       // Initial state
       chats: {},
       activeChatIds: [],
+      isCreatingNewChat: false,
 
       // Initialize chat if not exists
       initChat: (chatId: string) => {
@@ -85,6 +134,15 @@ export const useChatsStore = create<ChatsStoreState>()(
               [chatId]: {
                 ...state.chats[chatId],
                 error: error instanceof Error ? error.message : 'Failed to load chat',
+              },
+            },
+          }));
+        } finally {
+          set(state => ({
+            chats: {
+              ...state.chats,
+              [chatId]: {
+                ...state.chats[chatId],
                 isLoadingChat: false,
               },
             },
@@ -406,6 +464,156 @@ export const useChatsStore = create<ChatsStoreState>()(
           }));
         }
       },
+
+      appendNewNestedChat: async ({
+        newChatId,
+        parentChatId,
+        parentMessageId,
+        connectionType,
+      }) => {
+        // Get parent message to count existing branches
+        const parentMessage = get().chats[parentChatId]?.messages.find(
+          msg => msg.id === parentMessageId
+        );
+
+        const existingBranchesCount = parentMessage?.nested_chats?.length || 0;
+        const branchColor = BRANCH_COLORS[existingBranchesCount % BRANCH_COLORS.length];
+
+        // Create branch object for optimistic update
+        const newBranch = {
+          id: uuid(),
+          child_chat_id: newChatId,
+          connection_type: connectionType,
+          connection_color: branchColor,
+          context_type: 'full_message' as const,
+          start_position: 0,
+          end_position: 0,
+        };
+
+        set(state => ({
+          chats: {
+            ...state.chats,
+            [parentChatId]: {
+              ...state.chats[parentChatId],
+              messages: state.chats[parentChatId].messages.map(msg =>
+                msg.id === parentMessageId
+                  ? {
+                      ...msg,
+                      nested_chats: [...(msg.nested_chats || []), newBranch],
+                    }
+                  : msg
+              ),
+            },
+          },
+        }));
+
+        const rollbackFunc = () => {
+          set(state => ({
+            chats: {
+              ...state.chats,
+              [parentChatId]: {
+                ...state.chats[parentChatId],
+                messages: state.chats[parentChatId].messages.map(msg =>
+                  msg.id === parentMessageId
+                    ? {
+                        ...msg,
+                        nested_chats: [
+                          ...(msg.nested_chats || []).filter(
+                            item => item.id !== newBranch.id
+                          ),
+                        ],
+                      }
+                    : msg
+                ),
+              },
+            },
+          }));
+        };
+
+        // return rollback function
+        return rollbackFunc;
+      },
+
+      // // Create nested chat with branch
+      // createNestedChat: async ({
+      //   parentChatId,
+      //   parentMessageId,
+      //   content,
+      //   model,
+      //   connectionType,
+      // }: {
+      //   parentChatId: string;
+      //   parentMessageId: string;
+      //   content: string;
+      //   model: AIModel;
+      //   connectionType: 'attached' | 'detached' | 'temporary';
+      // }) => {
+      //   const newChatId = uuid();
+
+      //   // Get parent message to count existing branches
+      //   const parentMessage = get().chats[parentChatId]?.messages.find(
+      //     msg => msg.id === parentMessageId
+      //   );
+
+      //   const existingBranchesCount = parentMessage?.nested_chats?.length || 0;
+      //   const branchColor = BRANCH_COLORS[existingBranchesCount % BRANCH_COLORS.length];
+
+      //   // Create branch object for optimistic update
+      //   const newBranch = {
+      //     id: uuid(),
+      //     child_chat_id: newChatId,
+      //     connection_type: connectionType,
+      //     connection_color: branchColor,
+      //     context_type: 'full_message' as const,
+      //     start_position: 0,
+      //     end_position: 0,
+      //   };
+
+      //   // Optimistically update parent message with new branch
+      //   set(state => ({
+      //     chats: {
+      //       ...state.chats,
+      //       [parentChatId]: {
+      //         ...state.chats[parentChatId],
+      //         messages: state.chats[parentChatId].messages.map(msg =>
+      //           msg.id === parentMessageId
+      //             ? {
+      //                 ...msg,
+      //                 nested_chats: [...(msg.nested_chats || []), newBranch],
+      //               }
+      //             : msg
+      //         ),
+      //       },
+      //     },
+      //   }));
+
+      //   // Create the actual chat via file-system store
+      //   const { useFileSystemStore } = await import(
+      //     '@features/file-system/stores/file-system.store'
+      //   );
+      //   await useFileSystemStore.getState().createChat({
+      //     content,
+      //     model,
+      //     newChatId,
+      //     sendMessage: false, // Don't send message immediately
+      //     openInSplitScreen: false, // We'll handle navigation manually
+      //     parentChatId,
+      //     branchContext: {
+      //       parent_chat_id: parentChatId,
+      //       parent_message_id: parentMessageId,
+      //       connection_type: connectionType,
+      //       context_type: 'full_message',
+      //     },
+      //   });
+
+      //   // Navigate to split screen view
+      //   // Parent chat stays in URL path, nested chat goes to query param
+      //   const currentUrl = new URL(window.location.href);
+      //   currentUrl.searchParams.set(SearchParams.Split, newChatId);
+      //   navigate(`/chat/${parentChatId}${currentUrl.search}`);
+
+      //   return newChatId;
+      // },
 
       // Clear chat data
       clearChat: (chatId: string) => {

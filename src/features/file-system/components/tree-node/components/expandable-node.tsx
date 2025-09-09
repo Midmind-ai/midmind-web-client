@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from 'react';
-
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
-
+import React, { useEffect, useState } from 'react';
+import { EntityActionsMenu } from '@components/misc/entity-actions/components/entity-actions-menu';
 import EditableText from '@components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
-
-import { EntityActionsMenu } from '@features/entity-actions/components/entity-actions-menu';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import { useDraggableConfig } from '@features/file-system/components/tree-dnd/use-draggable-config';
 import ChildrenList from '@features/file-system/components/tree-node/components/children-list';
@@ -21,10 +18,8 @@ import {
 } from '@features/file-system/hooks/use-file-system.actions';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
-
-import { useMenuStateStore } from '@stores/use-menu-state-store';
-
 import { EntityEnum } from '@shared-types/entities';
+import { useMenuStateStore } from '@stores/menu-state.store';
 
 type Props = {
   node: TreeNodeType;

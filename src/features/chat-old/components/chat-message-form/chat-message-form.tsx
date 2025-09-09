@@ -5,7 +5,6 @@ import {
   SquareStopIcon,
 } from 'lucide-react';
 import { Controller } from 'react-hook-form';
-
 import { Button } from '@components/ui/button';
 import {
   Select,
@@ -16,12 +15,10 @@ import {
 } from '@components/ui/select';
 import { Separator } from '@components/ui/separator';
 import { Textarea } from '@components/ui/textarea';
-
+import { AI_MODELS } from '@constants/ai-models';
 import { useChatMessageFormLogic } from '@features/chat-old/components/chat-message-form/use-chat-message-form-logic';
 import MessageReply from '@features/chat-old/components/message-reply/message-reply';
-import { AI_MODELS } from '@features/chat-old/constants/ai-models';
 import type { OnSubmitArgs } from '@features/chat-old/types/chat-types';
-
 import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type Props = {
@@ -80,17 +77,17 @@ const ChatMessageForm = ({ chatId, onSubmit, branchContext }: Props) => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH_LITE}>
-                  {AI_MODELS.GEMINI_2_0_FLASH_LITE.toUpperCase()}
+                <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH_LITE.id}>
+                  {AI_MODELS.GEMINI_2_0_FLASH_LITE.name}
                 </SelectItem>
-                <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH}>
-                  {AI_MODELS.GEMINI_2_0_FLASH.toUpperCase()}
+                <SelectItem value={AI_MODELS.GEMINI_2_0_FLASH.id}>
+                  {AI_MODELS.GEMINI_2_0_FLASH.name}
                 </SelectItem>
-                <SelectItem value={AI_MODELS.GEMINI_2_5_FLASH}>
-                  {AI_MODELS.GEMINI_2_5_FLASH.toUpperCase()}
+                <SelectItem value={AI_MODELS.GEMINI_2_5_FLASH.id}>
+                  {AI_MODELS.GEMINI_2_5_FLASH.name}
                 </SelectItem>
-                <SelectItem value={AI_MODELS.GEMINI_2_5_PRO}>
-                  {AI_MODELS.GEMINI_2_5_PRO.toUpperCase()}
+                <SelectItem value={AI_MODELS.GEMINI_2_5_PRO.id}>
+                  {AI_MODELS.GEMINI_2_5_PRO.name}
                 </SelectItem>
               </SelectContent>
             </Select>

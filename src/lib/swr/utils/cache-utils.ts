@@ -1,5 +1,4 @@
 import { unstable_serialize } from 'swr';
-
 import type { Key, Cache } from 'swr';
 
 // Helper to get cache value for any key type

@@ -1,11 +1,9 @@
 import { authAxiosInstance, baseAxiosInstance } from '@config/axios';
-
 import type {
   SignInRequest,
   SignInWithGoogleRequest,
   TokenResponse,
 } from '@services/auth/auth-dtos';
-
 import type { MessageResponse } from '@shared-types/common';
 
 export class AuthService {

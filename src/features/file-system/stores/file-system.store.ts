@@ -1,36 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-
-import { ITEMS_PER_PAGE } from '@features/chat-old/hooks/use-get-chat-messages';
-import type { LLModel } from '@features/chat-old/types/chat-types';
-import { handleLLMResponse } from '@features/chat-old/utils/swr';
 import { useExpandedNodesStore } from '@features/file-system/stores/expanded-nodes.store';
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
-
 import { findCacheKeysByPattern, CACHE_KEYS } from '@hooks/cache-keys';
-
+import { mutate } from '@lib/swr';
 import type { CreateNewChatRequestDto } from '@services/chats/chats-dtos';
 import { ChatsService } from '@services/chats/chats-service';
-import type {
-  ConversationWithAIRequestDto,
-  ConversationWithAIResponseDto,
-} from '@services/conversations/conversations-dtos';
-import { ConversationsService } from '@services/conversations/conversations-service';
 import { DirectoriesService } from '@services/directories/directories-service';
-
-import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
-import { useAbortControllerStore } from '@stores/use-abort-controller-store';
-
 import { EntityEnum } from '@shared-types/entities';
-import type {
-  Directory,
-  Chat,
-  ChatMessage,
-  ChatBranchContext,
-} from '@shared-types/entities';
-
-import { mutate } from '@lib/swr';
+import type { Directory, Chat, ChatBranchContext } from '@shared-types/entities';
+import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
 
 type Node = (Directory | Chat) & {
   type: EntityEnum;
@@ -51,9 +31,7 @@ type FileSystemStoreType = {
   loadData: (parentId?: string | 'root', parentType?: EntityEnum) => Promise<void>;
 
   createChat: (args: {
-    content: string;
-    model: LLModel;
-    sendMessage?: boolean;
+    newChatId?: string;
     openInSplitScreen?: boolean;
     parentChatId?: string;
     parentFolderId?: string;
@@ -358,20 +336,14 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
       },
 
       createChat: async ({
-        content,
-        model,
-        sendMessage = false,
+        newChatId,
         openInSplitScreen = false,
         parentChatId,
         parentFolderId,
         branchContext,
         navigate,
       }) => {
-        const chatId = uuidv4();
-        const messageId = uuidv4();
-        const futureLLMMessageId = uuidv4();
-        const chatDetailsCacheKey = CACHE_KEYS.chats.details(chatId);
-        const messagesCacheKey = `${CACHE_KEYS.messages.byChatId(chatId)}?page=0&skip=0&take=${ITEMS_PER_PAGE}`;
+        const chatId = newChatId || uuidv4();
 
         const state = get();
         const originalNodes = [...state.nodes];
@@ -391,8 +363,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
         };
 
         // Mark chat as being created to prevent API calls
-        const { startCreating } = useEntityCreationStateStore.getState();
-        startCreating(chatId);
+        useEntityCreationStateStore.getState().startCreating(chatId);
 
         // Optimistic update to store
         set(state => {
@@ -431,58 +402,9 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           expandNode(parentChatId);
         }
 
-        // Add optimistic chat data into cache
-        await mutate(chatDetailsCacheKey, optimisticChat);
-
-        // Handle message sending if needed
-        if (sendMessage) {
-          // Create the user's initial message
-          const userMessage: ChatMessage = {
-            id: messageId,
-            content: content,
-            role: 'user',
-            nested_chats: [],
-            llm_model: model,
-            created_at: new Date().toISOString(),
-            reply_content: null,
-            attachments: [],
-          };
-
-          // Create an empty AI message placeholder
-          const llmMessage: ChatMessage = {
-            id: futureLLMMessageId,
-            content: '',
-            role: 'model',
-            nested_chats: [],
-            llm_model: model,
-            created_at: new Date().toISOString(),
-            reply_content: null,
-            attachments: [],
-          };
-
-          // Add messages in cache optimistically
-          await mutate(
-            messagesCacheKey,
-            {
-              data: [llmMessage, userMessage],
-              meta: {
-                total: 2,
-                lastPage: 1,
-                currentPage: 1,
-                perPage: 20,
-                prev: null,
-                next: null,
-              },
-            },
-            { revalidate: false, populateCache: true }
-          );
-        }
-
         // Handle split screen opening
         if (openInSplitScreen) {
-          const { openChatInSplitView } = await import(
-            '@features/chat-old/hooks/use-split-screen-actions'
-          );
+          const { openChatInSplitView } = await import('@hooks/use-split-screen-actions');
           openChatInSplitView(chatId, parentChatId);
         }
 
@@ -511,43 +433,6 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           // Create the chat on the server
           await ChatsService.createNewChat(newChatDto);
 
-          if (sendMessage) {
-            // Prepare conversation request
-            const conversationBody: ConversationWithAIRequestDto = {
-              chat_id: chatId,
-              message_id: messageId,
-              future_llm_message_id: futureLLMMessageId,
-              content,
-              model,
-              ...(branchContext && {
-                chat_metadata: {
-                  parent_message_id: branchContext.parent_message_id,
-                },
-              }),
-            };
-
-            // Create abort controller and start AI conversation
-            const { createAbortController, clearAbortController } =
-              useAbortControllerStore.getState();
-            const newAbortController = createAbortController(chatId);
-
-            ConversationsService.conversationWithAI(
-              conversationBody,
-              (chunk: ConversationWithAIResponseDto) => {
-                // console.log(chunk);
-                handleLLMResponse(
-                  clearAbortController,
-                  chatId,
-                  model,
-                  chunk,
-                  messageId,
-                  parentChatId
-                );
-              },
-              newAbortController.signal
-            );
-          }
-
           return chatId;
         } catch (error) {
           set({
@@ -555,14 +440,10 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
             childrenOf: originalChildrenOf,
             parentOf: originalParentOf,
           });
-          await mutate(chatDetailsCacheKey, undefined, { revalidate: true });
-          await mutate(messagesCacheKey, undefined, { revalidate: true });
 
           throw error;
         } finally {
-          // Mark chat creation as finished
-          const { finishCreating } = useEntityCreationStateStore.getState();
-          finishCreating(chatId);
+          useEntityCreationStateStore.getState().finishCreating(chatId);
         }
       },
 

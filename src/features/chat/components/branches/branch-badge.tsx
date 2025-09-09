@@ -1,15 +1,13 @@
-import { GitMerge } from 'lucide-react';
-import { Link } from 'react-router';
-
+import { GitMerge, Link2Off, Link2 } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router';
 import { Button } from '@components/ui/button';
 import { ThemedSpan } from '@components/ui/themed-span';
-
-import { AppRoutes } from '@constants/paths';
-
+import { AppRoutes, SearchParams } from '@constants/paths';
 import { cn } from '@utils/cn';
-import { darkenColor } from '@utils/colors';
 
 type Props = {
+  chatId: string;
   connectionType: string;
   bgColor: string;
   branchChatId: string;
@@ -20,59 +18,78 @@ const CONNECTION_LABELS = {
   detached: 'Attach',
 };
 
-const BranchBadge = ({ bgColor, connectionType, branchChatId }: Props) => {
-  const isDetached = connectionType === 'detached';
-  const label = CONNECTION_LABELS[connectionType as keyof typeof CONNECTION_LABELS];
+const BranchBadge = React.memo(
+  ({ bgColor, connectionType, chatId, branchChatId }: Props) => {
+    const isDetached = connectionType === 'detached';
+    const label = CONNECTION_LABELS[connectionType as keyof typeof CONNECTION_LABELS];
+    const IconComponent = isDetached ? Link2 : Link2Off;
 
-  const containerStyles = isDetached
-    ? { borderColor: bgColor }
-    : { backgroundColor: bgColor };
-  const iconColor = isDetached ? bgColor : 'white';
-  const buttonStyles = { color: bgColor };
-  const labelStyles = { color: darkenColor(bgColor) };
+    const navigate = useNavigate();
 
-  const handleClick = () => {
-    // eslint-disable-next-line no-alert
-    alert('Coming soon');
-  };
+    const containerStyles = isDetached
+      ? { borderColor: bgColor }
+      : { backgroundColor: bgColor };
+    const iconColor = isDetached ? bgColor : 'white';
 
-  return (
-    <Link
-      to={AppRoutes.Chat(branchChatId)}
-      target="_blank"
-      className={cn(
-        `group/branch inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px]
-        p-1`,
-        isDetached && 'border bg-transparent'
-      )}
-      style={containerStyles}
-    >
-      <GitMerge
-        className="h-[18px] w-[18px] flex-1"
-        style={{ color: iconColor }}
-      />
-      <Button
-        variant="ghost"
-        size="sm"
-        className={cn(
-          `hidden h-[22px] rounded-sm p-1.5 transition-colors duration-200
-          group-hover/branch:flex`,
-          isDetached
-            ? 'bg-muted/70 text-background hover:bg-muted'
-            : 'bg-background/50 hover:bg-background/70'
-        )}
-        style={buttonStyles}
-        onClick={handleClick}
-      >
-        <ThemedSpan
-          className="text-sm leading-none font-medium"
-          style={labelStyles}
+    const deactivate = () => {
+      // eslint-disable-next-line no-alert
+      alert('Coming soon');
+    };
+
+    return (
+      <div className="group/branch relative inline-block">
+        <div
+          onClick={() => {
+            navigate({
+              pathname: AppRoutes.Chat(chatId),
+              search: `?${SearchParams.Split}=${branchChatId}`,
+            });
+          }}
+          className={cn(
+            `inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1
+            opacity-85 transition-opacity hover:opacity-100`,
+            isDetached && 'border bg-transparent'
+          )}
+          style={containerStyles}
         >
-          {label}
-        </ThemedSpan>
-      </Button>
-    </Link>
-  );
-};
+          <GitMerge
+            className="h-[18px] w-[18px]"
+            style={{ color: iconColor }}
+          />
+        </div>
+
+        <div
+          className="invisible absolute top-full left-[-10px] z-10 scale-95 bg-transparent
+            px-[10px] pt-[5px] opacity-0 transition-all duration-200
+            group-hover/branch:visible group-hover/branch:scale-100
+            group-hover/branch:opacity-100"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex h-[30px] items-center gap-1 rounded-sm p-1.5 px-3 opacity-85
+              transition-opacity hover:opacity-100"
+            style={{
+              backgroundColor: bgColor,
+              color: 'white',
+            }}
+            onClick={deactivate}
+          >
+            <IconComponent
+              className="h-3.5 w-3.5"
+              style={{ color: 'white' }}
+            />
+            <ThemedSpan
+              className="text-sm leading-none font-medium"
+              style={{ color: 'white' }}
+            >
+              {label}
+            </ThemedSpan>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+);
 
 export default BranchBadge;

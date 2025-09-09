@@ -34,79 +34,79 @@ export default tseslint.config([
       'import/order': [
         'error',
         {
-          groups: [
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-            'object',
-            'type',
-          ],
-          pathGroups: [
-            {
-              pattern: 'react',
-              group: 'external',
-              position: 'before',
-            },
-            {
-              pattern: '@app/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@assets/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@components/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@config/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@constants/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@features/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@hooks/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@services/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@stores/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@shared-types/**',
-              group: 'internal',
-              position: 'before',
-            },
-            {
-              pattern: '@utils/**',
-              group: 'internal',
-              position: 'before',
-            },
-          ],
+          // groups: [
+          //   'external',
+          //   'internal',
+          //   'parent',
+          //   'sibling',
+          //   'index',
+          //   'object',
+          //   'type',
+          // ],
+          // pathGroups: [
+          //   {
+          //     pattern: 'react',
+          //     group: 'external',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@app/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@assets/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@components/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@config/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@constants/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@features/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@hooks/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@services/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@stores/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@shared-types/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          //   {
+          //     pattern: '@utils/**',
+          //     group: 'internal',
+          //     position: 'before',
+          //   },
+          // ],
           pathGroupsExcludedImportTypes: ['react'],
-          'newlines-between': 'always',
+          'newlines-between': 'never',
           alphabetize: {
             order: 'asc',
             caseInsensitive: true,

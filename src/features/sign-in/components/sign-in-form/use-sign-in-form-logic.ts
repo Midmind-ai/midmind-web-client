@@ -3,20 +3,14 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
-
 import { LocalStorageKeys } from '@constants/local-storage';
 import { AppRoutes } from '@constants/paths';
-
 import { useSignIn } from '@features/sign-in/hooks/use-sign-in';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
-
+import { useSWRConfig } from '@lib/swr';
 import type { SignInRequest } from '@services/auth/auth-dtos';
 import { AuthService } from '@services/auth/auth-service';
-
 import { setToStorage } from '@utils/local-storage';
-
-import { useSWRConfig } from '@lib/swr';
 
 const signInValidationSchema = z.object({
   email: z.email('Please enter a valid email address'),

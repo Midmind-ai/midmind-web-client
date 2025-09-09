@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
-
-import { DEFAULT_AI_MODEL } from '@features/chat-old/constants/ai-models';
+import { DEFAULT_AI_MODEL } from '@constants/ai-models';
+import { useChatsStore } from '@features/chat/stores/chats.store';
 import type {
   CreateBranchArgs,
   UseMessageSelectionContextT,
@@ -8,10 +8,8 @@ import type {
 import { emitBranchCreated } from '@features/chat-old/utils/branch-creation-emitter';
 import { emitMessageReply } from '@features/chat-old/utils/message-reply-emitter';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
-
+import { openChatInNewTab, openChatInSidePanel } from '@hooks/use-split-screen-actions';
 import type { ConversationBranchContext } from '@shared-types/entities';
-
-import { openChatInNewTab, openChatInSidePanel } from './use-split-screen-actions';
 
 export const useChatActions = (actualChatId?: string) => {
   const { id: urlChatId = '' } = useParams();
@@ -27,9 +25,8 @@ export const useChatActions = (actualChatId?: string) => {
   }: CreateBranchArgs) => {
     const textToUse = selectionContext?.selectedText || content;
 
+    // First create the chat
     const newChatId = await createChat({
-      content: textToUse,
-      model: DEFAULT_AI_MODEL,
       parentChatId: chatId,
       openInSplitScreen: true,
       branchContext: {
@@ -42,6 +39,10 @@ export const useChatActions = (actualChatId?: string) => {
         context_type: selectionContext ? 'text_selection' : 'full_message',
       },
     });
+
+    // Then send the initial message
+    const { sendMessage } = useChatsStore.getState();
+    await sendMessage(newChatId, textToUse, DEFAULT_AI_MODEL);
 
     const branchContext: ConversationBranchContext = {
       id: messageId,

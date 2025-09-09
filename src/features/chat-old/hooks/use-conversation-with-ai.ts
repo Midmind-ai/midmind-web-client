@@ -1,22 +1,16 @@
 import { produce } from 'immer';
-
 import { emitMessageSent } from '@features/chat-old/utils/message-send-emitter';
 import { getInfiniteKey, handleLLMResponse } from '@features/chat-old/utils/swr';
-
 import { MUTATION_KEYS } from '@hooks/cache-keys';
-
+import { useSWRConfig, useSWRMutation } from '@lib/swr';
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
 } from '@services/conversations/conversations-dtos';
 import { ConversationsService } from '@services/conversations/conversations-service';
-
-import { useAbortControllerStore } from '@stores/use-abort-controller-store';
-
 import type { PaginatedResponse } from '@shared-types/common';
 import type { ChatMessage } from '@shared-types/entities';
-
-import { useSWRConfig, useSWRMutation } from '@lib/swr';
+import { useAbortControllerStore } from '@stores/abort-controller.store';
 
 export const useConversationWithAI = (chatId: string) => {
   const { mutate } = useSWRConfig();

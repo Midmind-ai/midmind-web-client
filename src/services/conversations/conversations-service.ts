@@ -1,11 +1,9 @@
+import type { AxiosProgressEvent } from 'axios';
 import { baseAxiosInstance } from '@config/axios';
-
 import type {
   ConversationWithAIRequestDto,
   ConversationWithAIResponseDto,
 } from '@services/conversations/conversations-dtos';
-
-import type { AxiosProgressEvent } from 'axios';
 
 export class ConversationsService {
   static async conversationWithAI(

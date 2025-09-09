@@ -19,6 +19,15 @@ export type ChatBranchContext = components['schemas']['CreateChatDto']['chat_met
 export type ConversationBranchContext =
   components['schemas']['ChatMetadataByMessageIdDto'];
 
+// Streaming related types
+export type StreamChunk = components['schemas']['CreateConversationResponseContentDto'];
+
+// Request types
+export type SendMessageRequest = components['schemas']['CreateConversationDto'];
+
+// AI Model type from generated API
+export type AIModel = components['schemas']['CreateConversationDto']['model'];
+
 export type TreeItem = {
   id: string;
   name: string;

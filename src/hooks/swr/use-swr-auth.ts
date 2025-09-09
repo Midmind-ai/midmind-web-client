@@ -1,14 +1,9 @@
 import { LocalStorageKeys } from '@constants/local-storage';
-
 import { CACHE_KEYS } from '@hooks/cache-keys';
-
-import { UsersService } from '@services/users/users-service';
-
-import type { User } from '@shared-types/entities';
-
-import { getFromStorage } from '@utils/local-storage';
-
 import { useSWR } from '@lib/swr';
+import { UsersService } from '@services/users/users-service';
+import type { User } from '@shared-types/entities';
+import { getFromStorage } from '@utils/local-storage';
 
 export function useSwrCurrentUser() {
   const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);

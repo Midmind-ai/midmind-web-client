@@ -9,9 +9,7 @@ import {
   type DragOverEvent,
 } from '@dnd-kit/core';
 import { createPortal } from 'react-dom';
-
 import { SidebarMenu } from '@components/ui/sidebar';
-
 import { intersectionRatioCollision } from '@features/file-system/components/tree-dnd/collision-detection';
 import DragOverlayNode from '@features/file-system/components/tree-dnd/drag-overlay-node';
 import { useFileSystemActions } from '@features/file-system/hooks/use-file-system.actions';

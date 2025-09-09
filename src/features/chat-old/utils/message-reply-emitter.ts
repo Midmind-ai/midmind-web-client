@@ -1,5 +1,4 @@
 import EventEmitter from 'eventemitter3';
-
 import type { components } from 'generated/api-types';
 
 export type MessageReplyEvent = {

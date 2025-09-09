@@ -1,12 +1,13 @@
+import { memo } from 'react';
 import BranchBadge from './branch-badge';
-
-import type { ChatMessage } from '../../types';
+import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
+  chatId: string;
   branches: ChatMessage['nested_chats'];
 };
 
-const Branches = ({ branches }: Props) => {
+const Branches = ({ chatId, branches }: Props) => {
   if (!branches || branches.length === 0) {
     return null;
   }
@@ -26,6 +27,7 @@ const Branches = ({ branches }: Props) => {
           <BranchBadge
             key={id}
             bgColor={connection_color}
+            chatId={chatId}
             branchChatId={child_chat_id}
             connectionType={connection_type}
           />
@@ -35,4 +37,4 @@ const Branches = ({ branches }: Props) => {
   );
 };
 
-export default Branches;
+export default memo(Branches);

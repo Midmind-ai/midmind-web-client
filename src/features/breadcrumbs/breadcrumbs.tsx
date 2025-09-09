@@ -1,14 +1,12 @@
+import { memo } from 'react';
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@components/ui/breadcrumb';
-
 import { AppRoutes } from '@constants/paths';
-
 import BreadcrumbItem from '@features/breadcrumbs/components/breadcrumb-item/breadcrumb-item';
 import { useGetChatBreadcrumbs } from '@features/breadcrumbs/hooks/use-get-chat-breadcrumbs';
-
 import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
 
 type Props = {
@@ -39,4 +37,4 @@ const Breadcrumbs = ({ id }: Props) => {
   );
 };
 
-export default Breadcrumbs;
+export default memo(Breadcrumbs);

@@ -1,15 +1,15 @@
-import { cn } from '@utils/cn';
-
+import { memo } from 'react';
 import Branches from '../branches/branches';
 import ReactMarkdown from '../markdown/react-markdown';
 import QuickActions from '../quick-actions/quick-actions';
-
 import TypingDots from './typing-dots';
-
-import type { ChatMessage } from '../../types';
+import { AI_MODELS } from '@constants/ai-models';
+import type { ChatMessage } from '@shared-types/entities';
+import { cn } from '@utils/cn';
 
 type Props = {
   message: ChatMessage;
+  chatId: string;
   isLastMessage: boolean;
   isStreaming: boolean;
   streamingMessageId: string | null;
@@ -17,6 +17,7 @@ type Props = {
 
 const AIMessage = ({
   message,
+  chatId,
   isLastMessage,
   isStreaming,
   streamingMessageId,
@@ -25,19 +26,27 @@ const AIMessage = ({
   const isCurrentlyStreaming = id === streamingMessageId;
   const isWaiting = isStreaming && !content && isCurrentlyStreaming;
 
+  // Get the model name from AI_MODELS constant
+  const getModelName = (modelId: string | null | undefined) => {
+    if (!modelId) return '';
+    const model = Object.values(AI_MODELS).find(m => m.id === modelId);
+
+    return model?.name || modelId;
+  };
+
   return (
     <div
       className={cn(
-        'group w-full rounded-md bg-transparent px-2.5 pt-0 pb-2.5',
+        'group w-full rounded-md bg-transparent px-3.5 pt-0 pb-2.5',
         isLastMessage &&
           'min-h-[calc(100vh-var(--navigation-header-height)-var(--chat-form-with-padding-height)-115px)]'
       )}
     >
       <h6
         className="text-muted-foreground mb-4 text-xs font-light uppercase opacity-0
-          transition-opacity group-hover:opacity-70"
+          transition-opacity group-hover:opacity-60"
       >
-        {llm_model}
+        {getModelName(llm_model)}
       </h6>
 
       {isWaiting ? (
@@ -47,13 +56,21 @@ const AIMessage = ({
           <div className="pb-2 text-base leading-relaxed font-light">
             <ReactMarkdown content={content || ''} />
           </div>
-          <Branches branches={nested_chats} />
+          <Branches
+            chatId={chatId}
+            branches={nested_chats}
+          />
         </>
       )}
 
-      {!isWaiting && !isStreaming && isLastMessage && <QuickActions />}
+      {!isWaiting && !isStreaming && isLastMessage && (
+        <QuickActions
+          chatId={chatId}
+          messageId={id}
+        />
+      )}
     </div>
   );
 };
 
-export default AIMessage;
+export default memo(AIMessage);

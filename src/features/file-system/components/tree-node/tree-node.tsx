@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-
 import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
 import {
   useFileSystemActions,

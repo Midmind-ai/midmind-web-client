@@ -1,12 +1,8 @@
 import { FolderPlus, MessageSquarePlus } from 'lucide-react';
 import { useSearchParams } from 'react-router';
-
 import { SidebarMenuButton } from '@components/ui/sidebar';
-
 import { AppRoutes } from '@constants/paths';
-
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
-
 import { navigate } from '@hooks/use-navigation';
 
 const FolderActions = () => {

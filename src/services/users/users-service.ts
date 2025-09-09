@@ -1,5 +1,4 @@
 import { baseAxiosInstance } from '@config/axios';
-
 import type { User } from '@shared-types/entities';
 
 export class UsersService {

@@ -1,12 +1,10 @@
-import { type KeyboardEvent, useRef, useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
+import { type KeyboardEvent, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
-
-import { DEFAULT_AI_MODEL } from '@features/chat-old/constants/ai-models';
+import { DEFAULT_AI_MODEL } from '@constants/ai-models';
 import { useConversationWithAI } from '@features/chat-old/hooks/use-conversation-with-ai';
 import type { OnSubmitArgs, LLModel } from '@features/chat-old/types/chat-types';
 import {
@@ -14,7 +12,6 @@ import {
   unsubscribeFromMessageReply,
   type MessageReplyEvent,
 } from '@features/chat-old/utils/message-reply-emitter';
-
 import type { ConversationWithAIRequestDto } from '@services/conversations/conversations-dtos';
 
 type ChatMessageFormData = {

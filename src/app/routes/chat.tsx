@@ -1,5 +1,4 @@
 import { useParams } from 'react-router';
-
 import Chat from '@features/chat/chat';
 
 const ChatPage = () => {

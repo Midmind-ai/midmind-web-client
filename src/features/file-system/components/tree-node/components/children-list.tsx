@@ -1,12 +1,9 @@
 import React from 'react';
-
 import { SidebarMenuSub } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
-
 import { SKELETON_COUNT } from '@features/file-system/components/tree-node/constants';
 import { useFileSystemData } from '@features/file-system/data/use-file-system.data';
 import type { TreeNode as TreeNodeType } from '@features/file-system/data/use-file-system.data';
-
 import type { EntityEnum } from '@shared-types/entities';
 
 type Props = {

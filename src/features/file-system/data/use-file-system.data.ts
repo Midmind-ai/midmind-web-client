@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
-
-import { EntityEnum, type Chat, type Directory } from '@shared-types/entities';
-
 import { useFileSystemStore } from '../stores/file-system.store';
-
 import { useLoadData } from './use-load-data';
+import { EntityEnum, type Chat, type Directory } from '@shared-types/entities';
 
 export type TreeNode = {
   id: string;
