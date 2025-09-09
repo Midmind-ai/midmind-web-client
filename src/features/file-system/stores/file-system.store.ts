@@ -10,7 +10,6 @@ import { ChatsService } from '@services/chats/chats-service';
 import { DirectoriesService } from '@services/directories/directories-service';
 import { EntityEnum } from '@shared-types/entities';
 import type { Directory, Chat, ChatBranchContext } from '@shared-types/entities';
-import { useEntityCreationStateStore } from '@stores/entity-creation-state.store';
 
 type Node = (Directory | Chat) & {
   type: EntityEnum;
@@ -362,9 +361,6 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           has_children: false,
         };
 
-        // Mark chat as being created to prevent API calls
-        useEntityCreationStateStore.getState().startCreating(chatId);
-
         // Optimistic update to store
         set(state => {
           const updatedNodes = [optimisticChat, ...state.nodes];
@@ -442,8 +438,6 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
           });
 
           throw error;
-        } finally {
-          useEntityCreationStateStore.getState().finishCreating(chatId);
         }
       },
 
