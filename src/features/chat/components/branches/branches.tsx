@@ -21,7 +21,7 @@ const Branches = ({ chatId, branches }: Props) => {
   }
 
   return (
-    <div className="mb-4 flex items-center gap-2.5">
+    <div className="mb-5 flex items-center gap-2.5">
       {filteredBranches.map(
         ({ id, connection_color, connection_type, child_chat_id }) => (
           <BranchBadge

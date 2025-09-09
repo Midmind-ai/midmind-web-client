@@ -53,7 +53,7 @@ const AIMessage = ({
         <TypingDots />
       ) : (
         <>
-          <div className="pb-2 text-base leading-relaxed font-light">
+          <div className="pb-0 text-base leading-relaxed font-light">
             <ReactMarkdown content={content || ''} />
           </div>
           <Branches
