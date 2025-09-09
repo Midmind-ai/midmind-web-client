@@ -1,6 +1,7 @@
 import { GitMerge, Link2Off, Link2 } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router';
+import { useTheme } from '../../../../app/providers/theme-provider';
 import { Button } from '@components/ui/button';
 import { ThemedSpan } from '@components/ui/themed-span';
 import { AppRoutes, SearchParams } from '@constants/paths';
@@ -25,11 +26,13 @@ const BranchBadge = React.memo(
     const IconComponent = isDetached ? Link2 : Link2Off;
 
     const navigate = useNavigate();
+    const { theme, resolveTheme } = useTheme();
 
     const containerStyles = isDetached
       ? { borderColor: bgColor }
       : { backgroundColor: bgColor };
-    const iconColor = isDetached ? bgColor : 'white';
+    const themedContentColor = resolveTheme(theme) === 'light' ? 'white' : 'black';
+    const iconColor = isDetached ? bgColor : themedContentColor;
 
     const deactivate = () => {
       // eslint-disable-next-line no-alert
@@ -47,8 +50,8 @@ const BranchBadge = React.memo(
           }}
           className={cn(
             `inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1
-            opacity-85 transition-opacity hover:opacity-100`,
-            isDetached && 'border bg-transparent'
+            opacity-100 shadow-sm transition-opacity hover:scale-110 hover:opacity-95`,
+            isDetached && 'border bg-transparent shadow-none'
           )}
           style={containerStyles}
         >
@@ -67,21 +70,21 @@ const BranchBadge = React.memo(
           <Button
             variant="ghost"
             size="sm"
-            className="flex h-[30px] items-center gap-1 rounded-sm p-1.5 px-3 opacity-85
-              transition-opacity hover:opacity-100"
+            className="flex h-[30px] items-center gap-1 rounded-sm p-1.5 px-3 opacity-100
+              transition-opacity hover:opacity-95"
             style={{
               backgroundColor: bgColor,
-              color: 'white',
+              color: themedContentColor,
             }}
             onClick={deactivate}
           >
             <IconComponent
               className="h-3.5 w-3.5"
-              style={{ color: 'white' }}
+              style={{ color: themedContentColor }}
             />
             <ThemedSpan
               className="text-sm leading-none font-medium"
-              style={{ color: 'white' }}
+              style={{ color: themedContentColor }}
             >
               {label}
             </ThemedSpan>

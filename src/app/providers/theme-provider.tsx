@@ -1,5 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { LocalStorageKeys } from '@constants/local-storage';
 import { getFromStorage, setToStorage } from '@utils/local-storage';
 
@@ -13,11 +20,13 @@ type Props = {
 
 type State = {
   theme: Theme;
+  resolveTheme: (theme: Theme) => Theme;
   setTheme: (theme: Theme) => void;
 };
 
 const initialState: State = {
   theme: 'system',
+  resolveTheme: () => 'light',
   setTheme: () => null,
 };
 
@@ -33,26 +42,33 @@ export function ThemeProvider({
     () => getFromStorage<Theme>(storageKey) || defaultTheme
   );
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-
-    root.classList.remove('light', 'dark');
-
+  const resolveTheme = useCallback((theme: Theme) => {
     if (theme === 'system') {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
         : 'light';
 
-      root.classList.add(systemTheme);
-
-      return;
+      return systemTheme;
     }
 
+    return theme;
+  }, []);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+
+    root.classList.remove('light', 'dark');
+
+    const resolvedTheme = resolveTheme(theme);
+
+    root.classList.add(resolvedTheme);
+
     root.classList.add(theme);
-  }, [theme]);
+  }, [theme, resolveTheme]);
 
   const value = {
     theme,
+    resolveTheme,
     setTheme: (theme: Theme) => {
       setToStorage(storageKey, theme);
       setTheme(theme);
