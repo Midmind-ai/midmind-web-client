@@ -444,6 +444,7 @@ export interface components {
             end_position?: number;
             /** @enum {string} */
             connection_type: "attached" | "detached" | "temporary";
+            connection_color?: string;
             /** @enum {string} */
             context_type: "full_message" | "text_selection";
         };

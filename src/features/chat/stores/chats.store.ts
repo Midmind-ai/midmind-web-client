@@ -9,7 +9,12 @@ import type {
 } from '@services/conversations/conversations-dtos';
 import { ConversationsService } from '@services/conversations/conversations-service';
 import { MessagesService } from '@services/messages/messages-service';
-import type { AIModel, ChatMessage, Chat } from '@shared-types/entities';
+import type {
+  AIModel,
+  ChatMessage,
+  Chat,
+  ChatBranchContext,
+} from '@shared-types/entities';
 
 const ITEMS_PER_PAGE = 20;
 const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
@@ -72,7 +77,7 @@ export interface ChatsStoreState {
     parentChatId: string;
     parentMessageId: string;
     connectionType: 'attached' | 'detached' | 'temporary';
-  }) => VoidFunction;
+  }) => [ChatBranchContext, VoidFunction];
   clearChat: (chatId: string) => void;
   setError: (chatId: string, error: string | null) => void;
   addChatToActive: (chatId: string) => void;
@@ -465,7 +470,7 @@ export const useChatsStore = create<ChatsStoreState>()(
         }
       },
 
-      appendNewNestedChat: async ({
+      appendNewNestedChat: ({
         newChatId,
         parentChatId,
         parentMessageId,
@@ -480,7 +485,7 @@ export const useChatsStore = create<ChatsStoreState>()(
         const branchColor = BRANCH_COLORS[existingBranchesCount % BRANCH_COLORS.length];
 
         // Create branch object for optimistic update
-        const newBranch = {
+        const newBranchContext = {
           id: uuid(),
           child_chat_id: newChatId,
           connection_type: connectionType,
@@ -499,7 +504,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                 msg.id === parentMessageId
                   ? {
                       ...msg,
-                      nested_chats: [...(msg.nested_chats || []), newBranch],
+                      nested_chats: [...(msg.nested_chats || []), newBranchContext],
                     }
                   : msg
               ),
@@ -519,7 +524,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                         ...msg,
                         nested_chats: [
                           ...(msg.nested_chats || []).filter(
-                            item => item.id !== newBranch.id
+                            item => item.id !== newBranchContext.id
                           ),
                         ],
                       }
@@ -531,89 +536,8 @@ export const useChatsStore = create<ChatsStoreState>()(
         };
 
         // return rollback function
-        return rollbackFunc;
+        return [newBranchContext, rollbackFunc];
       },
-
-      // // Create nested chat with branch
-      // createNestedChat: async ({
-      //   parentChatId,
-      //   parentMessageId,
-      //   content,
-      //   model,
-      //   connectionType,
-      // }: {
-      //   parentChatId: string;
-      //   parentMessageId: string;
-      //   content: string;
-      //   model: AIModel;
-      //   connectionType: 'attached' | 'detached' | 'temporary';
-      // }) => {
-      //   const newChatId = uuid();
-
-      //   // Get parent message to count existing branches
-      //   const parentMessage = get().chats[parentChatId]?.messages.find(
-      //     msg => msg.id === parentMessageId
-      //   );
-
-      //   const existingBranchesCount = parentMessage?.nested_chats?.length || 0;
-      //   const branchColor = BRANCH_COLORS[existingBranchesCount % BRANCH_COLORS.length];
-
-      //   // Create branch object for optimistic update
-      //   const newBranch = {
-      //     id: uuid(),
-      //     child_chat_id: newChatId,
-      //     connection_type: connectionType,
-      //     connection_color: branchColor,
-      //     context_type: 'full_message' as const,
-      //     start_position: 0,
-      //     end_position: 0,
-      //   };
-
-      //   // Optimistically update parent message with new branch
-      //   set(state => ({
-      //     chats: {
-      //       ...state.chats,
-      //       [parentChatId]: {
-      //         ...state.chats[parentChatId],
-      //         messages: state.chats[parentChatId].messages.map(msg =>
-      //           msg.id === parentMessageId
-      //             ? {
-      //                 ...msg,
-      //                 nested_chats: [...(msg.nested_chats || []), newBranch],
-      //               }
-      //             : msg
-      //         ),
-      //       },
-      //     },
-      //   }));
-
-      //   // Create the actual chat via file-system store
-      //   const { useFileSystemStore } = await import(
-      //     '@features/file-system/stores/file-system.store'
-      //   );
-      //   await useFileSystemStore.getState().createChat({
-      //     content,
-      //     model,
-      //     newChatId,
-      //     sendMessage: false, // Don't send message immediately
-      //     openInSplitScreen: false, // We'll handle navigation manually
-      //     parentChatId,
-      //     branchContext: {
-      //       parent_chat_id: parentChatId,
-      //       parent_message_id: parentMessageId,
-      //       connection_type: connectionType,
-      //       context_type: 'full_message',
-      //     },
-      //   });
-
-      //   // Navigate to split screen view
-      //   // Parent chat stays in URL path, nested chat goes to query param
-      //   const currentUrl = new URL(window.location.href);
-      //   currentUrl.searchParams.set(SearchParams.Split, newChatId);
-      //   navigate(`/chat/${parentChatId}${currentUrl.search}`);
-
-      //   return newChatId;
-      // },
 
       // Clear chat data
       clearChat: (chatId: string) => {

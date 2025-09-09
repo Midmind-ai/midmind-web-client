@@ -422,6 +422,7 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
                   end_position: branchContext.end_position,
                   connection_type: branchContext.connection_type,
                   context_type: branchContext.context_type,
+                  connection_color: branchContext.connection_color,
                 },
               }),
           };

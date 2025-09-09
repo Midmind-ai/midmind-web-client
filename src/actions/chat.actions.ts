@@ -18,18 +18,10 @@ export const createNestedChatAndOpenSplitScreen = async (args: {
 }) => {
   const { appendNewNestedChat } = useChatsStore.getState();
   const { createChat } = useFileSystemStore.getState();
-  const {
-    connectionType,
-    contextType,
-    parentChatId,
-    parentMessageId,
-    startPosition,
-    endPosition,
-    selectedText,
-  } = args;
+  const { connectionType, parentChatId, parentMessageId } = args;
   const newChatId = uuidv4();
 
-  const rollbackNestedChat = appendNewNestedChat({
+  const [newBranchContext, rollbackNestedChat] = appendNewNestedChat({
     newChatId,
     connectionType,
     parentChatId,
@@ -37,13 +29,8 @@ export const createNestedChatAndOpenSplitScreen = async (args: {
   });
 
   const branchContext = {
-    connection_type: connectionType,
-    context_type: contextType,
-    parent_chat_id: parentChatId,
+    ...newBranchContext,
     parent_message_id: parentMessageId,
-    start_position: startPosition,
-    end_position: endPosition,
-    selected_text: selectedText,
   } as ChatBranchContext;
 
   try {
