@@ -22,7 +22,11 @@ const FolderList = () => {
     <TreeDndProvider>
       <DropZone
         data={rootDroppableData}
-        className="flex flex-1 rounded-none ring-0"
+        className="[&::-webkit-scrollbar-thumb]:bg-border/50
+          hover:[&::-webkit-scrollbar-thumb]:bg-border/70 flex flex-1 overflow-y-auto
+          rounded-none ring-0 [&::-webkit-scrollbar]:w-2
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <SidebarGroup className="flex flex-1">
           <SidebarGroupContent className="flex flex-1">

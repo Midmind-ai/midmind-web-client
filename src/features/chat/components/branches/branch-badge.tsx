@@ -49,8 +49,9 @@ const BranchBadge = React.memo(
             });
           }}
           className={cn(
-            `inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px] p-1
-            opacity-100 shadow-sm transition-opacity hover:scale-110 hover:opacity-95`,
+            `inline-flex h-7 cursor-pointer items-center gap-x-1.5 rounded-[6px]
+            border-transparent p-1 opacity-100 shadow-xs transition-opacity
+            hover:scale-110 hover:opacity-95`,
             isDetached && 'border bg-transparent shadow-none'
           )}
           style={containerStyles}

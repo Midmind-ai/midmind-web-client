@@ -4,7 +4,7 @@ import { SidebarProvider } from '@components/ui/sidebar';
 
 const RootLayout = () => {
   return (
-    <div className="flex">
+    <div className="flex h-full max-h-full">
       <SidebarProvider>
         <Sidebar />
         <SplitLayout />

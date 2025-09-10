@@ -8,12 +8,14 @@ const Sidebar = () => {
   return (
     <ShadcnSidebar>
       <SidebarHeader />
-      <div className="flex h-full">
-        <div className="flex h-full flex-col justify-between border-r-1 border-l-1 p-1">
-          <SidebarTabs />
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <div className="flex min-h-0 flex-col justify-between border-r-1 border-l-1 p-1">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <SidebarTabs />
+          </div>
           <UserDropdown />
         </div>
-        <SidebarContent className="gap-0">
+        <SidebarContent className="min-h-0 flex-1 gap-0">
           <FileSystem />
         </SidebarContent>
       </div>

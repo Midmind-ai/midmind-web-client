@@ -128,7 +128,7 @@ const SidebarResizeHandle = ({ className }: Props) => {
   return (
     <div
       className={cn(
-        `hover:bg-border active:bg-border absolute top-0 right-0 bottom-0 z-50 w-1
+        `hover:bg-border active:bg-border absolute top-0 right-0 bottom-0 z-50 w-0.5
         cursor-col-resize bg-transparent transition-colors duration-200`,
         isResizing && 'bg-border',
         className

@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { getRandomColor } from '../../../utils/color-picker';
 import { AI_MODELS } from '@constants/ai-models';
 import { ChatsService } from '@services/chats/chats-service';
 import type {
@@ -18,18 +19,6 @@ import type {
 
 const ITEMS_PER_PAGE = 20;
 const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
-
-// Branch color palette
-const BRANCH_COLORS = [
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#45B7D1', // Blue
-  '#96CEB4', // Green
-  '#FFEAA7', // Yellow
-  '#DDA0DD', // Purple
-  '#98D8C8', // Mint
-  '#F8B195', // Coral
-];
 
 // Initial state for a single chat
 const getInitialChatState = (): ChatState => ({
@@ -476,13 +465,7 @@ export const useChatsStore = create<ChatsStoreState>()(
         parentMessageId,
         connectionType,
       }) => {
-        // Get parent message to count existing branches
-        const parentMessage = get().chats[parentChatId]?.messages.find(
-          msg => msg.id === parentMessageId
-        );
-
-        const existingBranchesCount = parentMessage?.nested_chats?.length || 0;
-        const branchColor = BRANCH_COLORS[existingBranchesCount % BRANCH_COLORS.length];
+        const branchColor = getRandomColor();
 
         // Create branch object for optimistic update
         const newBranchContext = {
