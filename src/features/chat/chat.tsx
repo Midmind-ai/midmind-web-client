@@ -25,7 +25,6 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
   const isLoadingChat = chatState?.isLoadingChat || false;
   const isLoadingMessages = chatState?.isLoadingMessages || false;
   const isStreaming = chatState?.isStreaming || false;
-  const error = chatState?.error;
 
   // Set page title based on chat name from store
   usePageTitle(chatDetails?.name || '');
@@ -49,11 +48,6 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
         onClose={onClose}
       />
       <div className="flex-1 overflow-hidden">
-        {error && (
-          <div className="flex h-screen items-center justify-center">
-            <div className="text-red-500">Error: {error}</div>
-          </div>
-        )}
         {!chatState || isLoadingChat ? (
           <MessagesSkeleton />
         ) : (

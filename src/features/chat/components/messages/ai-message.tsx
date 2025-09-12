@@ -4,6 +4,8 @@ import ReactMarkdown from '../markdown/react-markdown';
 import QuickActions from '../quick-actions/quick-actions';
 import TypingDots from './typing-dots';
 import { AI_MODELS } from '@constants/ai-models';
+import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
+import { openChatInSidePanel } from '@hooks/use-split-screen-actions';
 import type { ChatMessage } from '@shared-types/entities';
 import { cn } from '@utils/cn';
 
@@ -25,6 +27,14 @@ const AIMessage = ({
   const { id, content, llm_model, nested_chats } = message;
   const isCurrentlyStreaming = id === streamingMessageId;
   const isWaiting = isStreaming && !content && isCurrentlyStreaming;
+
+  // Text highlighting hook for existing branch selections
+  const { messageRef } = useTextHighlight({
+    nested_chats,
+    onOpenBranch: (branchChatId: string) => {
+      openChatInSidePanel(branchChatId);
+    },
+  });
 
   // Get the model name from AI_MODELS constant
   const getModelName = (modelId: string | null | undefined) => {
@@ -53,7 +63,11 @@ const AIMessage = ({
         <TypingDots />
       ) : (
         <>
-          <div className="pb-0 text-base leading-relaxed font-light">
+          <div
+            ref={messageRef}
+            data-message-id={id}
+            className="pb-0 text-base leading-relaxed font-light"
+          >
             <ReactMarkdown content={content || ''} />
           </div>
           <Branches

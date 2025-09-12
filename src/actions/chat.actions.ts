@@ -16,9 +16,9 @@ export const createNestedChatAndOpenSplitScreen = async (args: {
   endPosition?: number;
   selectedText?: string;
 }) => {
-  const { appendNewNestedChat } = useChatsStore.getState();
+  const { appendNewNestedChat, setReplyContext } = useChatsStore.getState();
   const { createChat } = useFileSystemStore.getState();
-  const { connectionType, parentChatId, parentMessageId } = args;
+  const { connectionType, parentChatId, parentMessageId, selectedText } = args;
   const newChatId = uuidv4();
 
   const [newBranchContext, rollbackNestedChat] = appendNewNestedChat({
@@ -26,6 +26,10 @@ export const createNestedChatAndOpenSplitScreen = async (args: {
     connectionType,
     parentChatId,
     parentMessageId,
+    contextType: args.contextType,
+    selectedText: args.selectedText,
+    startPosition: args.startPosition,
+    endPosition: args.endPosition,
   });
 
   const branchContext = {
@@ -47,6 +51,14 @@ export const createNestedChatAndOpenSplitScreen = async (args: {
         navigate(`/chat/${parentChatId}${currentUrl.search}`);
       },
     });
+
+    // Set reply context for the new chat if text was selected
+    if (selectedText && args.contextType === 'text_selection') {
+      setReplyContext(newChatId, {
+        id: parentMessageId,
+        content: selectedText,
+      });
+    }
   } catch (e) {
     rollbackNestedChat();
     throw e;

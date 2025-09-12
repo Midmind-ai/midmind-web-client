@@ -22,9 +22,6 @@ const ChatInput = ({
   disabled = false,
 }: Props) => {
   const [content, setContent] = useState('');
-  const [replyInfo, setReplyInfo] = useState<{ id: string; content: string } | null>(
-    null
-  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // AI model store
@@ -34,8 +31,17 @@ const ChatInput = ({
   const chatState = useChatsStore(state => state.chats[chatId || '']);
   const sendMessage = useChatsStore(state => state.sendMessage);
   const stopStreaming = useChatsStore(state => state.stopStreaming);
+  const setReplyContext = useChatsStore(state => state.setReplyContext);
 
   const isStreaming = chatState?.isStreaming || false;
+  const replyContext = chatState?.replyContext;
+
+  // Auto-focus when reply context is set
+  useEffect(() => {
+    if (replyContext && chatId && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [replyContext, chatId]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -50,14 +56,17 @@ const ChatInput = ({
 
     const messageContent = content.trim();
     setContent('');
-    setReplyInfo(null);
 
     try {
       if (onSubmit) {
         // Use custom onSubmit handler
         await onSubmit(messageContent, currentModel);
+        // Clear reply context if using custom handler
+        if (chatId && replyContext) {
+          setReplyContext(chatId, null);
+        }
       } else if (chatId) {
-        // Use default chat store behavior
+        // Use default chat store behavior (sendMessage will handle and clear replyContext)
         await sendMessage(chatId, messageContent, currentModel);
       }
     } catch (error) {
@@ -82,15 +91,17 @@ const ChatInput = ({
   };
 
   const handleCloseReply = () => {
-    setReplyInfo(null);
+    if (chatId) {
+      setReplyContext(chatId, null);
+    }
   };
 
   return (
     <div>
-      {replyInfo && (
+      {replyContext && (
         <MessageReply
-          content={replyInfo.content}
-          className="mx-4 shadow-md"
+          content={replyContext.content}
+          className="mx-2 shadow-md"
           onClose={handleCloseReply}
         />
       )}
@@ -126,7 +137,8 @@ const ChatInput = ({
           autoComplete="off"
           disabled={isStreaming || disabled}
           className="bg-background-accent flex max-h-[600px] resize-none items-center
-            overflow-y-auto border-none px-0 shadow-none focus-visible:ring-0"
+            overflow-y-auto border-none px-0 py-0 text-base! font-light shadow-none
+            focus-visible:ring-0"
           autoFocus
         />
 

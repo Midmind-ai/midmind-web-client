@@ -1,8 +1,11 @@
-import { useEffect, useRef, memo } from 'react';
+import { useRef, memo, useEffect } from 'react';
 import { useChatsStore } from '../../stores/chats.store';
+import SelectionPopup from '../selection-popup/selection-popup';
 import AIMessage from './ai-message';
 import UserMessage from './user-message';
 import { ScrollArea } from '@components/ui/scroll-area';
+import { useGlobalSelectionDetection } from '@features/chat/hooks/use-global-selection-detection';
+import { useSelectionStore } from '@features/chat/stores/selection.store';
 import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
@@ -17,25 +20,27 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const chatState = useChatsStore(state => state.chats[chatId]);
   const loadMoreMessages = useChatsStore(state => state.loadMoreMessages);
+  const { messageId: selectedMessageId, chatId: selectedChatId } = useSelectionStore();
 
   const hasMoreMessages = chatState?.hasMoreMessages || false;
   const streamingMessageId = chatState?.streamingMessageId || null;
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      setTimeout(() => {
-        lastMessageRef.current?.scrollIntoView({
-          behavior: isStreaming ? 'smooth' : 'instant',
-          block: 'end',
-        });
-      }, 0);
-    }
+  // Global selection detection hook
+  useGlobalSelectionDetection({
+    messages,
+    chatId,
+    isStreaming,
+  });
 
-    // no need to change behavior of scrolling when isStreaming just finished
-    // because smooth animation does not keep up to finish due to behavior change to instant
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length]);
+  // Initial scroll to bottom when chat is first loaded (not during pagination)
+  useEffect(() => {
+    if (messages.length > 0 && chatState?.currentPage <= 1 && lastMessageRef.current) {
+      lastMessageRef.current?.scrollIntoView({
+        behavior: 'instant',
+        block: 'end',
+      });
+    }
+  }, [messages.length, chatState?.currentPage]);
 
   // Handle scroll for pagination
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -72,18 +77,6 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
       onScroll={handleScroll}
     >
       <div className="mx-auto flex max-w-[840px] flex-col gap-3 space-y-0 py-0 pt-10">
-        {hasMoreMessages && (
-          <div className="text-center">
-            <button
-              onClick={() => loadMoreMessages(chatId)}
-              className="text-sm text-blue-500 hover:underline"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Loading...' : 'Load more messages'}
-            </button>
-          </div>
-        )}
-
         {messages.map((message, index) => {
           const isLastMessage = index === messages.length - 1;
 
@@ -91,6 +84,7 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
             <div
               key={message.id}
               ref={isLastMessage ? lastMessageRef : null}
+              data-last-message={isLastMessage ? 'true' : 'false'}
             >
               {message.role === 'user' ? (
                 <UserMessage message={message} />
@@ -107,6 +101,13 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
           );
         })}
       </div>
+      {/* Global selection popup - only renders when there's a selection for this chat */}
+      {selectedMessageId && selectedChatId === chatId && (
+        <SelectionPopup
+          messageId={selectedMessageId}
+          chatId={selectedChatId}
+        />
+      )}
     </ScrollArea>
   );
 };

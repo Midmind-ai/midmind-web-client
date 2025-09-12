@@ -1,7 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import type { components } from '../../../../generated/api-types';
 import { getRandomColor } from '../../../utils/color-picker';
+import { scrollToBottom } from '../utils/scroll-utils';
 import { AI_MODELS } from '@constants/ai-models';
 import { ChatsService } from '@services/chats/chats-service';
 import type {
@@ -32,6 +34,7 @@ const getInitialChatState = (): ChatState => ({
   hasMoreMessages: false,
   currentPage: 0,
   abortController: null,
+  replyContext: null,
 });
 
 // UI State types
@@ -46,6 +49,7 @@ export interface ChatState {
   hasMoreMessages: boolean;
   currentPage: number;
   abortController: AbortController | null;
+  replyContext: components['schemas']['ReplyToDto'] | null;
 }
 
 export interface ChatsStoreState {
@@ -56,6 +60,10 @@ export interface ChatsStoreState {
 
   // Actions
   initChat: (chatId: string) => void;
+  setReplyContext: (
+    chatId: string,
+    replyContext: { id: string; content: string } | null
+  ) => void;
   loadChat: (chatId: string) => Promise<void>;
   loadMessages: (chatId: string) => Promise<void>;
   loadMoreMessages: (chatId: string) => Promise<void>;
@@ -66,6 +74,10 @@ export interface ChatsStoreState {
     parentChatId: string;
     parentMessageId: string;
     connectionType: 'attached' | 'detached' | 'temporary';
+    contextType?: 'full_message' | 'text_selection';
+    selectedText?: string;
+    startPosition?: number;
+    endPosition?: number;
   }) => [ChatBranchContext, VoidFunction];
   clearChat: (chatId: string) => void;
   setError: (chatId: string, error: string | null) => void;
@@ -242,7 +254,6 @@ export const useChatsStore = create<ChatsStoreState>()(
         }
       },
 
-      // Send message with streaming response
       sendMessage: async (chatId: string, content: string, model = DEFAULT_MODEL) => {
         const chatState = get().chats[chatId];
         if (!chatState) {
@@ -252,6 +263,9 @@ export const useChatsStore = create<ChatsStoreState>()(
         const userMessageId = uuid();
         const aiMessageId = uuid();
 
+        // Get the current reply context
+        const replyContext = get().chats[chatId]?.replyContext;
+
         // Create user message
         const userMessage = {
           id: userMessageId,
@@ -260,7 +274,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           created_at: new Date().toISOString(),
           llm_model: model,
           nested_chats: [],
-          reply_content: null,
+          reply_content: replyContext?.content || null,
           attachments: [],
         };
 
@@ -276,7 +290,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           attachments: [],
         };
 
-        // Add both messages immediately
+        // Add both messages immediately and clear reply context
         set(state => ({
           chats: {
             ...state.chats,
@@ -290,9 +304,13 @@ export const useChatsStore = create<ChatsStoreState>()(
               isStreaming: true,
               streamingMessageId: aiMessageId,
               error: null,
+              replyContext: null, // Clear reply context after sending
             },
           },
         }));
+
+        // Scroll to bottom after sending message
+        scrollToBottom();
 
         // Create abort controller for this request
         const abortController = new AbortController();
@@ -313,6 +331,7 @@ export const useChatsStore = create<ChatsStoreState>()(
             model,
             message_id: userMessageId,
             future_llm_message_id: aiMessageId,
+            ...(replyContext && { reply_to: replyContext }),
           };
 
           let accumulatedContent = '';
@@ -464,6 +483,10 @@ export const useChatsStore = create<ChatsStoreState>()(
         parentChatId,
         parentMessageId,
         connectionType,
+        contextType = 'full_message',
+        selectedText,
+        startPosition = 0,
+        endPosition = 0,
       }) => {
         const branchColor = getRandomColor();
 
@@ -473,9 +496,10 @@ export const useChatsStore = create<ChatsStoreState>()(
           child_chat_id: newChatId,
           connection_type: connectionType,
           connection_color: branchColor,
-          context_type: 'full_message' as const,
-          start_position: 0,
-          end_position: 0,
+          context_type: contextType,
+          selected_text: selectedText,
+          start_position: startPosition,
+          end_position: endPosition,
         };
 
         set(state => ({
@@ -538,6 +562,22 @@ export const useChatsStore = create<ChatsStoreState>()(
             activeChatIds: state.activeChatIds.filter(id => id !== chatId),
           };
         });
+      },
+
+      // Set reply context
+      setReplyContext: (
+        chatId: string,
+        replyContext: { id: string; content: string } | null
+      ) => {
+        set(state => ({
+          chats: {
+            ...state.chats,
+            [chatId]: {
+              ...state.chats[chatId],
+              replyContext,
+            },
+          },
+        }));
       },
 
       // Set error
