@@ -8,20 +8,30 @@ type Props = {
 };
 
 const UserMessage = ({ message }: Props) => {
-  const { content, reply_content } = message;
+  const { content, reply_content, attachments } = message;
 
   return (
-    <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
-      <div className="ml-auto w-fit max-w-[465px]">
-        {reply_content && (
-          <MessageReply
-            content={reply_content}
-            className="mx-4 shadow-md"
-            placement="message"
-          />
-        )}
-        <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
-          <ThemedP className="text-base font-light">{content}</ThemedP>
+    <div>
+      {attachments.length && (
+        <img
+          src={''}
+          alt="Image"
+          className="max-h-md mx-3.5 ml-auto h-auto w-auto max-w-md rounded-lg
+            object-cover shadow-sm"
+        />
+      )}
+      <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
+        <div className="ml-auto w-fit max-w-[465px]">
+          {reply_content && (
+            <MessageReply
+              content={reply_content}
+              className="mx-4 shadow-md"
+              placement="message"
+            />
+          )}
+          <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
+            <ThemedP className="text-base font-light">{content}</ThemedP>
+          </div>
         </div>
       </div>
     </div>

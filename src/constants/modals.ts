@@ -1,14 +1,16 @@
-// base type for all modal props
-export type BaseModalProps = {
-  open: boolean;
-  onAnimationEnd: () => void;
-};
+import FileViewModal, {
+  type FileViewModalProps,
+} from '@features/chat/components/file-view-modal/file-view-modal';
 
 // Empty type for when no modals are registered
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export type ModalPropsMap = {};
+
+export type ModalPropsMap = {
+  FileViewModal: Omit<FileViewModalProps, 'open' | 'onAnimationEnd'>;
+};
 
 // modal name must be unique
-export const Modals = {} as const;
+export const Modals = {
+  FileViewModal,
+} as const;
 
 export type ModalNames = keyof typeof Modals;

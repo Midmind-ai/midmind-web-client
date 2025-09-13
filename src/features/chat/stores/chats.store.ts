@@ -12,6 +12,8 @@ import type {
   ConversationWithAIResponseDto,
 } from '@services/conversations/conversations-dtos';
 import { ConversationsService } from '@services/conversations/conversations-service';
+import type { GetFileResponseDto } from '@services/files/files-dtos';
+import { FilesService } from '@services/files/files-service';
 import { MessagesService } from '@services/messages/messages-service';
 import type {
   AIModel,
@@ -27,6 +29,7 @@ const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
 const getInitialChatState = (): ChatState => ({
   chat: null,
   messages: [],
+  attachments: [],
   isLoadingChat: false,
   isLoadingMessages: false,
   isStreaming: false,
@@ -42,6 +45,7 @@ const getInitialChatState = (): ChatState => ({
 export interface ChatState {
   chat: Chat | null;
   messages: ChatMessage[];
+  attachments: GetFileResponseDto[];
   isLoadingChat: boolean;
   isLoadingMessages: boolean;
   isStreaming: boolean;
@@ -70,6 +74,7 @@ export interface ChatsStoreState {
   loadMoreMessages: (chatId: string) => Promise<void>;
   sendMessage: (chatId: string, content: string, model?: AIModel) => Promise<void>;
   stopStreaming: (chatId: string) => void;
+  loadAttachments: (messages: ChatMessage[]) => Promise<GetFileResponseDto[]>;
   appendNewNestedChat: (args: {
     newChatId: string;
     parentChatId: string;
@@ -185,6 +190,8 @@ export const useChatsStore = create<ChatsStoreState>()(
             take: ITEMS_PER_PAGE,
           });
 
+          const attachments = await get().loadAttachments(response.data);
+
           set(state => ({
             chats: {
               ...state.chats,
@@ -194,6 +201,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                 hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: 1,
+                attachments,
               },
             },
           }));
@@ -209,6 +217,19 @@ export const useChatsStore = create<ChatsStoreState>()(
             },
           }));
         }
+      },
+
+      // Load attachments
+      loadAttachments: async (messages: ChatMessage[]) => {
+        const fileIds = messages.flatMap(message =>
+          message.attachments.map(attachment => attachment.id)
+        );
+
+        const attachments = await Promise.all(
+          fileIds.map(fileId => FilesService.getFile(fileId))
+        );
+
+        return attachments;
       },
 
       // Load more messages (pagination)
@@ -234,6 +255,8 @@ export const useChatsStore = create<ChatsStoreState>()(
             take: ITEMS_PER_PAGE,
           });
 
+          const attachments = await get().loadAttachments(response.data);
+
           set(state => ({
             chats: {
               ...state.chats,
@@ -243,6 +266,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                 hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: state.chats[chatId].currentPage + 1,
+                attachments: [...attachments, ...state.chats[chatId].attachments],
               },
             },
           }));
