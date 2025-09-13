@@ -72,7 +72,13 @@ export interface ChatsStoreState {
   loadChat: (chatId: string) => Promise<void>;
   loadMessages: (chatId: string) => Promise<void>;
   loadMoreMessages: (chatId: string) => Promise<void>;
-  sendMessage: (chatId: string, content: string, model?: AIModel) => Promise<void>;
+  sendMessage: (
+    chatId: string,
+    content: string,
+    model?: AIModel,
+    attachments?: ChatMessage['attachments'],
+    attachmentFiles?: File[]
+  ) => Promise<void>;
   stopStreaming: (chatId: string) => void;
   loadAttachments: (messages: ChatMessage[]) => Promise<GetFileResponseDto[]>;
   appendNewNestedChat: (args: {
@@ -95,6 +101,10 @@ export interface ChatsStoreState {
   setError: (chatId: string, error: string | null) => void;
   addChatToActive: (chatId: string) => void;
   removeChatFromActive: (chatId: string) => void;
+  addAttachments: (
+    chatId: string,
+    attachments: { id: string; file_name: string; download_url: string }[]
+  ) => void;
 }
 
 export const useChatsStore = create<ChatsStoreState>()(
@@ -285,7 +295,13 @@ export const useChatsStore = create<ChatsStoreState>()(
         }
       },
 
-      sendMessage: async (chatId: string, content: string, model = DEFAULT_MODEL) => {
+      sendMessage: async (
+        chatId: string,
+        content: string,
+        model = DEFAULT_MODEL,
+        attachments = [],
+        attachmentFiles = []
+      ) => {
         const chatState = get().chats[chatId];
         if (!chatState) {
           get().initChat(chatId);
@@ -306,7 +322,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           llm_model: model,
           nested_chats: [],
           reply_content: replyContext?.content || null,
-          attachments: [],
+          attachments: attachments,
         };
 
         // Create empty AI message for streaming
@@ -321,6 +337,12 @@ export const useChatsStore = create<ChatsStoreState>()(
           attachments: [],
         };
 
+        const localAttachments = attachmentFiles.map((file, index) => ({
+          id: attachments[index]?.id || uuid(),
+          file_name: file.name,
+          download_url: URL.createObjectURL(file),
+        }));
+
         // Add both messages immediately and clear reply context
         set(state => ({
           chats: {
@@ -331,6 +353,10 @@ export const useChatsStore = create<ChatsStoreState>()(
                 ...(state.chats[chatId]?.messages || []),
                 userMessage,
                 aiMessage,
+              ],
+              attachments: [
+                ...(state.chats[chatId]?.attachments || []),
+                ...localAttachments,
               ],
               isStreaming: true,
               streamingMessageId: aiMessageId,
@@ -362,6 +388,7 @@ export const useChatsStore = create<ChatsStoreState>()(
             model,
             message_id: userMessageId,
             future_llm_message_id: aiMessageId,
+            attachments: attachments.map(att => att.id),
             ...(replyContext && { reply_to: replyContext }),
           };
 
@@ -689,6 +716,22 @@ export const useChatsStore = create<ChatsStoreState>()(
       removeChatFromActive: (chatId: string) => {
         set(state => ({
           activeChatIds: state.activeChatIds.filter(id => id !== chatId),
+        }));
+      },
+
+      // Add attachments to chat store
+      addAttachments: (
+        chatId: string,
+        attachments: { id: string; file_name: string; download_url: string }[]
+      ) => {
+        set(state => ({
+          chats: {
+            ...state.chats,
+            [chatId]: {
+              ...state.chats[chatId],
+              attachments: [...(state.chats[chatId]?.attachments || []), ...attachments],
+            },
+          },
         }));
       },
     }),

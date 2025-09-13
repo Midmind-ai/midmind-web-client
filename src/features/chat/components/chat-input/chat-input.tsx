@@ -11,12 +11,16 @@ import { useChatsStore } from '@features/chat/stores/chats.store';
 import type { AttachmentProgress } from '@features/chat/types/chat-types';
 import { useModalOperations } from '@hooks/logic/use-modal-operations';
 import { FilesService } from '@services/files/files-service';
-import type { AIModel } from '@shared-types/entities';
+import type { AIModel, ChatMessage } from '@shared-types/entities';
 import { useAiModelStore } from '@stores/ai-model.store';
 
 type Props = {
   chatId?: string;
-  onSubmit?: (content: string, model: AIModel) => Promise<void>;
+  onSubmit?: (
+    content: string,
+    model: AIModel,
+    attachments?: ChatMessage['attachments']
+  ) => Promise<void>;
   placeholder?: string;
   disabled?: boolean;
 };
@@ -42,6 +46,7 @@ const ChatInput = ({
   const sendMessage = useChatsStore(state => state.sendMessage);
   const stopStreaming = useChatsStore(state => state.stopStreaming);
   const setReplyContext = useChatsStore(state => state.setReplyContext);
+  const addAttachments = useChatsStore(state => state.addAttachments);
 
   const isStreaming = chatState?.isStreaming || false;
   const replyContext = chatState?.replyContext;
@@ -68,19 +73,46 @@ const ChatInput = ({
     if ((!hasContent && !hasAttachments) || isStreaming || disabled) return;
 
     const messageContent = content.trim();
+    const attachmentData = attachments
+      .filter(attachment => attachment.id)
+      .map(attachment => ({
+        id: attachment.id,
+        mime_type: attachment.file.type,
+        original_filename: attachment.file.name,
+      }));
+
+    // Create local attachments with URL.createObjectURL() for immediate display
+    const localAttachments = attachments
+      .filter(attachment => attachment.id)
+      .map(attachment => ({
+        id: attachment.id,
+        file_name: attachment.file.name,
+        download_url: URL.createObjectURL(attachment.file),
+      }));
+
     setContent('');
+    setAttachments([]);
 
     try {
       if (onSubmit) {
         // Use custom onSubmit handler
-        await onSubmit(messageContent, currentModel);
+        await onSubmit(messageContent, currentModel, attachmentData);
+
+        // Add attachments for immediate display
+        if (chatId) {
+          addAttachments(chatId, localAttachments);
+        }
+
         // Clear reply context if using custom handler
         if (chatId && replyContext) {
           setReplyContext(chatId, null);
         }
       } else if (chatId) {
+        // Add attachments for immediate display
+        addAttachments(chatId, localAttachments);
+
         // Use default chat store behavior (sendMessage will handle and clear replyContext)
-        await sendMessage(chatId, messageContent, currentModel);
+        await sendMessage(chatId, messageContent, currentModel, attachmentData);
       }
     } catch (error) {
       console.error('Failed to send message:', error);

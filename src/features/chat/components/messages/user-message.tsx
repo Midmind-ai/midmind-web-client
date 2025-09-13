@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { useChatsStore } from '../../stores/chats.store';
 import MessageReply from '../chat-input/message-reply';
 import ImageWithFallback from './image-with-fallback';
 import { ThemedP } from '@components/ui/themed-p';
@@ -8,28 +7,17 @@ import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
   message: ChatMessage;
-  chatId: string;
+  getFileUrl: (attachmentId: string) => string;
 };
 
-const UserMessage = ({ message, chatId }: Props) => {
+const UserMessage = ({ message, getFileUrl }: Props) => {
   const { content, reply_content, attachments } = message;
   const { openModal } = useModalOperations();
-  const chatState = useChatsStore(state => state.chats[chatId]);
-
-  const fileData = chatState?.attachments || [];
-
-  const fileDataMap = new Map(fileData.map(file => [file.id, file]));
-
-  const getFileUrl = (attachmentId: string) => {
-    const fileData = fileDataMap.get(attachmentId);
-
-    return fileData?.download_url || '';
-  };
 
   return (
     <div>
       {attachments.length > 0 && (
-        <div className="mx-3.5 ml-auto flex w-fit max-w-full flex-wrap gap-2">
+        <div className="mx-3.5 ml-auto flex w-fit max-w-full flex-wrap justify-end gap-2">
           {attachments.map(attachment => (
             <ImageWithFallback
               key={attachment.id}

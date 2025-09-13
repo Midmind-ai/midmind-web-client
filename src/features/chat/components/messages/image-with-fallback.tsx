@@ -33,17 +33,24 @@ const ImageWithFallback = ({
     return (
       <div
         className={cn(
-          `border-muted-foreground/30 bg-muted/20 flex h-32 w-48 items-center
+          `border-muted-foreground/30 bg-muted/20 flex h-32 w-48 max-w-2xs items-center
           justify-center rounded-lg border-2 border-dashed p-3`,
           className
         )}
       >
-        <div className="flex flex-col items-center gap-1.5 text-center">
+        <div className="flex w-full flex-col items-center gap-1.5">
           <ImageIcon className="text-muted-foreground h-6 w-6" />
           <div className="text-muted-foreground text-sm font-medium">
             Image unavailable
           </div>
-          <div className="text-muted-foreground text-xs">{alt}</div>
+          <div className="w-full max-w-full">
+            <div
+              className="text-muted-foreground overflow-hidden text-center text-xs
+                text-ellipsis whitespace-nowrap"
+            >
+              {alt}
+            </div>
+          </div>
         </div>
       </div>
     );

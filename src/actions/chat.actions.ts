@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { SearchParams } from '../constants/paths';
 import { navigate } from '../hooks/use-navigation';
 import { useEntityCreationStateStore } from '../stores/entity-creation-state.store';
-import type { AIModel, ChatBranchContext } from '../types/entities';
+import type { AIModel, ChatBranchContext, ChatMessage } from '../types/entities';
 import { useChatsStore } from '@features/chat/stores/chats.store';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 
@@ -69,11 +69,12 @@ export const createChatSendMessageAndNavigate = async (args: {
   parentChatId?: string;
   content: string;
   model: AIModel;
+  attachments?: ChatMessage['attachments'];
 }) => {
   const { sendMessage } = useChatsStore.getState();
   const { createChat } = useFileSystemStore.getState();
   const { startCreating, finishCreating } = useEntityCreationStateStore.getState();
-  const { content, model } = args;
+  const { content, model, attachments = [] } = args;
   const newChatId = uuidv4();
 
   try {
@@ -88,7 +89,7 @@ export const createChatSendMessageAndNavigate = async (args: {
       },
     });
 
-    await sendMessage(newChatId, content, model);
+    await sendMessage(newChatId, content, model, attachments);
   } finally {
     finishCreating(newChatId);
   }
