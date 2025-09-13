@@ -46,7 +46,6 @@ const ChatInput = ({
   const sendMessage = useChatsStore(state => state.sendMessage);
   const stopStreaming = useChatsStore(state => state.stopStreaming);
   const setReplyContext = useChatsStore(state => state.setReplyContext);
-  const addAttachments = useChatsStore(state => state.addAttachments);
 
   const isStreaming = chatState?.isStreaming || false;
   const replyContext = chatState?.replyContext;
@@ -81,14 +80,9 @@ const ChatInput = ({
         original_filename: attachment.file.name,
       }));
 
-    // Create local attachments with URL.createObjectURL() for immediate display
-    const localAttachments = attachments
+    const attachmentFiles = attachments
       .filter(attachment => attachment.id)
-      .map(attachment => ({
-        id: attachment.id,
-        file_name: attachment.file.name,
-        download_url: URL.createObjectURL(attachment.file),
-      }));
+      .map(attachment => attachment.file);
 
     setContent('');
     setAttachments([]);
@@ -98,21 +92,18 @@ const ChatInput = ({
         // Use custom onSubmit handler
         await onSubmit(messageContent, currentModel, attachmentData);
 
-        // Add attachments for immediate display
-        if (chatId) {
-          addAttachments(chatId, localAttachments);
-        }
-
         // Clear reply context if using custom handler
         if (chatId && replyContext) {
           setReplyContext(chatId, null);
         }
       } else if (chatId) {
-        // Add attachments for immediate display
-        addAttachments(chatId, localAttachments);
-
-        // Use default chat store behavior (sendMessage will handle and clear replyContext)
-        await sendMessage(chatId, messageContent, currentModel, attachmentData);
+        await sendMessage(
+          chatId,
+          messageContent,
+          currentModel,
+          attachmentData,
+          attachmentFiles
+        );
       }
     } catch (error) {
       console.error('Failed to send message:', error);

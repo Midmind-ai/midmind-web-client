@@ -70,11 +70,12 @@ export const createChatSendMessageAndNavigate = async (args: {
   content: string;
   model: AIModel;
   attachments?: ChatMessage['attachments'];
+  attachmentFiles?: File[];
 }) => {
   const { sendMessage } = useChatsStore.getState();
   const { createChat } = useFileSystemStore.getState();
   const { startCreating, finishCreating } = useEntityCreationStateStore.getState();
-  const { content, model, attachments = [] } = args;
+  const { content, model, attachments = [], attachmentFiles = [] } = args;
   const newChatId = uuidv4();
 
   try {
@@ -89,7 +90,7 @@ export const createChatSendMessageAndNavigate = async (args: {
       },
     });
 
-    await sendMessage(newChatId, content, model, attachments);
+    await sendMessage(newChatId, content, model, attachments, attachmentFiles);
   } finally {
     finishCreating(newChatId);
   }

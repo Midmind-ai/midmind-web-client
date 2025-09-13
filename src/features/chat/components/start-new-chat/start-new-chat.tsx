@@ -8,12 +8,14 @@ const StartNewChat = () => {
   const handleFormSubmit = async (
     content: string,
     model: AIModel,
-    attachments?: ChatMessage['attachments']
+    attachments?: ChatMessage['attachments'],
+    attachmentFiles?: File[]
   ) => {
     await createChatSendMessageAndNavigate({
       content,
       model,
       attachments,
+      attachmentFiles,
     });
   };
 

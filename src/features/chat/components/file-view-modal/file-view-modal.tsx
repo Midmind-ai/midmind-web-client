@@ -1,6 +1,6 @@
 import { XIcon } from 'lucide-react';
 import { Button } from '@components/ui/button';
-import { Dialog, DialogContent } from '@components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@components/ui/dialog';
 import { useModalOperations } from '@hooks/logic/use-modal-operations';
 import { type BaseModalProps } from '@shared-types/modals';
 
@@ -20,12 +20,15 @@ const FileViewModal = ({ fileUrl, open, onAnimationEnd }: FileViewModalProps) =>
       open={open}
       onOpenChange={handleClose}
     >
+      https://stackoverflow.com/questions/78728076/shadcn-dialogcontent-requires-a-dialogtitle-for-the-component-to-be-accessib
+      <DialogTitle className="sr-only" />
       <DialogContent
         className="flex h-screen min-w-full items-center justify-center border-none
           bg-transparent p-0 shadow-none outline-none"
         onAnimationEnd={onAnimationEnd}
         showCloseButton={false}
         onClick={handleClose}
+        aria-describedby="file-view-modal"
       >
         <img
           onClick={e => e.stopPropagation()}
