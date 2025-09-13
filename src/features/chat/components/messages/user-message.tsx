@@ -1,39 +1,66 @@
 import { memo } from 'react';
+import { useChatsStore } from '../../stores/chats.store';
 import MessageReply from '../chat-input/message-reply';
+import ImageWithFallback from './image-with-fallback';
 import { ThemedP } from '@components/ui/themed-p';
+import { useModalOperations } from '@hooks/logic/use-modal-operations';
 import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
   message: ChatMessage;
+  chatId: string;
 };
 
-const UserMessage = ({ message }: Props) => {
+const UserMessage = ({ message, chatId }: Props) => {
   const { content, reply_content, attachments } = message;
+  const { openModal } = useModalOperations();
+  const chatState = useChatsStore(state => state.chats[chatId]);
+
+  const fileData = chatState?.attachments || [];
+
+  const fileDataMap = new Map(fileData.map(file => [file.id, file]));
+
+  const getFileUrl = (attachmentId: string) => {
+    const fileData = fileDataMap.get(attachmentId);
+
+    return fileData?.download_url || '';
+  };
 
   return (
     <div>
-      {attachments.length && (
-        <img
-          src={''}
-          alt="Image"
-          className="max-h-md mx-3.5 ml-auto h-auto w-auto max-w-md rounded-lg
-            object-cover shadow-sm"
-        />
-      )}
-      <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
-        <div className="ml-auto w-fit max-w-[465px]">
-          {reply_content && (
-            <MessageReply
-              content={reply_content}
-              className="mx-4 shadow-md"
-              placement="message"
+      {attachments.length > 0 && (
+        <div className="mx-3.5 ml-auto flex w-fit max-w-full flex-wrap gap-2">
+          {attachments.map(attachment => (
+            <ImageWithFallback
+              key={attachment.id}
+              role="button"
+              onClick={() =>
+                openModal('FileViewModal', { fileUrl: getFileUrl(attachment.id) })
+              }
+              src={getFileUrl(attachment.id)}
+              alt={attachment.original_filename}
+              className="h-auto max-h-80 w-auto max-w-3xl rounded-lg object-cover
+                shadow-sm"
             />
-          )}
-          <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
-            <ThemedP className="text-base font-light">{content}</ThemedP>
+          ))}
+        </div>
+      )}
+      {content && (
+        <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
+          <div className="ml-auto w-fit max-w-[465px]">
+            {reply_content && (
+              <MessageReply
+                content={reply_content}
+                className="mx-4 shadow-md"
+                placement="message"
+              />
+            )}
+            <div className="bg-accent rounded-[10px] p-2.5 shadow-sm select-text">
+              <ThemedP className="text-base font-light">{content}</ThemedP>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -5,10 +5,10 @@ import { useModalOperations } from '@hooks/logic/use-modal-operations';
 import { type BaseModalProps } from '@shared-types/modals';
 
 export type FileViewModalProps = {
-  file: File;
+  fileUrl: string;
 } & BaseModalProps;
 
-const FileViewModal = ({ file, open, onAnimationEnd }: FileViewModalProps) => {
+const FileViewModal = ({ fileUrl, open, onAnimationEnd }: FileViewModalProps) => {
   const { closeModal } = useModalOperations();
 
   const handleClose = () => {
@@ -29,7 +29,7 @@ const FileViewModal = ({ file, open, onAnimationEnd }: FileViewModalProps) => {
       >
         <img
           onClick={e => e.stopPropagation()}
-          src={URL.createObjectURL(file)}
+          src={fileUrl}
           alt="File"
           className="mx-auto my-auto max-h-[80vh] max-w-[80vw] object-contain"
         />

@@ -87,7 +87,10 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
               data-last-message={isLastMessage ? 'true' : 'false'}
             >
               {message.role === 'user' ? (
-                <UserMessage message={message} />
+                <UserMessage
+                  message={message}
+                  chatId={chatId}
+                />
               ) : (
                 <AIMessage
                   message={message}

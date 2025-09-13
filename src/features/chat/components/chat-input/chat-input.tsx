@@ -218,7 +218,7 @@ const ChatInput = ({
 
   const handleFileClick = (file: File) => {
     openModal('FileViewModal', {
-      file,
+      fileUrl: URL.createObjectURL(file),
     });
   };
 
