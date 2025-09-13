@@ -12,6 +12,8 @@ import type {
   ConversationWithAIResponseDto,
 } from '@services/conversations/conversations-dtos';
 import { ConversationsService } from '@services/conversations/conversations-service';
+import type { GetFileResponseDto } from '@services/files/files-dtos';
+import { FilesService } from '@services/files/files-service';
 import { MessagesService } from '@services/messages/messages-service';
 import type {
   AIModel,
@@ -27,6 +29,7 @@ const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
 const getInitialChatState = (): ChatState => ({
   chat: null,
   messages: [],
+  attachments: [],
   isLoadingChat: false,
   isLoadingMessages: false,
   isStreaming: false,
@@ -42,6 +45,7 @@ const getInitialChatState = (): ChatState => ({
 export interface ChatState {
   chat: Chat | null;
   messages: ChatMessage[];
+  attachments: GetFileResponseDto[];
   isLoadingChat: boolean;
   isLoadingMessages: boolean;
   isStreaming: boolean;
@@ -68,8 +72,15 @@ export interface ChatsStoreState {
   loadChat: (chatId: string) => Promise<void>;
   loadMessages: (chatId: string) => Promise<void>;
   loadMoreMessages: (chatId: string) => Promise<void>;
-  sendMessage: (chatId: string, content: string, model?: AIModel) => Promise<void>;
+  sendMessage: (
+    chatId: string,
+    content: string,
+    model?: AIModel,
+    attachments?: ChatMessage['attachments'],
+    attachmentFiles?: File[]
+  ) => Promise<void>;
   stopStreaming: (chatId: string) => void;
+  loadAttachments: (messages: ChatMessage[]) => Promise<GetFileResponseDto[]>;
   appendNewNestedChat: (args: {
     newChatId: string;
     parentChatId: string;
@@ -90,6 +101,10 @@ export interface ChatsStoreState {
   setError: (chatId: string, error: string | null) => void;
   addChatToActive: (chatId: string) => void;
   removeChatFromActive: (chatId: string) => void;
+  addAttachments: (
+    chatId: string,
+    attachments: { id: string; file_name: string; download_url: string }[]
+  ) => void;
 }
 
 export const useChatsStore = create<ChatsStoreState>()(
@@ -185,6 +200,8 @@ export const useChatsStore = create<ChatsStoreState>()(
             take: ITEMS_PER_PAGE,
           });
 
+          const attachments = await get().loadAttachments(response.data);
+
           set(state => ({
             chats: {
               ...state.chats,
@@ -194,6 +211,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                 hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: 1,
+                attachments,
               },
             },
           }));
@@ -209,6 +227,19 @@ export const useChatsStore = create<ChatsStoreState>()(
             },
           }));
         }
+      },
+
+      // Load attachments
+      loadAttachments: async (messages: ChatMessage[]) => {
+        const fileIds = messages.flatMap(message =>
+          message.attachments.map(attachment => attachment.id)
+        );
+
+        const attachments = await Promise.all(
+          fileIds.map(fileId => FilesService.getFile(fileId))
+        );
+
+        return attachments;
       },
 
       // Load more messages (pagination)
@@ -234,6 +265,8 @@ export const useChatsStore = create<ChatsStoreState>()(
             take: ITEMS_PER_PAGE,
           });
 
+          const attachments = await get().loadAttachments(response.data);
+
           set(state => ({
             chats: {
               ...state.chats,
@@ -243,6 +276,7 @@ export const useChatsStore = create<ChatsStoreState>()(
                 hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: state.chats[chatId].currentPage + 1,
+                attachments: [...attachments, ...state.chats[chatId].attachments],
               },
             },
           }));
@@ -261,7 +295,13 @@ export const useChatsStore = create<ChatsStoreState>()(
         }
       },
 
-      sendMessage: async (chatId: string, content: string, model = DEFAULT_MODEL) => {
+      sendMessage: async (
+        chatId: string,
+        content: string,
+        model = DEFAULT_MODEL,
+        attachments = [],
+        attachmentFiles = []
+      ) => {
         const chatState = get().chats[chatId];
         if (!chatState) {
           get().initChat(chatId);
@@ -282,7 +322,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           llm_model: model,
           nested_chats: [],
           reply_content: replyContext?.content || null,
-          attachments: [],
+          attachments: attachments,
         };
 
         // Create empty AI message for streaming
@@ -297,6 +337,12 @@ export const useChatsStore = create<ChatsStoreState>()(
           attachments: [],
         };
 
+        const localAttachments = attachmentFiles.map((file, index) => ({
+          id: attachments[index]?.id || uuid(),
+          file_name: file.name,
+          download_url: URL.createObjectURL(file),
+        }));
+
         // Add both messages immediately and clear reply context
         set(state => ({
           chats: {
@@ -307,6 +353,10 @@ export const useChatsStore = create<ChatsStoreState>()(
                 ...(state.chats[chatId]?.messages || []),
                 userMessage,
                 aiMessage,
+              ],
+              attachments: [
+                ...(state.chats[chatId]?.attachments || []),
+                ...localAttachments,
               ],
               isStreaming: true,
               streamingMessageId: aiMessageId,
@@ -338,6 +388,7 @@ export const useChatsStore = create<ChatsStoreState>()(
             model,
             message_id: userMessageId,
             future_llm_message_id: aiMessageId,
+            attachments: attachments.map(att => att.id),
             ...(replyContext && { reply_to: replyContext }),
           };
 
@@ -665,6 +716,22 @@ export const useChatsStore = create<ChatsStoreState>()(
       removeChatFromActive: (chatId: string) => {
         set(state => ({
           activeChatIds: state.activeChatIds.filter(id => id !== chatId),
+        }));
+      },
+
+      // Add attachments to chat store
+      addAttachments: (
+        chatId: string,
+        attachments: { id: string; file_name: string; download_url: string }[]
+      ) => {
+        set(state => ({
+          chats: {
+            ...state.chats,
+            [chatId]: {
+              ...state.chats[chatId],
+              attachments: [...(state.chats[chatId]?.attachments || []), ...attachments],
+            },
+          },
         }));
       },
     }),

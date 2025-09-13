@@ -6,6 +6,7 @@ import UserMessage from './user-message';
 import { ScrollArea } from '@components/ui/scroll-area';
 import { useGlobalSelectionDetection } from '@features/chat/hooks/use-global-selection-detection';
 import { useSelectionStore } from '@features/chat/stores/selection.store';
+import type { GetFileResponseDto } from '@services/files/files-dtos';
 import type { ChatMessage } from '@shared-types/entities';
 
 type Props = {
@@ -24,6 +25,17 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
 
   const hasMoreMessages = chatState?.hasMoreMessages || false;
   const streamingMessageId = chatState?.streamingMessageId || null;
+  const fileData = chatState?.attachments || [];
+
+  const fileDataMap = () => {
+    return new Map(fileData.map((file: GetFileResponseDto) => [file.id, file]));
+  };
+
+  const getFileUrl = (attachmentId: string): string => {
+    const fileData = fileDataMap().get(attachmentId);
+
+    return fileData?.download_url || '';
+  };
 
   // Global selection detection hook
   useGlobalSelectionDetection({
@@ -87,7 +99,10 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
               data-last-message={isLastMessage ? 'true' : 'false'}
             >
               {message.role === 'user' ? (
-                <UserMessage message={message} />
+                <UserMessage
+                  message={message}
+                  getFileUrl={getFileUrl}
+                />
               ) : (
                 <AIMessage
                   message={message}

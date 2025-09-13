@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { Modals, type ModalNames } from '@constants/modals';
 import { useModalsStore } from '@stores/modals.store';
 
@@ -18,7 +17,7 @@ const ModalsRenderer = () => {
         }
 
         return (
-          <Fragment key={modalName}>
+          <div key={modalName}>
             <Component
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               {...(modal.props as any)}
@@ -29,7 +28,7 @@ const ModalsRenderer = () => {
                 }
               }}
             />
-          </Fragment>
+          </div>
         );
       })}
     </>
