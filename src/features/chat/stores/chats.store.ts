@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { components } from '../../../../generated/api-types';
+import { ChatMetadataService } from '../../../services/chat-metadata/chat-metadata-service';
 import { getRandomColor } from '../../../utils/color-picker';
 import { scrollToBottom } from '../utils/scroll-utils';
 import { AI_MODELS } from '@constants/ai-models';
@@ -79,6 +80,12 @@ export interface ChatsStoreState {
     startPosition?: number;
     endPosition?: number;
   }) => [ChatBranchContext, VoidFunction];
+  changeNestedChatConnectionType: (
+    parentChatId: string,
+    parentChatMessageId: string,
+    chatId: string,
+    connectionType: 'attached' | 'detached' | 'temporary'
+  ) => Promise<void>;
   clearChat: (chatId: string) => void;
   setError: (chatId: string, error: string | null) => void;
   addChatToActive: (chatId: string) => void;
@@ -544,6 +551,58 @@ export const useChatsStore = create<ChatsStoreState>()(
 
         // return rollback function
         return [newBranchContext, rollbackFunc];
+      },
+
+      changeNestedChatConnectionType: async (
+        parentChatId: string,
+        parentChatMessageId: string,
+        chatId: string,
+        connectionType: 'attached' | 'detached' | 'temporary'
+      ) => {
+        const prevParentChatState = get().chats[parentChatId];
+        // debugger;
+        set(state => ({
+          ...state,
+          chats: {
+            ...state.chats,
+            [parentChatId]: {
+              ...state.chats[parentChatId],
+              messages: state.chats[parentChatId].messages.map(message => {
+                if (message.id === parentChatMessageId) {
+                  return {
+                    ...message,
+                    nested_chats: message.nested_chats.map(nested_chat => {
+                      if (nested_chat.child_chat_id === chatId) {
+                        return {
+                          ...nested_chat,
+                          connection_type: connectionType,
+                        };
+                      } else {
+                        return nested_chat;
+                      }
+                    }),
+                  };
+                }
+
+                return message;
+              }),
+            },
+          },
+        }));
+        try {
+          await ChatMetadataService.updateChatMetadata(chatId, {
+            connection_type: connectionType,
+          });
+        } catch (e) {
+          set(state => ({
+            ...state,
+            chats: {
+              ...state.chats,
+              [parentChatId]: prevParentChatState,
+            },
+          }));
+          throw e;
+        }
       },
 
       // Clear chat data

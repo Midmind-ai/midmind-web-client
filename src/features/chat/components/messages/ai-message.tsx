@@ -73,6 +73,7 @@ const AIMessage = ({
           <Branches
             chatId={chatId}
             branches={nested_chats}
+            messageId={id}
           />
         </>
       )}
