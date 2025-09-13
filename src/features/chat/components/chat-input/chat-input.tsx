@@ -19,7 +19,8 @@ type Props = {
   onSubmit?: (
     content: string,
     model: AIModel,
-    attachments?: ChatMessage['attachments']
+    attachments?: ChatMessage['attachments'],
+    attachmentFiles?: File[]
   ) => Promise<void>;
   placeholder?: string;
   disabled?: boolean;
@@ -90,7 +91,7 @@ const ChatInput = ({
     try {
       if (onSubmit) {
         // Use custom onSubmit handler
-        await onSubmit(messageContent, currentModel, attachmentData);
+        await onSubmit(messageContent, currentModel, attachmentData, attachmentFiles);
 
         // Clear reply context if using custom handler
         if (chatId && replyContext) {
