@@ -6,7 +6,6 @@ export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
   const loadData = useFileSystemStore(state => state.loadData);
   const isParentLoading = useFileSystemStore(state => state.isParentLoading);
   const childrenOf = useFileSystemStore(state => state.childrenOf);
-  const isLoadingParentIds = useFileSystemStore(state => state.isLoadingParentIds);
 
   const actualParentId = parentId || 'root';
 
@@ -20,14 +19,7 @@ export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
     if (!hasChildren && !isParentLoading(actualParentId)) {
       loadData(actualParentId, parentType);
     }
-  }, [
-    actualParentId,
-    parentType,
-    isLoadingParentIds,
-    loadData,
-    isParentLoading,
-    childrenOf,
-  ]);
+  }, [actualParentId, parentType, loadData, isParentLoading, childrenOf]);
 
   return {
     isLoading: isParentLoading(actualParentId),
