@@ -4,10 +4,11 @@ import { EntityEnum } from '@shared-types/entities';
 
 export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
   const loadData = useFileSystemStore(state => state.loadData);
-  const isParentLoading = useFileSystemStore(state => state.isParentLoading);
   const childrenOf = useFileSystemStore(state => state.childrenOf);
+  const isLoadingParentIds = useFileSystemStore(state => state.isLoadingParentIds);
 
   const actualParentId = parentId || 'root';
+  const isLoading = isLoadingParentIds.includes(actualParentId);
 
   // Load data when parentId or parentType changes, but only if not already loaded
   useEffect(() => {
@@ -15,14 +16,17 @@ export const useLoadData = (parentId?: string, parentType?: EntityEnum) => {
     const hasChildren =
       childrenOf[actualParentId] && childrenOf[actualParentId].length >= 0;
 
-    // Only load if we don't have data for this parent yet
-    if (!hasChildren && !isParentLoading(actualParentId)) {
-      loadData(actualParentId, parentType);
+    if (!hasChildren) {
+      loadData({ parentId: actualParentId, parentType });
+    } else {
+      // load data without loading state if items already exists
+      loadData({ parentId: actualParentId, parentType, silent: true });
     }
-  }, [actualParentId, parentType, loadData, isParentLoading, childrenOf]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
-    isLoading: isParentLoading(actualParentId),
+    isLoading,
     error: [], // Will add proper error state later
   };
 };

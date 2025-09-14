@@ -27,7 +27,11 @@ type FileSystemStoreType = {
   loadDirectories: (parentId?: string | 'root') => Promise<void>;
   loadChatsByDirectory: (parentDirectoryId?: string | 'root') => Promise<void>;
   loadChatsByParentChat: (parentChatId?: string | 'root') => Promise<void>;
-  loadData: (parentId?: string | 'root', parentType?: EntityEnum) => Promise<void>;
+  loadData: (args: {
+    parentId?: string | 'root';
+    parentType?: EntityEnum;
+    silent?: boolean;
+  }) => Promise<void>;
 
   createChat: (args: {
     newChatId?: string;
@@ -245,64 +249,61 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
       },
 
       loadChatsByParentChat: async (parentChatId = 'root') => {
-        try {
-          // Convert 'root' to undefined for service call
-          const serviceParentId = parentChatId === 'root' ? undefined : parentChatId;
+        // Convert 'root' to undefined for service call
+        const serviceParentId = parentChatId === 'root' ? undefined : parentChatId;
 
-          const chats = await ChatsService.getChats({ parentChatId: serviceParentId });
+        const chats = await ChatsService.getChats({ parentChatId: serviceParentId });
 
-          // Add type to chats (same as SWR hook did)
-          const chatsWithType = chats.map(item => ({
-            ...item,
-            type: EntityEnum.Chat,
-          }));
+        // Add type to chats (same as SWR hook did)
+        const chatsWithType = chats.map(item => ({
+          ...item,
+          type: EntityEnum.Chat,
+        }));
 
-          // Update store with loaded chats
-          const state = get();
-          const existingNodes = state.nodes.filter(
-            node =>
-              // Keep nodes that are not sub-chats of this parent chat
-              !(
-                state.parentOf[node.id] === parentChatId &&
-                node.type === EntityEnum.Chat &&
-                (node as Chat).parent_chat_id
-              )
-          );
+        // Update store with loaded chats
+        const state = get();
+        const existingNodes = state.nodes.filter(
+          node =>
+            // Keep nodes that are not sub-chats of this parent chat
+            !(
+              state.parentOf[node.id] === parentChatId &&
+              node.type === EntityEnum.Chat &&
+              (node as Chat).parent_chat_id
+            )
+        );
 
-          set(state => ({
-            ...state,
-            nodes: [...existingNodes, ...chatsWithType],
-            childrenOf: {
-              ...state.childrenOf,
-              [parentChatId]: [
-                ...(state.childrenOf[parentChatId] || []).filter(id => {
-                  const node = state.nodes.find(n => n.id === id);
-
-                  return !(
-                    node?.type === EntityEnum.Chat && (node as Chat)?.parent_chat_id
-                  );
-                }),
-                ...chatsWithType.map(c => c.id),
-              ],
-            },
-
-            parentOf: {
-              ...state.parentOf,
-              ...chatsWithType.reduce((acc, c) => ({ ...acc, [c.id]: parentChatId }), {}),
-            },
-          }));
-        } catch (error) {
-          console.error('Error loading chats by parent chat:', error);
-          throw error;
-        }
-      },
-
-      loadData: async (parentId = 'root', parentType?: EntityEnum) => {
-        // Add to loading state at the start
         set(state => ({
           ...state,
-          isLoadingParentIds: [...new Set([...state.isLoadingParentIds, parentId])],
+          nodes: [...existingNodes, ...chatsWithType],
+          childrenOf: {
+            ...state.childrenOf,
+            [parentChatId]: [
+              ...(state.childrenOf[parentChatId] || []).filter(id => {
+                const node = state.nodes.find(n => n.id === id);
+
+                return !(
+                  node?.type === EntityEnum.Chat && (node as Chat)?.parent_chat_id
+                );
+              }),
+              ...chatsWithType.map(c => c.id),
+            ],
+          },
+
+          parentOf: {
+            ...state.parentOf,
+            ...chatsWithType.reduce((acc, c) => ({ ...acc, [c.id]: parentChatId }), {}),
+          },
         }));
+      },
+
+      loadData: async ({ parentId = 'root', parentType, silent = false }) => {
+        // Add to loading state at the start
+        if (!silent) {
+          set(state => ({
+            ...state,
+            isLoadingParentIds: [...new Set([...state.isLoadingParentIds, parentId])],
+          }));
+        }
 
         try {
           const loadingPromises: Promise<void>[] = [];
@@ -320,17 +321,14 @@ export const useFileSystemStore = create<FileSystemStoreType>()(
 
           // Execute all loading operations in parallel
           await Promise.allSettled(loadingPromises);
-        } catch (error) {
-          console.error('Error loading data:', error);
-          throw error;
         } finally {
-          // Remove from loading state when done (success or error)
-          set(state => ({
-            ...state,
-            isLoadingParentIds: [
-              ...state.isLoadingParentIds.filter(id => id !== parentId),
-            ],
-          }));
+          if (!silent) {
+            // Remove from loading state when done (success or error)
+            set(state => ({
+              ...state,
+              isLoadingParentIds: state.isLoadingParentIds.filter(id => id !== parentId),
+            }));
+          }
         }
       },
 
