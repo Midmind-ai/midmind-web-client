@@ -15,9 +15,7 @@ type Props = {
 
 const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) => {
   const chatState = useChatsStore(state => state.chats[chatId]);
-  const loadChat = useChatsStore(state => state.loadChat);
-  const loadMessages = useChatsStore(state => state.loadMessages);
-  const addChatToActive = useChatsStore(state => state.addChatToActive);
+  const initChatData = useChatsStore(state => state.initChatData);
   const removeChatFromActive = useChatsStore(state => state.removeChatFromActive);
 
   const chatDetails = chatState?.chat;
@@ -30,14 +28,12 @@ const Chat = ({ chatId, showCloseButton, showSidebarToggle, onClose }: Props) =>
   usePageTitle(chatDetails?.name || '');
 
   useEffect(() => {
-    addChatToActive(chatId);
-    loadChat(chatId);
-    loadMessages(chatId);
+    initChatData(chatId);
 
     return () => {
       removeChatFromActive(chatId);
     };
-  }, [chatId, addChatToActive, loadChat, loadMessages, removeChatFromActive]);
+  }, [chatId, initChatData, removeChatFromActive]);
 
   return (
     <div className="@container flex h-screen flex-col">

@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { components } from '../../../../generated/api-types';
 import { ChatMetadataService } from '../../../services/chat-metadata/chat-metadata-service';
+import { useEntityCreationStateStore } from '../../../stores/entity-creation-state.store';
 import { getRandomColor } from '../../../utils/color-picker';
 import { scrollToBottom } from '../utils/scroll-utils';
 import { AI_MODELS } from '@constants/ai-models';
@@ -64,6 +65,7 @@ export interface ChatsStoreState {
   isCreatingNewChat: boolean;
 
   // Actions
+  initChatData: (chatId: string) => void;
   initChat: (chatId: string) => void;
   setReplyContext: (
     chatId: string,
@@ -115,6 +117,18 @@ export const useChatsStore = create<ChatsStoreState>()(
       activeChatIds: [],
       isCreatingNewChat: false,
 
+      initChatData: (chatId: string) => {
+        const isChatCreatingProcess = useEntityCreationStateStore
+          .getState()
+          .isCreating(chatId);
+
+        if (isChatCreatingProcess) return;
+
+        useChatsStore.getState().initChat(chatId);
+        useChatsStore.getState().loadMessages(chatId);
+        useChatsStore.getState().loadChat(chatId);
+      },
+
       // Initialize chat if not exists
       initChat: (chatId: string) => {
         const { chats } = get();
@@ -151,7 +165,6 @@ export const useChatsStore = create<ChatsStoreState>()(
               [chatId]: {
                 ...state.chats[chatId],
                 chat: chatDetails,
-                isLoadingChat: false,
               },
             },
           }));

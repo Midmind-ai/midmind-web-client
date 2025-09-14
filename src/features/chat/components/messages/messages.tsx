@@ -46,13 +46,18 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
 
   // Initial scroll to bottom when chat is first loaded (not during pagination)
   useEffect(() => {
-    if (messages.length > 0 && chatState?.currentPage <= 1 && lastMessageRef.current) {
+    if (
+      messages.length > 0 &&
+      chatState?.currentPage <= 1 &&
+      lastMessageRef.current &&
+      !isStreaming
+    ) {
       lastMessageRef.current?.scrollIntoView({
         behavior: 'instant',
         block: 'end',
       });
     }
-  }, [messages.length, chatState?.currentPage]);
+  }, [messages.length, chatState?.currentPage, isStreaming]);
 
   // Handle scroll for pagination
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
