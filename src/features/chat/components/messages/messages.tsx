@@ -1,3 +1,4 @@
+import { MessageSquareX } from 'lucide-react';
 import { useRef, memo, useEffect } from 'react';
 import { useChatsStore } from '../../stores/chats.store';
 import SelectionPopup from '../selection-popup/selection-popup';
@@ -73,15 +74,21 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
   if (isLoading && messages.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-gray-500">Loading messages...</div>
+        <div className="text-ring">Loading messages...</div>
       </div>
     );
   }
 
   if (!isLoading && messages.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-gray-500">No messages yet. Start a conversation!</div>
+      <div className="flex h-full flex-col items-center justify-center">
+        <MessageSquareX
+          size={100}
+          strokeWidth={2}
+          absoluteStrokeWidth
+          className="text-ring mb-4"
+        />
+        <div className="text-ring">No messages yet. Start a conversation!</div>
       </div>
     );
   }

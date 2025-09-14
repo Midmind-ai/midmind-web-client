@@ -317,7 +317,7 @@ const ChatInput = ({
             placeholder={placeholder}
             autoComplete="off"
             disabled={isStreaming || disabled}
-            className="bg-background-accent flex max-h-[600px] resize-none items-center
+            className="bg-background-accent! flex max-h-[600px] resize-none items-center
               overflow-y-auto border-none px-0 py-0 text-base! font-light shadow-none
               focus-visible:ring-0"
             autoFocus
