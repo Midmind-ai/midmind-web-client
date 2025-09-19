@@ -5,6 +5,7 @@ import ChatOldPage from '@app/routes/chat-old';
 import ForgotPasswordPage from '@app/routes/forgot-password';
 import HomePage from '@app/routes/home';
 import NotFoundPage from '@app/routes/not-found';
+import NotePage from '@app/routes/note';
 import SignInPage from '@app/routes/sign-in';
 import SignUpPage from '@app/routes/sign-up';
 import { AppRoutes } from '@constants/paths';
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
           {
             path: AppRoutes.Chat(':id'),
             element: <ChatPage />,
+          },
+          {
+            path: AppRoutes.Note(':id'),
+            element: <NotePage />,
           },
           {
             path: '/chat-old/:id',

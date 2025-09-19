@@ -1,4 +1,4 @@
-import { Outlet, useParams } from 'react-router';
+import { Outlet, useParams, useLocation } from 'react-router';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -17,9 +17,10 @@ const SplitLayout = () => {
 
   const { id: currentChatId = '' } = useParams<{ id: string }>();
   const { value: chatId = '', removeValue } = useUrlParams(SearchParams.Split);
+  const location = useLocation();
 
   const sidePanelWidth = getFromStorage<number>(LocalStorageKeys.SidePanelWidth) || 50;
-  const isOnChatPage = !!currentChatId;
+  const isOnChatPage = !!currentChatId && location.pathname.startsWith('/chats/');
 
   const handleResize = (size: number) => {
     setToStorage(LocalStorageKeys.SidePanelWidth, size);
