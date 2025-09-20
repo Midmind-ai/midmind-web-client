@@ -31,9 +31,21 @@ export const useDraggableConfig = ({
   node,
   isDisabled = false,
 }: UseDraggableConfigProps): UseDraggableConfigReturn => {
+  // Convert item types to entity enum for compatibility
+  const nodeType =
+    typeof node.type === 'string'
+      ? node.type === 'folder'
+        ? EntityEnum.Folder
+        : node.type === 'chat'
+          ? EntityEnum.Chat
+          : node.type === 'note'
+            ? EntityEnum.Note
+            : (node.type as EntityEnum)
+      : (node.type as EntityEnum);
+
   // Prepare draggable data for when this node is being dragged
   const draggableData: DraggableData = {
-    type: node.type,
+    type: nodeType,
     id: node.id,
     parentFolderId: node.parentDirectoryId ?? undefined,
     parentChatId: node.parentChatId ?? undefined,
@@ -44,7 +56,7 @@ export const useDraggableConfig = ({
   const droppableData: DroppableData = {
     type: 'expandable-node',
     id: node.id,
-    nodeType: node.type,
+    nodeType: nodeType,
     accepts: [EntityEnum.Chat, EntityEnum.Folder], // ExpandableNodes can accept both chats and directories
     targetName: node.name, // Include the target directory name for logging
   };

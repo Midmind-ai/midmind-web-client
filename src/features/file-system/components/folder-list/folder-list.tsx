@@ -3,12 +3,12 @@ import { Skeleton } from '@components/ui/skeleton';
 import DropZone from '@features/file-system/components/tree-dnd/drop-zone';
 import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-provider';
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
-import { useFileSystemData } from '@features/file-system/data/use-file-system.data';
+import { useFileSystem } from '@features/file-system/data/use-file-system';
 import { type DroppableData } from '@features/file-system/hooks/use-file-system.actions';
 import { EntityEnum } from '@shared-types/entities';
 
 const FolderList = () => {
-  const { treeNodes, isLoading } = useFileSystemData();
+  const { treeNodes, isLoading } = useFileSystem();
 
   // Root drop zone configuration - accepts items to move to root level (null parent)
   const rootDroppableData: DroppableData = {

@@ -1,6 +1,6 @@
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useParams } from 'react-router';
-import { type TreeNode, type FileSystemData } from '../data/use-file-system.data';
+import { type TreeNode, type FileSystemData } from '../data/use-file-system';
 import { useExpandedNodesStore } from '../stores/expanded-nodes.store';
 import {
   useTreeDndLogic,

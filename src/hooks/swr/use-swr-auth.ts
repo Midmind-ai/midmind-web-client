@@ -1,8 +1,8 @@
 import { LocalStorageKeys } from '@constants/local-storage';
 import { CACHE_KEYS } from '@hooks/cache-keys';
 import { useSWR } from '@lib/swr';
+import type { User } from '@services/users/users-dtos';
 import { UsersService } from '@services/users/users-service';
-import type { User } from '@shared-types/entities';
 import { getFromStorage } from '@utils/local-storage';
 
 export function useSwrCurrentUser() {

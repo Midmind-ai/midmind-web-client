@@ -74,7 +74,14 @@ const ExpandableNode = React.memo(
     }, [isCurrentlyEditing]);
 
     const handleRename = async (newName: string) => {
-      if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
+      const nodeType = String(node.type);
+      const isFolder =
+        nodeType === EntityEnum.Folder ||
+        nodeType === EntityEnum.Mindlet ||
+        nodeType === 'folder';
+      const isChat = nodeType === EntityEnum.Chat || nodeType === 'chat';
+
+      if (isFolder) {
         // Check if this is a new directory (empty name means it was just created)
         if (node.name === '') {
           // This is a new directory being named for the first time
@@ -83,17 +90,19 @@ const ExpandableNode = React.memo(
           // This is an existing directory being renamed
           await renameFolder(node.id, newName);
         }
-      } else if (node.type === EntityEnum.Chat) {
+      } else if (isChat) {
         // Handle chat renaming
         await renameChat(node.id, newName);
       }
     };
 
     const handleCancel = async () => {
-      if (
-        (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) &&
-        node.name === ''
-      ) {
+      const nodeType = String(node.type);
+      const isFolder =
+        nodeType === EntityEnum.Folder ||
+        nodeType === EntityEnum.Mindlet ||
+        nodeType === 'folder';
+      if (isFolder && node.name === '') {
         // This is a new directory being canceled - remove from store
         const parentFolderId = node.parentDirectoryId || undefined;
         removeTemporaryFolder(node.id, parentFolderId);
@@ -114,10 +123,17 @@ const ExpandableNode = React.memo(
 
     // Map tree node types to entity types
     const getEntityType = () => {
-      if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
+      const nodeType = String(node.type);
+      const isFolder =
+        nodeType === EntityEnum.Folder ||
+        nodeType === EntityEnum.Mindlet ||
+        nodeType === 'folder';
+      const isChat = nodeType === EntityEnum.Chat || nodeType === 'chat';
+
+      if (isFolder) {
         return 'folder' as const;
       }
-      if (node.type === EntityEnum.Chat) {
+      if (isChat) {
         return 'chat' as const;
       }
 
@@ -211,7 +227,9 @@ const ExpandableNode = React.memo(
                   onCancel={handleCancel}
                   className="text-primary block truncate"
                   placeholder={
-                    node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet
+                    String(node.type) === EntityEnum.Folder ||
+                    String(node.type) === EntityEnum.Mindlet ||
+                    String(node.type) === 'folder'
                       ? 'Folder name...'
                       : 'Chat name...'
                   }
@@ -221,16 +239,21 @@ const ExpandableNode = React.memo(
                     entityType={getEntityType()}
                     handlers={{
                       onDelete: async () => {
-                        if (node.type === EntityEnum.Chat) {
+                        const nodeType = String(node.type);
+                        const isFolder =
+                          nodeType === EntityEnum.Folder ||
+                          nodeType === EntityEnum.Mindlet ||
+                          nodeType === 'folder';
+                        const isChat =
+                          nodeType === EntityEnum.Chat || nodeType === 'chat';
+
+                        if (isChat) {
                           await deleteChat(
                             node.id,
                             node.parentDirectoryId ?? undefined,
                             node.parentChatId ?? undefined
                           );
-                        } else if (
-                          node.type === EntityEnum.Folder ||
-                          node.type === EntityEnum.Mindlet
-                        ) {
+                        } else if (isFolder) {
                           await deleteFolder(
                             node.id,
                             node.parentDirectoryId ?? undefined
@@ -251,7 +274,6 @@ const ExpandableNode = React.memo(
             <CollapsibleContent>
               <ChildrenList
                 parentNodeId={node.id}
-                parentNodeType={node.type}
                 TreeNodeComponent={TreeNodeComponent}
               />
             </CollapsibleContent>
