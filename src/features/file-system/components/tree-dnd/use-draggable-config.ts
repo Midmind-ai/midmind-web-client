@@ -2,12 +2,18 @@ import { useDraggable } from '@dnd-kit/core';
 import type {
   DraggableData,
   DroppableData,
-  TreeNode,
+  Item,
 } from '@features/file-system/hooks/use-file-system.actions';
-import { EntityEnum } from '@shared-types/entities';
+import {
+  getItemDisplayName,
+  getItemEntityType,
+  getItemParentDirectoryId,
+  getItemParentChatId,
+} from '@features/file-system/utils/item-helpers';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type UseDraggableConfigProps = {
-  node: TreeNode;
+  node: Item;
   isDisabled?: boolean;
 };
 
@@ -31,24 +37,15 @@ export const useDraggableConfig = ({
   node,
   isDisabled = false,
 }: UseDraggableConfigProps): UseDraggableConfigReturn => {
-  // Convert item types to entity enum for compatibility
-  const nodeType =
-    typeof node.type === 'string'
-      ? node.type === 'folder'
-        ? EntityEnum.Folder
-        : node.type === 'chat'
-          ? EntityEnum.Chat
-          : node.type === 'note'
-            ? EntityEnum.Note
-            : (node.type as EntityEnum)
-      : (node.type as EntityEnum);
+  // Get entity type using helper function
+  const nodeType = getItemEntityType(node);
 
   // Prepare draggable data for when this node is being dragged
   const draggableData: DraggableData = {
     type: nodeType,
     id: node.id,
-    parentFolderId: node.parentDirectoryId ?? undefined,
-    parentChatId: node.parentChatId ?? undefined,
+    parentFolderId: getItemParentDirectoryId(node) ?? undefined,
+    parentChatId: getItemParentChatId(node) ?? undefined,
     node: node, // Pass the complete node for the overlay
   };
 
@@ -57,8 +54,8 @@ export const useDraggableConfig = ({
     type: 'expandable-node',
     id: node.id,
     nodeType: nodeType,
-    accepts: [EntityEnum.Chat, EntityEnum.Folder], // ExpandableNodes can accept both chats and directories
-    targetName: node.name, // Include the target directory name for logging
+    accepts: [ItemTypeEnum.Chat, ItemTypeEnum.Folder], // ExpandableNodes can accept both chats and directories
+    targetName: getItemDisplayName(node), // Include the target directory name for logging
   };
 
   // Set up the draggable behavior using @dnd-kit

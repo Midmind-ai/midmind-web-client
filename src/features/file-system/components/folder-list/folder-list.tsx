@@ -5,17 +5,17 @@ import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
 import { useFileSystem } from '@features/file-system/data/use-file-system';
 import { type DroppableData } from '@features/file-system/hooks/use-file-system.actions';
-import { EntityEnum } from '@shared-types/entities';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 const FolderList = () => {
-  const { treeNodes, isLoading } = useFileSystem();
+  const { items, isLoading } = useFileSystem();
 
   // Root drop zone configuration - accepts items to move to root level (null parent)
   const rootDroppableData: DroppableData = {
     type: 'root',
     id: 'root-drop-zone',
-    nodeType: EntityEnum.Folder,
-    accepts: [EntityEnum.Chat, EntityEnum.Folder], // Root can accept both chats and directories
+    nodeType: ItemTypeEnum.Folder,
+    accepts: [ItemTypeEnum.Chat, ItemTypeEnum.Folder], // Root can accept both chats and directories
   };
 
   return (
@@ -42,10 +42,10 @@ const FolderList = () => {
                 </div>
               )}
               {!isLoading &&
-                treeNodes?.map(node => (
+                items?.map(item => (
                   <TreeNode
-                    key={node.id}
-                    node={node}
+                    key={item.id}
+                    node={item}
                   />
                 ))}
             </SidebarMenu>

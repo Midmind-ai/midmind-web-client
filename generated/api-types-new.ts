@@ -180,10 +180,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Items
-         * @description List user's items with pagination.
+         * List Root Items
+         * @description List user's root-level items (parent_id is null) with pagination.
          */
-        get: operations["list_items_api_v1_items__get"];
+        get: operations["list_root_items_api_v1_items__get"];
         put?: never;
         /**
          * Create Item
@@ -260,6 +260,26 @@ export interface paths {
         patch: operations["move_item_api_v1_items__item_id__move_patch"];
         trace?: never;
     };
+    "/api/v1/items/{item_id}/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Rename Item
+         * @description Rename an item (generic across all item types).
+         */
+        patch: operations["rename_item_api_v1_items__item_id__rename_patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -287,6 +307,34 @@ export interface components {
             access_token: string;
         };
         /**
+         * ChatPayload
+         * @description Payload model for chat items.
+         */
+        ChatPayload: {
+            /**
+             * Name
+             * @default New Chat
+             */
+            name: string;
+            /**
+             * Depth
+             * @default 0
+             */
+            depth: number;
+            /**
+             * Position X
+             * @default 0
+             */
+            position_x: number;
+            /**
+             * Position Y
+             * @default 0
+             */
+            position_y: number;
+            /** Path */
+            path?: string[];
+        };
+        /**
          * CreateItemRequest
          * @description Request model for creating a new item.
          */
@@ -297,7 +345,7 @@ export interface components {
             /** Parent Id */
             parent_id?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
         };
         /** CreateUserDto */
         CreateUserDto: {
@@ -316,6 +364,17 @@ export interface components {
             confirmation_password: string;
             /** Avatar */
             avatar?: string | null;
+        };
+        /**
+         * FolderPayload
+         * @description Payload model for folder items.
+         */
+        FolderPayload: {
+            /**
+             * Name
+             * @default New Folder
+             */
+            name: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -374,7 +433,7 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
         };
         /**
          * ItemType
@@ -393,6 +452,29 @@ export interface components {
         MoveItemRequest: {
             /** Parent Id */
             parent_id?: string | null;
+        };
+        /**
+         * NotePayload
+         * @description Payload model for note items.
+         */
+        NotePayload: {
+            /**
+             * Name
+             * @default Untitled Note
+             */
+            name: string;
+            /** Content Md */
+            content_md?: string | null;
+            /** Content Json */
+            content_json?: Record<string, never> | null;
+        };
+        /**
+         * RenameItemRequest
+         * @description Request model for renaming an item (generic across all types).
+         */
+        RenameItemRequest: {
+            /** Name */
+            name: string;
         };
         /** SignInDto */
         SignInDto: {
@@ -788,15 +870,13 @@ export interface operations {
             };
         };
     };
-    list_items_api_v1_items__get: {
+    list_root_items_api_v1_items__get: {
         parameters: {
             query?: {
-                /** @description Number of items to return */
+                /** @description Number of root items to return */
                 limit?: number;
-                /** @description Number of items to skip */
+                /** @description Number of root items to skip */
                 offset?: number;
-                /** @description Filter by parent ID */
-                parent_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -960,6 +1040,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MoveItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_item_api_v1_items__item_id__rename_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameItemRequest"];
             };
         };
         responses: {

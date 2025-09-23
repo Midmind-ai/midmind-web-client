@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
 import {
   useFileSystemActions,
-  type TreeNode as TreeNodeType,
+  type Item,
 } from '@features/file-system/hooks/use-file-system.actions';
 
 type Props = {
-  node: TreeNodeType;
+  node: Item;
 };
 
 const TreeNode = ({ node }: Props) => {

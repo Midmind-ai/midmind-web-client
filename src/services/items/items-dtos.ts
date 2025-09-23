@@ -1,7 +1,14 @@
 import type { components } from 'generated/api-types-new';
 
-// Base types from API
-export type ItemType = components['schemas']['ItemType'];
+// Frontend ItemType enum - decoupled from backend string literals
+export enum ItemTypeEnum {
+  Note = 'note',
+  Chat = 'chat',
+  Folder = 'folder',
+}
+
+// Backend API type - keep for API compatibility
+export type ApiItemType = components['schemas']['ItemType'];
 export type ItemResponse = components['schemas']['ItemResponse'];
 export type ItemListResponse = components['schemas']['ItemListResponse'];
 export type CreateItemRequest = components['schemas']['CreateItemRequest'];
@@ -9,6 +16,7 @@ export type MoveItemRequest = components['schemas']['MoveItemRequest'];
 
 // Convenience type aliases
 export type Item = ItemResponse;
+export type ItemPayload = ItemResponse['payload'];
 
 // Tree-specific types for easier usage
 export interface TreeItem extends Item {
@@ -21,13 +29,18 @@ export interface TreeItem extends Item {
 export interface CreateTreeItemRequest {
   id?: string;
   name: string;
-  type: ItemType;
+  type: ItemTypeEnum;
   parent_id?: string | null;
-  payload?: Record<string, unknown>;
+  payload?: ItemPayload;
 }
 
 export interface MoveTreeItemRequest {
   parent_id: string | null;
+}
+
+// Rename request type (until backend generates it)
+export interface RenameItemRequest {
+  name: string;
 }
 
 // List options for items service

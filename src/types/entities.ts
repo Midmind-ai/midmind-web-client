@@ -36,6 +36,5 @@ export type TreeItem = {
 export enum EntityEnum {
   Folder = 'folder',
   Chat = 'chat',
-  Mindlet = 'mindlet',
   Note = 'note',
 }

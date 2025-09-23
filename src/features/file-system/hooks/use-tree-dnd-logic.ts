@@ -1,31 +1,30 @@
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useState } from 'react';
 import { useFileSystemStore } from '../stores/file-system.store';
-import type { TreeNode } from './use-file-system.actions';
-import { EntityEnum } from '@shared-types/entities';
+import type { Item } from '@services/items/items-dtos';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 export type DraggableData = {
-  type: EntityEnum;
+  type: ItemTypeEnum;
   id: string;
   parentFolderId?: string;
   parentChatId?: string;
-  node: TreeNode; // Add the full node data for the overlay
+  node: Item; // Add the full node data for the overlay
 };
 
 export type DroppableData = {
   type: 'expandable-node' | 'root';
   id: string;
-  nodeType: EntityEnum;
-  accepts: EntityEnum[];
+  nodeType: ItemTypeEnum;
+  accepts: ItemTypeEnum[];
   targetName?: string; // Add target name for logging
 };
 
 export const useTreeDndLogic = () => {
   const [activeItem, setActiveItem] = useState<DraggableData | null>(null);
 
-  // Get move functions directly from the store
-  const moveChat = useFileSystemStore(state => state.moveChat);
-  const moveFolder = useFileSystemStore(state => state.moveFolder);
+  // Get move function directly from the store
+  const moveItem = useFileSystemStore(state => state.moveItem);
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
@@ -53,8 +52,7 @@ export const useTreeDndLogic = () => {
 
     // For directories, prevent dropping on any of its descendants
     if (
-      (draggableData.type === EntityEnum.Folder ||
-        draggableData.type === EntityEnum.Mindlet) &&
+      draggableData.type === ItemTypeEnum.Folder &&
       droppableData.type === 'expandable-node'
     ) {
       // Check if the drop target is a descendant of the dragged directory
@@ -77,23 +75,8 @@ export const useTreeDndLogic = () => {
       return;
     }
 
-    if (draggableData.type === EntityEnum.Chat) {
-      await moveChat(
-        draggableData.id,
-        draggableData.parentFolderId,
-        draggableData.parentChatId,
-        targetParentFolderId
-      );
-    } else if (
-      draggableData.type === EntityEnum.Folder ||
-      draggableData.type === EntityEnum.Mindlet
-    ) {
-      await moveFolder(
-        draggableData.id,
-        draggableData.parentFolderId,
-        targetParentFolderId
-      );
-    }
+    // Use unified moveItem for all types
+    await moveItem(draggableData.id, targetParentFolderId);
   };
 
   const handleDragCancel = () => {
@@ -105,7 +88,7 @@ export const useTreeDndLogic = () => {
   const isDescendantOf = (
     nodeId: string,
     potentialAncestorId: string,
-    _ancestorNode: TreeNode
+    _ancestorNode: Item
   ): boolean => {
     // Basic check: if we're trying to drop a directory into itself, that's clearly circular
     if (nodeId === potentialAncestorId) {

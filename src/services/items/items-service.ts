@@ -9,6 +9,7 @@ import type {
   CreateTreeItemRequest,
   MoveTreeItemRequest,
 } from './items-dtos';
+import { ItemTypeEnum } from './items-dtos';
 import { baseAxiosInstance } from '@config/axios';
 
 export class ItemsService {
@@ -73,7 +74,7 @@ export class ItemsService {
       id: request.id || uuidv4(),
       type: request.type,
       parent_id: request.parent_id,
-      payload: (request.payload || {}) as Record<string, never>,
+      payload: request.payload as CreateItemRequest['payload'],
     };
 
     const { data } = await baseAxiosInstance.post<Item>('/items/', createRequest);
@@ -129,9 +130,9 @@ export class ItemsService {
   static async createFolder(name: string, parentId?: string | null): Promise<Item> {
     return this.createItem({
       name,
-      type: 'folder',
+      type: ItemTypeEnum.Folder,
       parent_id: parentId,
-      payload: {},
+      payload: { name },
     });
   }
 
@@ -145,9 +146,15 @@ export class ItemsService {
   ): Promise<Item> {
     return this.createItem({
       name,
-      type: 'chat',
+      type: ItemTypeEnum.Chat,
       parent_id: parentId,
-      payload: payload || {},
+      payload: {
+        name,
+        depth: 0,
+        position_x: 0,
+        position_y: 0,
+        ...payload,
+      },
     });
   }
 
@@ -161,9 +168,25 @@ export class ItemsService {
   ): Promise<Item> {
     return this.createItem({
       name,
-      type: 'note',
+      type: ItemTypeEnum.Note,
       parent_id: parentId,
-      payload: payload || {},
+      payload: {
+        name,
+        content_md: null,
+        content_json: null,
+        ...payload,
+      },
     });
+  }
+
+  /**
+   * Rename an item (works for all item types)
+   */
+  static async renameItem(itemId: string, name: string): Promise<Item> {
+    const { data } = await baseAxiosInstance.patch<Item>(`/items/${itemId}/rename/`, {
+      name,
+    });
+
+    return data;
   }
 }

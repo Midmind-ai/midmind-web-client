@@ -14,20 +14,26 @@ import ChildrenList from '@features/file-system/components/tree-node/components/
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
 import {
   useFileSystemActions,
-  type TreeNode as TreeNodeType,
+  type Item,
 } from '@features/file-system/hooks/use-file-system.actions';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
-import { EntityEnum } from '@shared-types/entities';
+import {
+  getItemDisplayName,
+  getItemEntityType,
+  getItemHasChildren,
+  getItemParentDirectoryId,
+} from '@features/file-system/utils/item-helpers';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 import { useMenuStateStore } from '@stores/menu-state.store';
 
 type Props = {
-  node: TreeNodeType;
+  node: Item;
   isActive: boolean;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   onClick: VoidFunction;
-  TreeNodeComponent: React.ComponentType<{ node: TreeNodeType }>;
+  TreeNodeComponent: React.ComponentType<{ node: Item }>;
 };
 
 const ExpandableNode = React.memo(
@@ -35,10 +41,8 @@ const ExpandableNode = React.memo(
     const [isHovered, setIsHovered] = useState(false);
 
     // Store actions (cache revalidation handled inside store)
-    const renameChat = useFileSystemStore(state => state.renameChat);
-    const renameFolder = useFileSystemStore(state => state.renameFolder);
-    const deleteChat = useFileSystemStore(state => state.deleteChat);
-    const deleteFolder = useFileSystemStore(state => state.deleteFolder);
+    const renameItem = useFileSystemStore(state => state.renameItem);
+    const deleteItem = useFileSystemStore(state => state.deleteItem);
     const finalizeFolderCreation = useFileSystemStore(
       state => state.finalizeFolderCreation
     );
@@ -75,36 +79,23 @@ const ExpandableNode = React.memo(
 
     const handleRename = async (newName: string) => {
       const nodeType = String(node.type);
-      const isFolder =
-        nodeType === EntityEnum.Folder ||
-        nodeType === EntityEnum.Mindlet ||
-        nodeType === 'folder';
-      const isChat = nodeType === EntityEnum.Chat || nodeType === 'chat';
+      const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
 
-      if (isFolder) {
-        // Check if this is a new directory (empty name means it was just created)
-        if (node.name === '') {
-          // This is a new directory being named for the first time
-          await finalizeFolderCreation(node.id, newName);
-        } else {
-          // This is an existing directory being renamed
-          await renameFolder(node.id, newName);
-        }
-      } else if (isChat) {
-        // Handle chat renaming
-        await renameChat(node.id, newName);
+      if (isFolder && getItemDisplayName(node) === '') {
+        // This is a new directory being named for the first time
+        await finalizeFolderCreation(node.id, newName);
+      } else {
+        // Use the unified renameItem for all types
+        await renameItem(node.id, newName);
       }
     };
 
     const handleCancel = async () => {
       const nodeType = String(node.type);
-      const isFolder =
-        nodeType === EntityEnum.Folder ||
-        nodeType === EntityEnum.Mindlet ||
-        nodeType === 'folder';
-      if (isFolder && node.name === '') {
+      const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
+      if (isFolder && getItemDisplayName(node) === '') {
         // This is a new directory being canceled - remove from store
-        const parentFolderId = node.parentDirectoryId || undefined;
+        const parentFolderId = getItemParentDirectoryId(node) || undefined;
         removeTemporaryFolder(node.id, parentFolderId);
       }
       // For chats, no special cancel logic needed - just cancel the edit
@@ -124,11 +115,8 @@ const ExpandableNode = React.memo(
     // Map tree node types to entity types
     const getEntityType = () => {
       const nodeType = String(node.type);
-      const isFolder =
-        nodeType === EntityEnum.Folder ||
-        nodeType === EntityEnum.Mindlet ||
-        nodeType === 'folder';
-      const isChat = nodeType === EntityEnum.Chat || nodeType === 'chat';
+      const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
+      const isChat = nodeType === ItemTypeEnum.Chat || nodeType === 'chat';
 
       if (isFolder) {
         return 'folder' as const;
@@ -214,24 +202,24 @@ const ExpandableNode = React.memo(
                       className={`${isHovered && !isCurrentlyEditing ? 'opacity-0' : 'opacity-100'}`}
                     >
                       <NodeIcon
-                        nodeType={node.type}
-                        hasChildren={node.hasChildren}
+                        nodeType={getItemEntityType(node)}
+                        hasChildren={getItemHasChildren(node)}
                       />
                     </div>
                   </div>
                 </CollapsibleTrigger>
                 <EditableText
                   entityId={node.id}
-                  currentValue={node.name}
+                  currentValue={getItemDisplayName(node)}
                   onSave={handleRename}
                   onCancel={handleCancel}
                   className="text-primary block truncate"
                   placeholder={
-                    String(node.type) === EntityEnum.Folder ||
-                    String(node.type) === EntityEnum.Mindlet ||
-                    String(node.type) === 'folder'
+                    getItemEntityType(node) === ItemTypeEnum.Folder
                       ? 'Folder name...'
-                      : 'Chat name...'
+                      : getItemEntityType(node) === ItemTypeEnum.Note
+                        ? 'Note name...'
+                        : 'Chat name...'
                   }
                 />
                 {!isCurrentlyEditing && (
@@ -239,26 +227,11 @@ const ExpandableNode = React.memo(
                     entityType={getEntityType()}
                     handlers={{
                       onDelete: async () => {
-                        const nodeType = String(node.type);
-                        const isFolder =
-                          nodeType === EntityEnum.Folder ||
-                          nodeType === EntityEnum.Mindlet ||
-                          nodeType === 'folder';
-                        const isChat =
-                          nodeType === EntityEnum.Chat || nodeType === 'chat';
-
-                        if (isChat) {
-                          await deleteChat(
-                            node.id,
-                            node.parentDirectoryId ?? undefined,
-                            node.parentChatId ?? undefined
-                          );
-                        } else if (isFolder) {
-                          await deleteFolder(
-                            node.id,
-                            node.parentDirectoryId ?? undefined
-                          );
-                        }
+                        // Use unified deleteItem for all types
+                        await deleteItem(
+                          node.id,
+                          getItemParentDirectoryId(node) ?? undefined
+                        );
                       },
                       onRename: handleRenameAction,
                       onOpenInNewTab: () => openChatInNewTab(node.id),

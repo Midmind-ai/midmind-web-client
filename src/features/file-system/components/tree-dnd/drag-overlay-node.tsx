@@ -1,10 +1,15 @@
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
 import { ThemedSpan } from '@components/ui/themed-span';
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
-import type { TreeNode } from '@features/file-system/hooks/use-file-system.actions';
+import type { Item } from '@features/file-system/hooks/use-file-system.actions';
+import {
+  getItemDisplayName,
+  getItemEntityType,
+  getItemHasChildren,
+} from '@features/file-system/utils/item-helpers';
 
 type Props = {
-  node: TreeNode;
+  node: Item;
 };
 
 const DragOverlayNode = ({ node }: Props) => {
@@ -19,11 +24,13 @@ const DragOverlayNode = ({ node }: Props) => {
             transition-colors"
         >
           <NodeIcon
-            nodeType={node.type}
-            hasChildren={node.hasChildren}
+            nodeType={getItemEntityType(node)}
+            hasChildren={getItemHasChildren(node)}
           />
         </div>
-        <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
+        <ThemedSpan className="text-primary block truncate">
+          {getItemDisplayName(node)}
+        </ThemedSpan>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

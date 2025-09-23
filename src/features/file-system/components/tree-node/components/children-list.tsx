@@ -1,22 +1,24 @@
 import React from 'react';
+import { useFileSystem } from '../../../data/use-file-system';
 import { SidebarMenuSub } from '@components/ui/sidebar';
 import { Skeleton } from '@components/ui/skeleton';
 import { SKELETON_COUNT } from '@features/file-system/components/tree-node/constants';
-import { useFileSystem } from '@features/file-system/data/use-file-system';
-import type { TreeNode as TreeNodeType } from '@features/file-system/data/use-file-system';
+import type { Item } from '@services/items/items-dtos';
 
 type Props = {
   parentNodeId: string;
-  TreeNodeComponent: React.ComponentType<{ node: TreeNodeType }>;
+  TreeNodeComponent: React.ComponentType<{ node: Item }>;
 };
 
 const ChildrenList = React.memo(({ parentNodeId, TreeNodeComponent }: Props) => {
-  const { treeNodes: childNodes, isLoading: isLoadingChildren } =
-    useFileSystem(parentNodeId);
+  const { items: childNodes, isLoading } = useFileSystem(parentNodeId);
+
+  // const isLoading = false;
+  // const childNodes = [];
 
   return (
     <SidebarMenuSub className="ml-3.5 pb-0 pl-3.5">
-      {isLoadingChildren && (
+      {isLoading && (
         <div className="space-y-2">
           {[...Array(SKELETON_COUNT)].map((_, idx) => (
             <Skeleton
@@ -26,7 +28,7 @@ const ChildrenList = React.memo(({ parentNodeId, TreeNodeComponent }: Props) => 
           ))}
         </div>
       )}
-      {!isLoadingChildren &&
+      {!isLoading &&
         childNodes &&
         childNodes.length > 0 &&
         childNodes.map(childNode => (
@@ -35,7 +37,7 @@ const ChildrenList = React.memo(({ parentNodeId, TreeNodeComponent }: Props) => 
             node={childNode}
           />
         ))}
-      {!isLoadingChildren && (!childNodes || childNodes.length === 0) && (
+      {!isLoading && (!childNodes || childNodes.length === 0) && (
         <div className="text-muted-foreground ml-3 px-2 py-1 text-sm opacity-45">
           Empty
         </div>

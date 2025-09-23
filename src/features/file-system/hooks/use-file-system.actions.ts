@@ -1,6 +1,6 @@
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useParams } from 'react-router';
-import { type TreeNode, type FileSystemData } from '../data/use-file-system';
+import { type FileSystemData } from '../data/use-file-system';
 import { useExpandedNodesStore } from '../stores/expanded-nodes.store';
 import {
   useTreeDndLogic,
@@ -14,7 +14,9 @@ import {
   openChatInSidePanel,
   navigateToChat,
 } from '@hooks/use-split-screen-actions';
-import { EntityEnum, type ChatBranchContext } from '@shared-types/entities';
+import type { Item } from '@services/items/items-dtos';
+import { ItemTypeEnum } from '@services/items/items-dtos';
+import { type ChatBranchContext } from '@shared-types/entities';
 import { useMenuStateStore } from '@stores/menu-state.store';
 
 // Type definitions for action parameters
@@ -68,8 +70,8 @@ type FileSystemActions = {
   helpers: {
     isExpanded: (nodeId: string) => boolean;
     isEditing: (nodeId: string) => boolean;
-    isNodeActive: (node: TreeNode) => boolean;
-    handleNodeClick: (node: TreeNode) => void;
+    isNodeActive: (node: Item) => boolean;
+    handleNodeClick: (node: Item) => void;
     isMenuOpen: (menuId: string) => boolean;
   };
 };
@@ -104,16 +106,16 @@ export const useFileSystemActions = (): FileSystemActions => {
   const isEditing = (nodeId: string): boolean => editingNodeId === nodeId;
   const isMenuOpen = (menuId: string): boolean => activeMenuId === menuId;
 
-  const isNodeActive = (node: TreeNode): boolean => {
-    if (node.type === EntityEnum.Chat) {
+  const isNodeActive = (node: Item): boolean => {
+    if (node.type === ItemTypeEnum.Chat) {
       return chatId === node.id;
     }
 
     return false;
   };
 
-  const handleNodeClick = (node: TreeNode): void => {
-    if (node.type === EntityEnum.Chat) {
+  const handleNodeClick = (node: Item): void => {
+    if (node.type === ItemTypeEnum.Chat) {
       navigateToChat(node.id);
     }
   };
@@ -161,7 +163,7 @@ export const useFileSystemActions = (): FileSystemActions => {
 export type {
   FileSystemData,
   FileSystemActions,
-  TreeNode,
+  Item,
   CreateChatArgs,
   DeleteChatParams,
   DraggableData,

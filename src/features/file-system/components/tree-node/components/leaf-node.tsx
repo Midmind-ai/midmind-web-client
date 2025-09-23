@@ -5,21 +5,26 @@ import { useDraggableConfig } from '@features/file-system/components/tree-dnd/us
 import NodeIcon from '@features/file-system/components/tree-node/components/node-icon';
 import {
   useFileSystemActions,
-  type TreeNode,
+  type Item,
 } from '@features/file-system/hooks/use-file-system.actions';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
-import { EntityEnum } from '@shared-types/entities';
+import {
+  getItemDisplayName,
+  getItemEntityType,
+  getItemHasChildren,
+  getItemParentDirectoryId,
+} from '@features/file-system/utils/item-helpers';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type Props = {
-  node: TreeNode;
+  node: Item;
   isActive: boolean;
   onClick: VoidFunction;
 };
 
 const LeafNode = ({ node, isActive, onClick }: Props) => {
   // Store actions (cache revalidation handled inside store)
-  const deleteChat = useFileSystemStore(state => state.deleteChat);
-  const deleteFolder = useFileSystemStore(state => state.deleteFolder);
+  const deleteItem = useFileSystemStore(state => state.deleteItem);
 
   // Still need actions for other operations
   const { openChatInSidePanel, openChatInNewTab, startEditing } =
@@ -33,10 +38,11 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
 
   // Map tree node types to entity types
   const getEntityType = () => {
-    if (node.type === EntityEnum.Folder || node.type === EntityEnum.Mindlet) {
+    const entityType = getItemEntityType(node);
+    if (entityType === ItemTypeEnum.Folder) {
       return 'folder' as const;
     }
-    if (node.type === EntityEnum.Chat) {
+    if (entityType === ItemTypeEnum.Chat) {
       return 'chat' as const;
     }
 
@@ -65,27 +71,19 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
           rounded-[4px] transition-colors"
       >
         <NodeIcon
-          nodeType={node.type}
-          hasChildren={node.hasChildren}
+          nodeType={getItemEntityType(node)}
+          hasChildren={getItemHasChildren(node)}
         />
       </div>
-      <ThemedSpan className="text-primary block truncate">{node.name}</ThemedSpan>
+      <ThemedSpan className="text-primary block truncate">
+        {getItemDisplayName(node)}
+      </ThemedSpan>
       <EntityActionsMenu
         entityType={getEntityType()}
         handlers={{
           onDelete: async () => {
-            if (node.type === EntityEnum.Chat) {
-              await deleteChat(
-                node.id,
-                node.parentDirectoryId ?? undefined,
-                node.parentChatId ?? undefined
-              );
-            } else if (
-              node.type === EntityEnum.Folder ||
-              node.type === EntityEnum.Mindlet
-            ) {
-              await deleteFolder(node.id, node.parentDirectoryId ?? undefined);
-            }
+            // Use unified deleteItem for all types
+            await deleteItem(node.id, getItemParentDirectoryId(node) ?? undefined);
           },
           onRename: handleRenameAction,
           onOpenInNewTab: () => openChatInNewTab(node.id),
