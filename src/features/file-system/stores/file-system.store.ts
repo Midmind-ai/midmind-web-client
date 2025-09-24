@@ -430,9 +430,6 @@ export const useFileSystemStore = create<FileSystemStore>()(
 
         try {
           await ItemsService.createFolder(name, parentFolderId);
-
-          // Stop inline editing
-          useInlineEditStore.getState().stopEditing();
         } catch (error) {
           // Remove temporary folder on error
           set(state => ({
@@ -445,6 +442,9 @@ export const useFileSystemStore = create<FileSystemStore>()(
           }));
 
           throw error;
+        } finally {
+          // Stop inline editing
+          useInlineEditStore.getState().stopEditing();
         }
       },
 

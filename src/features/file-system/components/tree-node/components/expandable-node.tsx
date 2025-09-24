@@ -79,9 +79,9 @@ const ExpandableNode = React.memo(
 
     const handleRename = async (newName: string) => {
       const nodeType = String(node.type);
-      const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
+      const isFolder = nodeType === ItemTypeEnum.Folder;
 
-      if (isFolder && getItemDisplayName(node) === '') {
+      if (isFolder && node?.payload?.name === '') {
         // This is a new directory being named for the first time
         await finalizeFolderCreation(node.id, newName);
       } else {

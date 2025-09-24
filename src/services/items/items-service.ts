@@ -29,7 +29,7 @@ export class ItemsService {
       params.append('parent_id', parent_id);
     }
 
-    const { data } = await baseAxiosInstance.get<ItemListResponse>(`/items/`, {
+    const { data } = await baseAxiosInstance.get<ItemListResponse>(`/items`, {
       params: Object.fromEntries(params),
     });
 
@@ -45,7 +45,7 @@ export class ItemsService {
    * Get a single item by ID
    */
   static async getItem(itemId: string): Promise<Item> {
-    const { data } = await baseAxiosInstance.get<Item>(`/items/${itemId}/`);
+    const { data } = await baseAxiosInstance.get<Item>(`/items/${itemId}`);
 
     return data;
   }
@@ -55,7 +55,7 @@ export class ItemsService {
    */
   static async getItemChildren(itemId: string): Promise<ItemsListResult> {
     const { data } = await baseAxiosInstance.get<ItemListResponse>(
-      `/items/${itemId}/children/`
+      `/items/${itemId}/children`
     );
 
     return {
@@ -77,7 +77,7 @@ export class ItemsService {
       payload: request.payload as CreateItemRequest['payload'],
     };
 
-    const { data } = await baseAxiosInstance.post<Item>('/items/', createRequest);
+    const { data } = await baseAxiosInstance.post<Item>('/items', createRequest);
 
     return data;
   }
@@ -91,7 +91,7 @@ export class ItemsService {
     };
 
     const { data } = await baseAxiosInstance.patch<Item>(
-      `/items/${itemId}/move/`,
+      `/items/${itemId}/move`,
       moveRequest
     );
 
@@ -102,7 +102,7 @@ export class ItemsService {
    * Delete an item and all its children
    */
   static async deleteItem(itemId: string): Promise<void> {
-    await baseAxiosInstance.delete(`/items/${itemId}/`);
+    await baseAxiosInstance.delete(`/items/${itemId}`);
   }
 
   /**
@@ -128,7 +128,7 @@ export class ItemsService {
    * Create a folder item
    */
   static async createFolder(name: string, parentId?: string | null): Promise<Item> {
-    return this.createItem({
+    return await this.createItem({
       name,
       type: ItemTypeEnum.Folder,
       parent_id: parentId,
@@ -144,7 +144,7 @@ export class ItemsService {
     parentId?: string | null,
     payload?: Record<string, unknown>
   ): Promise<Item> {
-    return this.createItem({
+    return await this.createItem({
       name,
       type: ItemTypeEnum.Chat,
       parent_id: parentId,
