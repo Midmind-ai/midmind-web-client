@@ -6,9 +6,15 @@ import {
   ResizablePanelGroup,
 } from '@components/ui/resizable';
 import { LocalStorageKeys } from '@constants/local-storage';
-import { AppRoutes, SearchParams } from '@constants/paths';
-import Chat from '@features/chat/chat';
-import { navigate, useInitializeNavigation } from '@hooks/use-navigation';
+import {
+  // AppRoutes,
+  SearchParams,
+} from '@constants/paths';
+// import Chat from '@features/chat/chat';
+import {
+  // navigate,
+  useInitializeNavigation,
+} from '@hooks/use-navigation';
 import { useUrlParams } from '@hooks/utils/use-url-params';
 import { cn } from '@utils/cn';
 import { getFromStorage, setToStorage } from '@utils/local-storage';
@@ -17,7 +23,10 @@ const SplitLayout = () => {
   useInitializeNavigation();
 
   const { id: currentChatId = '' } = useParams<{ id: string }>();
-  const { value: chatId = '', removeValue } = useUrlParams(SearchParams.Split);
+  const {
+    value: chatId = '',
+    // removeValue
+  } = useUrlParams(SearchParams.Split);
 
   const sidePanelWidth = getFromStorage<number>(LocalStorageKeys.SidePanelWidth) || 50;
   const isOnChatPage = !!currentChatId;
@@ -26,13 +35,13 @@ const SplitLayout = () => {
     setToStorage(LocalStorageKeys.SidePanelWidth, size);
   };
 
-  const handleCloseLeftPanel = () => {
-    if (chatId) navigate(AppRoutes.Chat(chatId));
-  };
+  // const handleCloseLeftPanel = () => {
+  //   if (chatId) navigate(AppRoutes.Chat(chatId));
+  // };
 
-  const handleCloseRightPanel = () => {
-    removeValue();
-  };
+  // const handleCloseRightPanel = () => {
+  //   removeValue();
+  // };
 
   return (
     <ResizablePanelGroup direction="horizontal">

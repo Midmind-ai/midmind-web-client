@@ -127,9 +127,14 @@ export class ItemsService {
   /**
    * Create a folder item
    */
-  static async createFolder(name: string, parentId?: string | null): Promise<Item> {
+  static async createFolder(
+    id: string,
+    name: string,
+    parentId?: string | null
+  ): Promise<Item> {
     return await this.createItem({
       name,
+      id,
       type: ItemTypeEnum.Folder,
       parent_id: parentId,
       payload: { name },

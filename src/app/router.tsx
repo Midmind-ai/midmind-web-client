@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router';
 import { ItemRouter } from '../features/item-router/item-router';
 import RootLayout from '@app/root-layout';
-import ChatPage from '@app/routes/chat';
-import ChatOldPage from '@app/routes/chat-old';
+// import ChatPage from '@app/routes/chat';
+// import ChatOldPage from '@app/routes/chat-old';
 import ForgotPasswordPage from '@app/routes/forgot-password';
 import HomePage from '@app/routes/home';
 import NotFoundPage from '@app/routes/not-found';

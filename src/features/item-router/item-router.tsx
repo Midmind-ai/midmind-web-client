@@ -5,7 +5,6 @@ import { ItemsService } from '../../services/items/items-service';
 
 export const ItemRouter = () => {
   const { id } = useParams();
-  console.log(id);
   const [type, setType] = useState<string>('null');
 
   useEffect(() => {

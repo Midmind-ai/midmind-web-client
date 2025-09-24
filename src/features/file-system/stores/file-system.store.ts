@@ -429,7 +429,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }));
 
         try {
-          await ItemsService.createFolder(name, parentFolderId);
+          await ItemsService.createFolder(id, name, parentFolderId);
         } catch (error) {
           // Remove temporary folder on error
           set(state => ({
