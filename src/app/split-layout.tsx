@@ -1,4 +1,5 @@
 import { Outlet, useParams } from 'react-router';
+import { ItemRouter } from '../features/item-router/item-router';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -42,12 +43,15 @@ const SplitLayout = () => {
         className={cn(chatId ? 'w-1/2' : 'w-full')}
       >
         {isOnChatPage ? (
-          <Chat
+          <>
+            <ItemRouter />
+            {/* <Chat
             chatId={currentChatId}
             showCloseButton={!!chatId}
             showSidebarToggle={true}
             onClose={handleCloseLeftPanel}
-          />
+            /> */}
+          </>
         ) : (
           <Outlet />
         )}
@@ -64,12 +68,15 @@ const SplitLayout = () => {
             defaultSize={sidePanelWidth}
             className="w-1/2"
           >
-            <Chat
+            <>
+              <ItemRouter />
+              {/* <Chat
               chatId={chatId}
               showCloseButton
               showSidebarToggle={false}
               onClose={handleCloseRightPanel}
-            />
+              /> */}
+            </>
           </ResizablePanel>
         </>
       )}

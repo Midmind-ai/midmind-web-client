@@ -72,12 +72,6 @@ const EditableText = ({
       return;
     }
 
-    if (trimmedValue === currentValue) {
-      stopEditing();
-
-      return;
-    }
-
     try {
       setIsSubmitting(true);
       await onSave(trimmedValue);

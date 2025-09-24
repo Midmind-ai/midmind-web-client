@@ -1,4 +1,4 @@
-import { FolderPlus, MessageSquarePlus } from 'lucide-react';
+import { FilePlus2, FolderPlus, MessageSquarePlus } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 import { SidebarMenuButton } from '@components/ui/sidebar';
 import { AppRoutes } from '@constants/paths';
@@ -35,6 +35,12 @@ const FolderActions = () => {
           onClick={handleCreateDirectory}
         >
           <FolderPlus className="size-5.5! stroke-1" />
+        </SidebarMenuButton>
+        <SidebarMenuButton
+          className={buttonClassNames}
+          onClick={() => {}}
+        >
+          <FilePlus2 className="size-5.5! stroke-1" />
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}

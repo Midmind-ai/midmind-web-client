@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router';
+import { ItemRouter } from '../features/item-router/item-router';
 import RootLayout from '@app/root-layout';
 import ChatPage from '@app/routes/chat';
 import ChatOldPage from '@app/routes/chat-old';
@@ -23,13 +24,17 @@ const router = createBrowserRouter([
             element: <HomePage />,
           },
           {
-            path: AppRoutes.Chat(':id'),
-            element: <ChatPage />,
+            path: AppRoutes.Item(':id'),
+            element: <ItemRouter />,
           },
-          {
-            path: '/chat-old/:id',
-            element: <ChatOldPage />,
-          },
+          // {
+          //   path: AppRoutes.Chat(':id'),
+          //   element: <ChatPage />,
+          // },
+          // {
+          //   path: '/chat-old/:id',
+          //   element: <ChatOldPage />,
+          // },
         ],
       },
     ],
