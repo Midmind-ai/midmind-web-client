@@ -14,7 +14,6 @@ import {
   getItemHasChildren,
   getItemParentDirectoryId,
 } from '@features/file-system/utils/item-helpers';
-import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type Props = {
   node: Item;
@@ -35,20 +34,6 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
     node,
     isDisabled: false,
   });
-
-  // Map tree node types to entity types
-  const getEntityType = () => {
-    const entityType = getItemEntityType(node);
-    if (entityType === ItemTypeEnum.Folder) {
-      return 'folder' as const;
-    }
-    if (entityType === ItemTypeEnum.Chat) {
-      return 'chat' as const;
-    }
-
-    // Add mappings for other types as needed
-    return 'folder' as const; // fallback
-  };
 
   // Handle rename action for this specific node
   const handleRenameAction = () => {
@@ -79,7 +64,7 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
         {getItemDisplayName(node)}
       </ThemedSpan>
       <EntityActionsMenu
-        entityType={getEntityType()}
+        entityType={getItemEntityType(node)}
         handlers={{
           onDelete: async () => {
             // Use unified deleteItem for all types

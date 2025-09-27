@@ -4,16 +4,12 @@ import type { EntityActionHandlers } from '@components/misc/entity-actions/types
 import {
   createFolderActions,
   createChatActions,
-  createBranchActions,
-  createMindletActions,
+  createNoteActions,
 } from '@components/misc/entity-actions/utils/action-creators';
-import type { components } from 'generated/api-types';
-
-// Use the breadcrumbs type which has all entity types
-type EntityType = components['schemas']['ChatBreadcrumbsDto']['type'];
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type UseEntityActionsParams = {
-  entityType: EntityType;
+  entityType: ItemTypeEnum;
   handlers: EntityActionHandlers;
   isDeleting?: boolean;
 };
@@ -24,7 +20,7 @@ export const useEntityActions = ({
   isDeleting = false,
 }: UseEntityActionsParams): ActionConfig[] => {
   return useMemo(() => {
-    if (entityType === 'folder') {
+    if (entityType === ItemTypeEnum.Folder) {
       if (!handlers.onRename) {
         return [];
       }
@@ -38,7 +34,7 @@ export const useEntityActions = ({
       );
     }
 
-    if (entityType === 'chat') {
+    if (entityType === ItemTypeEnum.Chat) {
       if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
         return [];
       }
@@ -54,28 +50,14 @@ export const useEntityActions = ({
       );
     }
 
-    if (entityType === 'nested_chat') {
-      if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
+    if (entityType === ItemTypeEnum.Note) {
+      if (!handlers.onRename) {
         return [];
       }
 
-      return createBranchActions(
+      return createNoteActions(
         {
-          onDelete: handlers.onDelete,
-          onOpenInNewTab: handlers.onOpenInNewTab,
-          onOpenInSidePanel: handlers.onOpenInSidePanel,
-        },
-        { isDeleting }
-      );
-    }
-
-    if (entityType === 'mindlet') {
-      if (!handlers.onOpenInNewTab || !handlers.onOpenInSidePanel) {
-        return [];
-      }
-
-      return createMindletActions(
-        {
+          onRename: handlers.onRename,
           onDelete: handlers.onDelete,
           onOpenInNewTab: handlers.onOpenInNewTab,
           onOpenInSidePanel: handlers.onOpenInSidePanel,

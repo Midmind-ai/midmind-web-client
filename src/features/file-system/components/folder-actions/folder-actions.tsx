@@ -4,12 +4,13 @@ import { SidebarMenuButton } from '@components/ui/sidebar';
 import { AppRoutes } from '@constants/paths';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
 import { navigate } from '@hooks/use-navigation';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 const FolderActions = () => {
   const [searchParams] = useSearchParams();
 
   // Store actions (inline editing handled inside store)
-  const createTemporaryFolder = useFileSystemStore(state => state.createTemporaryFolder);
+  const createTemporaryItem = useFileSystemStore(state => state.createTemporaryItem);
 
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
@@ -24,7 +25,13 @@ const FolderActions = () => {
   const handleCreateDirectory = () => {
     // Create new directory inline (no parent - root level)
     // Store automatically starts inline editing
-    createTemporaryFolder();
+    createTemporaryItem(ItemTypeEnum.Folder);
+  };
+
+  const handleCreateNote = () => {
+    // Create new note inline (no parent - root level)
+    // Store automatically starts inline editing
+    createTemporaryItem(ItemTypeEnum.Note);
   };
 
   return (
@@ -38,7 +45,7 @@ const FolderActions = () => {
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}
-          onClick={() => {}}
+          onClick={handleCreateNote}
         >
           <FilePlus2 className="size-5.5! stroke-1" />
         </SidebarMenuButton>

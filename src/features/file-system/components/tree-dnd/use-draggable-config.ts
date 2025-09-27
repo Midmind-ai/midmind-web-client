@@ -4,13 +4,13 @@ import type {
   DroppableData,
   Item,
 } from '@features/file-system/hooks/use-file-system.actions';
+import { getAcceptedTypes } from '@features/file-system/utils/drop-zone-configs';
 import {
   getItemDisplayName,
   getItemEntityType,
   getItemParentDirectoryId,
   getItemParentChatId,
 } from '@features/file-system/utils/item-helpers';
-import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type UseDraggableConfigProps = {
   node: Item;
@@ -54,7 +54,7 @@ export const useDraggableConfig = ({
     type: 'expandable-node',
     id: node.id,
     nodeType: nodeType,
-    accepts: [ItemTypeEnum.Chat, ItemTypeEnum.Folder], // ExpandableNodes can accept both chats and directories
+    accepts: getAcceptedTypes('expandableNode'), // Use centralized configuration
     targetName: getItemDisplayName(node), // Include the target directory name for logging
   };
 

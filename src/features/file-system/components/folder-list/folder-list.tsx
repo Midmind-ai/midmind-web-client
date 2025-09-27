@@ -5,6 +5,7 @@ import TreeDndProvider from '@features/file-system/components/tree-dnd/tree-dnd-
 import TreeNode from '@features/file-system/components/tree-node/tree-node';
 import { useFileSystem } from '@features/file-system/data/use-file-system';
 import { type DroppableData } from '@features/file-system/hooks/use-file-system.actions';
+import { getAcceptedTypes } from '@features/file-system/utils/drop-zone-configs';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 
 const FolderList = () => {
@@ -15,7 +16,7 @@ const FolderList = () => {
     type: 'root',
     id: 'root-drop-zone',
     nodeType: ItemTypeEnum.Folder,
-    accepts: [ItemTypeEnum.Chat, ItemTypeEnum.Folder], // Root can accept both chats and directories
+    accepts: getAcceptedTypes('root'), // Use centralized configuration
   };
 
   return (

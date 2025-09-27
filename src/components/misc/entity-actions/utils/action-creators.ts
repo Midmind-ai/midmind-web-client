@@ -25,6 +25,13 @@ type MindletActionHandlers = {
   onOpenInSidePanel: () => void;
 };
 
+type NoteActionHandlers = {
+  onRename: () => void;
+  onDelete: () => void;
+  onOpenInNewTab?: () => void;
+  onOpenInSidePanel?: () => void;
+};
+
 export const createFolderActions = (
   handlers: FolderActionHandlers,
   options: { isDeleting?: boolean } = {}
@@ -174,3 +181,61 @@ export const createMindletActions = (
     },
   },
 ];
+
+export const createNoteActions = (
+  handlers: NoteActionHandlers,
+  options: { isDeleting?: boolean } = {}
+): ActionConfig[] => {
+  const actions: ActionConfig[] = [];
+
+  // Add open actions if handlers are provided
+  if (handlers.onOpenInNewTab) {
+    actions.push({
+      key: 'open-new-tab',
+      label: 'Open in new tab',
+      icon: ExternalLink,
+      handler: e => {
+        e.stopPropagation();
+        handlers.onOpenInNewTab?.();
+      },
+    });
+  }
+
+  if (handlers.onOpenInSidePanel) {
+    actions.push({
+      key: 'open-side-panel',
+      label: 'Open in side panel',
+      icon: PanelRight,
+      handler: e => {
+        e.stopPropagation();
+        handlers.onOpenInSidePanel?.();
+      },
+    });
+  }
+
+  // Add rename action
+  actions.push({
+    key: 'rename',
+    label: 'Rename',
+    icon: Pencil,
+    handler: e => {
+      e.stopPropagation();
+      handlers.onRename();
+    },
+  });
+
+  // Add delete action
+  actions.push({
+    key: 'delete',
+    label: 'Delete',
+    icon: options.isDeleting ? Loader2 : Trash2,
+    variant: 'destructive',
+    loading: options.isDeleting,
+    handler: e => {
+      e.stopPropagation();
+      handlers.onDelete();
+    },
+  });
+
+  return actions;
+};

@@ -10,15 +10,12 @@ import {
 } from '@components/ui/dropdown-menu';
 import { SidebarMenuAction } from '@components/ui/sidebar';
 import { ThemedSpan } from '@components/ui/themed-span';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 import { useMenuStateStore } from '@stores/menu-state.store';
 import { cn } from '@utils/cn';
-import type { components } from 'generated/api-types';
-
-// Use the breadcrumbs type which has all entity types
-type EntityType = components['schemas']['ChatBreadcrumbsDto']['type'];
 
 type Props = {
-  entityType: EntityType;
+  entityType: ItemTypeEnum;
   handlers: EntityActionHandlers;
   isDeleting?: boolean;
   trigger?: React.ReactNode;

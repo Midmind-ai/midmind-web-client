@@ -41,14 +41,15 @@ type FileSystemStore = {
     navigate?: (chatId: string) => void;
   }) => Promise<string>;
 
-  // Folder creation
-  createTemporaryFolder: (parentFolderId?: string) => string;
-  finalizeFolderCreation: (
+  // Item creation (folders, notes, etc.)
+  createTemporaryItem: (itemType: ItemTypeEnum, parentId?: string) => string;
+  finalizeItemCreation: (
     id: string,
     name: string,
-    parentFolderId?: string
+    itemType: ItemTypeEnum,
+    parentId?: string
   ) => Promise<void>;
-  removeTemporaryFolder: (id: string, parentFolderId?: string) => void;
+  removeTemporaryItem: (id: string, parentId?: string) => void;
 
   // Loading state helpers
   hasLoadAttempted: (parentId: string | 'root') => boolean;
@@ -391,15 +392,15 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }
       },
 
-      createTemporaryFolder: parentFolderId => {
+      createTemporaryItem: (itemType, parentId) => {
         const newId = uuidv4();
-        const parentId = parentFolderId || 'root';
+        const actualParentId = parentId || 'root';
 
-        // Create temporary folder item
-        const newFolder: Item = {
+        // Create temporary item
+        const newItem: Item = {
           id: newId,
-          type: 'folder',
-          parent_id: parentFolderId || null,
+          type: itemType,
+          parent_id: parentId || null,
           root_item_id: null,
           user_id: 'current-user',
           created_at: new Date().toISOString(),
@@ -411,7 +412,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         set(state => ({
           itemsByParentId: {
             ...state.itemsByParentId,
-            [parentId]: [newFolder, ...(state.itemsByParentId[parentId] || [])],
+            [actualParentId]: [newItem, ...(state.itemsByParentId[actualParentId] || [])],
           },
         }));
 
@@ -420,14 +421,14 @@ export const useFileSystemStore = create<FileSystemStore>()(
         return newId;
       },
 
-      finalizeFolderCreation: async (id, name, parentFolderId) => {
-        const parentId = parentFolderId || 'root';
+      finalizeItemCreation: async (id, name, itemType, parentId) => {
+        const actualParentId = parentId || 'root';
 
-        // Update folder name
+        // Update item name
         set(state => ({
           itemsByParentId: {
             ...state.itemsByParentId,
-            [parentId]: (state.itemsByParentId[parentId] || []).map(item =>
+            [actualParentId]: (state.itemsByParentId[actualParentId] || []).map(item =>
               item.id === id ? { ...item, payload: { ...item.payload, name } } : item
             ),
           },
@@ -437,15 +438,15 @@ export const useFileSystemStore = create<FileSystemStore>()(
           await ItemsService.createItem({
             id,
             payload: { name },
-            parent_id: parentFolderId,
-            type: ItemTypeEnum.Folder,
+            parent_id: parentId,
+            type: itemType,
           });
         } catch (error) {
-          // Remove temporary folder on error
+          // Remove temporary item on error
           set(state => ({
             itemsByParentId: {
               ...state.itemsByParentId,
-              [parentId]: (state.itemsByParentId[parentId] || []).filter(
+              [actualParentId]: (state.itemsByParentId[actualParentId] || []).filter(
                 item => item.id !== id
               ),
             },
@@ -458,8 +459,8 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }
       },
 
-      removeTemporaryFolder: (id, parentFolderId) => {
-        const parentId = parentFolderId || 'root';
+      removeTemporaryItem: (id, parentId) => {
+        const actualParentId = parentId || 'root';
 
         // Stop inline editing
         const inlineEditStore = useInlineEditStore.getState();
@@ -471,7 +472,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         set(state => ({
           itemsByParentId: {
             ...state.itemsByParentId,
-            [parentId]: (state.itemsByParentId[parentId] || []).filter(
+            [actualParentId]: (state.itemsByParentId[actualParentId] || []).filter(
               item => item.id !== id
             ),
           },

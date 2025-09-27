@@ -43,12 +43,8 @@ const ExpandableNode = React.memo(
     // Store actions (cache revalidation handled inside store)
     const renameItem = useFileSystemStore(state => state.renameItem);
     const deleteItem = useFileSystemStore(state => state.deleteItem);
-    const finalizeFolderCreation = useFileSystemStore(
-      state => state.finalizeFolderCreation
-    );
-    const removeTemporaryFolder = useFileSystemStore(
-      state => state.removeTemporaryFolder
-    );
+    const finalizeItemCreation = useFileSystemStore(state => state.finalizeItemCreation);
+    const removeTemporaryItem = useFileSystemStore(state => state.removeTemporaryItem);
 
     // Still need actions for other operations
     const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
@@ -80,10 +76,17 @@ const ExpandableNode = React.memo(
     const handleRename = async (newName: string) => {
       const nodeType = String(node.type);
       const isFolder = nodeType === ItemTypeEnum.Folder;
+      const isNote = nodeType === ItemTypeEnum.Note;
 
-      if (isFolder && node?.payload?.name === '') {
-        // This is a new directory being named for the first time
-        await finalizeFolderCreation(node.id, newName);
+      if ((isFolder || isNote) && node?.payload?.name === '') {
+        // This is a new item being named for the first time
+        const itemType = isFolder ? ItemTypeEnum.Folder : ItemTypeEnum.Note;
+        await finalizeItemCreation(
+          node.id,
+          newName,
+          itemType,
+          getItemParentDirectoryId(node) || undefined
+        );
       } else {
         // Use the unified renameItem for all types
         await renameItem(node.id, newName);
@@ -93,12 +96,14 @@ const ExpandableNode = React.memo(
     const handleCancel = async () => {
       const nodeType = String(node.type);
       const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
-      if (isFolder && getItemDisplayName(node) === '') {
-        // This is a new directory being canceled - remove from store
-        const parentFolderId = getItemParentDirectoryId(node) || undefined;
-        removeTemporaryFolder(node.id, parentFolderId);
+      const isNote = nodeType === ItemTypeEnum.Note || nodeType === 'note';
+
+      if ((isFolder || isNote) && getItemDisplayName(node) === '') {
+        // This is a new item being canceled - remove from store
+        const parentId = getItemParentDirectoryId(node) || undefined;
+        removeTemporaryItem(node.id, parentId);
       }
-      // For chats, no special cancel logic needed - just cancel the edit
+      // For chats and existing items, no special cancel logic needed - just cancel the edit
     };
 
     const handleChevronClick = (e: React.MouseEvent) => {
@@ -110,23 +115,6 @@ const ExpandableNode = React.memo(
       }
 
       setIsOpen(!isOpen);
-    };
-
-    // Map tree node types to entity types
-    const getEntityType = () => {
-      const nodeType = String(node.type);
-      const isFolder = nodeType === ItemTypeEnum.Folder || nodeType === 'folder';
-      const isChat = nodeType === ItemTypeEnum.Chat || nodeType === 'chat';
-
-      if (isFolder) {
-        return 'folder' as const;
-      }
-      if (isChat) {
-        return 'chat' as const;
-      }
-
-      // Add mappings for other types as needed
-      return 'folder' as const; // fallback
     };
 
     // Handle rename action for this specific node
@@ -224,7 +212,7 @@ const ExpandableNode = React.memo(
                 />
                 {!isCurrentlyEditing && (
                   <EntityActionsMenu
-                    entityType={getEntityType()}
+                    entityType={getItemEntityType(node)}
                     handlers={{
                       onDelete: async () => {
                         // Use unified deleteItem for all types
