@@ -5,7 +5,11 @@ import { useExpandedNodesStore } from '@features/file-system/stores/expanded-nod
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 import { findCacheKeysByPattern, CACHE_KEYS } from '@hooks/cache-keys';
 import { mutate } from '@lib/swr';
-import type { Item, ItemsListResult } from '@services/items/items-dtos';
+import {
+  ItemTypeEnum,
+  type Item,
+  type ItemsListResult,
+} from '@services/items/items-dtos';
 import { ItemsService } from '@services/items/items-service';
 import type { ChatBranchContext } from '@shared-types/entities';
 
@@ -370,11 +374,12 @@ export const useFileSystemStore = create<FileSystemStore>()(
         if (navigate) navigate(chatId);
 
         try {
-          await ItemsService.createChat(
-            'New chat',
-            parentChatId || parentFolderId || null,
-            optimisticChat.payload
-          );
+          await ItemsService.createItem({
+            type: ItemTypeEnum.Chat,
+            id: chatId,
+            parent_id: parentChatId || parentFolderId || null,
+            payload: { name: 'Untitled chat' },
+          });
 
           return chatId;
         } catch (error) {
@@ -429,7 +434,12 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }));
 
         try {
-          await ItemsService.createFolder(id, name, parentFolderId);
+          await ItemsService.createItem({
+            id,
+            payload: { name },
+            parent_id: parentFolderId,
+            type: ItemTypeEnum.Folder,
+          });
         } catch (error) {
           // Remove temporary folder on error
           set(state => ({
