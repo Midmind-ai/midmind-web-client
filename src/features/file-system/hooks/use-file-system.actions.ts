@@ -79,7 +79,7 @@ type FileSystemActions = {
 // Actions-only hook for components that don't need data fetching
 // This prevents unnecessary SWR calls and controller data fetching
 export const useFileSystemActions = (): FileSystemActions => {
-  const { id: chatId = '' } = useParams();
+  const { id = '' } = useParams();
 
   // DND logic
   const {
@@ -108,7 +108,7 @@ export const useFileSystemActions = (): FileSystemActions => {
 
   const isNodeActive = (node: Item): boolean => {
     if (node.type === ItemTypeEnum.Chat) {
-      return chatId === node.id;
+      return id === node.id;
     }
 
     return false;

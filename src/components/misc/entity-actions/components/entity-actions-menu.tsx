@@ -1,6 +1,9 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useMemo } from 'react';
-import { useEntityActions } from '@components/misc/entity-actions/hooks/use-entity-actions';
+import {
+  getActionIcon,
+  getAvailableActions,
+} from '@components/misc/entity-actions/entity-actions-config';
 import type { EntityActionHandlers } from '@components/misc/entity-actions/types/entity-action-handlers';
 import {
   DropdownMenu,
@@ -21,6 +24,7 @@ type Props = {
   trigger?: React.ReactNode;
   triggerClassName?: string;
   menuId?: string; // Unique identifier for this menu instance
+  setIsHovered: (val: boolean) => void;
 };
 
 export const EntityActionsMenu = ({
@@ -30,8 +34,12 @@ export const EntityActionsMenu = ({
   trigger,
   triggerClassName = '',
   menuId,
+  setIsHovered,
 }: Props) => {
-  const actions = useEntityActions({ entityType, handlers, isDeleting });
+  // Get available actions directly from config
+  const actions = useMemo(() => {
+    return getAvailableActions(entityType, handlers, isDeleting);
+  }, [entityType, handlers, isDeleting]);
 
   // Generate unique menu ID if not provided
   const uniqueMenuId = useMemo(() => {
@@ -82,34 +90,39 @@ export const EntityActionsMenu = ({
         side="right"
         align="start"
       >
-        {actions.map(action => (
-          <DropdownMenuItem
-            key={action.key}
-            onClick={action.handler}
-          >
-            {action.loading && action.icon && (
-              <action.icon
-                className={cn(
-                  'animate-spin',
-                  action.variant === 'destructive' ? 'text-destructive' : ''
-                )}
-              />
-            )}
-            {!action.loading && action.icon && (
-              <action.icon
-                className={cn(
-                  'mr-2 size-4',
-                  action.variant === 'destructive' ? 'text-destructive' : ''
-                )}
-              />
-            )}
-            <ThemedSpan
-              className={action.variant === 'destructive' ? 'text-destructive' : ''}
+        {actions.map(action => {
+          const Icon = getActionIcon(action, isDeleting);
+          const isLoading = action.id === 'delete' && isDeleting;
+
+          return (
+            <DropdownMenuItem
+              key={action.id}
+              onClick={e => {
+                e.stopPropagation();
+                const handler = handlers[action.action];
+                if (handler) {
+                  handler();
+                }
+
+                setTimeout(() => {
+                  setIsHovered(false);
+                }, 0);
+              }}
             >
-              {action.label}
-            </ThemedSpan>
-          </DropdownMenuItem>
-        ))}
+              <Icon
+                className={cn(
+                  isLoading ? 'animate-spin' : 'mr-2 size-4',
+                  action.variant === 'destructive' ? 'text-destructive' : ''
+                )}
+              />
+              <ThemedSpan
+                className={action.variant === 'destructive' ? 'text-destructive' : ''}
+              >
+                {action.label}
+              </ThemedSpan>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

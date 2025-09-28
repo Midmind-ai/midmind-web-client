@@ -1,4 +1,4 @@
-import { FilePlus2, FolderPlus, MessageSquarePlus } from 'lucide-react';
+import { Folder, Library, MessageSquare, NotebookText } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 import { SidebarMenuButton } from '@components/ui/sidebar';
 import { AppRoutes } from '@constants/paths';
@@ -28,6 +28,12 @@ const FolderActions = () => {
     createTemporaryItem(ItemTypeEnum.Folder);
   };
 
+  const handleCreateProject = () => {
+    // Create new directory inline (no parent - root level)
+    // Store automatically starts inline editing
+    createTemporaryItem(ItemTypeEnum.Project);
+  };
+
   const handleCreateNote = () => {
     // Create new note inline (no parent - root level)
     // Store automatically starts inline editing
@@ -39,21 +45,27 @@ const FolderActions = () => {
       <div className="flex gap-1">
         <SidebarMenuButton
           className={buttonClassNames}
+          onClick={handleCreateProject}
+        >
+          <Library className="size-5.5! stroke-1" />
+        </SidebarMenuButton>
+        <SidebarMenuButton
+          className={buttonClassNames}
           onClick={handleCreateDirectory}
         >
-          <FolderPlus className="size-5.5! stroke-1" />
+          <Folder className="size-5.5! stroke-1" />
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}
           onClick={handleCreateNote}
         >
-          <FilePlus2 className="size-5.5! stroke-1" />
+          <NotebookText className="size-5.5! stroke-1" />
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}
           onClick={handleNavigateToHome}
         >
-          <MessageSquarePlus className="size-5.5! stroke-1" />
+          <MessageSquare className="size-5.5! stroke-1" />
         </SidebarMenuButton>
       </div>
     </div>

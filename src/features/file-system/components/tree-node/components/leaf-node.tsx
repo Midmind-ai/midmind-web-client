@@ -77,6 +77,7 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
         isDeleting={false}
         triggerClassName="opacity-0 group-hover/item:opacity-100"
         menuId={`leaf-node-${node.id}`}
+        setIsHovered={() => {}}
       />
     </SidebarMenuButton>
   );

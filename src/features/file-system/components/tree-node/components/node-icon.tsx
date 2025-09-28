@@ -1,4 +1,10 @@
-import { Folder, MessageCircle, MessagesSquare, NotebookText } from 'lucide-react';
+import {
+  Folder,
+  Library,
+  MessageCircle,
+  MessagesSquare,
+  NotebookText,
+} from 'lucide-react';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type Props = {
@@ -22,6 +28,10 @@ const NodeIcon = ({ nodeType, hasChildren }: Props) => {
 
   if (nodeType === ItemTypeEnum.Note) {
     return <NotebookText className="size-4 stroke-[1.5px]" />;
+  }
+
+  if (nodeType === ItemTypeEnum.Project) {
+    return <Library className="size-4.5 stroke-[1.5px] text-blue-600" />;
   }
 
   // Default fallback

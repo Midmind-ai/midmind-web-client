@@ -45,6 +45,7 @@ const ExpandableNode = React.memo(
     const deleteItem = useFileSystemStore(state => state.deleteItem);
     const finalizeItemCreation = useFileSystemStore(state => state.finalizeItemCreation);
     const removeTemporaryItem = useFileSystemStore(state => state.removeTemporaryItem);
+    const convertItemType = useFileSystemStore(state => state.convertItemType);
 
     // Still need actions for other operations
     const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
@@ -74,17 +75,12 @@ const ExpandableNode = React.memo(
     }, [isCurrentlyEditing]);
 
     const handleRename = async (newName: string) => {
-      const nodeType = String(node.type);
-      const isFolder = nodeType === ItemTypeEnum.Folder;
-      const isNote = nodeType === ItemTypeEnum.Note;
-
-      if ((isFolder || isNote) && node?.payload?.name === '') {
+      if (node?.payload?.name === '') {
         // This is a new item being named for the first time
-        const itemType = isFolder ? ItemTypeEnum.Folder : ItemTypeEnum.Note;
         await finalizeItemCreation(
           node.id,
           newName,
-          itemType,
+          node.type as ItemTypeEnum,
           getItemParentDirectoryId(node) || undefined
         );
       } else {
@@ -147,6 +143,7 @@ const ExpandableNode = React.memo(
                 onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onBlur={() => setIsHovered(false)}
                 onKeyDown={
                   isCurrentlyEditing
                     ? e => {
@@ -227,10 +224,15 @@ const ExpandableNode = React.memo(
                       onRename: handleRenameAction,
                       onOpenInNewTab: () => openChatInNewTab(node.id),
                       onOpenInSidePanel: () => openChatInSidePanel(node.id),
+                      onConvertToFolder: () =>
+                        convertItemType(node.id, ItemTypeEnum.Folder),
+                      onConvertToProject: () =>
+                        convertItemType(node.id, ItemTypeEnum.Project),
                     }}
                     isDeleting={false}
                     triggerClassName="opacity-0 group-hover/item:opacity-100"
                     menuId={`expandable-node-${node.id}`}
+                    setIsHovered={setIsHovered}
                   />
                 )}
               </SidebarMenuButton>
@@ -238,6 +240,7 @@ const ExpandableNode = React.memo(
             <CollapsibleContent>
               <ChildrenList
                 parentNodeId={node.id}
+                isProjectChildrenList={node.type === ItemTypeEnum.Project}
                 TreeNodeComponent={TreeNodeComponent}
               />
             </CollapsibleContent>
