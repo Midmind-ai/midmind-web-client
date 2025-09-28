@@ -4,1124 +4,1225 @@
  */
 
 export interface paths {
-  '/api/v1/auth/sign-in': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log in into the system
+         * @description Sign in with email and password.
+         */
+        post: operations["sign_in_api_v1_auth_sign_in_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /**
-     * Log in into the system
-     * @description Sign in with email and password.
-     */
-    post: operations['sign_in_api_v1_auth_sign_in_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/sign-up': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a new user
+         * @description Register a new user with email and password.
+         */
+        post: operations["sign_up_api_v1_auth_sign_up_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /**
-     * Register a new user
-     * @description Register a new user with email and password.
-     */
-    post: operations['sign_up_api_v1_auth_sign_up_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/google': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log in with Google
+         * @description Sign in with Google OAuth.
+         */
+        post: operations["sign_in_with_google_api_v1_auth_google_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /**
-     * Log in with Google
-     * @description Sign in with Google OAuth.
-     */
-    post: operations['sign_in_with_google_api_v1_auth_google_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/refresh': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh access token
+         * @description Refresh access token using refresh token.
+         */
+        post: operations["refresh_api_v1_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /**
-     * Refresh access token
-     * @description Refresh access token using refresh token.
-     */
-    post: operations['refresh_api_v1_auth_refresh_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/auth/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout a user from the system
+         * @description Logout user by removing session.
+         */
+        post: operations["logout_api_v1_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /**
-     * Logout a user from the system
-     * @description Logout user by removing session.
-     */
-    post: operations['logout_api_v1_auth_logout_post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/users/current': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/users/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current user
+         * @description Get current authenticated user information.
+         */
+        get: operations["get_current_user_endpoint_api_v1_users_current_get"];
+        /**
+         * Update current user
+         * @description Update current authenticated user information.
+         */
+        put: operations["update_current_user_api_v1_users_current_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Get current user
-     * @description Get current authenticated user information.
-     */
-    get: operations['get_current_user_endpoint_api_v1_users_current_get'];
-    /**
-     * Update current user
-     * @description Update current authenticated user information.
-     */
-    put: operations['update_current_user_api_v1_users_current_put'];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/users/': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/users/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List users
+         * @description List users with pagination and optional search (admin only).
+         */
+        get: operations["list_users_api_v1_users__get"];
+        put?: never;
+        /**
+         * Create user
+         * @description Create a new user (admin only).
+         */
+        post: operations["create_user_api_v1_users__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * List users
-     * @description List users with pagination and optional search (admin only).
-     */
-    get: operations['list_users_api_v1_users__get'];
-    put?: never;
-    /**
-     * Create user
-     * @description Create a new user (admin only).
-     */
-    post: operations['create_user_api_v1_users__post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/users/{user_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get user by ID
+         * @description Get user by ID (admin only).
+         */
+        get: operations["get_user_by_id_api_v1_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Get user by ID
-     * @description Get user by ID (admin only).
-     */
-    get: operations['get_user_by_id_api_v1_users__user_id__get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/items/': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Root Items
+         * @description List user's root-level items (parent_id is null) with pagination.
+         */
+        get: operations["list_root_items_api_v1_items__get"];
+        put?: never;
+        /**
+         * Create Item
+         * @description Create a new item of any type.
+         */
+        post: operations["create_item_api_v1_items__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * List Root Items
-     * @description List user's root-level items (parent_id is null) with pagination.
-     */
-    get: operations['list_root_items_api_v1_items__get'];
-    put?: never;
-    /**
-     * Create Item
-     * @description Create a new item of any type.
-     */
-    post: operations['create_item_api_v1_items__post'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/items/{item_id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Item
+         * @description Get a single item by ID.
+         */
+        get: operations["get_item_api_v1_items__item_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Item
+         * @description Delete an item and all its children.
+         */
+        delete: operations["delete_item_api_v1_items__item_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Get Item
-     * @description Get a single item by ID.
-     */
-    get: operations['get_item_api_v1_items__item_id__get'];
-    put?: never;
-    post?: never;
-    /**
-     * Delete Item
-     * @description Delete an item and all its children.
-     */
-    delete: operations['delete_item_api_v1_items__item_id__delete'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/items/{item_id}/children': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/{item_id}/children": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Item Children
+         * @description Get direct children of an item (folder contents).
+         */
+        get: operations["get_item_children_api_v1_items__item_id__children_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Get Item Children
-     * @description Get direct children of an item (folder contents).
-     */
-    get: operations['get_item_children_api_v1_items__item_id__children_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/items/{item_id}/move': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/{item_id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Move Item
+         * @description Move an item to a new parent with hierarchy validation.
+         */
+        patch: operations["move_item_api_v1_items__item_id__move_patch"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /**
-     * Move Item
-     * @description Move an item to a new parent with hierarchy validation.
-     */
-    patch: operations['move_item_api_v1_items__item_id__move_patch'];
-    trace?: never;
-  };
-  '/api/v1/items/{item_id}/rename': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/{item_id}/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Rename Item
+         * @description Rename an item (generic across all item types).
+         */
+        patch: operations["rename_item_api_v1_items__item_id__rename_patch"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /**
-     * Rename Item
-     * @description Rename an item (generic across all item types).
-     */
-    patch: operations['rename_item_api_v1_items__item_id__rename_patch'];
-    trace?: never;
-  };
-  '/health': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/items/{parent_id}/renormalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renormalize Positions
+         * @description Reset positions to 1000-unit gaps when precision is exhausted.
+         */
+        post: operations["renormalize_positions_api_v1_items__parent_id__renormalize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Health Check */
-    get: operations['health_check_health_get'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health Check */
+        get: operations["health_check_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /** AccessTokenDto */
-    AccessTokenDto: {
-      /** Access Token */
-      access_token: string;
+    schemas: {
+        /** AccessTokenDto */
+        AccessTokenDto: {
+            /** Access Token */
+            access_token: string;
+        };
+        /**
+         * ChatPayload
+         * @description Payload model for chat items.
+         */
+        ChatPayload: {
+            /**
+             * Name
+             * @default New Chat
+             */
+            name: string;
+            /**
+             * Depth
+             * @default 0
+             */
+            depth: number;
+            /**
+             * Position X
+             * @default 0
+             */
+            position_x: number;
+            /**
+             * Position Y
+             * @default 0
+             */
+            position_y: number;
+            /** Path */
+            path?: string[];
+        };
+        /**
+         * ChildrenBounds
+         * @description Model for children position bounds.
+         * @example {
+         *       "count": 3,
+         *       "max_position": 5000,
+         *       "min_position": 1000
+         *     }
+         */
+        ChildrenBounds: {
+            /** Min Position */
+            min_position: number;
+            /** Max Position */
+            max_position: number;
+            /** Count */
+            count: number;
+        };
+        /**
+         * CreateItemRequest
+         * @description Request model for creating a new item.
+         */
+        CreateItemRequest: {
+            /** Id */
+            id: string;
+            type: components["schemas"]["ItemType"];
+            /** Parent Id */
+            parent_id?: string | null;
+            /** Position */
+            position: number;
+            /** Payload */
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
+        };
+        /** CreateUserDto */
+        CreateUserDto: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Password */
+            password: string;
+            /** Confirmation Password */
+            confirmation_password: string;
+            /** Avatar */
+            avatar?: string | null;
+        };
+        /**
+         * FolderPayload
+         * @description Payload model for folder items.
+         */
+        FolderPayload: {
+            /**
+             * Name
+             * @default Untitled folder
+             */
+            name: string;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * ItemListResponse
+         * @description Response model for paginated item lists.
+         * @example {
+         *       "items": [
+         *         {
+         *           "children_bounds": {
+         *             "count": 2,
+         *             "max_position": 2000,
+         *             "min_position": 1000
+         *           },
+         *           "created_at": "2025-09-20T13:00:00Z",
+         *           "id": "item-uuid",
+         *           "payload": {
+         *             "name": "My Folder"
+         *           },
+         *           "position": 3000,
+         *           "type": "folder",
+         *           "user_id": "user-uuid"
+         *         }
+         *       ],
+         *       "limit": 50,
+         *       "offset": 0,
+         *       "total": 1
+         *     }
+         */
+        ItemListResponse: {
+            /** Items */
+            items: components["schemas"]["ItemResponse"][];
+            /** Total */
+            total: number;
+            /** Limit */
+            limit: number;
+            /** Offset */
+            offset: number;
+        };
+        /**
+         * ItemResponse
+         * @description Unified response model for items with type-specific payload.
+         */
+        ItemResponse: {
+            /** Id */
+            id: string;
+            type: components["schemas"]["ItemType"];
+            /** Parent Id */
+            parent_id: string | null;
+            /** Root Item Id */
+            root_item_id: string | null;
+            /** User Id */
+            user_id: string;
+            /** Position */
+            position: number;
+            children_bounds?: components["schemas"]["ChildrenBounds"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at: string | null;
+            /** Payload */
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
+        };
+        /**
+         * ItemType
+         * @enum {string}
+         */
+        ItemType: "note" | "chat" | "folder";
+        /** MessageDto */
+        MessageDto: {
+            /** Message */
+            message: string;
+        };
+        /**
+         * MoveItemRequest
+         * @description Request model for moving an item to a new parent.
+         */
+        MoveItemRequest: {
+            /** Parent Id */
+            parent_id?: string | null;
+            /** Position */
+            position: number;
+        };
+        /**
+         * NotePayload
+         * @description Payload model for note items.
+         */
+        NotePayload: {
+            /**
+             * Name
+             * @default Untitled note
+             */
+            name: string;
+            /** Content Md */
+            content_md?: string | null;
+            /** Content Json */
+            content_json?: Record<string, never> | null;
+        };
+        /**
+         * RenameItemRequest
+         * @description Request model for renaming an item (generic across all types).
+         */
+        RenameItemRequest: {
+            /** Name */
+            name: string;
+        };
+        /**
+         * RenormalizeResponse
+         * @description Response model for renormalization operations.
+         * @example {
+         *       "items": [
+         *         {
+         *           "id": "item-1",
+         *           "position": 1000
+         *         },
+         *         {
+         *           "id": "item-2",
+         *           "position": 2000
+         *         },
+         *         {
+         *           "id": "item-3",
+         *           "position": 3000
+         *         }
+         *       ]
+         *     }
+         */
+        RenormalizeResponse: {
+            /** Items */
+            items: {
+                [key: string]: number;
+            }[];
+        };
+        /** SignInDto */
+        SignInDto: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** SignInWithGoogleDto */
+        SignInWithGoogleDto: {
+            /** Code */
+            code: string;
+        };
+        /** SignUpDto */
+        SignUpDto: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+            /** Confirmation Password */
+            confirmation_password: string;
+        };
+        /** UpdateUserDto */
+        UpdateUserDto: {
+            /** First Name */
+            first_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Avatar */
+            avatar?: string | null;
+            /** Password */
+            password?: string | null;
+            /** Confirmation Password */
+            confirmation_password?: string | null;
+        };
+        /** UserListDto */
+        UserListDto: {
+            /** Users */
+            users: components["schemas"]["UserResponseDto"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Pages */
+            pages: number;
+        };
+        /** UserResponseDto */
+        UserResponseDto: {
+            /** Id */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Avatar */
+            avatar?: string | null;
+            /** Provider */
+            provider?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Updated At */
+            updated_at?: string | null;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+        };
     };
-    /**
-     * ChatPayload
-     * @description Payload model for chat items.
-     */
-    ChatPayload: {
-      /**
-       * Name
-       * @default New Chat
-       */
-      name: string;
-      /**
-       * Depth
-       * @default 0
-       */
-      depth: number;
-      /**
-       * Position X
-       * @default 0
-       */
-      position_x: number;
-      /**
-       * Position Y
-       * @default 0
-       */
-      position_y: number;
-      /** Path */
-      path?: string[];
-    };
-    /**
-     * CreateItemRequest
-     * @description Request model for creating a new item.
-     */
-    CreateItemRequest: {
-      /** Id */
-      id: string;
-      type: components['schemas']['ItemType'];
-      /** Parent Id */
-      parent_id?: string | null;
-      /** Payload */
-      payload?:
-        | components['schemas']['NotePayload']
-        | components['schemas']['FolderPayload']
-        | components['schemas']['ChatPayload'];
-    };
-    /** CreateUserDto */
-    CreateUserDto: {
-      /**
-       * Email
-       * Format: email
-       */
-      email: string;
-      /** First Name */
-      first_name: string;
-      /** Last Name */
-      last_name: string;
-      /** Password */
-      password: string;
-      /** Confirmation Password */
-      confirmation_password: string;
-      /** Avatar */
-      avatar?: string | null;
-    };
-    /**
-     * FolderPayload
-     * @description Payload model for folder items.
-     */
-    FolderPayload: {
-      /**
-       * Name
-       * @default Untitled folder
-       */
-      name: string;
-    };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components['schemas']['ValidationError'][];
-    };
-    /**
-     * ItemListResponse
-     * @description Response model for paginated item lists.
-     * @example {
-     *       "items": [
-     *         {
-     *           "created_at": "2025-09-20T13:00:00Z",
-     *           "id": "item-uuid",
-     *           "payload": {
-     *             "name": "My Folder"
-     *           },
-     *           "type": "folder",
-     *           "user_id": "user-uuid"
-     *         }
-     *       ],
-     *       "limit": 50,
-     *       "offset": 0,
-     *       "total": 1
-     *     }
-     */
-    ItemListResponse: {
-      /** Items */
-      items: components['schemas']['ItemResponse'][];
-      /** Total */
-      total: number;
-      /** Limit */
-      limit: number;
-      /** Offset */
-      offset: number;
-    };
-    /**
-     * ItemResponse
-     * @description Unified response model for items with type-specific payload.
-     */
-    ItemResponse: {
-      /** Id */
-      id: string;
-      type: components['schemas']['ItemType'];
-      /** Parent Id */
-      parent_id: string | null;
-      /** Root Item Id */
-      root_item_id: string | null;
-      /** User Id */
-      user_id: string;
-      /**
-       * Created At
-       * Format: date-time
-       */
-      created_at: string;
-      /** Updated At */
-      updated_at: string | null;
-      /** Payload */
-      payload?:
-        | components['schemas']['NotePayload']
-        | components['schemas']['FolderPayload']
-        | components['schemas']['ChatPayload'];
-    };
-    /**
-     * ItemType
-     * @enum {string}
-     */
-    ItemType: 'note' | 'chat' | 'folder';
-    /** MessageDto */
-    MessageDto: {
-      /** Message */
-      message: string;
-    };
-    /**
-     * MoveItemRequest
-     * @description Request model for moving an item to a new parent.
-     */
-    MoveItemRequest: {
-      /** Parent Id */
-      parent_id?: string | null;
-    };
-    /**
-     * NotePayload
-     * @description Payload model for note items.
-     */
-    NotePayload: {
-      /**
-       * Name
-       * @default Untitled note
-       */
-      name: string;
-      /** Content Md */
-      content_md?: string | null;
-      /** Content Json */
-      content_json?: Record<string, never> | null;
-    };
-    /**
-     * RenameItemRequest
-     * @description Request model for renaming an item (generic across all types).
-     */
-    RenameItemRequest: {
-      /** Name */
-      name: string;
-    };
-    /** SignInDto */
-    SignInDto: {
-      /**
-       * Email
-       * Format: email
-       */
-      email: string;
-      /** Password */
-      password: string;
-    };
-    /** SignInWithGoogleDto */
-    SignInWithGoogleDto: {
-      /** Code */
-      code: string;
-    };
-    /** SignUpDto */
-    SignUpDto: {
-      /** First Name */
-      first_name: string;
-      /** Last Name */
-      last_name: string;
-      /**
-       * Email
-       * Format: email
-       */
-      email: string;
-      /** Password */
-      password: string;
-      /** Confirmation Password */
-      confirmation_password: string;
-    };
-    /** UpdateUserDto */
-    UpdateUserDto: {
-      /** First Name */
-      first_name?: string | null;
-      /** Last Name */
-      last_name?: string | null;
-      /** Email */
-      email?: string | null;
-      /** Avatar */
-      avatar?: string | null;
-      /** Password */
-      password?: string | null;
-      /** Confirmation Password */
-      confirmation_password?: string | null;
-    };
-    /** UserListDto */
-    UserListDto: {
-      /** Users */
-      users: components['schemas']['UserResponseDto'][];
-      /** Total */
-      total: number;
-      /** Page */
-      page: number;
-      /** Size */
-      size: number;
-      /** Pages */
-      pages: number;
-    };
-    /** UserResponseDto */
-    UserResponseDto: {
-      /** Id */
-      id: string;
-      /**
-       * Email
-       * Format: email
-       */
-      email: string;
-      /** First Name */
-      first_name: string;
-      /** Last Name */
-      last_name: string;
-      /** Avatar */
-      avatar?: string | null;
-      /** Provider */
-      provider?: string | null;
-      /**
-       * Created At
-       * Format: date-time
-       */
-      created_at: string;
-      /** Updated At */
-      updated_at?: string | null;
-    };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  sign_in_api_v1_auth_sign_in_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    sign_in_api_v1_auth_sign_in_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SignInDto'];
-      };
+    sign_up_api_v1_auth_sign_up_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignUpDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    sign_in_with_google_api_v1_auth_google_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInWithGoogleDto"];
+            };
         };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
     };
-  };
-  sign_up_api_v1_auth_sign_up_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    refresh_api_v1_auth_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessTokenDto"];
+                };
+            };
+        };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SignUpDto'];
-      };
+    logout_api_v1_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+        };
     };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    get_current_user_endpoint_api_v1_users_current_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
         };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
     };
-  };
-  sign_in_with_google_api_v1_auth_google_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    update_current_user_api_v1_users_current_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SignInWithGoogleDto'];
-      };
+    list_users_api_v1_users__get: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Page size */
+                size?: number;
+                /** @description Search term */
+                search?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserListDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    create_user_api_v1_users__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUserDto"];
+            };
         };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
     };
-  };
-  refresh_api_v1_auth_refresh_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    get_user_by_id_api_v1_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    list_root_items_api_v1_items__get: {
+        parameters: {
+            query?: {
+                /** @description Number of root items to return */
+                limit?: number;
+                /** @description Number of root items to skip */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['AccessTokenDto'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-      };
     };
-  };
-  logout_api_v1_auth_logout_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    create_item_api_v1_items__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    get_item_api_v1_items__item_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-      };
     };
-  };
-  get_current_user_endpoint_api_v1_users_current_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    delete_item_api_v1_items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    get_item_children_api_v1_items__item_id__children_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['UserResponseDto'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-      };
     };
-  };
-  update_current_user_api_v1_users_current_put: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    move_item_api_v1_items__item_id__move_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateUserDto'];
-      };
+    rename_item_api_v1_items__item_id__rename_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
     };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    renormalize_positions_api_v1_items__parent_id__renormalize_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parent_id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['MessageDto'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenormalizeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
     };
-  };
-  list_users_api_v1_users__get: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Page size */
-        size?: number;
-        /** @description Search term */
-        search?: string | null;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
+    health_check_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserListDto'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  create_user_api_v1_users__post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateUserDto'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserResponseDto'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_user_by_id_api_v1_users__user_id__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        user_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['UserResponseDto'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  list_root_items_api_v1_items__get: {
-    parameters: {
-      query?: {
-        /** @description Number of root items to return */
-        limit?: number;
-        /** @description Number of root items to skip */
-        offset?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemListResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  create_item_api_v1_items__post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateItemRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_item_api_v1_items__item_id__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        item_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  delete_item_api_v1_items__item_id__delete: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        item_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  get_item_children_api_v1_items__item_id__children_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        item_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemListResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  move_item_api_v1_items__item_id__move_patch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        item_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['MoveItemRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  rename_item_api_v1_items__item_id__rename_patch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        item_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RenameItemRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['ItemResponse'];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['HTTPValidationError'];
-        };
-      };
-    };
-  };
-  health_check_health_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': unknown;
-        };
-      };
-    };
-  };
 }

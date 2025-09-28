@@ -7,6 +7,8 @@ import type {
   ListItemsOptions,
   ItemsListResult,
   MoveTreeItemRequest,
+  CreateTreeItemRequest,
+  RenormalizeResponse,
 } from './items-dtos';
 import { baseAxiosInstance } from '@config/axios';
 
@@ -62,11 +64,12 @@ export class ItemsService {
   /**
    * Create a new item
    */
-  static async createItem(request: CreateItemRequest): Promise<Item> {
+  static async createItem(request: CreateTreeItemRequest): Promise<Item> {
     const createRequest: CreateItemRequest = {
       id: request.id || uuidv4(),
       type: request.type,
       parent_id: request.parent_id,
+      position: request.position,
       payload: request.payload as CreateItemRequest['payload'],
     };
 
@@ -81,6 +84,7 @@ export class ItemsService {
   static async moveItem(itemId: string, request: MoveTreeItemRequest): Promise<Item> {
     const moveRequest: MoveItemRequest = {
       parent_id: request.parent_id,
+      position: request.position,
     };
 
     const { data } = await baseAxiosInstance.patch<Item>(
@@ -105,6 +109,20 @@ export class ItemsService {
     const { data } = await baseAxiosInstance.patch<Item>(`/items/${itemId}/rename/`, {
       name,
     });
+
+    return data;
+  }
+
+  /**
+   * Renormalize positions when precision is exhausted
+   */
+  static async renormalizePositions(
+    parentId: string | null
+  ): Promise<RenormalizeResponse> {
+    const pathParentId = parentId || 'root';
+    const { data } = await baseAxiosInstance.post<RenormalizeResponse>(
+      `/items/${pathParentId}/renormalize`
+    );
 
     return data;
   }

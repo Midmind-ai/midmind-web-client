@@ -13,6 +13,8 @@ export type ItemResponse = components['schemas']['ItemResponse'];
 export type ItemListResponse = components['schemas']['ItemListResponse'];
 export type CreateItemRequest = components['schemas']['CreateItemRequest'];
 export type MoveItemRequest = components['schemas']['MoveItemRequest'];
+export type ChildrenBounds = components['schemas']['ChildrenBounds'];
+export type RenormalizeResponse = components['schemas']['RenormalizeResponse'];
 
 // Convenience type aliases
 export type Item = ItemResponse;
@@ -32,10 +34,12 @@ export interface CreateTreeItemRequest {
   type: ItemTypeEnum;
   parent_id?: string | null;
   payload?: ItemPayload;
+  position: number;
 }
 
 export interface MoveTreeItemRequest {
   parent_id: string | null;
+  position: number;
 }
 
 // Rename request type (until backend generates it)

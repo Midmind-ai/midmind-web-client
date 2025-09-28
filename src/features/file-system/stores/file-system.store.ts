@@ -12,6 +12,11 @@ import {
 } from '@services/items/items-dtos';
 import { ItemsService } from '@services/items/items-service';
 import type { ChatBranchContext } from '@shared-types/entities';
+import {
+  calculateInsertPosition,
+  sortItemsByPosition,
+  POSITION_GAP,
+} from '@utils/position-calculator';
 
 // Simplified store state - no more complex Node type!
 type FileSystemStore = {
@@ -29,7 +34,12 @@ type FileSystemStore = {
   // CRUD operations (already unified from previous work)
   renameItem: (nodeId: string, newName: string) => Promise<void>;
   deleteItem: (id: string, parentId?: string) => Promise<void>;
-  moveItem: (itemId: string, targetParentId: string | null) => Promise<void>;
+  moveItem: (
+    itemId: string,
+    targetParentId: string | null,
+    targetPosition?: number
+  ) => Promise<void>;
+  renormalizePositions: (parentId: string | null) => Promise<void>;
 
   // Chat creation
   createChat: (args: {
@@ -95,7 +105,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
             ...state,
             itemsByParentId: {
               ...state.itemsByParentId,
-              [actualParentId]: result.items,
+              [actualParentId]: sortItemsByPosition(result.items),
             },
             hasLoadedParentIds: new Set([...state.hasLoadedParentIds, actualParentId]),
             isLoadingParentIds: new Set(
@@ -240,7 +250,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }
       },
 
-      moveItem: async (itemId, targetParentId) => {
+      moveItem: async (itemId, targetParentId, targetPosition) => {
         const state = get();
         // Find item across all parents
         let itemToMove: Item | undefined;
@@ -269,6 +279,19 @@ export const useFileSystemStore = create<FileSystemStore>()(
 
         const originalItemsByParentId = { ...state.itemsByParentId };
 
+        // Use provided position or calculate default position
+        let position: number;
+        if (targetPosition !== undefined) {
+          // Use provided position (from position-aware drops)
+          position = targetPosition;
+        } else {
+          // Calculate default position (insert at beginning for legacy calls)
+          const targetSiblings = (
+            state.itemsByParentId[actualTargetParentId] || []
+          ).filter(item => item.id !== itemId); // Exclude item being moved
+          position = calculateInsertPosition(targetSiblings, 0);
+        }
+
         // Optimistic update
         set(state => {
           const updatedItemsByParentId = { ...state.itemsByParentId };
@@ -278,12 +301,19 @@ export const useFileSystemStore = create<FileSystemStore>()(
             state.itemsByParentId[sourceParentIdConst] || []
           ).filter(item => item.id !== itemId);
 
-          // Update item's parent_id and add to target parent
-          const movedItem: Item = { ...itemToMoveConst, parent_id: targetParentId };
-          updatedItemsByParentId[actualTargetParentId] = [
-            movedItem,
+          // Update item's parent_id, position and add to target parent
+          const movedItem: Item = {
+            ...itemToMoveConst,
+            parent_id: targetParentId,
+            position,
+          };
+
+          // Insert at correct position and sort
+          const targetItems = [
             ...(state.itemsByParentId[actualTargetParentId] || []),
+            movedItem,
           ];
+          updatedItemsByParentId[actualTargetParentId] = sortItemsByPosition(targetItems);
 
           return {
             itemsByParentId: updatedItemsByParentId,
@@ -291,7 +321,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         });
 
         try {
-          await ItemsService.moveItem(itemId, { parent_id: targetParentId });
+          await ItemsService.moveItem(itemId, { parent_id: targetParentId, position });
 
           // Invalidate caches
           await mutate(CACHE_KEYS.chats.byParentId(sourceParentId), undefined, {
@@ -326,6 +356,10 @@ export const useFileSystemStore = create<FileSystemStore>()(
 
         const parentId = parentChatId || parentFolderId || 'root';
 
+        // Calculate position for the new chat
+        const siblings = state.itemsByParentId[parentId] || [];
+        const position = calculateInsertPosition(siblings, 0); // Insert at beginning
+
         // Create optimistic chat item
         const optimisticChat: Item = {
           id: chatId,
@@ -333,6 +367,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
           parent_id: parentChatId || parentFolderId || null,
           root_item_id: null,
           user_id: 'current-user',
+          position,
           created_at: new Date().toISOString(),
           updated_at: null,
           payload: {
@@ -356,7 +391,10 @@ export const useFileSystemStore = create<FileSystemStore>()(
         set(state => ({
           itemsByParentId: {
             ...state.itemsByParentId,
-            [parentId]: [optimisticChat, ...(state.itemsByParentId[parentId] || [])],
+            [parentId]: sortItemsByPosition([
+              optimisticChat,
+              ...(state.itemsByParentId[parentId] || []),
+            ]),
           },
         }));
 
@@ -378,7 +416,9 @@ export const useFileSystemStore = create<FileSystemStore>()(
           await ItemsService.createItem({
             type: ItemTypeEnum.Chat,
             id: chatId,
+            name: 'Untitled chat',
             parent_id: parentChatId || parentFolderId || null,
+            position,
             payload: { name: 'Untitled chat' },
           });
 
@@ -396,6 +436,10 @@ export const useFileSystemStore = create<FileSystemStore>()(
         const newId = uuidv4();
         const actualParentId = parentId || 'root';
 
+        const state = get();
+        const siblings = state.itemsByParentId[actualParentId] || [];
+        const position = calculateInsertPosition(siblings, 0); // Insert at beginning
+
         // Create temporary item
         const newItem: Item = {
           id: newId,
@@ -403,6 +447,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
           parent_id: parentId || null,
           root_item_id: null,
           user_id: 'current-user',
+          position,
           created_at: new Date().toISOString(),
           updated_at: null,
           payload: { name: '' },
@@ -412,7 +457,10 @@ export const useFileSystemStore = create<FileSystemStore>()(
         set(state => ({
           itemsByParentId: {
             ...state.itemsByParentId,
-            [actualParentId]: [newItem, ...(state.itemsByParentId[actualParentId] || [])],
+            [actualParentId]: sortItemsByPosition([
+              newItem,
+              ...(state.itemsByParentId[actualParentId] || []),
+            ]),
           },
         }));
 
@@ -434,11 +482,20 @@ export const useFileSystemStore = create<FileSystemStore>()(
           },
         }));
 
+        // Get the temporary item to extract its calculated position
+        const state = get();
+        const tempItem = state.itemsByParentId[actualParentId]?.find(
+          item => item.id === id
+        );
+        const position = tempItem?.position || POSITION_GAP;
+
         try {
           await ItemsService.createItem({
             id,
+            name,
             payload: { name },
             parent_id: parentId,
+            position,
             type: itemType,
           });
         } catch (error) {
@@ -477,6 +534,40 @@ export const useFileSystemStore = create<FileSystemStore>()(
             ),
           },
         }));
+      },
+
+      renormalizePositions: async parentId => {
+        try {
+          const response = await ItemsService.renormalizePositions(parentId);
+
+          // Update positions in store with server response
+          const actualParentId = parentId || 'root';
+
+          set(state => {
+            const currentItems = state.itemsByParentId[actualParentId] || [];
+            const updatedItems = currentItems.map(item => {
+              // Find the position update for this item ID
+              const positionUpdate = response.items.find(updateObj =>
+                Object.prototype.hasOwnProperty.call(updateObj, item.id)
+              );
+              const newPosition = positionUpdate
+                ? positionUpdate[item.id]
+                : item.position;
+
+              return { ...item, position: newPosition };
+            });
+
+            return {
+              itemsByParentId: {
+                ...state.itemsByParentId,
+                [actualParentId]: sortItemsByPosition(updatedItems),
+              },
+            };
+          });
+        } catch (error) {
+          console.error('Failed to renormalize positions:', error);
+          throw error;
+        }
       },
 
       // Loading state helpers
