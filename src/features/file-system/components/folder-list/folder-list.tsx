@@ -23,6 +23,7 @@ const FolderList = () => {
     <TreeDndProvider>
       <DropZone
         data={rootDroppableData}
+        enablePositionDetection={true}
         className="[&::-webkit-scrollbar-thumb]:bg-border/50
           hover:[&::-webkit-scrollbar-thumb]:bg-border/70 flex flex-1 overflow-y-auto
           rounded-none ring-0 [&::-webkit-scrollbar]:w-2
@@ -42,13 +43,21 @@ const FolderList = () => {
                   ))}
                 </div>
               )}
-              {!isLoading &&
-                items?.map(item => (
-                  <TreeNode
-                    key={item.id}
-                    node={item}
-                  />
-                ))}
+              {!isLoading && items && items.length > 0 && (
+                <div className="">
+                  {items.map(item => (
+                    <TreeNode
+                      key={item.id}
+                      node={item}
+                    />
+                  ))}
+                </div>
+              )}
+              {!isLoading && (!items || items.length === 0) && (
+                <div className="text-muted-foreground ml-3 px-2 py-1 text-sm opacity-45">
+                  Empty
+                </div>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

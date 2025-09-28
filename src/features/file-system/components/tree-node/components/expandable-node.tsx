@@ -127,7 +127,10 @@ const ExpandableNode = React.memo(
         ref={setDraggableNodeRef}
         style={dragStyle}
       >
-        <DropZone data={droppableData}>
+        <DropZone
+          data={droppableData}
+          enablePositionDetection={true}
+        >
           <Collapsible
             className="group/collapsible
               [&[data-state=open]>div>svg:first-child]:rotate-90"
@@ -139,7 +142,7 @@ const ExpandableNode = React.memo(
               <SidebarMenuButton
                 isActive={isActive}
                 className={`${isCurrentlyEditing ? '[&:active]:bg-transparent [&:active]:text-current' : 'group/item'}
-                  relative cursor-pointer gap-1.5 rounded-sm p-1 pr-8
+                  relative h-8 cursor-pointer gap-1.5 rounded-sm p-1 pr-8
                   data-[active=true]:font-normal`}
                 onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
                 onMouseEnter={() => setIsHovered(true)}

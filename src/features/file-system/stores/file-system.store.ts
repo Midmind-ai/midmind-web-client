@@ -18,10 +18,72 @@ import {
   POSITION_GAP,
 } from '@utils/position-calculator';
 
+// Type for items grouped by parent
+type ItemsByParentId = Record<string | 'root', Item[]>;
+
+// Helper functions for item operations
+const findItemLocation = (itemsByParentId: ItemsByParentId, itemId: string) => {
+  for (const [parentId, items] of Object.entries(itemsByParentId)) {
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      return { item, parentId: parentId as string | 'root' };
+    }
+  }
+
+  return null;
+};
+
+const removeItemFromParent = (
+  itemsByParentId: ItemsByParentId,
+  parentId: string | 'root',
+  itemId: string
+): ItemsByParentId => {
+  return {
+    ...itemsByParentId,
+    [parentId]: itemsByParentId[parentId]?.filter(item => item.id !== itemId) || [],
+  };
+};
+
+const addItemToParent = (
+  itemsByParentId: ItemsByParentId,
+  parentId: string | 'root',
+  item: Item
+): ItemsByParentId => {
+  // Ensure no duplicates and insert at correct position
+  const existingItems = (itemsByParentId[parentId] || []).filter(i => i.id !== item.id);
+
+  return {
+    ...itemsByParentId,
+    [parentId]: sortItemsByPosition([...existingItems, item]),
+  };
+};
+
+const calculateDefaultPosition = (
+  targetSiblings: Item[],
+  excludeItemId: string
+): number => {
+  const siblings = targetSiblings.filter(item => item.id !== excludeItemId);
+
+  return calculateInsertPosition(siblings, 0);
+};
+
+const invalidateMoveRelatedCaches = async (
+  sourceParentId: string | 'root',
+  targetParentId: string | 'root'
+) => {
+  const promises = [
+    mutate(CACHE_KEYS.chats.byParentId(sourceParentId), undefined, { revalidate: true }),
+    mutate(CACHE_KEYS.chats.byParentId(targetParentId), undefined, { revalidate: true }),
+    mutate(findCacheKeysByPattern(['breadcrumbs']), undefined, { revalidate: true }),
+  ];
+
+  await Promise.all(promises);
+};
+
 // Simplified store state - no more complex Node type!
 type FileSystemStore = {
   // Items grouped by parent ID - single source of truth
-  itemsByParentId: Record<string | 'root', Item[]>;
+  itemsByParentId: ItemsByParentId;
 
   // Loading state
   isLoadingParentIds: Set<string | 'root'>;
@@ -252,92 +314,56 @@ export const useFileSystemStore = create<FileSystemStore>()(
 
       moveItem: async (itemId, targetParentId, targetPosition) => {
         const state = get();
-        // Find item across all parents
-        let itemToMove: Item | undefined;
-        let sourceParentId: string | 'root' | undefined;
 
-        Object.entries(state.itemsByParentId).forEach(([pid, items]) => {
-          const item = items.find(i => i.id === itemId);
-          if (item) {
-            itemToMove = item;
-            sourceParentId = pid;
-          }
-        });
-
-        if (!itemToMove || !sourceParentId) {
+        // 1. Find the item to move
+        const location = findItemLocation(state.itemsByParentId, itemId);
+        if (!location) {
           throw new Error('Item not found');
         }
 
-        // Store as const to help TypeScript narrow the type in closures
-        const itemToMoveConst: Item = itemToMove;
-        const sourceParentIdConst: string | 'root' = sourceParentId;
+        const { item: itemToMove, parentId: sourceParentId } = location;
+        const targetParent = targetParentId || 'root';
 
-        const actualTargetParentId = targetParentId || 'root';
+        // 2. Calculate position
+        const position =
+          targetPosition ??
+          calculateDefaultPosition(state.itemsByParentId[targetParent] || [], itemId);
 
-        // Don't move if already in target location
-        if (sourceParentIdConst === actualTargetParentId) return;
+        // 3. Create moved item with new properties
+        const movedItem: Item = {
+          ...itemToMove,
+          parent_id: targetParentId,
+          position,
+        };
 
-        const originalItemsByParentId = { ...state.itemsByParentId };
+        // 4. Save original state for rollback
+        const originalState = { ...state.itemsByParentId };
 
-        // Use provided position or calculate default position
-        let position: number;
-        if (targetPosition !== undefined) {
-          // Use provided position (from position-aware drops)
-          position = targetPosition;
-        } else {
-          // Calculate default position (insert at beginning for legacy calls)
-          const targetSiblings = (
-            state.itemsByParentId[actualTargetParentId] || []
-          ).filter(item => item.id !== itemId); // Exclude item being moved
-          position = calculateInsertPosition(targetSiblings, 0);
-        }
-
-        // Optimistic update
+        // 5. Optimistic update - clear and simple
         set(state => {
-          const updatedItemsByParentId = { ...state.itemsByParentId };
+          let updated = { ...state.itemsByParentId };
 
-          // Remove from source parent
-          updatedItemsByParentId[sourceParentIdConst] = (
-            state.itemsByParentId[sourceParentIdConst] || []
-          ).filter(item => item.id !== itemId);
+          // Remove from source
+          updated = removeItemFromParent(updated, sourceParentId, itemId);
 
-          // Update item's parent_id, position and add to target parent
-          const movedItem: Item = {
-            ...itemToMoveConst,
-            parent_id: targetParentId,
-            position,
-          };
+          // Add to target (with duplicate prevention built-in)
+          updated = addItemToParent(updated, targetParent, movedItem);
 
-          // Insert at correct position and sort
-          const targetItems = [
-            ...(state.itemsByParentId[actualTargetParentId] || []),
-            movedItem,
-          ];
-          updatedItemsByParentId[actualTargetParentId] = sortItemsByPosition(targetItems);
-
-          return {
-            itemsByParentId: updatedItemsByParentId,
-          };
+          return { itemsByParentId: updated };
         });
 
+        // 6. Sync with backend
         try {
-          await ItemsService.moveItem(itemId, { parent_id: targetParentId, position });
+          await ItemsService.moveItem(itemId, {
+            parent_id: targetParentId,
+            position,
+          });
 
-          // Invalidate caches
-          await mutate(CACHE_KEYS.chats.byParentId(sourceParentId), undefined, {
-            revalidate: true,
-          });
-          await mutate(CACHE_KEYS.chats.byParentId(actualTargetParentId), undefined, {
-            revalidate: true,
-          });
-          await mutate(findCacheKeysByPattern(['breadcrumbs']), undefined, {
-            revalidate: true,
-          });
+          // Invalidate relevant caches
+          await invalidateMoveRelatedCaches(sourceParentId, targetParent);
         } catch (error) {
-          // Rollback
-          set({
-            itemsByParentId: originalItemsByParentId,
-          });
+          // Rollback on error
+          set({ itemsByParentId: originalState });
           throw error;
         }
       },
