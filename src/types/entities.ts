@@ -6,6 +6,12 @@ export type Chat = components['schemas']['ChatDto'] & { type: EntityEnum };
 
 export type Directory = components['schemas']['GetFolderDto'] & { type: EntityEnum };
 
+export type Project = {
+  name: string;
+  description?: string | null;
+  type: EntityEnum;
+};
+
 export type ChatMessage = components['schemas']['AppMessageDto'];
 
 export type Team = {
@@ -37,4 +43,5 @@ export enum EntityEnum {
   Folder = 'folder',
   Chat = 'chat',
   Note = 'note',
+  Project = 'project',
 }

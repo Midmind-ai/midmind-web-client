@@ -123,6 +123,10 @@ type FileSystemStore = {
   ) => Promise<void>;
   removeTemporaryItem: (id: string, parentId?: string) => void;
 
+  // Project-specific operations
+  convertItemType: (itemId: string, targetType: ItemTypeEnum) => Promise<void>;
+  getDescendants: (itemId: string) => Promise<Item[]>;
+
   // Loading state helpers
   hasLoadAttempted: (parentId: string | 'root') => boolean;
   isParentLoading: (parentId: string | 'root') => boolean;
@@ -592,6 +596,71 @@ export const useFileSystemStore = create<FileSystemStore>()(
           });
         } catch (error) {
           console.error('Failed to renormalize positions:', error);
+          throw error;
+        }
+      },
+
+      convertItemType: async (itemId, targetType) => {
+        const state = get();
+
+        // Find the item to convert
+        const location = findItemLocation(state.itemsByParentId, itemId);
+        if (!location) {
+          throw new Error('Item not found');
+        }
+
+        const { item: originalItem, parentId } = location;
+
+        // Store original state for rollback
+        const originalItemsByParentId = { ...state.itemsByParentId };
+
+        // Optimistic update - change the item type
+        const convertedItem: Item = {
+          ...originalItem,
+          type: targetType,
+        };
+
+        set(state => ({
+          itemsByParentId: {
+            ...state.itemsByParentId,
+            [parentId]: state.itemsByParentId[parentId].map(item =>
+              item.id === itemId ? convertedItem : item
+            ),
+          },
+        }));
+
+        try {
+          // API call to convert item type
+          const updatedItem = await ItemsService.convertItemType(itemId, {
+            type: targetType,
+          });
+
+          // Update with server response
+          set(state => ({
+            itemsByParentId: {
+              ...state.itemsByParentId,
+              [parentId]: state.itemsByParentId[parentId].map(item =>
+                item.id === itemId ? updatedItem : item
+              ),
+            },
+          }));
+
+          // Revalidate breadcrumb caches since project/folder conversion affects navigation
+          await mutate(findCacheKeysByPattern(['breadcrumbs']));
+        } catch (error) {
+          // Rollback on error
+          set({ itemsByParentId: originalItemsByParentId });
+          throw error;
+        }
+      },
+
+      getDescendants: async itemId => {
+        try {
+          const response = await ItemsService.getDescendants(itemId);
+
+          return response.items;
+        } catch (error) {
+          console.error('Failed to get descendants:', error);
           throw error;
         }
       },

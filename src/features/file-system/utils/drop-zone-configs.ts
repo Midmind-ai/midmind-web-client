@@ -10,6 +10,7 @@ export const DRAGGABLE_TYPES = [
   ItemTypeEnum.Chat,
   ItemTypeEnum.Folder,
   ItemTypeEnum.Note,
+  ItemTypeEnum.Project,
 ] as const;
 
 // Drop zone configurations

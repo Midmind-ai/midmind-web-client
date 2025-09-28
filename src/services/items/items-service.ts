@@ -9,6 +9,8 @@ import type {
   MoveTreeItemRequest,
   CreateTreeItemRequest,
   RenormalizeResponse,
+  ConvertItemRequest,
+  ItemDescendantsResponse,
 } from './items-dtos';
 import { baseAxiosInstance } from '@config/axios';
 
@@ -122,6 +124,32 @@ export class ItemsService {
     const pathParentId = parentId || 'root';
     const { data } = await baseAxiosInstance.post<RenormalizeResponse>(
       `/items/${pathParentId}/renormalize`
+    );
+
+    return data;
+  }
+
+  /**
+   * Convert an item type (e.g., folder ↔ project)
+   */
+  static async convertItemType(
+    itemId: string,
+    request: ConvertItemRequest
+  ): Promise<Item> {
+    const { data } = await baseAxiosInstance.patch<Item>(
+      `/items/${itemId}/convert`,
+      request
+    );
+
+    return data;
+  }
+
+  /**
+   * Get all descendants of an item (all nested items)
+   */
+  static async getDescendants(itemId: string): Promise<ItemDescendantsResponse> {
+    const { data } = await baseAxiosInstance.get<ItemDescendantsResponse>(
+      `/items/${itemId}/descendants`
     );
 
     return data;

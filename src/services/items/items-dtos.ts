@@ -5,6 +5,7 @@ export enum ItemTypeEnum {
   Note = 'note',
   Chat = 'chat',
   Folder = 'folder',
+  Project = 'project',
 }
 
 // Backend API type - keep for API compatibility
@@ -66,4 +67,16 @@ export interface ItemsListResult {
 export interface ItemWithChildren extends Item {
   children?: Item[];
   childrenLoaded?: boolean;
+}
+
+// Project-specific types (manual definitions until API types are updated)
+export interface ConvertItemRequest {
+  type: ItemTypeEnum;
+}
+
+export interface ItemDescendantsResponse {
+  parent_id: string;
+  items: Item[];
+  total_count: number;
+  has_projects: boolean;
 }

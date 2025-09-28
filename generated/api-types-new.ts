@@ -240,6 +240,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/{item_id}/descendants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Item Descendants
+         * @description Get all descendants of an item (all nested items).
+         */
+        get: operations["get_item_descendants_api_v1_items__item_id__descendants_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/{item_id}/move": {
         parameters: {
             query?: never;
@@ -278,6 +298,26 @@ export interface paths {
          * @description Rename an item (generic across all item types).
          */
         patch: operations["rename_item_api_v1_items__item_id__rename_patch"];
+        trace?: never;
+    };
+    "/api/v1/items/{item_id}/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Convert Item Type
+         * @description Convert an item type (e.g., folder ↔ project).
+         */
+        patch: operations["convert_item_type_api_v1_items__item_id__convert_patch"];
         trace?: never;
     };
     "/api/v1/items/{parent_id}/renormalize": {
@@ -372,6 +412,14 @@ export interface components {
             count: number;
         };
         /**
+         * ConvertItemRequest
+         * @description Request model for converting an item type (e.g., folder ↔ project).
+         */
+        ConvertItemRequest: {
+            /** @description Target item type */
+            type: components["schemas"]["ItemType"];
+        };
+        /**
          * CreateItemRequest
          * @description Request model for creating a new item.
          */
@@ -384,7 +432,7 @@ export interface components {
             /** Position */
             position: number;
             /** Payload */
-            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"];
         };
         /** CreateUserDto */
         CreateUserDto: {
@@ -419,6 +467,42 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * ItemDescendantsResponse
+         * @description Response model for item descendants (all nested items).
+         * @example {
+         *       "has_projects": false,
+         *       "items": [
+         *         {
+         *           "created_at": "2025-09-20T13:00:00Z",
+         *           "id": "note-uuid-456",
+         *           "parent_id": "folder-uuid-123",
+         *           "payload": {
+         *             "content_md": "# Hello",
+         *             "name": "My Note"
+         *           },
+         *           "position": 1000,
+         *           "type": "note",
+         *           "user_id": "user-uuid"
+         *         }
+         *       ],
+         *       "parent_id": "folder-uuid-123",
+         *       "total_count": 1
+         *     }
+         */
+        ItemDescendantsResponse: {
+            /** Parent Id */
+            parent_id: string;
+            /** Items */
+            items: components["schemas"]["ItemResponse"][];
+            /** Total Count */
+            total_count: number;
+            /**
+             * Has Projects
+             * @description True if any descendant is a project (useful for conversion validation)
+             */
+            has_projects: boolean;
         };
         /**
          * ItemListResponse
@@ -481,13 +565,13 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
             /** Payload */
-            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"];
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"];
         };
         /**
          * ItemType
          * @enum {string}
          */
-        ItemType: "note" | "chat" | "folder";
+        ItemType: "chat" | "folder" | "note" | "project";
         /** MessageDto */
         MessageDto: {
             /** Message */
@@ -517,6 +601,19 @@ export interface components {
             content_md?: string | null;
             /** Content Json */
             content_json?: Record<string, never> | null;
+        };
+        /**
+         * ProjectPayload
+         * @description Payload model for project items.
+         */
+        ProjectPayload: {
+            /**
+             * Name
+             * @default Untitled project
+             */
+            name: string;
+            /** Description */
+            description?: string | null;
         };
         /**
          * RenameItemRequest
@@ -1104,6 +1201,37 @@ export interface operations {
             };
         };
     };
+    get_item_descendants_api_v1_items__item_id__descendants_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemDescendantsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     move_item_api_v1_items__item_id__move_patch: {
         parameters: {
             query?: never;
@@ -1151,6 +1279,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RenameItemRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    convert_item_type_api_v1_items__item_id__convert_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConvertItemRequest"];
             };
         };
         responses: {
