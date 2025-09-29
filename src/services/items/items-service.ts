@@ -19,7 +19,7 @@ export class ItemsService {
    * List items with optional filtering and pagination
    */
   static async getRootItems(options: ListItemsOptions = {}): Promise<ItemsListResult> {
-    const { limit = 50, offset = 0 } = options;
+    const { limit = 200, offset = 0 } = options;
 
     const params = new URLSearchParams({
       limit: limit.toString(),
