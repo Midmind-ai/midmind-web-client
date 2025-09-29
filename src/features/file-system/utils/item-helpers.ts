@@ -40,10 +40,16 @@ export const getItemEntityType = (item: Item): ItemTypeEnum => {
  * Note: This will be determined by server data/state in practice
  */
 export const getItemHasChildren = (item: Item): boolean => {
-  // For now, folders and chats can have children, notes cannot
+  // All item types can have children - notes can have chats for context, etc.
   const entityType = getItemEntityType(item);
 
-  return entityType === ItemTypeEnum.Folder || entityType === ItemTypeEnum.Chat;
+  return (
+    entityType === ItemTypeEnum.Folder ||
+    entityType === ItemTypeEnum.Project ||
+    entityType === ItemTypeEnum.Note ||
+    entityType === ItemTypeEnum.Prompt ||
+    entityType === ItemTypeEnum.Chat
+  );
 };
 
 /**

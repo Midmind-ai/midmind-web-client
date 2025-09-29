@@ -111,12 +111,16 @@ export const EntityActionsMenu = ({
             >
               <Icon
                 className={cn(
-                  isLoading ? 'animate-spin' : 'mr-2 size-4',
-                  action.variant === 'destructive' ? 'text-destructive' : ''
+                  isLoading ? 'animate-spin' : 'size-4',
+                  action.variant === 'destructive' ? 'text-destructive' : '',
+                  action.iconColor || ''
                 )}
               />
               <ThemedSpan
-                className={action.variant === 'destructive' ? 'text-destructive' : ''}
+                className={cn(
+                  action.variant === 'destructive' ? 'text-destructive' : '',
+                  action.iconColor || ''
+                )}
               >
                 {action.label}
               </ThemedSpan>

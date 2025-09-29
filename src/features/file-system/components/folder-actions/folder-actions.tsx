@@ -1,4 +1,4 @@
-import { Folder, Library, MessageSquare, NotebookText } from 'lucide-react';
+import { Folder, Library, MessageSquare, NotebookText, Wrench } from 'lucide-react';
 // import { useSearchParams } from 'react-router';
 import { SidebarMenuButton } from '@components/ui/sidebar';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
@@ -44,6 +44,12 @@ const FolderActions = () => {
     createTemporaryItem(ItemTypeEnum.Note);
   };
 
+  const handleCreatePrompt = () => {
+    // Create new prompt inline (no parent - root level)
+    // Store automatically starts inline editing
+    createTemporaryItem(ItemTypeEnum.Prompt);
+  };
+
   return (
     <div className="flex justify-end border-b-1 p-1">
       <div className="flex gap-1">
@@ -64,6 +70,12 @@ const FolderActions = () => {
           onClick={handleCreateNote}
         >
           <NotebookText className="size-5.5! stroke-1" />
+        </SidebarMenuButton>
+        <SidebarMenuButton
+          className={buttonClassNames}
+          onClick={handleCreatePrompt}
+        >
+          <Wrench className="size-5.5! stroke-1" />
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}

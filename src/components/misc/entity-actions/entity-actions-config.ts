@@ -6,24 +6,19 @@ import {
   PanelRight,
   Pencil,
   Trash2,
+  NotebookText,
+  Wrench,
 } from 'lucide-react';
+import type { EntityActionHandlers } from './types/entity-action-handlers';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 
 export type EntityAction = {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  iconColor?: string; // Optional color class for icons
   variant?: 'default' | 'destructive';
   action: keyof EntityActionHandlers;
-};
-
-export type EntityActionHandlers = {
-  onDelete?: (id: string) => void;
-  onRename?: (id: string) => void;
-  onOpenInNewTab?: (id: string) => void;
-  onOpenInSidePanel?: (id: string) => void;
-  onConvertToFolder?: (id: string) => void;
-  onConvertToProject?: (id: string) => void;
 };
 
 export const ENTITY_ACTIONS_CONFIG: Record<ItemTypeEnum, EntityAction[]> = {
@@ -38,6 +33,7 @@ export const ENTITY_ACTIONS_CONFIG: Record<ItemTypeEnum, EntityAction[]> = {
       id: 'convert-to-project',
       label: 'Convert to Project',
       icon: Library,
+      iconColor: 'text-blue-600',
       action: 'onConvertToProject',
     },
     {
@@ -91,6 +87,13 @@ export const ENTITY_ACTIONS_CONFIG: Record<ItemTypeEnum, EntityAction[]> = {
       action: 'onRename',
     },
     {
+      id: 'convert-to-prompt',
+      label: 'Convert to Prompt',
+      icon: Wrench,
+      iconColor: 'text-amber-600',
+      action: 'onConvertToPrompt',
+    },
+    {
       id: 'delete',
       label: 'Delete',
       icon: Trash2,
@@ -117,6 +120,40 @@ export const ENTITY_ACTIONS_CONFIG: Record<ItemTypeEnum, EntityAction[]> = {
       label: 'Rename',
       icon: Pencil,
       action: 'onRename',
+    },
+    {
+      id: 'delete',
+      label: 'Delete',
+      icon: Trash2,
+      variant: 'destructive',
+      action: 'onDelete',
+    },
+  ],
+
+  [ItemTypeEnum.Prompt]: [
+    {
+      id: 'open-new-tab',
+      label: 'Open in new tab',
+      icon: ExternalLink,
+      action: 'onOpenInNewTab',
+    },
+    {
+      id: 'open-side-panel',
+      label: 'Open in side panel',
+      icon: PanelRight,
+      action: 'onOpenInSidePanel',
+    },
+    {
+      id: 'rename',
+      label: 'Rename',
+      icon: Pencil,
+      action: 'onRename',
+    },
+    {
+      id: 'convert-to-note',
+      label: 'Convert to Note',
+      icon: NotebookText,
+      action: 'onConvertToNote',
     },
     {
       id: 'delete',

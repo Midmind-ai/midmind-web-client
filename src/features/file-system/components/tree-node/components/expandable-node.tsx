@@ -247,6 +247,9 @@ const ExpandableNode = React.memo(
                         convertItemType(node.id, ItemTypeEnum.Folder),
                       onConvertToProject: () =>
                         convertItemType(node.id, ItemTypeEnum.Project),
+                      onConvertToNote: () => convertItemType(node.id, ItemTypeEnum.Note),
+                      onConvertToPrompt: () =>
+                        convertItemType(node.id, ItemTypeEnum.Prompt),
                     }}
                     isDeleting={false}
                     triggerClassName="opacity-0 group-hover/item:opacity-100"

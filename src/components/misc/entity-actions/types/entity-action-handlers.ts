@@ -5,4 +5,6 @@ export type EntityActionHandlers = {
   onOpenInSidePanel?: () => void;
   onConvertToFolder?: () => void;
   onConvertToProject?: () => void;
+  onConvertToNote?: () => void;
+  onConvertToPrompt?: () => void;
 };

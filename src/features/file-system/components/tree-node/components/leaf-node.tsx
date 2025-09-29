@@ -14,6 +14,7 @@ import {
   getItemHasChildren,
   getItemParentDirectoryId,
 } from '@features/file-system/utils/item-helpers';
+import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type Props = {
   node: Item;
@@ -24,6 +25,7 @@ type Props = {
 const LeafNode = ({ node, isActive, onClick }: Props) => {
   // Store actions (cache revalidation handled inside store)
   const deleteItem = useFileSystemStore(state => state.deleteItem);
+  const convertItemType = useFileSystemStore(state => state.convertItemType);
 
   // Still need actions for other operations
   const { openChatInSidePanel, openChatInNewTab, startEditing } =
@@ -73,6 +75,8 @@ const LeafNode = ({ node, isActive, onClick }: Props) => {
           onRename: handleRenameAction,
           onOpenInNewTab: () => openChatInNewTab(node.id),
           onOpenInSidePanel: () => openChatInSidePanel(node.id),
+          onConvertToNote: () => convertItemType(node.id, ItemTypeEnum.Note),
+          onConvertToPrompt: () => convertItemType(node.id, ItemTypeEnum.Prompt),
         }}
         isDeleting={false}
         triggerClassName="opacity-0 group-hover/item:opacity-100"

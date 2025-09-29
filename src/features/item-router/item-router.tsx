@@ -20,4 +20,5 @@ export const ItemRouter = () => {
   if (type === ItemTypeEnum.Note) return <div>Note page</div>;
   if (type === ItemTypeEnum.Chat) return <div>Chat page</div>;
   if (type === ItemTypeEnum.Folder) return <div>Folder page</div>;
+  if (type === ItemTypeEnum.Prompt) return <div>Prompt page (placeholder)</div>;
 };

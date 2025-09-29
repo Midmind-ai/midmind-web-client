@@ -432,7 +432,7 @@ export interface components {
             /** Position */
             position: number;
             /** Payload */
-            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"];
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"] | components["schemas"]["PromptPayload"];
         };
         /** CreateUserDto */
         CreateUserDto: {
@@ -565,13 +565,13 @@ export interface components {
             /** Updated At */
             updated_at: string | null;
             /** Payload */
-            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"];
+            payload?: components["schemas"]["NotePayload"] | components["schemas"]["FolderPayload"] | components["schemas"]["ChatPayload"] | components["schemas"]["ProjectPayload"] | components["schemas"]["PromptPayload"];
         };
         /**
          * ItemType
          * @enum {string}
          */
-        ItemType: "chat" | "folder" | "note" | "project";
+        ItemType: "chat" | "folder" | "note" | "project" | "prompt";
         /** MessageDto */
         MessageDto: {
             /** Message */
@@ -614,6 +614,21 @@ export interface components {
             name: string;
             /** Description */
             description?: string | null;
+        };
+        /**
+         * PromptPayload
+         * @description Prompt payload - stored in notes table like NotePayload
+         */
+        PromptPayload: {
+            /**
+             * Name
+             * @default Untitled prompt
+             */
+            name: string;
+            /** Content Md */
+            content_md?: string | null;
+            /** Content Json */
+            content_json?: Record<string, never> | null;
         };
         /**
          * RenameItemRequest

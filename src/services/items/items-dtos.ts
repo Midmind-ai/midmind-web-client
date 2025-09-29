@@ -6,6 +6,7 @@ export enum ItemTypeEnum {
   Chat = 'chat',
   Folder = 'folder',
   Project = 'project',
+  Prompt = 'prompt',
 }
 
 // Backend API type - keep for API compatibility
@@ -20,6 +21,9 @@ export type RenormalizeResponse = components['schemas']['RenormalizeResponse'];
 // Convenience type aliases
 export type Item = ItemResponse;
 export type ItemPayload = ItemResponse['payload'];
+
+// Type-specific payload aliases
+export type PromptPayload = components['schemas']['PromptPayload'];
 
 // Tree-specific types for easier usage
 export interface TreeItem extends Item {
