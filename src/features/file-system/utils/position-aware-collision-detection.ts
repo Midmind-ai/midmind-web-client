@@ -38,6 +38,7 @@ export const positionAwareCollisionDetection: CollisionDetection = args => {
       pointerCoordinates,
       droppableContainer
     );
+    // console.log(positionData.positionWithinDropZone);
 
     // Add position data to collision
     return {

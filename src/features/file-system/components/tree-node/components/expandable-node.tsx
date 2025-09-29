@@ -1,3 +1,4 @@
+import { useDndContext } from '@dnd-kit/core';
 import {
   Collapsible,
   CollapsibleContent,
@@ -5,6 +6,9 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { cn } from '../../../../../utils/cn';
+import { useDragStateStore } from '../../../stores/drag-state.store';
+import type { PositionAwareCollisionData } from '../../../utils/position-aware-collision-detection';
 import { EntityActionsMenu } from '@components/misc/entity-actions/components/entity-actions-menu';
 import EditableText from '@components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
@@ -54,6 +58,7 @@ const ExpandableNode = React.memo(
 
     const isCurrentlyEditing = isEditing(node.id);
     const isCurrentMenuOpen = isMenuOpen(`expandable-node-${node.id}`);
+    const isDraggingAnyItem = useDragStateStore(state => state.isDraggingAny);
 
     // Drag and drop configuration
     const {
@@ -62,6 +67,7 @@ const ExpandableNode = React.memo(
       listeners,
       setNodeRef: setDraggableNodeRef,
       dragStyle,
+      isDragging,
     } = useDraggableConfig({
       node,
       isDisabled: isCurrentlyEditing,
@@ -118,6 +124,11 @@ const ExpandableNode = React.memo(
       startEditing(node.id);
     };
 
+    const { collisions } = useDndContext();
+    const currentCollision = collisions?.find(collision => collision.id === node.id);
+    const currentIntent = (currentCollision?.data as PositionAwareCollisionData)
+      ?.positionWithinDropZone;
+
     return (
       <SidebarMenuItem
         ref={setDraggableNodeRef}
@@ -137,11 +148,19 @@ const ExpandableNode = React.memo(
             <div className="flex items-center gap-[3px]">
               <SidebarMenuButton
                 isActive={isActive}
-                className={`${isCurrentlyEditing ? '[&:active]:bg-transparent [&:active]:text-current' : 'group/item'}
-                  relative h-8 cursor-pointer gap-1.5 rounded-sm p-1 pr-8
-                  data-[active=true]:font-normal`}
+                className={cn(
+                  'relative h-8 cursor-pointer gap-1.5 rounded-sm p-1 pr-8',
+                  'data-[active=true]:font-normal',
+                  isCurrentlyEditing
+                    ? '[&:active]:bg-transparent [&:active]:text-current'
+                    : 'group/item',
+                  {
+                    'pointer-events-none':
+                      isDraggingAnyItem && currentIntent !== 'inside',
+                  }
+                )}
                 onClick={isCurrentlyEditing || isCurrentMenuOpen ? undefined : onClick}
-                onMouseEnter={() => setIsHovered(true)}
+                onMouseEnter={() => !isDragging && setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onBlur={() => setIsHovered(false)}
                 onKeyDown={

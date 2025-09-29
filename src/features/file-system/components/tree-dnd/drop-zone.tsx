@@ -38,9 +38,8 @@ const DropZone = ({
 
   // Get the position intent from collision data
   const currentCollision = collisions?.find(collision => collision.id === data.id);
-  const currentIntent =
-    (currentCollision?.data as PositionAwareCollisionData)?.positionWithinDropZone ||
-    'inside';
+  const currentIntent = (currentCollision?.data as PositionAwareCollisionData)
+    ?.positionWithinDropZone;
 
   // Show position indicator for all valid drops with position detection
   const showPositionIndicator = showDropFeedback && enablePositionDetection;
@@ -59,7 +58,7 @@ const DropZone = ({
     >
       {children}
       {/* Position indicators */}
-      {showPositionIndicator && (
+      {showPositionIndicator && currentIntent && (
         <DropPositionIndicator
           isVisible={true}
           position={currentIntent}

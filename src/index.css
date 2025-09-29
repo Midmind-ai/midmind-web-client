@@ -3,3 +3,9 @@
 @import '@config/theme-colors.css';
 @import '@config/theme-fonts.css';
 @import '@config/layout-variables.css';
+
+/* Global drag cursor */
+body.dragging-cursor,
+body.dragging-cursor * {
+  cursor: grabbing !important;
+}
