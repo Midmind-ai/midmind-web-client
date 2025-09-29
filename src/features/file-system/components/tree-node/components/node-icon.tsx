@@ -1,10 +1,4 @@
-import {
-  Folder,
-  Library,
-  MessageCircle,
-  MessagesSquare,
-  NotebookText,
-} from 'lucide-react';
+import { Folder, Library, MessagesSquare, NotebookText } from 'lucide-react';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 
 type Props = {
@@ -12,14 +6,9 @@ type Props = {
   hasChildren?: boolean;
 };
 
-const NodeIcon = ({ nodeType, hasChildren }: Props) => {
+const NodeIcon = ({ nodeType }: Props) => {
   if (nodeType === ItemTypeEnum.Chat) {
-    // Show MessagesSquare for chats with branches, MessageCircle for single chats
-    return hasChildren ? (
-      <MessagesSquare className="size-4 stroke-[1.5px]" />
-    ) : (
-      <MessageCircle className="size-4 stroke-[1.5px]" />
-    );
+    return <MessagesSquare className="size-4 stroke-[1.5px]" />;
   }
 
   if (nodeType === ItemTypeEnum.Folder) {

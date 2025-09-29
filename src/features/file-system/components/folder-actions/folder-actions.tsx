@@ -1,13 +1,13 @@
 import { Folder, Library, MessageSquare, NotebookText } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+// import { useSearchParams } from 'react-router';
 import { SidebarMenuButton } from '@components/ui/sidebar';
-import { AppRoutes } from '@constants/paths';
 import { useFileSystemStore } from '@features/file-system/stores/file-system.store';
-import { navigate } from '@hooks/use-navigation';
+// import { AppRoutes } from '@constants/paths';
+// import { navigate } from '@hooks/use-navigation';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 
 const FolderActions = () => {
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
 
   // Store actions (inline editing handled inside store)
   const createTemporaryItem = useFileSystemStore(state => state.createTemporaryItem);
@@ -15,11 +15,15 @@ const FolderActions = () => {
   const buttonClassNames =
     'size-8 p-1 rounded-sm flex items-center justify-center cursor-pointer';
 
-  const handleNavigateToHome = () => {
-    const params = searchParams.toString();
-    const url = params ? `${AppRoutes.Home}?${params}` : AppRoutes.Home;
+  // const handleNavigateToHome = () => {
+  //   const params = searchParams.toString();
+  //   const url = params ? `${AppRoutes.Home}?${params}` : AppRoutes.Home;
 
-    navigate(url);
+  //   navigate(url);
+  // };
+
+  const handleCreateChat = () => {
+    createTemporaryItem(ItemTypeEnum.Chat);
   };
 
   const handleCreateDirectory = () => {
@@ -63,7 +67,7 @@ const FolderActions = () => {
         </SidebarMenuButton>
         <SidebarMenuButton
           className={buttonClassNames}
-          onClick={handleNavigateToHome}
+          onClick={handleCreateChat}
         >
           <MessageSquare className="size-5.5! stroke-1" />
         </SidebarMenuButton>
