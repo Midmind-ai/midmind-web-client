@@ -6,6 +6,7 @@ export const AppRoutes = {
   Item: (id: string) => `/item/${id}`,
   Chat: (id: string) => `/chat/${id}`,
   ChatOld: (id: string) => `/chat-old/${id}`,
+  Note: (id: string) => `/notes/${id}`,
   NotFound: '*',
 } as const;
 

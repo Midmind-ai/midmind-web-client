@@ -2,6 +2,7 @@ import { GitMerge, Link2Off, Link2 } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router';
 import { useTheme } from '../../../../app/providers/theme-provider';
+import { useChatsStore } from '../../stores/chats.store';
 import { Button } from '@components/ui/button';
 import { ThemedSpan } from '@components/ui/themed-span';
 import { AppRoutes, SearchParams } from '@constants/paths';
@@ -12,6 +13,7 @@ type Props = {
   connectionType: string;
   bgColor: string;
   branchChatId: string;
+  messageId: string;
 };
 
 const CONNECTION_LABELS = {
@@ -20,8 +22,13 @@ const CONNECTION_LABELS = {
 };
 
 const BranchBadge = React.memo(
-  ({ bgColor, connectionType, chatId, branchChatId }: Props) => {
+  ({ bgColor, connectionType, chatId, branchChatId, messageId }: Props) => {
+    const changeNestedChatConnectionType = useChatsStore(
+      state => state.changeNestedChatConnectionType
+    );
+
     const isDetached = connectionType === 'detached';
+    const isAttached = connectionType === 'attached';
     const label = CONNECTION_LABELS[connectionType as keyof typeof CONNECTION_LABELS];
     const IconComponent = isDetached ? Link2 : Link2Off;
 
@@ -34,9 +41,10 @@ const BranchBadge = React.memo(
     const themedContentColor = resolveTheme(theme) === 'light' ? 'white' : 'black';
     const iconColor = isDetached ? bgColor : themedContentColor;
 
-    const deactivate = () => {
-      // eslint-disable-next-line no-alert
-      alert('Coming soon');
+    const toggleConnectionType = () => {
+      const newConnectionType = isDetached ? 'attached' : isAttached ? 'detached' : '';
+      if (!newConnectionType) return;
+      changeNestedChatConnectionType(chatId, messageId, branchChatId, newConnectionType);
     };
 
     return (
@@ -77,7 +85,7 @@ const BranchBadge = React.memo(
               backgroundColor: bgColor,
               color: themedContentColor,
             }}
-            onClick={deactivate}
+            onClick={toggleConnectionType}
           >
             <IconComponent
               className="h-3.5 w-3.5"

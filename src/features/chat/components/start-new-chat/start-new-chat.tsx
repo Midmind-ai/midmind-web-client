@@ -1,14 +1,21 @@
 import { createChatSendMessageAndNavigate } from '../../../../actions/chat.actions';
 import { ThemedH1 } from '@components/ui/themed-h1';
 import ChatInput from '@features/chat/components/chat-input/chat-input';
-import type { AIModel } from '@shared-types/entities';
+import type { AIModel, ChatMessage } from '@shared-types/entities';
 import { cn } from '@utils/cn';
 
 const StartNewChat = () => {
-  const handleFormSubmit = async (content: string, model: AIModel) => {
+  const handleFormSubmit = async (
+    content: string,
+    model: AIModel,
+    attachments?: ChatMessage['attachments'],
+    attachmentFiles?: File[]
+  ) => {
     await createChatSendMessageAndNavigate({
       content,
       model,
+      attachments,
+      attachmentFiles,
     });
   };
 

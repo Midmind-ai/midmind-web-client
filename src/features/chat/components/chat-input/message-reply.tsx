@@ -15,7 +15,7 @@ const MessageReply = ({ content, className, placement = 'form', onClose }: Props
 
   const classNames = cn(
     'flex gap-2 p-2.5 rounded-tl-[10px] rounded-tr-[10px]',
-    !placedInMessage && 'bg-accent border-base border',
+    !placedInMessage && 'bg-accent border-base border-t border-r border-l',
     placedInMessage && 'bg-background-accent',
     placement === 'message' && 'mb-0',
     placement === 'form' && 'mb-0',

@@ -46,6 +46,6 @@ export const handleSWRError = (error: unknown) => {
   // Show error toast with Sonner
   toast.error(errorMessage, {
     description: errorTitle !== 'Error' ? errorTitle : undefined,
-    duration: 5000,
+    duration: 3000,
   });
 };

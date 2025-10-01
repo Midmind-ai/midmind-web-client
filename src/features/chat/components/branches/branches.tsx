@@ -5,9 +5,10 @@ import type { ChatMessage } from '@shared-types/entities';
 type Props = {
   chatId: string;
   branches: ChatMessage['nested_chats'];
+  messageId: string;
 };
 
-const Branches = ({ chatId, branches }: Props) => {
+const Branches = ({ chatId, branches, messageId }: Props) => {
   if (!branches || branches.length === 0) {
     return null;
   }
@@ -30,6 +31,7 @@ const Branches = ({ chatId, branches }: Props) => {
             chatId={chatId}
             branchChatId={child_chat_id}
             connectionType={connection_type}
+            messageId={messageId}
           />
         )
       )}

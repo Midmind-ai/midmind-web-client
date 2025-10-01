@@ -236,37 +236,6 @@ export const useFileSystemStore = create<FileSystemStore>()(
             ),
           },
         }));
-
-        try {
-          // API call
-          const updatedItem = await ItemsService.renameItem(nodeId, newName);
-
-          // Update with server response
-          set(state => ({
-            itemsByParentId: {
-              ...state.itemsByParentId,
-              [parentId]: state.itemsByParentId[parentId].map(item =>
-                item.id === nodeId ? updatedItem : item
-              ),
-            },
-          }));
-
-          // Revalidate breadcrumb caches
-          await mutate(findCacheKeysByPattern(['breadcrumbs']));
-        } catch (error) {
-          // Rollback
-          if (originalItem) {
-            set(state => ({
-              itemsByParentId: {
-                ...state.itemsByParentId,
-                [parentId]: state.itemsByParentId[parentId]
-                  .map(item => (item.id === nodeId ? originalItem : item))
-                  .filter((item): item is Item => item !== undefined),
-              },
-            }));
-          }
-          throw error;
-        }
       },
 
       deleteItem: async (id, parentId) => {
