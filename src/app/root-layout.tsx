@@ -1,4 +1,4 @@
-import SplitLayout from '@app/split-layout';
+import { Outlet } from 'react-router';
 import Sidebar from '@components/misc/sidebar/sidebar';
 import { SidebarProvider } from '@components/ui/sidebar';
 
@@ -7,7 +7,7 @@ const RootLayout = () => {
     <div className="flex h-full max-h-full">
       <SidebarProvider>
         <Sidebar />
-        <SplitLayout />
+        <Outlet />
       </SidebarProvider>
     </div>
   );

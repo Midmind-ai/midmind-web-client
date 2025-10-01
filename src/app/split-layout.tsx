@@ -1,4 +1,4 @@
-import { Outlet, useParams } from 'react-router';
+import { Outlet } from 'react-router';
 import { ItemRouter } from '../features/item-router/item-router';
 import {
   ResizableHandle,
@@ -22,26 +22,13 @@ import { getFromStorage, setToStorage } from '@utils/local-storage';
 const SplitLayout = () => {
   useInitializeNavigation();
 
-  const { id: currentChatId = '' } = useParams<{ id: string }>();
-  const {
-    value: chatId = '',
-    // removeValue
-  } = useUrlParams(SearchParams.Split);
+  const { value: itemId = '' } = useUrlParams(SearchParams.Split);
 
   const sidePanelWidth = getFromStorage<number>(LocalStorageKeys.SidePanelWidth) || 50;
-  const isOnChatPage = !!currentChatId;
 
   const handleResize = (size: number) => {
     setToStorage(LocalStorageKeys.SidePanelWidth, size);
   };
-
-  // const handleCloseLeftPanel = () => {
-  //   if (chatId) navigate(AppRoutes.Chat(chatId));
-  // };
-
-  // const handleCloseRightPanel = () => {
-  //   removeValue();
-  // };
 
   return (
     <ResizablePanelGroup direction="horizontal">
@@ -49,24 +36,12 @@ const SplitLayout = () => {
         id="main-panel"
         order={1}
         minSize={35}
-        className={cn(chatId ? 'w-1/2' : 'w-full')}
+        className={cn(itemId ? 'w-1/2' : 'w-full')}
       >
-        {isOnChatPage ? (
-          <>
-            <ItemRouter />
-            {/* <Chat
-            chatId={currentChatId}
-            showCloseButton={!!chatId}
-            showSidebarToggle={true}
-            onClose={handleCloseLeftPanel}
-            /> */}
-          </>
-        ) : (
-          <Outlet />
-        )}
+        <Outlet />
       </ResizablePanel>
 
-      {chatId && (
+      {itemId && (
         <>
           <ResizableHandle />
           <ResizablePanel
@@ -77,15 +52,7 @@ const SplitLayout = () => {
             defaultSize={sidePanelWidth}
             className="w-1/2"
           >
-            <>
-              <ItemRouter />
-              {/* <Chat
-              chatId={chatId}
-              showCloseButton
-              showSidebarToggle={false}
-              onClose={handleCloseRightPanel}
-              /> */}
-            </>
+            <ItemRouter />
           </ResizablePanel>
         </>
       )}

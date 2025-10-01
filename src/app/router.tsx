@@ -8,6 +8,7 @@ import HomePage from '@app/routes/home';
 import NotFoundPage from '@app/routes/not-found';
 import SignInPage from '@app/routes/sign-in';
 import SignUpPage from '@app/routes/sign-up';
+import SplitLayout from '@app/split-layout';
 import { AppRoutes } from '@constants/paths';
 import ProtectedRoute from '@features/sign-in/components/protected-route/protected-route';
 
@@ -20,21 +21,26 @@ const router = createBrowserRouter([
         element: <RootLayout />,
         children: [
           {
-            index: true,
-            element: <HomePage />,
+            element: <SplitLayout />,
+            children: [
+              {
+                index: true,
+                element: <HomePage />,
+              },
+              {
+                path: AppRoutes.Item(':id'),
+                element: <ItemRouter />,
+              },
+              // {
+              //   path: AppRoutes.Chat(':id'),
+              //   element: <ChatPage />,
+              // },
+              // {
+              //   path: '/chat-old/:id',
+              //   element: <ChatOldPage />,
+              // },
+            ],
           },
-          {
-            path: AppRoutes.Item(':id'),
-            element: <ItemRouter />,
-          },
-          // {
-          //   path: AppRoutes.Chat(':id'),
-          //   element: <ChatPage />,
-          // },
-          // {
-          //   path: '/chat-old/:id',
-          //   element: <ChatOldPage />,
-          // },
         ],
       },
     ],

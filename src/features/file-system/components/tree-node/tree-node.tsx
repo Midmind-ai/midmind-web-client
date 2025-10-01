@@ -1,4 +1,6 @@
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router';
+import { AppRoutes } from '../../../../constants/paths';
 import ExpandableNode from '@features/file-system/components/tree-node/components/expandable-node';
 import {
   useFileSystemActions,
@@ -10,11 +12,16 @@ type Props = {
 };
 
 const TreeNode = ({ node }: Props) => {
-  const { isExpanded, isNodeActive, handleNodeClick } = useFileSystemActions().helpers;
+  const { isExpanded, isNodeActive } = useFileSystemActions().helpers;
   const { setExpanded } = useFileSystemActions().actions;
   const isOpen = isExpanded(node.id);
   const isActive = isNodeActive(node);
-  const handleClick = useCallback(() => handleNodeClick(node), [node, handleNodeClick]);
+  const navigate = useNavigate();
+
+  const navigateToItem = () => {
+    const currentSearch = window.location.search;
+    navigate(`${AppRoutes.Item(node.id)}${currentSearch}`);
+  };
 
   const setIsOpen = useCallback(
     (open: boolean) => {
@@ -41,7 +48,7 @@ const TreeNode = ({ node }: Props) => {
       isActive={isActive}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      onClick={handleClick}
+      onClick={navigateToItem}
       TreeNodeComponent={TreeNode}
     />
   );
