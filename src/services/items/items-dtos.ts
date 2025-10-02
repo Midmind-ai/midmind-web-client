@@ -23,7 +23,11 @@ export type Item = ItemResponse;
 export type ItemPayload = ItemResponse['payload'];
 
 // Type-specific payload aliases
+export type NotePayload = components['schemas']['NotePayload'];
 export type PromptPayload = components['schemas']['PromptPayload'];
+export type ChatPayload = components['schemas']['ChatPayload'];
+export type FolderPayload = components['schemas']['FolderPayload'];
+export type ProjectPayload = components['schemas']['ProjectPayload'];
 
 // Tree-specific types for easier usage
 export interface TreeItem extends Item {
@@ -83,4 +87,15 @@ export interface ItemDescendantsResponse {
   items: Item[];
   total_count: number;
   has_projects: boolean;
+}
+
+// Type guard helpers
+export function isNotePayload(payload: ItemPayload | undefined): payload is NotePayload {
+  return !!payload && ('content_json' in payload || 'content_md' in payload);
+}
+
+export function hasContentJson(
+  payload: ItemPayload | undefined
+): payload is NotePayload | PromptPayload {
+  return !!payload && 'content_json' in payload;
 }

@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { Button } from '@components/ui/button';
 import { useSidebar } from '@components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
-import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
+// import Breadcrumbs from '@features/breadcrumbs/breadcrumbs';
 
 type Props = {
   id: string;
@@ -13,7 +13,6 @@ type Props = {
 };
 
 const NavigationHeader = ({
-  id,
   showCloseButton,
   showSidebarToggle = true,
   onClose,
@@ -42,7 +41,7 @@ const NavigationHeader = ({
             <div className="relative h-[15px] w-0 border" />
           </>
         )}
-        <Breadcrumbs id={id} />
+        {/* <Breadcrumbs id={id} /> */}
       </div>
       <div className="flex items-center gap-2">
         {/* <Button variant="outline">

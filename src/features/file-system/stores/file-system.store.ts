@@ -94,7 +94,7 @@ type FileSystemStore = {
   loadItems: (parentId: string | null) => Promise<void>;
 
   // CRUD operations (already unified from previous work)
-  renameItem: (nodeId: string, newName: string) => Promise<void>;
+  renameItem: (nodeId: string, newName: string) => VoidFunction;
   deleteItem: (id: string, parentId?: string) => Promise<void>;
   moveItem: (
     itemId: string,
@@ -205,7 +205,7 @@ export const useFileSystemStore = create<FileSystemStore>()(
         }
       },
 
-      renameItem: async (nodeId, newName) => {
+      renameItem: (nodeId, newName) => {
         const state = get();
         // Find item across all parents
         let originalItem: Item | undefined;
@@ -236,6 +236,10 @@ export const useFileSystemStore = create<FileSystemStore>()(
             ),
           },
         }));
+
+        return () => {
+          set(state);
+        };
       },
 
       deleteItem: async (id, parentId) => {

@@ -340,6 +340,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notes/{note_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Note
+         * @description Update note content (name, content_json, or content_md).
+         *
+         *     All fields are optional - at least one must be provided.
+         *     If content_json is provided without content_md, markdown will be auto-generated.
+         */
+        patch: operations["update_note_api_v1_notes__note_id__patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -600,7 +623,51 @@ export interface components {
             /** Content Md */
             content_md?: string | null;
             /** Content Json */
-            content_json?: Record<string, never> | null;
+            content_json?: {
+                [key: string]: unknown;
+            } | Record<string, never> | null;
+        };
+        /**
+         * NoteResponse
+         * @description Response model for note data.
+         * @example {
+         *       "content_json": {
+         *         "root": {
+         *           "children": [
+         *             {
+         *               "children": [
+         *                 {
+         *                   "text": "Title",
+         *                   "type": "text"
+         *                 }
+         *               ],
+         *               "tag": "h1",
+         *               "type": "heading"
+         *             }
+         *           ],
+         *           "type": "root"
+         *         },
+         *         "version": 1
+         *       },
+         *       "content_md": "# Title\n\nSome content here",
+         *       "id": "note-uuid-123",
+         *       "name": "My Note",
+         *       "updated_at": "2025-10-01T14:30:00Z"
+         *     }
+         */
+        NoteResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Content Json */
+            content_json?: {
+                [key: string]: unknown;
+            } | Record<string, never> | null;
+            /** Content Md */
+            content_md: string | null;
+            /** Updated At */
+            updated_at: string | null;
         };
         /**
          * ProjectPayload
@@ -628,7 +695,9 @@ export interface components {
             /** Content Md */
             content_md?: string | null;
             /** Content Json */
-            content_json?: Record<string, never> | null;
+            content_json?: {
+                [key: string]: unknown;
+            } | Record<string, never> | null;
         };
         /**
          * RenameItemRequest
@@ -694,6 +763,20 @@ export interface components {
             password: string;
             /** Confirmation Password */
             confirmation_password: string;
+        };
+        /**
+         * UpdateNoteRequest
+         * @description Request model for updating note content.
+         */
+        UpdateNoteRequest: {
+            /** Name */
+            name?: string | null;
+            /** Content Json */
+            content_json?: {
+                [key: string]: unknown;
+            } | Record<string, never> | null;
+            /** Content Md */
+            content_md?: string | null;
         };
         /** UpdateUserDto */
         UpdateUserDto: {
@@ -1370,6 +1453,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RenormalizeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_note_api_v1_notes__note_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                note_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNoteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NoteResponse"];
                 };
             };
             /** @description Validation Error */

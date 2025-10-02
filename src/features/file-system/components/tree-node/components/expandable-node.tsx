@@ -6,6 +6,7 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { updateNoteName } from '../../../../../actions/note.actions';
 import { cn } from '../../../../../utils/cn';
 import { useDragStateStore } from '../../../stores/drag-state.store';
 import type { PositionAwareCollisionData } from '../../../utils/position-aware-collision-detection';
@@ -45,7 +46,6 @@ const ExpandableNode = React.memo(
     const [isHovered, setIsHovered] = useState(false);
 
     // Store actions (cache revalidation handled inside store)
-    const renameItem = useFileSystemStore(state => state.renameItem);
     const deleteItem = useFileSystemStore(state => state.deleteItem);
     const finalizeItemCreation = useFileSystemStore(state => state.finalizeItemCreation);
     const removeTemporaryItem = useFileSystemStore(state => state.removeTemporaryItem);
@@ -91,7 +91,7 @@ const ExpandableNode = React.memo(
         );
       } else {
         // Use the unified renameItem for all types
-        await renameItem(node.id, newName);
+        await updateNoteName(node.id, newName);
       }
     };
 

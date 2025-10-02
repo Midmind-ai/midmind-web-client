@@ -109,7 +109,10 @@ const InlineEditableText = forwardRef<EditableTextRef, Props>(
           onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn('inline w-full border-0 bg-transparent outline-none', className)}
+          className={cn(
+            'bg-accent inlin-block h-14 w-full rounded-md border-0 p-2 outline-none',
+            className
+          )}
         />
       );
     }
@@ -119,8 +122,9 @@ const InlineEditableText = forwardRef<EditableTextRef, Props>(
         ref={textRef}
         onClick={handleClick}
         className={cn(
-          'inline max-w-full overflow-hidden text-ellipsis whitespace-nowrap',
-          clickToEdit && !disabled ? 'cursor-pointer' : 'cursor-default',
+          `hover:bg-accent inline h-14 w-fit max-w-full overflow-hidden rounded-md p-2
+          text-ellipsis whitespace-nowrap`,
+          clickToEdit && !disabled ? 'cursor-text' : 'cursor-default',
           className
         )}
       >
