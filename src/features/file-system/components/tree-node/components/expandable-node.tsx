@@ -50,6 +50,7 @@ const ExpandableNode = React.memo(
     const finalizeItemCreation = useFileSystemStore(state => state.finalizeItemCreation);
     const removeTemporaryItem = useFileSystemStore(state => state.removeTemporaryItem);
     const convertItemType = useFileSystemStore(state => state.convertItemType);
+    const renameItem = useFileSystemStore(state => state.renameItem);
 
     // Still need actions for other operations
     const { openChatInNewTab, openChatInSidePanel } = useFileSystemActions().actions;
@@ -91,7 +92,12 @@ const ExpandableNode = React.memo(
         );
       } else {
         // Use the unified renameItem for all types
-        await updateNoteName(node.id, newName);
+
+        if (node.type === ItemTypeEnum.Note || node.type === ItemTypeEnum.Prompt) {
+          await updateNoteName(node.id, newName);
+        } else {
+          await renameItem(node.id, newName);
+        }
       }
     };
 

@@ -5,6 +5,7 @@ import { NoteSkeleton } from './components/note-skeleton';
 import { useNoteAutosave } from './hooks/use-note-autosave';
 import { useNotesStore } from './stores/notes.store';
 import NavigationHeader from '@components/misc/navigation-header/navigation-header';
+import { ScrollArea } from '@components/ui/scroll-area';
 
 interface NotePageProps {
   noteId: string;
@@ -38,20 +39,22 @@ export const NotePage = ({ noteId }: NotePageProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-hidden">
       <NavigationHeader
         id={noteId}
         showSidebarToggle
       />
 
-      <div className="flex flex-1 flex-col">
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 py-10">
+      <ScrollArea className="min-h-0 flex-1">
+        <div className="flex w-full flex-col gap-4 pt-10">
           <NoteHeader
             name={noteName}
             onNameChange={handleNameChange}
+            type={noteState.item.type}
           />
 
           <NoteEditor
+            key={noteId}
             noteId={noteId}
             initialContent={contentJson || null}
             onContentChange={handleContentChange}
@@ -64,7 +67,7 @@ export const NotePage = ({ noteId }: NotePageProps) => {
             </div>
           )}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };

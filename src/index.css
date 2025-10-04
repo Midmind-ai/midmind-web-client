@@ -4,6 +4,14 @@
 @import '@config/theme-fonts.css';
 @import '@config/layout-variables.css';
 
+/* Viewport height constraints */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Global drag cursor */
 body.dragging-cursor,
 body.dragging-cursor * {

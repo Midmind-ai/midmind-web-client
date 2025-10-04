@@ -1,16 +1,22 @@
 import type { components } from 'generated/api-types-new';
 
-// Frontend ItemType enum - decoupled from backend string literals
-export enum ItemTypeEnum {
-  Note = 'note',
-  Chat = 'chat',
-  Folder = 'folder',
-  Project = 'project',
-  Prompt = 'prompt',
-}
+// Backend API type - source of truth
+export type ApiItemType = components['schemas']['ItemType'];
+
+// ItemTypeEnum const object - tied to OpenAPI union
+// Can be used as both runtime value and type
+export const ItemTypeEnum = {
+  Note: 'note',
+  Chat: 'chat',
+  Folder: 'folder',
+  Project: 'project',
+  Prompt: 'prompt',
+} as const satisfies Record<string, ApiItemType>;
+
+// Type derived from const (same as ApiItemType)
+export type ItemTypeEnum = (typeof ItemTypeEnum)[keyof typeof ItemTypeEnum];
 
 // Backend API type - keep for API compatibility
-export type ApiItemType = components['schemas']['ItemType'];
 export type ItemResponse = components['schemas']['ItemResponse'];
 export type ItemListResponse = components['schemas']['ItemListResponse'];
 export type CreateItemRequest = components['schemas']['CreateItemRequest'];
