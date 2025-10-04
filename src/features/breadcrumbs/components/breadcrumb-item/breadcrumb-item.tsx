@@ -1,4 +1,6 @@
 import { Link } from 'react-router';
+import type { ItemTypeEnum } from '../../../../services/items/items-dtos';
+import NodeIcon from '../../../file-system/components/tree-node/components/node-icon';
 import {
   BreadcrumbItem as ShadcnBreadcrumbItem,
   BreadcrumbLink,
@@ -6,13 +8,11 @@ import {
 import { ThemedSpan } from '@components/ui/themed-span';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip';
 import { useIsTextTruncated } from '@hooks/utils/use-is-text-truncated';
-import { type EntityType } from '@shared-types/entity';
 import { cn } from '@utils/cn';
-import { renderEntityIcon } from '@utils/entity-icons';
 
 type Props = {
   title: string;
-  type: EntityType;
+  type: ItemTypeEnum;
   isActive?: boolean;
   href: string;
 };
@@ -22,7 +22,9 @@ const BreadcrumbItem = ({ title, type, isActive, href }: Props) => {
 
   const breadcrumbContent = (
     <div className="flex min-w-0 items-center gap-1.5">
-      <div className="flex-shrink-0">{renderEntityIcon(type)}</div>
+      <div className="flex-shrink-0">
+        <NodeIcon nodeType={type} />
+      </div>
       <ThemedSpan
         ref={textRef}
         className="truncate"

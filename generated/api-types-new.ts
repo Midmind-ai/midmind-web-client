@@ -240,6 +240,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/items/{item_id}/breadcrumbs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Item Breadcrumbs
+         * @description Get breadcrumb trail for an item (all ancestors in order).
+         */
+        get: operations["get_item_breadcrumbs_api_v1_items__item_id__breadcrumbs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/items/{item_id}/descendants": {
         parameters: {
             query?: never;
@@ -390,6 +410,22 @@ export interface components {
             access_token: string;
         };
         /**
+         * BreadcrumbItem
+         * @description Single breadcrumb item in the hierarchy trail.
+         * @example {
+         *       "id": "folder-uuid-123",
+         *       "name": "My Folder",
+         *       "type": "folder"
+         *     }
+         */
+        BreadcrumbItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            type: components["schemas"]["ItemType"];
+        };
+        /**
          * ChatPayload
          * @description Payload model for chat items.
          */
@@ -490,6 +526,33 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * ItemBreadcrumbsResponse
+         * @description Response model for item breadcrumbs (ancestor trail).
+         * @example {
+         *       "breadcrumbs": [
+         *         {
+         *           "id": "root-folder-uuid",
+         *           "name": "Projects",
+         *           "type": "folder"
+         *         },
+         *         {
+         *           "id": "subfolder-uuid",
+         *           "name": "Work",
+         *           "type": "folder"
+         *         },
+         *         {
+         *           "id": "note-uuid",
+         *           "name": "My Note",
+         *           "type": "note"
+         *         }
+         *       ]
+         *     }
+         */
+        ItemBreadcrumbsResponse: {
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["BreadcrumbItem"][];
         };
         /**
          * ItemDescendantsResponse
@@ -1286,6 +1349,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ItemListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_item_breadcrumbs_api_v1_items__item_id__breadcrumbs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ItemBreadcrumbsResponse"];
                 };
             };
             /** @description Validation Error */

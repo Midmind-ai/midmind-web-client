@@ -11,6 +11,7 @@ import type {
   RenormalizeResponse,
   ConvertItemRequest,
   ItemDescendantsResponse,
+  ItemBreadcrumbsResponse,
 } from './items-dtos';
 import { baseAxiosInstance } from '@config/axios';
 
@@ -150,6 +151,14 @@ export class ItemsService {
   static async getDescendants(itemId: string): Promise<ItemDescendantsResponse> {
     const { data } = await baseAxiosInstance.get<ItemDescendantsResponse>(
       `/items/${itemId}/descendants`
+    );
+
+    return data;
+  }
+
+  static async getItemBreadcrumbs(itemId: string): Promise<ItemBreadcrumbsResponse> {
+    const { data } = await baseAxiosInstance.get<ItemBreadcrumbsResponse>(
+      `/items/${itemId}/breadcrumbs`
     );
 
     return data;

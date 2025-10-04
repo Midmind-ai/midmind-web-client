@@ -23,6 +23,8 @@ export type CreateItemRequest = components['schemas']['CreateItemRequest'];
 export type MoveItemRequest = components['schemas']['MoveItemRequest'];
 export type ChildrenBounds = components['schemas']['ChildrenBounds'];
 export type RenormalizeResponse = components['schemas']['RenormalizeResponse'];
+export type BreadcrumbItem = components['schemas']['BreadcrumbItem'];
+export type ItemBreadcrumbsResponse = components['schemas']['ItemBreadcrumbsResponse'];
 
 // Convenience type aliases
 export type Item = ItemResponse;

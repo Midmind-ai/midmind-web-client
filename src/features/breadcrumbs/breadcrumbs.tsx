@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import type { BreadcrumbItem as BreadcrumbItemType } from '../../services/items/items-dtos';
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -6,32 +7,33 @@ import {
 } from '@components/ui/breadcrumb';
 import { AppRoutes } from '@constants/paths';
 import BreadcrumbItem from '@features/breadcrumbs/components/breadcrumb-item/breadcrumb-item';
-import { useGetChatBreadcrumbs } from '@features/breadcrumbs/hooks/use-get-chat-breadcrumbs';
-import type { GetChatBreadcrumbsResponse } from '@services/breadcrumbs/breadcrumbs-dtos';
+import { useGetItemBreadcrumbs } from '@features/breadcrumbs/hooks/use-get-item-breadcrumbs';
 
 type Props = {
   id: string;
 };
 
 const Breadcrumbs = ({ id }: Props) => {
-  const { data } = useGetChatBreadcrumbs(id);
+  const { data } = useGetItemBreadcrumbs(id);
 
   return (
     <Breadcrumb>
       <BreadcrumbList className="gap-1 sm:gap-1">
-        {data?.map(({ id, name, type }: GetChatBreadcrumbsResponse[0], index: number) => (
-          <div
-            className="flex items-center"
-            key={id}
-          >
-            <BreadcrumbItem
-              title={name}
-              type={type}
-              href={AppRoutes.Chat(id)}
-            />
-            {index < data.length - 1 && <BreadcrumbSeparator />}
-          </div>
-        ))}
+        {data?.breadcrumbs?.map(
+          ({ id, name, type }: BreadcrumbItemType, index: number) => (
+            <div
+              className="flex items-center gap-1"
+              key={id}
+            >
+              <BreadcrumbItem
+                title={name}
+                type={type}
+                href={AppRoutes.Item(id)}
+              />
+              {index < data.breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+            </div>
+          )
+        )}
       </BreadcrumbList>
     </Breadcrumb>
   );

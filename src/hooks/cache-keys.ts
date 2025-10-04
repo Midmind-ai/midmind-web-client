@@ -4,6 +4,9 @@ export const CACHE_KEYS = {
     refreshToken: ['auth', 'refreshToken'],
     signIn: ['auth', 'signIn'],
   },
+  items: {
+    breadcrumbsById: (itemId: string) => ['breadcrumbs', itemId],
+  },
   chats: {
     root: ['chats'],
     byParentId: (parentDirectoryId?: string | null, parentChatId?: string | null) => {
