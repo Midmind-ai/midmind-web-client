@@ -15,10 +15,11 @@ function ScrollArea({ className, children, onScroll, ...props }: ScrollAreaProps
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        // [&>div]:!block - Fix for Radix ScrollArea internal div with display:table causing width issues
+        // [&>div:not([class])]:!flex - Fix for Radix ScrollArea internal div with display:table, force flex instead
         className="focus-visible:ring-ring/50 size-full rounded-[inherit]
           transition-[color,box-shadow] outline-none focus-visible:ring-[3px]
-          focus-visible:outline-1 [&>div]:!block"
+          focus-visible:outline-1 [&>div:not([class])]:!flex [&>div:not([class])]:!h-full
+          [&>div:not([class])]:!flex-col"
         onScroll={onScroll}
       >
         {children}

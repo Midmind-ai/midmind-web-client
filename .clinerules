@@ -1,0 +1,247 @@
+# .clinerules - Frontend (React/TypeScript) Project Rules
+
+## Development Tools & Agents
+
+web app usually is running on the http://localhost:5173
+
+### Chrome DevTools MCP
+
+- Available for browser debugging and UI inspection
+- Take screenshots with `mcp__chrome-devtools__take_screenshot`
+- View console logs with `mcp__chrome-devtools__list_console_messages`
+- Check network requests with `mcp__chrome-devtools__list_network_requests`
+
+### Agents (Use Proactively)
+
+**Automatically launch agents for these tasks:**
+
+- **react-zustand-architect**: When building/refactoring React components with Zustand
+  - Creating new features with components + stores + services
+  - Refactoring components to proper architecture
+  - Building complex UI with state management
+  - Example: "Create a search feature" → Auto-launch this agent
+
+- **tailwind-ui-architect**: When creating/fixing UI layouts and styling
+  - Building responsive layouts
+  - Creating complex component compositions
+  - Fixing styling issues
+  - Example: "Create a dashboard layout" → Auto-launch this agent
+
+- **system-architect**: When designing full-stack features
+  - Planning client-server communication
+  - Designing WebSocket integration
+  - Architecting new features that span frontend + backend
+  - Example: "Design notification system" → Auto-launch this agent
+
+- **general-purpose**: For multi-file searches, refactoring, code review
+  - Finding pattern violations across codebase
+  - Large-scale refactoring tasks
+  - Deep code analysis
+  - Example: "Find all direct service calls" → Auto-launch this agent
+
+## Package Management
+
+- Always use **Yarn**, never npm
+- Run `yarn install` for new dependencies
+- Commit yarn.lock, never package-lock.json
+
+## Code Style & Naming
+
+- **Files & Folders**: Always use kebab-case (e.g., `use-file-system-actions.ts`, `tree-node/`)
+- **Components**: PascalCase for component names, kebab-case for filenames (e.g., `TreeNode` in `tree-node.tsx`)
+- **Functions & Variables**: camelCase (e.g., `handleClick`, `isLoading`)
+- **Types & Interfaces**: PascalCase (e.g., `User`, `ChatMessage`)
+- **Constants**: UPPER_SNAKE_CASE for true constants (e.g., `API_BASE_URL`)
+- **Props Type**: Always name component props type as `Props`
+
+## Project Architecture
+
+- Follow **Zustand-centric** state management - stores handle data fetching and business logic
+- Use **Router → Service → Zustand Store** pattern
+- **Never call services directly from components** - use stores or action hooks
+- Keep components focused on UI rendering only
+- Extract complex logic into custom hooks (`use[ComponentName]Logic.ts`)
+
+## State Management
+
+- Use **Zustand stores** for global state, not Context API or Redux
+- Use `shallow` comparison for selecting multiple store values
+- Store selectors should be granular (one value per selector when possible)
+- Business logic belongs in stores, not components or hooks
+- Action hooks only coordinate store actions with navigation/side effects
+
+## File Organization
+
+- Place files in feature-based folders: `src/features/[feature]/`
+- Each feature has: `components/`, `hooks/`, `stores/`, optionally `utils/` or `data/`
+- Global shared code goes in: `src/components/`, `src/hooks/`, `src/stores/`, `src/services/`
+- Configuration in: `src/config/` (not `src/constants/`)
+- Constants in: `src/constants/` (cache keys, route names, storage keys)
+
+## API Integration
+
+- Service classes in `src/services/[entity]/[entity]-service.ts`
+- DTOs in `src/services/[entity]/[entity]-dtos.ts`
+- **One service per entity** (single responsibility principle)
+- Use centralized Axios instances from `src/config/axios.ts`
+- Never use SWR for data that belongs in Zustand stores
+- SWR only for simple, read-only data without complex state management
+
+## Error Handling
+
+- **Never add manual error handling in hooks** - handled globally by Axios interceptors
+- Errors automatically show Sonner toast notifications
+- Axios interceptor at `src/config/axios.ts` handles all API errors
+- SWR automatically rolls back optimistic updates on error
+
+## TypeScript
+
+- Always use TypeScript, avoid `any` type
+- Define explicit types for all props, state, and function returns
+- Use type inference where appropriate
+- Export types that might be reused
+- Use OpenAPI-generated types from `generated/api-types-new.ts`
+
+## Styling
+
+- Use **Tailwind CSS** utilities for all styling
+- Use **Shadcn/UI** theme colors (not simple Tailwind colors)
+- Use **Shadcn/UI** components (in `src/components/ui/`)
+- Avoid custom CSS files unless absolutely necessary
+- Use `cn()` utility for conditional class names
+- Follow mobile-first responsive design
+
+## Forms
+
+- Use **React Hook Form** for all forms
+- Validate with **Zod** schemas
+- Keep validation schemas close to where they're used
+
+## Component Patterns
+
+```tsx
+type Props = {
+  someProp: string;
+  onAction: VoidFunction;
+};
+
+const MyComponent = ({ someProp, onAction }: Props) => {
+  const { data, isLoading } = useMyComponentLogic();
+
+  return <div className="...">{/* Component JSX */}</div>;
+};
+
+export default MyComponent;
+```
+
+## Hook Patterns
+
+- **UI Logic Hooks**: `use-[component]-logic.ts` - Handle UI state, animations, forms
+- **Action Hooks**: `use-[feature]-actions.ts` - Coordinate store actions with navigation
+- **Utility Hooks**: `use-[utility].ts` - Reusable functionality (DnD, debounce)
+
+## Cache Keys
+
+- Always import from centralized `src/hooks/cache-keys.ts`
+- Never use hardcoded strings for SWR mutation keys
+- Use the pattern: `CACHE_KEYS.entity.operation(params)`
+
+## Testing
+
+- Focus on user interactions and outcomes
+- Test custom hooks separately from components
+- Write tests for critical business logic
+
+## API Types Generation
+
+- **After backend changes to DTOs/endpoints**: Run `yarn types:generate:python` to regenerate types
+- This fetches the OpenAPI spec from the running FastAPI server
+- Generates TypeScript types in `generated/api-types-new.ts`
+- Import types from `generated/api-types-new.ts` in DTOs
+- Ensures full type safety from backend to frontend
+
+### Type Generation Workflow
+
+1. Backend: Change DTOs in `app/api/*/dto.py`
+2. Backend: Server must be running (`poetry run uvicorn app.main:app --reload`)
+3. Frontend: Run `yarn types:generate:python`
+4. Frontend: Update DTOs in `src/services/*/[entity]-dtos.ts` to export new types
+5. Frontend: Update service methods with proper types
+
+## Pre-Commit Checklist
+
+- Run `yarn types:check` before committing TypeScript changes
+- Run `yarn lint` to check for linting errors
+- Run `yarn format` to format code with Prettier
+- Ensure no console.log statements in production code
+- **If backend DTOs changed**: Run `yarn types:generate:python` to update types
+
+## Common Commands
+
+```bash
+# Development
+yarn dev                      # Start dev server (port 5173)
+yarn build                    # Build for production
+yarn preview                  # Preview production build
+
+# Code Quality
+yarn types:check              # TypeScript type checking
+yarn lint                     # ESLint check
+yarn format                   # Format with Prettier
+
+# Type Generation
+yarn types:generate:python    # Generate types from FastAPI OpenAPI
+
+# Dependencies
+yarn add [package]            # Add dependency
+yarn add -D [package]         # Add dev dependency
+```
+
+## Important Patterns
+
+**For code examples, see CLAUDE.md "Code Examples & Patterns" section**
+
+### Store Usage in Components
+
+- Use single selectors for state: `useStore(state => state.value)`
+- Use `shallow` comparison for multiple actions
+- See CLAUDE.md for complete examples
+
+### Service Layer
+
+- Static methods in service classes
+- Use baseAxiosInstance from config
+- One service per entity
+- See CLAUDE.md for complete examples
+
+### Action Hooks
+
+- Only coordinate store actions with navigation
+- Business logic stays in stores
+- See CLAUDE.md for complete examples
+
+## Never Do
+
+- ❌ Use npm instead of yarn
+- ❌ Call services directly from components
+- ❌ Use useState for complex global state (use Zustand)
+- ❌ Add manual try-catch for API calls (handled globally)
+- ❌ Hardcode cache keys (import from cache-keys.ts)
+- ❌ Mix business logic in components
+- ❌ Use snake_case for file names (use kebab-case)
+- ❌ Create new files unless absolutely necessary
+- ❌ Add emojis unless user explicitly requests
+- ❌ Create documentation files (\*.md) unless explicitly requested
+
+## Always Do
+
+- ✅ Use Yarn for package management
+- ✅ Follow Zustand-centric architecture
+- ✅ Use centralized cache keys
+- ✅ Keep components focused on UI
+- ✅ Extract logic into custom hooks
+- ✅ Use Tailwind for styling
+- ✅ Use kebab-case for all files and folders
+- ✅ Import types from OpenAPI generation
+- ✅ Follow the established patterns in CLAUDE.md
+- ✅ Prefer editing existing files over creating new ones

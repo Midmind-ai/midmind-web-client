@@ -63,13 +63,13 @@ export const NoteEditor = ({ initialContent, onContentChange }: NoteEditorProps)
   const shouldAutoFocus = isContentEmpty();
 
   return (
-    <div>
+    <div className="h-full">
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="relative rounded">
+        <div className="relative h-full rounded">
           <PlainTextPlugin
             contentEditable={
               <ContentEditable
-                className="resize-none p-2 px-32 pb-10 text-base outline-none"
+                className="h-full resize-none p-2 px-32 pb-10 text-base outline-none"
               />
             }
             placeholder={

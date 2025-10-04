@@ -550,6 +550,116 @@ yarn types:check  # Check TypeScript types
 yarn format       # Format code with Prettier
 ```
 
+## 💻 Code Examples & Patterns
+
+### Component Pattern
+```tsx
+type Props = {
+  someProp: string;
+  onAction: VoidFunction;
+};
+
+const MyComponent = ({ someProp, onAction }: Props) => {
+  const { data, isLoading } = useMyComponentLogic();
+
+  return <div className="...">{/* Component JSX */}</div>;
+};
+
+export default MyComponent;
+```
+
+### Store Usage in Components
+```tsx
+import { shallow } from 'zustand/shallow';
+
+const FileExplorer = () => {
+  // Single selector
+  const entities = useFileSystemStore(state => state.entities);
+
+  // Multiple actions with shallow comparison
+  const { createEntity, deleteEntity } = useFileSystemStore(
+    state => ({
+      createEntity: state.createEntity,
+      deleteEntity: state.deleteEntity,
+    }),
+    shallow
+  );
+
+  return <div>{/* UI */}</div>;
+};
+```
+
+### Service Layer Pattern
+```tsx
+// services/items/items-service.ts
+export class ItemsService {
+  static async getItem(itemId: string): Promise<Item> {
+    const { data } = await baseAxiosInstance.get<Item>(`/items/${itemId}`);
+    return data;
+  }
+
+  static async createItem(request: CreateItemRequest): Promise<Item> {
+    const { data } = await baseAxiosInstance.post<Item>('/items', request);
+    return data;
+  }
+}
+```
+
+### Action Hook Pattern (Navigation Coordination)
+```tsx
+// features/file-system/hooks/use-file-system-actions.ts
+export const useFileSystemActions = () => {
+  const navigate = useNavigate();
+  const createEntity = useFileSystemStore(state => state.createEntity);
+
+  const createAndNavigate = async (name: string, type: EntityEnum) => {
+    const entity = await createEntity(name, type); // Business logic in store
+    if (type === EntityEnum.Chat) {
+      navigate(`/chat/${entity.id}`); // Navigation side effect
+    }
+    return entity;
+  };
+
+  return { createAndNavigate };
+};
+```
+
+### Zustand Store Pattern
+```tsx
+export const useFileSystemStore = create<FileSystemStore>((set, get) => ({
+  // State
+  entities: {},
+  isLoading: false,
+
+  // Actions
+  loadData: async (parentId: string) => {
+    set({ isLoading: true });
+    try {
+      const data = await ItemsService.getItems(parentId);
+      set({ entities: data, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+    }
+  },
+
+  // Selectors
+  getEntityById: (id: string) => {
+    return get().entities[id];
+  },
+}));
+```
+
+### Cache Keys Pattern
+```tsx
+import { MUTATION_KEYS, CACHE_KEYS } from '@hooks/cache-keys';
+
+// Use centralized mutation keys
+useSWRMutation(MUTATION_KEYS.directories.move, mutationFn);
+
+// Use centralized cache keys
+const key = CACHE_KEYS.directories.withParent(parentId);
+```
+
 ## ⚠️ Important Notes
 
 - Node.js version required: **>=20.0.0**

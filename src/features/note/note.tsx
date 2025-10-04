@@ -46,19 +46,21 @@ export const NotePage = ({ noteId }: NotePageProps) => {
       />
 
       <ScrollArea className="min-h-0 flex-1">
-        <div className="flex w-full flex-col gap-4 pt-10">
+        <div className="flex min-h-full w-full flex-col gap-4 pt-10">
           <NoteHeader
             name={noteName}
             onNameChange={handleNameChange}
             type={noteState.item.type}
           />
 
-          <NoteEditor
-            key={noteId}
-            noteId={noteId}
-            initialContent={contentJson || null}
-            onContentChange={handleContentChange}
-          />
+          <div className="flex-1">
+            <NoteEditor
+              key={noteId}
+              noteId={noteId}
+              initialContent={contentJson || null}
+              onContentChange={handleContentChange}
+            />
+          </div>
 
           {/* Error message */}
           {noteState.error && (
