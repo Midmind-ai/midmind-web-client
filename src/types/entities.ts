@@ -1,3 +1,4 @@
+import type { MessageResponse, MessageNestedChat } from '@services/chats/chats-dtos';
 import type { components } from 'generated/api-types';
 
 export type User = components['schemas']['UserDto'];
@@ -12,7 +13,8 @@ export type Project = {
   type: EntityEnum;
 };
 
-export type ChatMessage = components['schemas']['AppMessageDto'];
+// Using new MessageResponse type from chats-dtos (temporarily extended)
+export type ChatMessage = MessageResponse;
 
 export type Team = {
   name: string;
@@ -20,7 +22,8 @@ export type Team = {
   plan: string;
 };
 
-export type ChatBranchContext = components['schemas']['CreateChatDto']['chat_metadata'];
+// Using MessageNestedChat from chats-dtos
+export type ChatBranchContext = MessageNestedChat;
 
 export type ConversationBranchContext =
   components['schemas']['ChatMetadataByMessageIdDto'];
@@ -28,11 +31,11 @@ export type ConversationBranchContext =
 // Streaming related types
 export type StreamChunk = components['schemas']['CreateConversationResponseContentDto'];
 
-// Request types
+// Request types - keeping old for now
 export type SendMessageRequest = components['schemas']['CreateConversationDto'];
 
-// AI Model type from generated API
-export type AIModel = components['schemas']['CreateConversationDto']['model'];
+// AI Model type - define temporarily until new API has it
+export type AIModel = string;
 
 export type TreeItem = {
   id: string;

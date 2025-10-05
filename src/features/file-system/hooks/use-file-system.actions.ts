@@ -7,7 +7,6 @@ import {
   type DraggableData,
   type DroppableData,
 } from './use-tree-dnd-logic';
-import type { LLModel } from '@features/chat-old/types/chat-types';
 import { useInlineEditStore } from '@features/file-system/stores/inline-edit.store';
 import {
   openChatInNewTab,
@@ -18,6 +17,9 @@ import type { Item } from '@services/items/items-dtos';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 import { type ChatBranchContext } from '@shared-types/entities';
 import { useMenuStateStore } from '@stores/menu-state.store';
+import type { components } from 'generated/api-types-new';
+
+type LLModel = components['schemas']['LLModel'];
 
 // Type definitions for action parameters
 type CreateChatArgs = {

@@ -8,14 +8,8 @@ import { getRandomColor } from '../../../utils/color-picker';
 import { scrollToBottom } from '../utils/scroll-utils';
 import { AI_MODELS } from '@constants/ai-models';
 import { ChatsService } from '@services/chats/chats-service';
-import type {
-  ConversationWithAIRequestDto,
-  ConversationWithAIResponseDto,
-} from '@services/conversations/conversations-dtos';
-import { ConversationsService } from '@services/conversations/conversations-service';
 import type { GetFileResponseDto } from '@services/files/files-dtos';
 import { FilesService } from '@services/files/files-service';
-import { MessagesService } from '@services/messages/messages-service';
 import type {
   AIModel,
   ChatMessage,
@@ -126,7 +120,6 @@ export const useChatsStore = create<ChatsStoreState>()(
 
         useChatsStore.getState().initChat(chatId);
         useChatsStore.getState().loadMessages(chatId);
-        useChatsStore.getState().loadChat(chatId);
       },
 
       // Initialize chat if not exists
@@ -158,13 +151,13 @@ export const useChatsStore = create<ChatsStoreState>()(
         }));
 
         try {
-          const chatDetails = await ChatsService.getChatDetails(chatId);
+          // const chatDetails = await ChatsService.getChatDetails(chatId);
           set(state => ({
             chats: {
               ...state.chats,
               [chatId]: {
                 ...state.chats[chatId],
-                chat: chatDetails,
+                // chat: chatDetails,
               },
             },
           }));
@@ -208,20 +201,28 @@ export const useChatsStore = create<ChatsStoreState>()(
         }));
 
         try {
-          const response = await MessagesService.getChatMessages(chatId, {
-            skip: 0,
-            take: ITEMS_PER_PAGE,
+          const response = await ChatsService.getMessages(chatId, {
+            offset: 0,
+            limit: ITEMS_PER_PAGE,
           });
 
-          const attachments = await get().loadAttachments(response.data);
+          // Add default values for fields that backend doesn't populate yet
+          const messages = response.messages.map(msg => ({
+            ...msg,
+            reply_content: null,
+            nested_chats: [],
+            attachments: [],
+          }));
+
+          const attachments = await get().loadAttachments(messages);
 
           set(state => ({
             chats: {
               ...state.chats,
               [chatId]: {
                 ...state.chats[chatId],
-                messages: response.data.reverse(),
-                hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
+                messages: messages.reverse(),
+                hasMoreMessages: messages.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: 1,
                 attachments,
@@ -273,20 +274,28 @@ export const useChatsStore = create<ChatsStoreState>()(
         }));
 
         try {
-          const response = await MessagesService.getChatMessages(chatId, {
-            skip: chatState.currentPage * ITEMS_PER_PAGE,
-            take: ITEMS_PER_PAGE,
+          const response = await ChatsService.getMessages(chatId, {
+            offset: chatState.currentPage * ITEMS_PER_PAGE,
+            limit: ITEMS_PER_PAGE,
           });
 
-          const attachments = await get().loadAttachments(response.data);
+          // Add default values for fields that backend doesn't populate yet
+          const messages = response.messages.map(msg => ({
+            ...msg,
+            reply_content: null,
+            nested_chats: [],
+            attachments: [],
+          }));
+
+          const attachments = await get().loadAttachments(messages);
 
           set(state => ({
             chats: {
               ...state.chats,
               [chatId]: {
                 ...state.chats[chatId],
-                messages: [...response.data.reverse(), ...state.chats[chatId].messages],
-                hasMoreMessages: response.data.length === ITEMS_PER_PAGE,
+                messages: [...messages.reverse(), ...state.chats[chatId].messages],
+                hasMoreMessages: messages.length === ITEMS_PER_PAGE,
                 isLoadingMessages: false,
                 currentPage: state.chats[chatId].currentPage + 1,
                 attachments: [...attachments, ...state.chats[chatId].attachments],
@@ -327,24 +336,28 @@ export const useChatsStore = create<ChatsStoreState>()(
         const replyContext = get().chats[chatId]?.replyContext;
 
         // Create user message
-        const userMessage = {
+        const userMessage: ChatMessage = {
           id: userMessageId,
+          chat_id: chatId,
+          user_id: null,
           content,
-          role: 'user' as const,
+          role: 'user',
           created_at: new Date().toISOString(),
-          llm_model: model,
+          llm_model: model as ChatMessage['llm_model'],
           nested_chats: [],
           reply_content: replyContext?.content || null,
           attachments: attachments,
         };
 
         // Create empty AI message for streaming
-        const aiMessage = {
+        const aiMessage: ChatMessage = {
           id: aiMessageId,
+          chat_id: chatId,
+          user_id: null,
           content: '',
-          role: 'model' as const,
+          role: 'model',
           created_at: new Date().toISOString(),
-          llm_model: model,
+          llm_model: model as ChatMessage['llm_model'],
           nested_chats: [],
           reply_content: null,
           attachments: [],
@@ -395,22 +408,23 @@ export const useChatsStore = create<ChatsStoreState>()(
         }));
 
         try {
-          const requestData: ConversationWithAIRequestDto = {
-            chat_id: chatId,
+          const requestData = {
+            id: userMessageId,
             content,
             model,
-            message_id: userMessageId,
-            future_llm_message_id: aiMessageId,
-            attachments: attachments.map(att => att.id),
             ...(replyContext && { reply_to: replyContext }),
+            ...(attachments.length > 0 && {
+              attachments: attachments.map(att => att.id),
+            }),
           };
 
           let accumulatedContent = '';
           let titleUpdated = false;
 
-          await ConversationsService.conversationWithAI(
+          await ChatsService.sendMessage(
+            chatId,
             requestData,
-            (chunk: ConversationWithAIResponseDto) => {
+            chunk => {
               // Handle different chunk types
               switch (chunk.type) {
                 case 'content':
@@ -434,22 +448,22 @@ export const useChatsStore = create<ChatsStoreState>()(
                   break;
 
                 case 'title': {
-                  if ('title' in chunk && 'chat_id' in chunk && !titleUpdated) {
+                  if (chunk.title && chunk.chat_id && !titleUpdated) {
                     titleUpdated = true;
-                    const titleChunk = chunk as { title: string; chat_id: string };
+                    const title = chunk.title;
                     set(state => ({
                       chats: {
                         ...state.chats,
                         [chatId]: {
                           ...state.chats[chatId],
                           chat: state.chats[chatId].chat
-                            ? { ...state.chats[chatId].chat, name: titleChunk.title }
+                            ? { ...state.chats[chatId].chat, name: title }
                             : state.chats[chatId].chat,
                         },
                       },
                     }));
                     // Update document title
-                    document.title = titleChunk.title;
+                    document.title = title;
                   }
                   break;
                 }
@@ -476,12 +490,12 @@ export const useChatsStore = create<ChatsStoreState>()(
 
                 case 'error': {
                   let errorMessage = 'An error occurred';
-                  if ('error' in chunk) {
+                  if (chunk.error) {
                     try {
-                      const errorData = JSON.parse(chunk.error as string);
+                      const errorData = JSON.parse(chunk.error);
                       errorMessage = errorData?.error?.message || errorMessage;
                     } catch {
-                      errorMessage = (chunk.error as string) || errorMessage;
+                      errorMessage = chunk.error || errorMessage;
                     }
                   }
 

@@ -1,53 +1,81 @@
 import { baseAxiosInstance } from '@config/axios';
-import type {
-  UpdateChatDetailsRequestDto,
-  CreateNewChatRequestDto,
-} from '@services/chats/chats-dtos';
-import type { MessageResponse } from '@shared-types/common';
-import type { Chat } from '@shared-types/entities';
+import type { SendMessageRequest, MessageListResponse } from '@services/chats/chats-dtos';
 
 export class ChatsService {
-  static async getChats(options?: { parentDirectoryId?: string; parentChatId?: string }) {
-    const params: Record<string, string> = {};
+  static async sendMessage(
+    chatId: string,
+    request: SendMessageRequest,
+    onChunk: (data: {
+      type: string;
+      body?: string;
+      title?: string;
+      chat_id?: string;
+      error?: string;
+      id?: string;
+    }) => void,
+    signal?: AbortSignal
+  ): Promise<void> {
+    const token = localStorage.getItem('accessToken');
+    const url = `${baseAxiosInstance.defaults.baseURL}/chats/${chatId}/send-message`;
 
-    if (options?.parentDirectoryId && options.parentDirectoryId !== 'root') {
-      params.parent_folder_id = options.parentDirectoryId;
-    }
-
-    if (options?.parentChatId && options.parentChatId !== 'root') {
-      params.parent_chat_id = options.parentChatId;
-    }
-
-    const { data } = await baseAxiosInstance.get<Chat[]>('/chats', {
-      params,
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+      signal,
     });
 
-    return data;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    if (!reader) {
+      throw new Error('Response body is not readable');
+    }
+
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith('data:')) {
+          const jsonStr = trimmed.replace(/^data:\s*/, '');
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            onChunk(parsed);
+          } catch (error) {
+            console.error('Failed to parse SSE data:', jsonStr, error);
+          }
+        }
+      }
+    }
   }
 
-  static async createNewChat(body: CreateNewChatRequestDto) {
-    const { data } = await baseAxiosInstance.post<MessageResponse>('/chats', body);
-
-    return data;
-  }
-
-  static async getChatDetails(chatId: string) {
-    const { data } = await baseAxiosInstance.get<Chat>(`/chats/${chatId}`);
-
-    return data;
-  }
-
-  static async updateChatDetails(chatId: string, body: UpdateChatDetailsRequestDto) {
-    const { data } = await baseAxiosInstance.put<MessageResponse>(
-      `/chats/${chatId}`,
-      body
+  static async getMessages(
+    chatId: string,
+    params?: { limit?: number; offset?: number }
+  ): Promise<MessageListResponse> {
+    const { data } = await baseAxiosInstance.get<MessageListResponse>(
+      `/chats/${chatId}/messages`,
+      { params }
     );
-
-    return data;
-  }
-
-  static async deleteChat(chatId: string) {
-    const { data } = await baseAxiosInstance.delete<MessageResponse>(`/chats/${chatId}`);
 
     return data;
   }

@@ -172,7 +172,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/items/": {
+    "/api/v1/items": {
         parameters: {
             query?: never;
             header?: never;
@@ -183,13 +183,13 @@ export interface paths {
          * List Root Items
          * @description List user's root-level items (parent_id is null) with pagination.
          */
-        get: operations["list_root_items_api_v1_items__get"];
+        get: operations["list_root_items_api_v1_items_get"];
         put?: never;
         /**
          * Create Item
          * @description Create a new item of any type.
          */
-        post: operations["create_item_api_v1_items__post"];
+        post: operations["create_item_api_v1_items_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -354,6 +354,63 @@ export interface paths {
          * @description Reset positions to 1000-unit gaps when precision is exhausted.
          */
         post: operations["renormalize_positions_api_v1_items__parent_id__renormalize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}/send-message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Message
+         * @description Send a message to a chat and receive SSE stream with assistant response.
+         *
+         *     This endpoint:
+         *     1. Verifies the chat exists and user has access
+         *     2. Saves the user's message
+         *     3. Generates a mock assistant response (will be LLM later)
+         *     4. Streams both messages as SSE events
+         *
+         *     Returns:
+         *         SSE stream with message events and [DONE] marker
+         */
+        post: operations["send_message_api_v1_chats__chat_id__send_message_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Chat Messages
+         * @description Get paginated messages for a chat, ordered by newest first.
+         *
+         *     Args:
+         *         chat_id: ID of the chat
+         *         limit: Maximum number of messages to return (1-100, default 50)
+         *         offset: Number of messages to skip for pagination (default 0)
+         *
+         *     Returns:
+         *         List of messages and total count
+         */
+        get: operations["get_chat_messages_api_v1_chats__chat_id__messages_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -658,11 +715,53 @@ export interface components {
          * @enum {string}
          */
         ItemType: "chat" | "folder" | "note" | "project" | "prompt";
+        /**
+         * LLModel
+         * @description LLM model types - using real Gemini models.
+         * @enum {string}
+         */
+        LLModel: "gemini-pro" | "gemini-1.5-pro" | "gemini-1.5-flash" | "mock";
         /** MessageDto */
         MessageDto: {
             /** Message */
             message: string;
         };
+        /**
+         * MessageListResponse
+         * @description Response model for paginated message list.
+         */
+        MessageListResponse: {
+            /** Messages */
+            messages: components["schemas"]["MessageResponse"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * MessageResponse
+         * @description Response model for a single message.
+         */
+        MessageResponse: {
+            /** Id */
+            id: string;
+            /** Chat Id */
+            chat_id: string;
+            /** User Id */
+            user_id: string | null;
+            /** Content */
+            content: string;
+            role: components["schemas"]["MessageSenderRole"];
+            llm_model: components["schemas"]["LLModel"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * MessageSenderRole
+         * @enum {string}
+         */
+        MessageSenderRole: "model" | "user";
         /**
          * MoveItemRequest
          * @description Request model for moving an item to a new parent.
@@ -795,6 +894,22 @@ export interface components {
             items: {
                 [key: string]: number;
             }[];
+        };
+        /**
+         * SendMessageRequest
+         * @description Request body for sending a message.
+         */
+        SendMessageRequest: {
+            /**
+             * Id
+             * @description Client-generated message ID for optimistic updates
+             */
+            id: string;
+            /**
+             * Content
+             * @description Message content
+             */
+            content: string;
         };
         /** SignInDto */
         SignInDto: {
@@ -1204,7 +1319,7 @@ export interface operations {
             };
         };
     };
-    list_root_items_api_v1_items__get: {
+    list_root_items_api_v1_items_get: {
         parameters: {
             query?: {
                 /** @description Number of root items to return */
@@ -1238,7 +1353,7 @@ export interface operations {
             };
         };
     };
-    create_item_api_v1_items__post: {
+    create_item_api_v1_items_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1547,6 +1662,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RenormalizeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_message_api_v1_chats__chat_id__send_message_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_chat_messages_api_v1_chats__chat_id__messages_get: {
+        parameters: {
+            query?: {
+                /** @description Number of messages to return */
+                limit?: number;
+                /** @description Number of messages to skip */
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageListResponse"];
                 };
             };
             /** @description Validation Error */
