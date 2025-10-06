@@ -3,6 +3,10 @@
     "chrome-devtools": {
       "command": "npx",
       "args": ["chrome-devtools-mcp@latest"]
+    },
+    "context7": {
+      "command": "context7-mcp",
+      "args": []
     }
   }
 }

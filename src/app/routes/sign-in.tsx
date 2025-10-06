@@ -29,8 +29,8 @@ const SignInPage = () => {
             shadow-[0_1px_20px_0_rgba(0,0,0,0.05)] lg:flex"
         >
           <ThemedH1 className="max-w-[508px] text-5xl leading-[140%] font-thin">
-            <ThemedSpan className="font-normal">Reasoning space</ThemedSpan> for
-            individuals, teams, and organizations
+            <ThemedSpan className="font-normal">Reasoning space</ThemedSpan> where notes
+            and chats think together
           </ThemedH1>
           <ChatTreeIcon className="z-10 max-w-full" />
           <LogoBackgroundIcon className="absolute bottom-0 left-0" />
