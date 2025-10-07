@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { v4 as uuid } from 'uuid';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
@@ -428,8 +429,8 @@ export const useChatsStore = create<ChatsStoreState>()(
               // Handle different chunk types
               switch (chunk.type) {
                 case 'content':
-                  if (chunk.body) {
-                    accumulatedContent += chunk.body;
+                  if (chunk.content) {
+                    accumulatedContent += chunk.content;
                     // Update the streaming message
                     set(state => ({
                       chats: {
@@ -448,9 +449,9 @@ export const useChatsStore = create<ChatsStoreState>()(
                   break;
 
                 case 'title': {
-                  if (chunk.title && chunk.chat_id && !titleUpdated) {
+                  if (chunk.content && !titleUpdated) {
                     titleUpdated = true;
-                    const title = chunk.title;
+                    const title = chunk.content;
                     set(state => ({
                       chats: {
                         ...state.chats,
@@ -489,15 +490,10 @@ export const useChatsStore = create<ChatsStoreState>()(
                   break;
 
                 case 'error': {
-                  let errorMessage = 'An error occurred';
-                  if (chunk.error) {
-                    try {
-                      const errorData = JSON.parse(chunk.error);
-                      errorMessage = errorData?.error?.message || errorMessage;
-                    } catch {
-                      errorMessage = chunk.error || errorMessage;
-                    }
-                  }
+                  const errorMessage = chunk.content || 'An error occurred';
+
+                  toast.error(errorMessage, { duration: 5000 });
+                  console.error(errorMessage);
 
                   set(state => ({
                     chats: {

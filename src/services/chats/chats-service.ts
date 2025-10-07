@@ -1,28 +1,21 @@
-import { baseAxiosInstance } from '@config/axios';
+import type { SSEEvent } from './sse-events';
+import { baseAxiosInstance, getAuthHeaders } from '@config/axios';
 import type { SendMessageRequest, MessageListResponse } from '@services/chats/chats-dtos';
 
 export class ChatsService {
   static async sendMessage(
     chatId: string,
     request: SendMessageRequest,
-    onChunk: (data: {
-      type: string;
-      body?: string;
-      title?: string;
-      chat_id?: string;
-      error?: string;
-      id?: string;
-    }) => void,
+    onChunk: (data: SSEEvent) => void,
     signal?: AbortSignal
   ): Promise<void> {
-    const token = localStorage.getItem('accessToken');
     const url = `${baseAxiosInstance.defaults.baseURL}/chats/${chatId}/send-message`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
+        ...getAuthHeaders(),
       },
       body: JSON.stringify(request),
       signal,

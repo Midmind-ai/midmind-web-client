@@ -32,6 +32,12 @@ const processQueue = (error: unknown, token: string = '') => {
   refreshQueue = [];
 };
 
+export const getAuthHeaders = (): Record<string, string> => {
+  const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
+
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+};
+
 const addTokenToRequest = (request: InternalAxiosRequestConfig) => {
   const accessToken = getFromStorage<string>(LocalStorageKeys.AccessToken);
 
