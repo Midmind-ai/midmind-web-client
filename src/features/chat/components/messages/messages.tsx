@@ -100,7 +100,10 @@ const Messages = ({ messages, chatId, isLoading, isStreaming }: Props) => {
         [&_[data-slot=scroll-area-scrollbar]]:w-2"
       onScroll={handleScroll}
     >
-      <div className="mx-auto flex max-w-[840px] flex-col gap-3 space-y-0 py-0 pt-10">
+      <div
+        className="mx-auto flex w-[100%] max-w-[840px] flex-col gap-3 space-y-0 py-0
+          pt-10"
+      >
         {messages.map((message, index) => {
           const isLastMessage = index === messages.length - 1;
 

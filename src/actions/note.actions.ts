@@ -8,7 +8,7 @@ import { NotesService } from '../services/notes/notes-service';
 export const updateNoteName = async (noteId: string, name: string) => {
   // Update both stores
   const rollbackNoteStore = useNotesStore.getState().updateName(noteId, name);
-  const rollbackFileSystemStore = useFileSystemStore.getState().renameItem(noteId, name);
+  const rollbackFileSystemStore = useFileSystemStore.getState().setItemName(noteId, name);
 
   try {
     await NotesService.updateNote(noteId, { name });
