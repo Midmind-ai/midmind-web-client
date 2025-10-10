@@ -70,8 +70,8 @@ export const NoteEditor = ({ initialContent, onContentChange }: NoteEditorProps)
             <PlainTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="h-full resize-none p-2 px-5 pb-10 text-base font-light
-                    outline-none"
+                  className="h-full resize-none p-2 px-5 pb-10 text-base leading-relaxed
+                    font-light outline-none"
                 />
               }
               placeholder={
