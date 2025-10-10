@@ -65,7 +65,7 @@ export const NoteEditor = ({ initialContent, onContentChange }: NoteEditorProps)
   return (
     <div className="h-full">
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="m-auto w-[100%] max-w-[840px]">
+        <div className="m-auto h-full w-[100%] max-w-[840px]">
           <div className="relative h-full rounded">
             <PlainTextPlugin
               contentEditable={
@@ -77,7 +77,7 @@ export const NoteEditor = ({ initialContent, onContentChange }: NoteEditorProps)
               placeholder={
                 <div
                   className="text-muted-foreground pointer-events-none absolute top-2
-                    left-32 opacity-70"
+                    left-5 opacity-70"
                 >
                   Enter note text
                 </div>
