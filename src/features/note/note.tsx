@@ -4,7 +4,6 @@ import { NoteHeader } from './components/note-header/note-header';
 import { NoteSkeleton } from './components/note-skeleton';
 import { useNoteAutosave } from './hooks/use-note-autosave';
 import { useNotesStore } from './stores/notes.store';
-import NavigationHeader from '@components/misc/navigation-header/navigation-header';
 import { ScrollArea } from '@components/ui/scroll-area';
 
 interface NotePageProps {
@@ -39,38 +38,31 @@ export const NotePage = ({ noteId }: NotePageProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <NavigationHeader
-        id={noteId}
-        showSidebarToggle
-      />
+    <ScrollArea className="h-full">
+      <div className="flex min-h-full w-full flex-col gap-4 pt-10">
+        <NoteHeader
+          name={noteName}
+          onNameChange={handleNameChange}
+          type={noteState.item.type}
+        />
 
-      <ScrollArea className="min-h-0 flex-1">
-        <div className="flex min-h-full w-full flex-col gap-4 pt-10">
-          <NoteHeader
-            name={noteName}
-            onNameChange={handleNameChange}
-            type={noteState.item.type}
+        <div className="flex-1">
+          <NoteEditor
+            key={noteId}
+            noteId={noteId}
+            initialContent={contentJson || null}
+            onContentChange={handleContentChange}
           />
-
-          <div className="flex-1">
-            <NoteEditor
-              key={noteId}
-              noteId={noteId}
-              initialContent={contentJson || null}
-              onContentChange={handleContentChange}
-            />
-          </div>
-
-          {/* Error message */}
-          {noteState.error && (
-            <div className="rounded bg-red-50 p-4 text-sm text-red-600">
-              {noteState.error}
-            </div>
-          )}
         </div>
-      </ScrollArea>
-    </div>
+
+        {/* Error message */}
+        {noteState.error && (
+          <div className="rounded bg-red-50 p-4 text-sm text-red-600">
+            {noteState.error}
+          </div>
+        )}
+      </div>
+    </ScrollArea>
   );
 };
 

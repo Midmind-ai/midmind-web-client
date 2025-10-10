@@ -52,7 +52,7 @@ const SplitLayout = () => {
             defaultSize={sidePanelWidth}
             className="w-1/2"
           >
-            <ItemRouter />
+            <ItemRouter isInRightPanel />
           </ResizablePanel>
         </>
       )}

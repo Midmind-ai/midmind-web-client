@@ -47,7 +47,7 @@ const AIMessage = ({
   return (
     <div
       className={cn(
-        'group w-full rounded-md bg-transparent px-3.5 pt-0 pb-2.5',
+        'group w-full rounded-md bg-transparent px-5 pt-0 pb-2.5',
         isLastMessage &&
           'min-h-[calc(100vh-var(--navigation-header-height)-var(--chat-form-with-padding-height)-115px)]'
       )}

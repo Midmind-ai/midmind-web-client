@@ -17,7 +17,7 @@ const UserMessage = ({ message, getFileUrl }: Props) => {
   return (
     <div>
       {attachments.length > 0 && (
-        <div className="mx-3.5 ml-auto flex w-fit max-w-full flex-wrap justify-end gap-2">
+        <div className="mx-5 ml-auto flex w-fit max-w-full flex-wrap justify-end gap-2">
           {attachments.map(attachment => (
             <ImageWithFallback
               key={attachment.id}
@@ -34,7 +34,7 @@ const UserMessage = ({ message, getFileUrl }: Props) => {
         </div>
       )}
       {content && (
-        <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
+        <div className="group w-full rounded-md bg-transparent px-5 py-2.5">
           <div className="ml-auto w-fit max-w-[465px]">
             {reply_content && (
               <MessageReply

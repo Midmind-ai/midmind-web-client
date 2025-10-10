@@ -12,16 +12,18 @@ export const NoteHeader = ({ name, type, onNameChange }: NoteHeaderProps) => {
     'underline decoration-amber-500 decoration-2 underline-offset-4';
 
   return (
-    <div className={'relative px-30'}>
-      <InlineEditableText
-        value={name}
-        onSave={onNameChange}
-        className={`flex w-full text-4xl font-semibold ${
-          type === ItemTypeEnum.Prompt ? promptClassNames : ''
-        }`}
-        placeholder="Untitled note"
-        clickToEdit
-      />
+    <div className="m-auto w-[100%] max-w-[840px]">
+      <div className={'relative px-2.5'}>
+        <InlineEditableText
+          value={name}
+          onSave={onNameChange}
+          className={`flex w-full text-4xl font-semibold ${
+            type === ItemTypeEnum.Prompt ? promptClassNames : ''
+          }`}
+          placeholder="Untitled note"
+          clickToEdit
+        />
+      </div>
     </div>
   );
 };

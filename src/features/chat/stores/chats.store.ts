@@ -56,7 +56,6 @@ export interface ChatState {
 export interface ChatsStoreState {
   // Multiple chats support
   chats: Record<string, ChatState>;
-  activeChatIds: string[];
   isCreatingNewChat: boolean;
 
   // Actions
@@ -96,8 +95,6 @@ export interface ChatsStoreState {
   ) => Promise<void>;
   clearChat: (chatId: string) => void;
   setError: (chatId: string, error: string | null) => void;
-  addChatToActive: (chatId: string) => void;
-  removeChatFromActive: (chatId: string) => void;
   addAttachments: (
     chatId: string,
     attachments: { id: string; file_name: string; download_url: string }[]
@@ -109,7 +106,6 @@ export const useChatsStore = create<ChatsStoreState>()(
     (set, get) => ({
       // Initial state
       chats: {},
-      activeChatIds: [],
       isCreatingNewChat: false,
 
       initChatData: (chatId: string) => {
@@ -692,7 +688,6 @@ export const useChatsStore = create<ChatsStoreState>()(
 
           return {
             chats: newChats,
-            activeChatIds: state.activeChatIds.filter(id => id !== chatId),
           };
         });
       },
@@ -723,22 +718,6 @@ export const useChatsStore = create<ChatsStoreState>()(
               error,
             },
           },
-        }));
-      },
-
-      // Add chat to active list
-      addChatToActive: (chatId: string) => {
-        set(state => ({
-          activeChatIds: state.activeChatIds.includes(chatId)
-            ? state.activeChatIds
-            : [...state.activeChatIds, chatId],
-        }));
-      },
-
-      // Remove chat from active list
-      removeChatFromActive: (chatId: string) => {
-        set(state => ({
-          activeChatIds: state.activeChatIds.filter(id => id !== chatId),
         }));
       },
 

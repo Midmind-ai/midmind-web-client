@@ -65,26 +65,29 @@ export const NoteEditor = ({ initialContent, onContentChange }: NoteEditorProps)
   return (
     <div className="h-full">
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="relative h-full rounded">
-          <PlainTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="h-full resize-none p-2 px-32 pb-10 text-base outline-none"
-              />
-            }
-            placeholder={
-              <div
-                className="text-muted-foreground pointer-events-none absolute top-2
-                  left-32 opacity-70"
-              >
-                Enter note text
-              </div>
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <OnChangePlugin onChange={handleEditorChange} />
-          <HistoryPlugin />
-          {shouldAutoFocus && <AutoFocusPlugin />}
+        <div className="m-auto w-[100%] max-w-[840px]">
+          <div className="relative h-full rounded">
+            <PlainTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className="h-full resize-none p-2 px-5 pb-10 text-base font-light
+                    outline-none"
+                />
+              }
+              placeholder={
+                <div
+                  className="text-muted-foreground pointer-events-none absolute top-2
+                    left-32 opacity-70"
+                >
+                  Enter note text
+                </div>
+              }
+              ErrorBoundary={LexicalErrorBoundary}
+            />
+            <OnChangePlugin onChange={handleEditorChange} />
+            <HistoryPlugin />
+            {shouldAutoFocus && <AutoFocusPlugin />}
+          </div>
         </div>
       </LexicalComposer>
     </div>
