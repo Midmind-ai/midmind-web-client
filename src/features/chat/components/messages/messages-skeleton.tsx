@@ -8,7 +8,9 @@ const MessagesSkeleton = () => {
       className="[&_[data-slot=scroll-area-thumb]]:bg-border h-full
         [&_[data-slot=scroll-area-scrollbar]]:w-2.5"
     >
-      <div className="mx-auto flex max-w-[840px] flex-col gap-3 space-y-0 py-0 pt-8">
+      <div
+        className="mx-auto flex w-full max-w-[840px] flex-col gap-3 space-y-0 py-0 pt-8"
+      >
         {/* User Message Skeleton */}
         <div className="group w-full rounded-md bg-transparent px-3.5 py-2.5">
           <div className="ml-auto w-fit max-w-[465px]">

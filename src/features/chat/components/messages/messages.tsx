@@ -1,9 +1,9 @@
 import { MessageSquareX } from 'lucide-react';
 import { useRef, memo, useEffect } from 'react';
 import { useChatsStore } from '../../stores/chats.store';
-import SelectionPopup from '../selection-popup/selection-popup';
-import AIMessage from './ai-message';
-import UserMessage from './user-message';
+import AIMessage from './components/ai-message/ai-message';
+import UserMessage from './components/user-message/user-message';
+import SelectionPopup from './selection-popup';
 import { ScrollArea } from '@components/ui/scroll-area';
 import { useGlobalSelectionDetection } from '@features/chat/hooks/use-global-selection-detection';
 import { useSelectionStore } from '@features/chat/stores/selection.store';

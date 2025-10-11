@@ -1,7 +1,7 @@
 import { FilePlus, GitBranchPlus, GitCommitVertical, Glasses } from 'lucide-react';
 import { memo } from 'react';
-import { createNestedChatAndOpenSplitScreen } from '../../../../actions/chat.actions';
 import QuickActionButton from './quick-action-button';
+import { createNestedChatAndOpenSplitScreen } from '@actions/chat.actions';
 
 type Props = {
   chatId: string;

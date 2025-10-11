@@ -1,11 +1,11 @@
 import { GitMerge, Link2Off, Link2 } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { useTheme } from '../../../../app/providers/theme-provider';
-import { useChatsStore } from '../../stores/chats.store';
+import { useTheme } from '@app/providers/theme-provider';
 import { Button } from '@components/ui/button';
 import { ThemedSpan } from '@components/ui/themed-span';
 import { AppRoutes, SearchParams } from '@constants/paths';
+import { useChatsStore } from '@features/chat/stores/chats.store';
 import { cn } from '@utils/cn';
 
 type Props = {

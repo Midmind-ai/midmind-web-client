@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { components } from '../../../../generated/api-types-new';
+import { detectDraftChanges } from '../utils/draft-utils';
 import type { AttachmentProgress } from '@features/chat/types/chat-types';
 import { ChatsService } from '@services/chats/chats-service';
 
@@ -29,11 +30,15 @@ export const useDraftAutoSave = ({
   attachments,
   replyContext,
   isStreaming,
-  debounceMs = 1500,
+  debounceMs = 1000,
 }: UseDraftAutoSaveParams) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const previousStateRef = useRef({ content, attachments, replyContext });
-  const isInitializedRef = useRef(false);
+  const isMountedRef = useRef(false);
+  const previousStateRef = useRef<{
+    content: string;
+    attachments: AttachmentProgress[];
+    replyContext: components['schemas']['ReplyToDto'] | null | undefined;
+  }>({ content: '', attachments: [], replyContext: null });
 
   const saveDraft = useCallback(async () => {
     if (!chatId || isStreaming) return;
@@ -56,39 +61,29 @@ export const useDraftAutoSave = ({
   }, [chatId, content, attachments, replyContext, isStreaming]);
 
   useEffect(() => {
-    // Don't auto-save if no chatId or currently streaming
-    if (!chatId || isStreaming) return;
-
-    // Check if state actually changed
-    const prev = previousStateRef.current;
-
-    // Check reply context changes (handles null, undefined, and object changes)
-    const replyContextChanged =
-      (replyContext === null || replyContext === undefined) !==
-        (prev.replyContext === null || prev.replyContext === undefined) ||
-      replyContext?.id !== prev.replyContext?.id ||
-      replyContext?.content !== prev.replyContext?.content;
-
-    const hasChanged =
-      content !== prev.content ||
-      attachments.length !== prev.attachments.length ||
-      attachments.some((att, i) => att.id !== prev.attachments[i]?.id) ||
-      replyContextChanged;
-
-    // Update previous state
-    previousStateRef.current = { content, attachments, replyContext };
-
-    // Skip auto-save until after initial draft load and first user change
-    if (!isInitializedRef.current) {
-      // Mark as initialized after first state change
-      if (hasChanged) {
-        isInitializedRef.current = true;
-      }
+    // Skip the very first effect run (component mount)
+    // This prevents saving when draft is initially loaded from backend
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      previousStateRef.current = { content, attachments, replyContext };
 
       return;
     }
 
-    if (!hasChanged) return;
+    // Don't auto-save if no chatId or currently streaming
+    if (!chatId || isStreaming) return;
+
+    // Check if state actually changed using pure function
+    const changes = detectDraftChanges(
+      { content, attachments, replyContext },
+      previousStateRef.current
+    );
+
+    // Update previous state
+    previousStateRef.current = { content, attachments, replyContext };
+
+    // If nothing changed, don't trigger save
+    if (!changes.hasAnyChange) return;
 
     // Clear existing timeout
     if (timeoutRef.current) {

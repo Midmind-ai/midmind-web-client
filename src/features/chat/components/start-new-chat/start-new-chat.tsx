@@ -1,4 +1,4 @@
-import { createChatSendMessageAndNavigate } from '../../../../actions/chat.actions';
+import { createChatSendMessageAndNavigate } from '@actions/chat.actions';
 import { ThemedH1 } from '@components/ui/themed-h1';
 import ChatInput from '@features/chat/components/chat-input/chat-input';
 import type { AIModel, ChatMessage } from '@shared-types/entities';

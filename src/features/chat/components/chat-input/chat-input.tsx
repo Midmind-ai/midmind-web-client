@@ -1,11 +1,11 @@
 import { PaperclipIcon, SendHorizonal, SquareStopIcon } from 'lucide-react';
 import { useState, useRef, useEffect, memo } from 'react';
-import MessageReply from './message-reply';
-import ModelSelector from './model-selector';
+import GlobalFileDropZone from './components/global-file-drop-zone';
+import ImageUploadProgress from './components/image-upload-progress';
+import MessageReply from './components/message-reply';
+import ModelSelector from './components/model-selector';
 import { Button } from '@components/ui/button';
 import { Textarea } from '@components/ui/textarea';
-import GlobalFileDropZone from '@features/chat/components/global-file-drop-zone/global-file-drop-zone';
-import ImageUploadProgress from '@features/chat/components/image-upload-progress/image-upload-progress';
 import { useDraftAutoSave } from '@features/chat/hooks/use-draft-autosave';
 import { useDraftMessageLoader } from '@features/chat/hooks/use-draft-message-loader';
 import { useFileUpload } from '@features/chat/hooks/use-file-upload';

@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import MessageReply from '../chat-input/message-reply';
-import ImageWithFallback from './image-with-fallback';
+import ImageWithFallback from './components/image-with-fallback';
+import MessageReply from './components/message-reply';
 import { ThemedP } from '@components/ui/themed-p';
 import { useModalOperations } from '@hooks/logic/use-modal-operations';
 import type { ChatMessage } from '@shared-types/entities';

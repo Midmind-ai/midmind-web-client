@@ -6,10 +6,9 @@ import {
 } from '@radix-ui/react-collapsible';
 import { ChevronRight } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { updateNoteName } from '../../../../../actions/note.actions';
-import { cn } from '../../../../../utils/cn';
 import { useDragStateStore } from '../../../stores/drag-state.store';
 import type { PositionAwareCollisionData } from '../../../utils/position-aware-collision-detection';
+import { updateNoteName } from '@actions/note.actions';
 import { EntityActionsMenu } from '@components/misc/entity-actions/components/entity-actions-menu';
 import EditableText from '@components/ui/editable-text';
 import { SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar';
@@ -31,6 +30,7 @@ import {
 } from '@features/file-system/utils/item-helpers';
 import { ItemTypeEnum } from '@services/items/items-dtos';
 import { useMenuStateStore } from '@stores/menu-state.store';
+import { cn } from '@utils/cn';
 
 type Props = {
   node: Item;

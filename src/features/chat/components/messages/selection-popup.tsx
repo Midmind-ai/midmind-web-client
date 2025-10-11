@@ -1,7 +1,7 @@
 import { GitBranch, Copy, Link2Off, Clock, Reply } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { createNestedChatAndOpenSplitScreen } from '../../../../actions/chat.actions';
+import { createNestedChatAndOpenSplitScreen } from '@actions/chat.actions';
 import { Button } from '@components/ui/button';
 import { useChatsStore } from '@features/chat/stores/chats.store';
 import { useSelectionStore } from '@features/chat/stores/selection.store';

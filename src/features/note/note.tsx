@@ -1,9 +1,9 @@
-import { updateNoteName } from '../../actions/note.actions';
 import { NoteEditor } from './components/note-editor/note-editor';
 import { NoteHeader } from './components/note-header/note-header';
 import { NoteSkeleton } from './components/note-skeleton';
 import { useNoteAutosave } from './hooks/use-note-autosave';
 import { useNotesStore } from './stores/notes.store';
+import { updateNoteName } from '@actions/note.actions';
 import { ScrollArea } from '@components/ui/scroll-area';
 
 interface NotePageProps {

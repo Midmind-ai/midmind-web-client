@@ -1,8 +1,8 @@
 import { memo } from 'react';
-import Branches from '../branches/branches';
-import ReactMarkdown from '../markdown/react-markdown';
-import QuickActions from '../quick-actions/quick-actions';
-import TypingDots from './typing-dots';
+import Branches from './components/branches/branches';
+import Markdown from './components/markdown';
+import QuickActions from './components/quick-actions/quick-actions';
+import TypingDots from './components/typing-dots';
 import { AI_MODELS } from '@constants/ai-models';
 import { useTextHighlight } from '@features/chat/hooks/use-text-highlight';
 import { openChatInSidePanel } from '@hooks/use-split-screen-actions';
@@ -68,7 +68,7 @@ const AIMessage = ({
             data-message-id={id}
             className="pb-0 text-base leading-relaxed font-light"
           >
-            <ReactMarkdown content={content || ''} />
+            <Markdown content={content || ''} />
           </div>
           <Branches
             chatId={chatId}
