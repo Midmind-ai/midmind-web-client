@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { components } from '../../../../generated/api-types-new';
 import { detectDraftChanges } from '../utils/draft-utils';
 import type { AttachmentProgress } from '@features/chat/types/chat-types';
 import { ChatsService } from '@services/chats/chats-service';
@@ -8,7 +7,7 @@ interface UseDraftAutoSaveParams {
   chatId: string | undefined;
   content: string;
   attachments: AttachmentProgress[];
-  replyContext: components['schemas']['ReplyToDto'] | null | undefined;
+  replyContext: { id: string; content: string } | null | undefined;
   isStreaming: boolean;
   debounceMs?: number;
 }
@@ -37,20 +36,16 @@ export const useDraftAutoSave = ({
   const previousStateRef = useRef<{
     content: string;
     attachments: AttachmentProgress[];
-    replyContext: components['schemas']['ReplyToDto'] | null | undefined;
+    replyContext: { id: string; content: string } | null | undefined;
   }>({ content: '', attachments: [], replyContext: null });
 
   const saveDraft = useCallback(async () => {
     if (!chatId || isStreaming) return;
 
     try {
-      // Extract attachment IDs (only uploaded ones)
-      const attachmentIds = attachments.filter(att => att.id).map(att => att.id);
-
       // Save draft to backend
       await ChatsService.updateDraftMessage(chatId, {
         content,
-        attachments: attachmentIds.length > 0 ? attachmentIds : null,
         reply_to_message_id: replyContext?.id || null,
         reply_content: replyContext?.content || null,
       });
@@ -58,7 +53,7 @@ export const useDraftAutoSave = ({
       console.error('Failed to save draft:', error);
       // Don't throw - auto-save should be silent
     }
-  }, [chatId, content, attachments, replyContext, isStreaming]);
+  }, [chatId, content, replyContext, isStreaming]);
 
   useEffect(() => {
     // Skip the very first effect run (component mount)
@@ -112,10 +107,8 @@ export const useDraftAutoSave = ({
         clearTimeout(timeoutRef.current);
 
         // Inline save to avoid dependency issues
-        const attachmentIds = attachments.filter(att => att.id).map(att => att.id);
         ChatsService.updateDraftMessage(chatId, {
           content,
-          attachments: attachmentIds.length > 0 ? attachmentIds : null,
           reply_to_message_id: replyContext?.id || null,
           reply_content: replyContext?.content || null,
         }).catch(err => console.error('Failed to save draft on unmount:', err));

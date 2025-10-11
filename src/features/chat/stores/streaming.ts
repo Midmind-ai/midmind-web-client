@@ -26,9 +26,9 @@ export const createOptimisticUserMessage = (params: {
   role: 'user',
   created_at: new Date().toISOString(),
   llm_model: params.model as ChatMessage['llm_model'],
-  is_draft: false,
-  nested_chats: [],
+  reply_to_message_id: null,
   reply_content: params.replyContext?.content || null,
+  nested_chats: [],
   attachments: params.attachments,
 });
 
@@ -47,9 +47,9 @@ export const createOptimisticAIMessage = (params: {
   role: 'model',
   created_at: new Date().toISOString(),
   llm_model: params.model as ChatMessage['llm_model'],
-  is_draft: false,
-  nested_chats: [],
+  reply_to_message_id: null,
   reply_content: null,
+  nested_chats: [],
   attachments: [],
 });
 

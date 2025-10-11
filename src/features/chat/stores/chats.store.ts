@@ -57,6 +57,29 @@ const enrichMessage = (msg: components['schemas']['MessageResponse']): ChatMessa
   };
 };
 
+/**
+ * Helper to convert MessageDraftResponse to ChatMessage-like structure
+ * Drafts don't have all message fields, so we provide defaults
+ */
+const enrichDraft = (
+  draft: components['schemas']['MessageDraftResponse'],
+  chatId: string
+): ChatMessage => {
+  return {
+    id: `draft-${chatId}`, // Synthetic ID for draft
+    chat_id: draft.chat_id,
+    user_id: null, // Drafts don't have user_id in response
+    content: draft.content,
+    role: 'user' as const,
+    llm_model: null,
+    reply_to_message_id: draft.reply_to_message_id ?? null,
+    reply_content: draft.reply_content ?? null,
+    created_at: draft.updated_at, // Use updated_at as created_at
+    nested_chats: [],
+    attachments: [],
+  };
+};
+
 // UI State types
 export interface ChatState {
   chat: Chat | null;
@@ -71,7 +94,7 @@ export interface ChatState {
   hasMoreMessages: boolean;
   currentPage: number;
   abortController: AbortController | null;
-  replyContext: components['schemas']['ReplyToDto'] | null;
+  replyContext: { id: string; content: string } | null;
 }
 
 export interface ChatsStoreState extends ChatBranchesSlice {
@@ -226,7 +249,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           try {
             const draftMessage = await ChatsService.getDraftMessage(chatId);
 
-            const enrichedDraft = enrichMessage(draftMessage);
+            const enrichedDraft = enrichDraft(draftMessage, chatId);
 
             // Extract reply context from draft if exists
             const replyContext =
@@ -386,7 +409,10 @@ export const useChatsStore = create<ChatsStoreState>()(
               id: userMessageId,
               content,
               model,
-              ...(replyContext && { reply_to: replyContext }),
+              ...(replyContext && {
+                reply_to_message_id: replyContext.id,
+                reply_content: replyContext.content,
+              }),
               ...(attachments.length > 0 && {
                 attachments: attachments.map(att => att.id),
               }),

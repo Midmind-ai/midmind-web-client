@@ -1,11 +1,5 @@
 import type { components } from 'generated/api-types-new';
 
-// Temporary types until backend is updated
-export type ReplyToDto = {
-  id: string;
-  content: string;
-};
-
 export type UpdateChatDetailsRequestDto = {
   name?: string;
 };
@@ -34,18 +28,18 @@ export type MessageAttachment = {
   original_filename: string;
 };
 
-// Message DTOs - using new API types
-export type SendMessageRequest = components['schemas']['SendMessageRequest'] & {
-  model?: string;
-  reply_to?: ReplyToDto;
-  attachments?: string[];
-};
+// Message DTOs - using generated API types with extensions
+export type SendMessageRequest = components['schemas']['SendMessageRequest'];
 
 // Temporary extension until backend adds these fields to MessageResponse
 export type MessageResponse = components['schemas']['MessageResponse'] & {
-  reply_content: string | null;
   nested_chats: MessageNestedChat[];
   attachments: MessageAttachment[];
 };
 
 export type MessageListResponse = components['schemas']['MessageListResponse'];
+
+// Draft message types - using generated API types
+export type MessageDraftResponse = components['schemas']['MessageDraftResponse'];
+export type UpdateMessageDraftRequest =
+  components['schemas']['UpdateMessageDraftRequest'];

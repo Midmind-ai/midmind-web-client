@@ -375,9 +375,9 @@ export interface paths {
          *
          *     This endpoint:
          *     1. Verifies the chat exists and user has access
-         *     2. Saves the user's message
-         *     3. Generates a mock assistant response (will be LLM later)
-         *     4. Streams both messages as SSE events
+         *     2. Saves the user's message (with optional reply context)
+         *     3. Generates assistant response using LLM
+         *     4. Streams response chunks as SSE events
          *
          *     Returns:
          *         SSE stream with message events and [DONE] marker
@@ -425,33 +425,40 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Chat Draft Message
-         * @description Get the draft message for a chat.
+         * Get Chat Message Draft
+         * @description Get the message draft for a chat.
          *
-         *     If no draft message exists, creates a new empty draft message.
+         *     If no draft exists, creates a new empty draft (fallback).
+         *     In normal flow, draft should always exist (created with chat).
          *
          *     Args:
          *         chat_id: ID of the chat
          *
          *     Returns:
-         *         The draft message (existing or newly created)
-         */
-        get: operations["get_chat_draft_message_api_v1_chats__chat_id__message_draft_get"];
-        /**
-         * Update Chat Draft Message
-         * @description Update the draft message for a chat.
+         *         MessageDraftResponse with draft content
          *
-         *     If no draft exists, creates a new one.
+         *     Raises:
+         *         HTTPException 404: If chat not found
+         */
+        get: operations["get_chat_message_draft_api_v1_chats__chat_id__message_draft_get"];
+        /**
+         * Update Chat Message Draft
+         * @description Update the message draft for a chat.
+         *
+         *     Creates draft if it doesn't exist (fallback), updates if it does.
          *     This endpoint is used for auto-saving draft content as user types.
          *
          *     Args:
          *         chat_id: ID of the chat
-         *         request: Draft content, attachments, and reply context
+         *         request: Draft content and optional reply context
          *
          *     Returns:
-         *         Updated draft message
+         *         MessageDraftResponse with updated draft content
+         *
+         *     Raises:
+         *         HTTPException 404: If chat not found
          */
-        put: operations["update_chat_draft_message_api_v1_chats__chat_id__message_draft_put"];
+        put: operations["update_chat_message_draft_api_v1_chats__chat_id__message_draft_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -763,6 +770,38 @@ export interface components {
          * @enum {string}
          */
         LLModel: "gemini-2.0-flash-lite" | "gemini-2.0-flash" | "gemini-2.5-flash" | "gemini-2.5-pro";
+        /**
+         * MessageDraftResponse
+         * @description Response model for a message draft.
+         */
+        MessageDraftResponse: {
+            /**
+             * Chat Id
+             * @description ID of the chat
+             */
+            chat_id: string;
+            /**
+             * Content
+             * @description Draft message content
+             */
+            content: string;
+            /**
+             * Reply To Message Id
+             * @description ID of message being replied to
+             */
+            reply_to_message_id?: string | null;
+            /**
+             * Reply Content
+             * @description Content of message being replied to
+             */
+            reply_content?: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             * @description Last update timestamp
+             */
+            updated_at: string;
+        };
         /** MessageDto */
         MessageDto: {
             /** Message */
@@ -793,11 +832,6 @@ export interface components {
             content: string;
             role: components["schemas"]["MessageSenderRole"];
             llm_model: components["schemas"]["LLModel"] | null;
-            /**
-             * Is Draft
-             * @default false
-             */
-            is_draft: boolean;
             /** Reply To Message Id */
             reply_to_message_id?: string | null;
             /** Reply Content */
@@ -947,22 +981,6 @@ export interface components {
             }[];
         };
         /**
-         * ReplyToDto
-         * @description Reply-to message reference.
-         */
-        ReplyToDto: {
-            /**
-             * Id
-             * @description ID of the message being replied to
-             */
-            id: string;
-            /**
-             * Content
-             * @description Content of the message being replied to
-             */
-            content: string;
-        };
-        /**
          * SendMessageRequest
          * @description Request body for sending a message.
          */
@@ -982,8 +1000,16 @@ export interface components {
              * @default gemini-2.0-flash-lite
              */
             model: components["schemas"]["LLModel"];
-            /** @description Message being replied to */
-            reply_to?: components["schemas"]["ReplyToDto"] | null;
+            /**
+             * Reply To Message Id
+             * @description ID of the message being replied to
+             */
+            reply_to_message_id?: string | null;
+            /**
+             * Reply Content
+             * @description Content of the message being replied to
+             */
+            reply_content?: string | null;
             /**
              * Attachments
              * @description List of attachment IDs
@@ -1022,20 +1048,15 @@ export interface components {
             confirmation_password: string;
         };
         /**
-         * UpdateDraftMessageRequest
-         * @description Request body for updating draft message.
+         * UpdateMessageDraftRequest
+         * @description Request body for updating message draft.
          */
-        UpdateDraftMessageRequest: {
+        UpdateMessageDraftRequest: {
             /**
              * Content
              * @description Draft message content
              */
             content: string;
-            /**
-             * Attachments
-             * @description List of attachment IDs
-             */
-            attachments?: string[] | null;
             /**
              * Reply To Message Id
              * @description ID of the message being replied to
@@ -1851,7 +1872,7 @@ export interface operations {
             };
         };
     };
-    get_chat_draft_message_api_v1_chats__chat_id__message_draft_get: {
+    get_chat_message_draft_api_v1_chats__chat_id__message_draft_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1868,7 +1889,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MessageResponse"];
+                    "application/json": components["schemas"]["MessageDraftResponse"];
                 };
             };
             /** @description Validation Error */
@@ -1882,7 +1903,7 @@ export interface operations {
             };
         };
     };
-    update_chat_draft_message_api_v1_chats__chat_id__message_draft_put: {
+    update_chat_message_draft_api_v1_chats__chat_id__message_draft_put: {
         parameters: {
             query?: never;
             header?: never;
@@ -1893,7 +1914,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateDraftMessageRequest"];
+                "application/json": components["schemas"]["UpdateMessageDraftRequest"];
             };
         };
         responses: {
@@ -1903,7 +1924,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MessageResponse"];
+                    "application/json": components["schemas"]["MessageDraftResponse"];
                 };
             };
             /** @description Validation Error */
