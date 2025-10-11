@@ -1,6 +1,13 @@
+import type { components } from '../../../generated/api-types-new';
 import type { SSEEvent } from './sse-events';
 import { baseAxiosInstance, getAuthHeaders } from '@config/axios';
-import type { SendMessageRequest, MessageListResponse } from '@services/chats/chats-dtos';
+import type {
+  SendMessageRequest,
+  MessageListResponse,
+  MessageResponse,
+} from '@services/chats/chats-dtos';
+
+type UpdateDraftMessageRequest = components['schemas']['UpdateDraftMessageRequest'];
 
 export class ChatsService {
   static async sendMessage(
@@ -68,6 +75,26 @@ export class ChatsService {
     const { data } = await baseAxiosInstance.get<MessageListResponse>(
       `/chats/${chatId}/messages`,
       { params }
+    );
+
+    return data;
+  }
+
+  static async getDraftMessage(chatId: string): Promise<MessageResponse> {
+    const { data } = await baseAxiosInstance.get<MessageResponse>(
+      `/chats/${chatId}/message-draft`
+    );
+
+    return data;
+  }
+
+  static async updateDraftMessage(
+    chatId: string,
+    request: UpdateDraftMessageRequest
+  ): Promise<MessageResponse> {
+    const { data } = await baseAxiosInstance.put<MessageResponse>(
+      `/chats/${chatId}/message-draft`,
+      request
     );
 
     return data;

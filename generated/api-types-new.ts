@@ -417,6 +417,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chats/{chat_id}/message-draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Chat Draft Message
+         * @description Get the draft message for a chat.
+         *
+         *     If no draft message exists, creates a new empty draft message.
+         *
+         *     Args:
+         *         chat_id: ID of the chat
+         *
+         *     Returns:
+         *         The draft message (existing or newly created)
+         */
+        get: operations["get_chat_draft_message_api_v1_chats__chat_id__message_draft_get"];
+        /**
+         * Update Chat Draft Message
+         * @description Update the draft message for a chat.
+         *
+         *     If no draft exists, creates a new one.
+         *     This endpoint is used for auto-saving draft content as user types.
+         *
+         *     Args:
+         *         chat_id: ID of the chat
+         *         request: Draft content, attachments, and reply context
+         *
+         *     Returns:
+         *         Updated draft message
+         */
+        put: operations["update_chat_draft_message_api_v1_chats__chat_id__message_draft_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notes/{note_id}": {
         parameters: {
             query?: never;
@@ -720,7 +762,7 @@ export interface components {
          * @description LLM model types - using real Gemini models.
          * @enum {string}
          */
-        LLModel: "gemini-pro" | "gemini-1.5-pro" | "gemini-1.5-flash" | "mock";
+        LLModel: "gemini-2.0-flash-lite" | "gemini-2.0-flash" | "gemini-2.5-flash" | "gemini-2.5-pro";
         /** MessageDto */
         MessageDto: {
             /** Message */
@@ -751,6 +793,15 @@ export interface components {
             content: string;
             role: components["schemas"]["MessageSenderRole"];
             llm_model: components["schemas"]["LLModel"] | null;
+            /**
+             * Is Draft
+             * @default false
+             */
+            is_draft: boolean;
+            /** Reply To Message Id */
+            reply_to_message_id?: string | null;
+            /** Reply Content */
+            reply_content?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -896,6 +947,22 @@ export interface components {
             }[];
         };
         /**
+         * ReplyToDto
+         * @description Reply-to message reference.
+         */
+        ReplyToDto: {
+            /**
+             * Id
+             * @description ID of the message being replied to
+             */
+            id: string;
+            /**
+             * Content
+             * @description Content of the message being replied to
+             */
+            content: string;
+        };
+        /**
          * SendMessageRequest
          * @description Request body for sending a message.
          */
@@ -910,6 +977,18 @@ export interface components {
              * @description Message content
              */
             content: string;
+            /**
+             * @description LLM model to use for response
+             * @default gemini-2.0-flash-lite
+             */
+            model: components["schemas"]["LLModel"];
+            /** @description Message being replied to */
+            reply_to?: components["schemas"]["ReplyToDto"] | null;
+            /**
+             * Attachments
+             * @description List of attachment IDs
+             */
+            attachments?: string[] | null;
         };
         /** SignInDto */
         SignInDto: {
@@ -941,6 +1020,32 @@ export interface components {
             password: string;
             /** Confirmation Password */
             confirmation_password: string;
+        };
+        /**
+         * UpdateDraftMessageRequest
+         * @description Request body for updating draft message.
+         */
+        UpdateDraftMessageRequest: {
+            /**
+             * Content
+             * @description Draft message content
+             */
+            content: string;
+            /**
+             * Attachments
+             * @description List of attachment IDs
+             */
+            attachments?: string[] | null;
+            /**
+             * Reply To Message Id
+             * @description ID of the message being replied to
+             */
+            reply_to_message_id?: string | null;
+            /**
+             * Reply Content
+             * @description Content of the message being replied to
+             */
+            reply_content?: string | null;
         };
         /**
          * UpdateNoteRequest
@@ -1733,6 +1838,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessageListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_chat_draft_message_api_v1_chats__chat_id__message_draft_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_chat_draft_message_api_v1_chats__chat_id__message_draft_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDraftMessageRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
                 };
             };
             /** @description Validation Error */

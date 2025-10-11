@@ -25,6 +25,7 @@ const DEFAULT_MODEL = AI_MODELS.GEMINI_2_0_FLASH_LITE.id;
 const getInitialChatState = (): ChatState => ({
   chat: null,
   messages: [],
+  draftMessage: null,
   attachments: [],
   isLoadingChat: false,
   isLoadingMessages: false,
@@ -41,6 +42,7 @@ const getInitialChatState = (): ChatState => ({
 export interface ChatState {
   chat: Chat | null;
   messages: ChatMessage[];
+  draftMessage: ChatMessage | null;
   attachments: GetFileResponseDto[];
   isLoadingChat: boolean;
   isLoadingMessages: boolean;
@@ -67,6 +69,7 @@ export interface ChatsStoreState {
   ) => void;
   loadChat: (chatId: string) => Promise<void>;
   loadMessages: (chatId: string) => Promise<void>;
+  loadDraftMessage: (chatId: string) => Promise<void>;
   loadMoreMessages: (chatId: string) => Promise<void>;
   sendMessage: (
     chatId: string,
@@ -117,6 +120,7 @@ export const useChatsStore = create<ChatsStoreState>()(
 
         useChatsStore.getState().initChat(chatId);
         useChatsStore.getState().loadMessages(chatId);
+        useChatsStore.getState().loadDraftMessage(chatId);
       },
 
       // Initialize chat if not exists
@@ -240,6 +244,65 @@ export const useChatsStore = create<ChatsStoreState>()(
         }
       },
 
+      // Load draft message
+      loadDraftMessage: async (chatId: string) => {
+        get().initChat(chatId);
+
+        try {
+          const draftMessage = await ChatsService.getDraftMessage(chatId);
+
+          // Add default values for fields that backend doesn't populate yet
+          const enrichedDraft: ChatMessage = {
+            ...draftMessage,
+            nested_chats: [],
+            attachments: draftMessage.attachments || [],
+          };
+
+          // Extract reply context from draft if exists
+          const replyContext =
+            draftMessage.reply_to_message_id && draftMessage.reply_content
+              ? {
+                  id: draftMessage.reply_to_message_id,
+                  content: draftMessage.reply_content,
+                }
+              : null;
+
+          set(state => ({
+            chats: {
+              ...state.chats,
+              [chatId]: {
+                ...state.chats[chatId],
+                draftMessage: enrichedDraft,
+                replyContext,
+              },
+            },
+          }));
+
+          // If draft has content and attachments, load the attachment files
+          if (
+            draftMessage.content &&
+            draftMessage.content.trim() !== '' &&
+            enrichedDraft.attachments.length > 0
+          ) {
+            const draftAttachments = await get().loadAttachments([enrichedDraft]);
+
+            // Replace attachments in store with draft attachments
+            set(state => ({
+              chats: {
+                ...state.chats,
+                [chatId]: {
+                  ...state.chats[chatId],
+                  attachments: draftAttachments,
+                },
+              },
+            }));
+          }
+        } catch (error) {
+          // Silently fail - draft message is optional
+          console.error('Failed to load draft message:', error);
+        }
+      },
+
       // Load attachments
       loadAttachments: async (messages: ChatMessage[]) => {
         const fileIds = messages.flatMap(message =>
@@ -341,6 +404,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           role: 'user',
           created_at: new Date().toISOString(),
           llm_model: model as ChatMessage['llm_model'],
+          is_draft: false,
           nested_chats: [],
           reply_content: replyContext?.content || null,
           attachments: attachments,
@@ -355,6 +419,7 @@ export const useChatsStore = create<ChatsStoreState>()(
           role: 'model',
           created_at: new Date().toISOString(),
           llm_model: model as ChatMessage['llm_model'],
+          is_draft: false,
           nested_chats: [],
           reply_content: null,
           attachments: [],

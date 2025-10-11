@@ -1,5 +1,6 @@
 import type { MessageResponse, MessageNestedChat } from '@services/chats/chats-dtos';
 import type { components } from 'generated/api-types';
+import type { components as componentsNew } from 'generated/api-types-new';
 
 export type User = components['schemas']['UserDto'];
 
@@ -34,8 +35,8 @@ export type StreamChunk = components['schemas']['CreateConversationResponseConte
 // Request types - keeping old for now
 export type SendMessageRequest = components['schemas']['CreateConversationDto'];
 
-// AI Model type - define temporarily until new API has it
-export type AIModel = string;
+// AI Model type - use LLModel enum from new generated API types
+export type AIModel = componentsNew['schemas']['LLModel'];
 
 export type TreeItem = {
   id: string;

@@ -8,9 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --cache --fix --max-warnings 0",
     "types:check": "tsc -b --noEmit",
-    "types:generate": "openapi-typescript https://midmind-server-develop.up.railway.app/api-json -o generated/api-types.ts",
-    "types:generate:dev": "openapi-typescript http://localhost:3001/api-json -o generated/api-types.ts",
-    "types:generate:python": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o generated/api-types-new.ts",
+    "types:generate": "openapi-typescript http://localhost:8000/api/v1/openapi.json -o generated/api-types-new.ts",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "prepare": "husky"
